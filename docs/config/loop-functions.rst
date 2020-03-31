@@ -9,9 +9,10 @@ The following root XML tags are defined under ``<loop_functions>`` in addition t
 | ``caches``             | Depth1, depth2 controllers | Parameters for the use of caches in the arena.                                                                               |
 +------------------------+----------------------------+------------------------------------------------------------------------------------------------------------------------------+
 
-Any of the attributes can be added under the ``metrics`` tag in place of one of
-the ``<...>`` above. Not defining them disables metric collection of the given
-type.
+Any of the following attributes can be added under the ``metrics`` tag in place
+of one of the ``<append>,<create>,<truncate>`` tags, in addition to the ones
+specified in :xref:`COSM`. Not defining them disables metric collection of the
+given type.
 
 +------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
 | XML attribute                                  | Description                                                                   | Additional Notes                                 |

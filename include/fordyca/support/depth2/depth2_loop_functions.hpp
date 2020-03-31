@@ -28,8 +28,6 @@
 #include <memory>
 
 #include "fordyca/support/depth1/depth1_loop_functions.hpp"
-#include "fordyca/support/robot_los_updater.hpp"
-#include "fordyca/support/robot_metric_extractor.hpp"
 #include "fordyca/support/robot_task_extractor.hpp"
 
 /*******************************************************************************
@@ -84,20 +82,20 @@ class depth2_loop_functions final : public depth1::depth1_loop_functions,
                                robot_arena_interactor>::type>;
   using los_updater_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth2::typelist,
-                                robot_los_updater>::type>;
+                              cfops::robot_los_update>::type>;
   using task_extractor_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth2::typelist,
                                 robot_task_extractor>::type>;
 
   using metric_extractor_typelist = rmpl::typelist<
-    robot_metric_extractor<depth2_metrics_aggregator,
-                           controller::depth2::birtd_dpo_controller>,
-    robot_metric_extractor<depth2_metrics_aggregator,
-                           controller::depth2::birtd_odpo_controller>,
-    robot_metric_extractor<depth2_metrics_aggregator,
-                           controller::depth2::birtd_mdpo_controller>,
-    robot_metric_extractor<depth2_metrics_aggregator,
-                           controller::depth2::birtd_omdpo_controller>
+    ccops::metrics_extract<controller::depth2::birtd_dpo_controller,
+                           depth2_metrics_aggregator>,
+    ccops::metrics_extract<controller::depth2::birtd_odpo_controller,
+                           depth2_metrics_aggregator>,
+    ccops::metrics_extract<controller::depth2::birtd_mdpo_controller,
+                           depth2_metrics_aggregator>,
+    ccops::metrics_extract<controller::depth2::birtd_omdpo_controller,
+                           depth2_metrics_aggregator>
     >;
   using metric_extractor_map_type = rds::type_map<metric_extractor_typelist>;
 

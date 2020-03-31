@@ -21,10 +21,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Woverloaded-virtual"
+#include "rcppsw/common/common.hpp"
+
+RCPPSW_WARNING_DISABLE_PUSH()
+RCPPSW_WARNING_DISABLE_OVERLOADED_VIRTUAL()
 #include "fordyca/support/depth1/depth1_qt_user_functions.hpp"
-#pragma GCC diagnostic pop
+RCPPSW_WARNING_DISABLE_POP()
 #include "cosm/vis/task_visualizer.hpp"
 
 #include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
@@ -60,12 +62,14 @@ void depth1_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
 }
 
 using namespace argos; // NOLINT
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wglobal-constructors"
-#pragma clang diagnostic ignored "-Wmissing-prototypes"
-#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+
+RCPPSW_WARNING_DISABLE_PUSH()
+RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
+RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
+RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
+
 REGISTER_QTOPENGL_USER_FUNCTIONS(depth1_qt_user_functions,
                                  "depth1_qt_user_functions");
-#pragma clang diagnostic pop
+RCPPSW_WARNING_DISABLE_POP()
 
 NS_END(support, fordyca, depth1);

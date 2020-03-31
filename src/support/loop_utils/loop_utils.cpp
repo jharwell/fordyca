@@ -26,9 +26,6 @@
 #include "cosm/arena/base_arena_map.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
 
-#include "fordyca/controller/foraging_controller.hpp"
-#include "fordyca/repr/line_of_sight.hpp"
-
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -37,26 +34,8 @@ NS_START(fordyca, support, utils);
 /*******************************************************************************
  * Functions
  ******************************************************************************/
-placement_status_t placement_conflict(const rmath::vector2d& ent1_loc,
-                                      const rmath::vector2d& ent1_dims,
-                                      const crepr::entity2D* const entity) {
-  auto loc_xspan = crepr::entity2D::xspan(ent1_loc, ent1_dims.x());
-  auto loc_yspan = crepr::entity2D::yspan(ent1_loc, ent1_dims.y());
-  return placement_status_t{entity->xspan().overlaps_with(loc_xspan),
-                            entity->yspan().overlaps_with(loc_yspan)};
-} /* placement_conflict() */
-
-std::unique_ptr<repr::line_of_sight> compute_robot_los(
-    const carena::base_arena_map& map,
-    uint los_grid_size,
-    const rmath::vector2d& pos) {
-  rmath::vector2u position = rmath::dvec2uvec(pos, map.grid_resolution().v());
-  return std::make_unique<repr::line_of_sight>(
-      map.subgrid(position.x(), position.y(), los_grid_size), position);
-} /* compute_robot_los */
-
 cds::block2D_vectorno free_blocks_calc(const cads::acache_vectoro& all_caches,
-                                        const cds::block2D_vectorno& all_blocks) {
+                                       const cds::block2D_vectorno& all_blocks) {
   cds::block2D_vectorno free_blocks;
   std::copy_if(all_blocks.begin(),
                all_blocks.end(),

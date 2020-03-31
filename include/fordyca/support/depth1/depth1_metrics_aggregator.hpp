@@ -28,7 +28,7 @@
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
 #include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
 #include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
-#include "fordyca/metrics/blocks/manipulation_metrics.hpp"
+#include "cosm/controller/metrics/manipulation_metrics.hpp"
 #include "cosm/fsm/metrics/movement_metrics.hpp"
 #include "cosm/fsm/metrics/collision_metrics.hpp"
 #include "cosm/fsm/metrics/goal_acq_metrics.hpp"
@@ -138,7 +138,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
   template<typename ControllerType>
   void collect_controller_common(const ControllerType* const controller) {
     collect("fsm::movement", *controller);
-    collect("blocks::manipulation", *controller->block_manip_collator());
+    collect("blocks::manipulation", *controller->block_manip_recorder());
 
     auto task = dynamic_cast<const cta::polled_task*>(controller->current_task());
     if (nullptr == task) {

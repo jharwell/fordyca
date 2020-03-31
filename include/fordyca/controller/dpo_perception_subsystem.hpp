@@ -54,7 +54,7 @@ NS_START(controller);
  * \class dpo_perception_subsystem
  * \ingroup controller
  *
- * \brief Translates the sensor readings of the robot (i.e. \ref line_of_sight),
+ * \brief Translates the sensor readings of the robot (i.e. \ref foraging_los),
  * into a useful internal repr: a \ref dpo_store.
  */
 class dpo_perception_subsystem final
@@ -94,15 +94,15 @@ class dpo_perception_subsystem final
    *
    * \param c_los The LOS to process.
    */
-  void process_los(const repr::line_of_sight* c_los,
+  void process_los(const cfrepr::foraging_los* c_los,
                    oracular_info_receptor* receptor);
 
-  void process_los_blocks(const repr::line_of_sight* c_los);
-  void process_los_caches(const repr::line_of_sight* c_los);
+  void process_los_blocks(const cfrepr::foraging_los* c_los);
+  void process_los_caches(const cfrepr::foraging_los* c_los);
 
-  void los_tracking_sync(const repr::line_of_sight* c_los,
+  void los_tracking_sync(const cfrepr::foraging_los* c_los,
                          const cads::bcache_vectorno& los_caches);
-  void los_tracking_sync(const repr::line_of_sight* c_los,
+  void los_tracking_sync(const cfrepr::foraging_los* c_los,
                          const cds::block2D_vectorno& los_blocks);
 
  private:

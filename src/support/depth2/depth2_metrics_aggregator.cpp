@@ -25,6 +25,7 @@
 
 #include <boost/mpl/for_each.hpp>
 
+#include "cosm/metrics/collector_registerer.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tab.hpp"
 #include "cosm/ta/metrics/bi_tab_metrics.hpp"
@@ -35,7 +36,6 @@
 
 #include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
 #include "fordyca/metrics/caches/site_selection_metrics_collector.hpp"
-#include "cosm/metrics/collector_registerer.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth2/foraging_task.hpp"

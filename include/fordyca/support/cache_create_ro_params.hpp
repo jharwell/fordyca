@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include "rcppsw/types/timestep.hpp"
 
-#include "cosm/foraging/ds/block_cluster_vector.hpp"
 #include "cosm/arena/ds/cache_vector.hpp"
+#include "cosm/foraging/ds/block_cluster_vector.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

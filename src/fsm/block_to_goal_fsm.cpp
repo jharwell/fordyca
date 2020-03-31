@@ -28,9 +28,9 @@
 #include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
+#include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
 #include "fordyca/tasks/argument.hpp"
-#include "fordyca/fsm/foraging_acq_goal.hpp"
 
 /*******************************************************************************
  * Namespaces

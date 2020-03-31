@@ -25,24 +25,19 @@
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
-
-#include "rcppsw/algorithm/closest_pair2D.hpp"
-#include "rcppsw/math/vector2.hpp"
-
-#include "cosm/convergence/config/convergence_config.hpp"
-#include "cosm/convergence/convergence_calculator.hpp"
-#include "cosm/arena/config/arena_map_config.hpp"
-#include "cosm/oracle/config/oracle_manager_config.hpp"
-#include "cosm/oracle/oracle_manager.hpp"
-#include "cosm/vis/config/visualization_config.hpp"
 #include "cosm/arena/caching_arena_map.hpp"
+#include "cosm/arena/config/arena_map_config.hpp"
+#include "cosm/pal/argos_convergence_calculator.hpp"
 #include "cosm/metrics/config/output_config.hpp"
+#include "cosm/oracle/config/aggregate_oracle_config.hpp"
+#include "cosm/foraging/oracle/foraging_oracle.hpp"
+#include "cosm/oracle/tasking_oracle.hpp"
 #include "cosm/pal/argos_swarm_iterator.hpp"
+#include "cosm/vis/config/visualization_config.hpp"
 
 #include "fordyca/config/tv/tv_manager_config.hpp"
-#include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/support/tv/fordyca_pd_adaptor.hpp"
 
 /*******************************************************************************
@@ -56,7 +51,8 @@ NS_START(fordyca, support);
 base_loop_functions::base_loop_functions(void)
     : ER_CLIENT_INIT("fordyca.loop.base"),
       m_tv_manager(nullptr),
-      m_conv_calc(nullptr) {}
+      m_conv_calc(nullptr),
+      m_oracle(nullptr) {}
 
 base_loop_functions::~base_loop_functions(void) = default;
 
@@ -91,23 +87,16 @@ void base_loop_functions::init(ticpp::Element& node) {
   tv_init(config()->config_get<config::tv::tv_manager_config>());
 
   /* initialize oracle, if configured */
-  oracle_init(config()->config_get<coconfig::oracle_manager_config>());
+  oracle_init(config()->config_get<coconfig::aggregate_oracle_config>());
 } /* init() */
 
 void base_loop_functions::convergence_init(
-    const cconvergence::config::convergence_config* const config) {
+    const ccconfig::convergence_config* const config) {
   if (nullptr == config) {
     return;
   }
-  m_conv_calc = std::make_unique<cconvergence::convergence_calculator>(
-      config,
-      std::bind(&base_loop_functions::calc_robot_headings,
-                this,
-                std::placeholders::_1),
-      std::bind(&base_loop_functions::calc_robot_nn, this, std::placeholders::_1),
-      std::bind(&base_loop_functions::calc_robot_positions,
-                this,
-                std::placeholders::_1));
+  ER_INFO("Creating convergence calculator");
+  m_conv_calc = std::make_unique<convergence_calculator_type>(config, this);
 } /* convergence_init() */
 
 void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
@@ -119,16 +108,11 @@ void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
    * they are disabled, and trying to figure out how to get things to work if
    * they are omitted is waaayyyy too much work. See #621 too.
    */
-  auto envd =
-      std::make_unique<tv::env_dynamics>(&tvp->env_dynamics,
-                                         this,
-                                         arena_map<carena::caching_arena_map>());
+  auto envd = std::make_unique<tv::env_dynamics>(
+      &tvp->env_dynamics, this, arena_map<carena::caching_arena_map>());
 
-  auto popd = std::make_unique<tv::fordyca_pd_adaptor>(&tvp->population_dynamics,
-                                                       this,
-                                                       arena_map(),
-                                                       envd.get(),
-                                                       rng());
+  auto popd = std::make_unique<tv::fordyca_pd_adaptor>(
+      &tvp->population_dynamics, this, arena_map(), envd.get(), rng());
 
   m_tv_manager =
       std::make_unique<tv::tv_manager>(std::move(envd), std::move(popd));
@@ -139,13 +123,15 @@ void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
    * static ordering, because we use robot ID to create the mapping.
    */
   auto cb = [&](auto* c) {
-    m_tv_manager->dynamics<ctv::dynamics_type::ekENVIRONMENT>()->register_controller(*c);
-    c->irv_init(m_tv_manager->dynamics<ctv::dynamics_type::ekENVIRONMENT>()->rda_adaptor());
+    m_tv_manager->dynamics<ctv::dynamics_type::ekENVIRONMENT>()
+        ->register_controller(*c);
+    c->irv_init(m_tv_manager->dynamics<ctv::dynamics_type::ekENVIRONMENT>()
+                    ->rda_adaptor());
   };
   cpal::argos_swarm_iterator::controllers<argos::CFootBotEntity,
                                           controller::foraging_controller,
                                           cpal::iteration_order::ekSTATIC>(
-                                              this, cb, kARGoSRobotType);
+      this, cb, kARGoSRobotType);
 } /* tv_init() */
 
 void base_loop_functions::output_init(const cmconfig::output_config* output) {
@@ -165,6 +151,14 @@ void base_loop_functions::output_init(const cmconfig::output_config* output) {
 #endif
 } /* output_init() */
 
+void base_loop_functions::oracle_init(
+    const coconfig::aggregate_oracle_config* const oraclep) {
+  if (nullptr != oraclep) {
+    ER_INFO("Creating foraging oracle");
+    m_oracle = std::make_unique<cforacle::foraging_oracle>(oraclep);
+  }
+} /* oracle_init() */
+
 /*******************************************************************************
  * ARGoS Hooks
  ******************************************************************************/
@@ -177,8 +171,8 @@ void base_loop_functions::pre_step(void) {
     m_tv_manager->update(rtypes::timestep(GetSpace().GetSimulationClock()));
   }
 
-  if (nullptr != oracle_manager()) {
-    oracle_manager()->update(arena_map<carena::caching_arena_map>());
+  if (nullptr != oracle()) {
+    oracle()->update(arena_map<carena::caching_arena_map>());
   }
 } /* pre_step() */
 
@@ -196,79 +190,5 @@ void base_loop_functions::reset(void) {
   arena_map()->distribute_all_blocks();
 } /* reset() */
 
-/*******************************************************************************
- * Metrics
- ******************************************************************************/
-std::vector<double> base_loop_functions::calc_robot_nn(
-    RCSW_UNUSED uint n_threads) const {
-  std::vector<rmath::vector2d> v;
-  auto cb = [&](auto* robot) {
-    v.push_back({robot->GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
-                 robot->GetEmbodiedEntity().GetOriginAnchor().Position.GetY()});
-  };
-  cpal::argos_swarm_iterator::robots<argos::CFootBotEntity,
-                                     cpal::iteration_order::ekSTATIC>(
-                                         this, cb, kARGoSRobotType);
-
-  /*
-   * For each closest pair of robots we find, we add the corresponding distance
-   * TWICE to our results vector, because 2 robots i and j are each other's
-   * closest robots (if they were not, they would not have been returned by the
-   * algorithm).
-   */
-  std::vector<double> res;
-  size_t n_robots = GetSpace().GetEntitiesByType(kARGoSRobotType).size();
-
-#pragma omp parallel for num_threads(n_threads)
-  for (size_t i = 0; i < n_robots / 2; ++i) {
-    auto dist_func = std::bind(&rmath::vector2d::distance,
-                               std::placeholders::_1,
-                               std::placeholders::_2);
-    auto pts =
-        ralg::closest_pair2D<rmath::vector2d>()("recursive", v, dist_func);
-    size_t old = v.size();
-#pragma omp critical
-    {
-      v.erase(std::remove_if(v.begin(),
-                             v.end(),
-                             [&](const auto& pt) {
-                               return pt == pts.p1 || pt == pts.p2;
-                             }),
-              v.end());
-
-      ER_ASSERT(old == v.size() + 2,
-                "Closest pair of points not removed from set");
-      res.push_back(pts.dist);
-      res.push_back(pts.dist);
-    }
-  } /* for(i..) */
-
-  return res;
-} /* calc_robot_nn() */
-
-std::vector<rmath::radians> base_loop_functions::calc_robot_headings(uint) const {
-  std::vector<rmath::radians> v;
-
-  auto cb = [&](const auto* controller) {
-    v.push_back(controller->heading2D());
-  };
-  cpal::argos_swarm_iterator::controllers<argos::CFootBotEntity,
-                                          controller::foraging_controller,
-                                          cpal::iteration_order::ekSTATIC>(
-                                              this, cb, kARGoSRobotType);
-  return v;
-} /* calc_robot_headings() */
-
-std::vector<rmath::vector2d> base_loop_functions::calc_robot_positions(
-    uint) const {
-  std::vector<rmath::vector2d> v;
-
-  auto cb = [&](const auto* controller) { v.push_back(controller->pos2D()); };
-  cpal::argos_swarm_iterator::controllers<argos::CFootBotEntity,
-                                          controller::foraging_controller,
-                                          cpal::iteration_order::ekSTATIC>(
-      this, cb, kARGoSRobotType);
-  return v;
-} /* calc_robot_positions() */
 
 NS_END(support, fordyca);

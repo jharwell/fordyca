@@ -30,18 +30,13 @@
 #include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/controller/controller_fwd.hpp"
 #include "rcppsw/ds/type_map.hpp"
+#include "cosm/foraging/operations/robot_los_update.hpp"
+#include "cosm/controller/operations/metrics_extract.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
-
-template<typename ControllerType>
-class robot_los_updater;
-template<typename AggregatorType, typename ControllerType>
-class robot_metric_extractor;
-
-NS_START(depth0);
+NS_START(fordyca, support, depth0);
 namespace detail {
 struct functor_maps_initializer;
 } /* namespace detail */
@@ -91,19 +86,19 @@ class depth0_loop_functions : public base_loop_functions,
     >;
   using los_updater_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth0::typelist,
-                              robot_los_updater>::type>;
+                              cfops::robot_los_update>::type>;
 
   using metric_extraction_typelist = rmpl::typelist<
-    robot_metric_extractor<depth0_metrics_aggregator,
-                           controller::depth0::crw_controller>,
-    robot_metric_extractor<depth0_metrics_aggregator,
-                           controller::depth0::dpo_controller>,
-    robot_metric_extractor<depth0_metrics_aggregator,
-                           controller::depth0::odpo_controller>,
-    robot_metric_extractor<depth0_metrics_aggregator,
-                           controller::depth0::mdpo_controller>,
-    robot_metric_extractor<depth0_metrics_aggregator,
-                           controller::depth0::omdpo_controller>
+    ccops::metrics_extract<controller::depth0::crw_controller,
+                           depth0_metrics_aggregator>,
+    ccops::metrics_extract<controller::depth0::dpo_controller,
+                           depth0_metrics_aggregator>,
+    ccops::metrics_extract<controller::depth0::odpo_controller,
+                           depth0_metrics_aggregator>,
+    ccops::metrics_extract<controller::depth0::mdpo_controller,
+                           depth0_metrics_aggregator>,
+    ccops::metrics_extract<controller::depth0::omdpo_controller,
+                           depth0_metrics_aggregator>
     >;
 
   using metric_extraction_map_type = rds::type_map<metric_extraction_typelist>;

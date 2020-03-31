@@ -30,18 +30,18 @@
 #include "rcppsw/math/config/rng_config.hpp"
 #include "rcppsw/math/rngm.hpp"
 
+#include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/metrics/config/output_config.hpp"
 #include "cosm/repr/base_block2D.hpp"
+#include "cosm/robots/footbot/config/saa_xml_names.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 #include "cosm/steer2D/config/force_calculator_config.hpp"
 #include "cosm/subsystem/config/actuation_subsystem2D_config.hpp"
 #include "cosm/subsystem/config/sensing_subsystem2D_config.hpp"
 #include "cosm/subsystem/saa_subsystem2D.hpp"
 #include "cosm/tv/robot_dynamics_applicator.hpp"
-#include "cosm/fsm/supervisor_fsm.hpp"
 
 #include "fordyca/config/foraging_controller_repository.hpp"
-#include "cosm/robots/footbot/config/saa_xml_names.hpp"
 
 /*******************************************************************************
  * Namespaces

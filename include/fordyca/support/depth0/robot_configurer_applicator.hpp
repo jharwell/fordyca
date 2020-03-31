@@ -1,5 +1,5 @@
 /**
- * \file depth0/robot_los_updater_adaptor.hpp
+ * \file depth0/robot_configurer_applicator.hpp
  *
  * \copyright 2019 John Harwell, All rights reserved.
  *
@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_ROBOT_LOS_UPDATER_ADAPTOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_ROBOT_LOS_UPDATER_ADAPTOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_ROBOT_CONFIGURER_APPLICATOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_ROBOT_CONFIGURER_APPLICATOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -26,42 +26,41 @@
 #include "fordyca/fordyca.hpp"
 #include "fordyca/controller/controller_fwd.hpp"
 #include "rcppsw/ds/type_map.hpp"
-#include "fordyca/support/robot_los_updater.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, support, depth0, detail);
+NS_START(fordyca, support, depth0);
+template<class T>
+class robot_configurer;
 
-/*******************************************************************************
- * Type Definitions
- ******************************************************************************/
-using los_updater_map_type = rds::type_map<
+using configurer_map_type = rds::type_map<
   rmpl::typelist_wrap_apply<controller::depth0::typelist,
-                            robot_los_updater>::type>;
+                            robot_configurer>::type>;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class robot_los_updater_adaptor
+ * \class robot_configurer_applicator
  * \ingroup support depth0
  *
- * \brief Wrapping functor to update robot LOS each timestep. Needed for use
- * with boost::static_visitor.
+ * \brief Wrapping functor to perform robot controller configuration during
+ * initialization.
  */
-class robot_los_updater_adaptor {
+class robot_configurer_applicator {
  public:
-  explicit robot_los_updater_adaptor(controller::foraging_controller* const c)
+  explicit robot_configurer_applicator( controller::foraging_controller* const c)
       : controller(c) {}
 
-  void operator()(robot_los_updater<controller::depth0::crw_controller>& ) const {}
+  void operator()(robot_configurer<controller::depth0::crw_controller>& ) const {}
 
-  template<typename ControllerType,
-           RCPPSW_SFINAE_FUNC(!std::is_same<ControllerType,
+  template<typename T,
+           RCPPSW_SFINAE_FUNC(!std::is_same<T,
                                  controller::depth0::crw_controller>::value)>
-  void operator()(robot_los_updater<ControllerType>& los_updater) const {
-    los_updater(dynamic_cast<ControllerType*>(controller));
+  void operator()(robot_configurer<T>& configurer) const {
+    auto cast = dynamic_cast<typename support::depth0::robot_configurer<T>::controller_type*>(controller);
+    configurer(cast);
   }
 
  private:
@@ -70,6 +69,6 @@ class robot_los_updater_adaptor {
   /* clang-format on */
 };
 
-NS_END(detail, depth0, support, fordyca);
+NS_END(depth0, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_ROBOT_LOS_UPDATER_ADAPTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_ROBOT_CONFIGURER_APPLICATOR_HPP_ */

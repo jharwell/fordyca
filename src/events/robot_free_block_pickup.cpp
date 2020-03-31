@@ -94,7 +94,6 @@ void robot_free_block_pickup::visit(
   auto robot_block = m_block->clone();
   robot_block->md()->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
-  controller.block_manip_collator()->free_pickup_event(true);
 
   ER_INFO("Picked up block%d", m_block->id().v());
   controller.ndc_pop();
@@ -165,7 +164,6 @@ void robot_free_block_pickup::visit(
   robot_block->md()->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
-  controller.block_manip_collator()->free_pickup_event(true);
   ER_INFO("Picked up block%d", m_block->id().v());
 
   controller.ndc_pop();
@@ -182,7 +180,6 @@ void robot_free_block_pickup::visit(
   robot_block->md()->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
-  controller.block_manip_collator()->free_pickup_event(true);
   ER_INFO("Picked up block%d", m_block->id().v());
 
   controller.ndc_pop();
@@ -199,7 +196,6 @@ void robot_free_block_pickup::visit(
   robot_block->md()->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
-  controller.block_manip_collator()->free_pickup_event(true);
   ER_INFO("Picked up block%d", m_block->id().v());
 
   controller.ndc_pop();
@@ -216,7 +212,6 @@ void robot_free_block_pickup::visit(
   robot_block->md()->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
-  controller.block_manip_collator()->free_pickup_event(true);
   ER_INFO("Picked up block%d", m_block->id().v());
 
   controller.ndc_pop();
@@ -230,7 +225,6 @@ void robot_free_block_pickup::visit(
   controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
-  controller.block_manip_collator()->free_pickup_event(true);
 
   auto robot_block = m_block->clone();
   robot_block->md()->robot_id(mc_robot_id);
@@ -247,7 +241,6 @@ void robot_free_block_pickup::visit(
   controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
-  controller.block_manip_collator()->free_pickup_event(true);
 
   auto robot_block = m_block->clone();
   robot_block->md()->robot_id(mc_robot_id);
@@ -264,7 +257,6 @@ void robot_free_block_pickup::visit(
   controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
-  controller.block_manip_collator()->free_pickup_event(true);
 
   auto robot_block = m_block->clone();
   robot_block->md()->robot_id(mc_robot_id);
@@ -281,7 +273,6 @@ void robot_free_block_pickup::visit(
   controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
-  controller.block_manip_collator()->free_pickup_event(true);
 
   auto robot_block = m_block->clone();
   robot_block->md()->robot_id(mc_robot_id);
@@ -319,7 +310,6 @@ void robot_free_block_pickup::visit(
   controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
-  controller.block_manip_collator()->free_pickup_event(true);
 
   auto robot_block = m_block->clone();
   robot_block->md()->robot_id(mc_robot_id);
@@ -336,7 +326,6 @@ void robot_free_block_pickup::visit(
   controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
-  controller.block_manip_collator()->free_pickup_event(true);
 
   auto robot_block = m_block->clone();
   robot_block->md()->robot_id(mc_robot_id);
@@ -353,7 +342,6 @@ void robot_free_block_pickup::visit(
   controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
-  controller.block_manip_collator()->free_pickup_event(true);
 
   auto robot_block = m_block->clone();
   robot_block->md()->robot_id(mc_robot_id);
@@ -370,7 +358,6 @@ void robot_free_block_pickup::visit(
   controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
-  controller.block_manip_collator()->free_pickup_event(true);
 
   auto robot_block = m_block->clone();
   robot_block->md()->robot_id(mc_robot_id);

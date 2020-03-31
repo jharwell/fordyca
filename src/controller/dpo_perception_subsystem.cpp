@@ -61,7 +61,7 @@ void dpo_perception_subsystem::update(oracular_info_receptor* const receptor) {
 void dpo_perception_subsystem::reset(void) { m_store->clear_all(); }
 
 void dpo_perception_subsystem::process_los(
-    const repr::line_of_sight* const c_los,
+    const cfrepr::foraging_los* const c_los,
     oracular_info_receptor* const receptor) {
   ER_TRACE("LOS LL=%s, LR=%s, UL=%s UR=%s",
            c_los->abs_ll().to_str().c_str(),
@@ -89,7 +89,7 @@ void dpo_perception_subsystem::process_los(
 } /* process_los() */
 
 void dpo_perception_subsystem::process_los_caches(
-    const repr::line_of_sight* const c_los) {
+    const cfrepr::foraging_los* const c_los) {
   cads::bcache_vectorno los_caches = c_los->caches();
   ER_DEBUG("Caches in DPO store: [%s]",
            rcppsw::to_string(m_store->caches()).c_str());
@@ -119,7 +119,7 @@ void dpo_perception_subsystem::process_los_caches(
 } /* process_los_caches() */
 
 void dpo_perception_subsystem::process_los_blocks(
-    const repr::line_of_sight* const c_los) {
+    const cfrepr::foraging_los* const c_los) {
   /*
    * Because this is computed, rather than a returned reference to a member
    * variable, we can't use separate begin()/end() calls with it, and need to
@@ -162,7 +162,7 @@ void dpo_perception_subsystem::process_los_blocks(
 } /* process_los() */
 
 void dpo_perception_subsystem::los_tracking_sync(
-    const repr::line_of_sight* const c_los,
+    const cfrepr::foraging_los* const c_los,
     const cads::bcache_vectorno& los_caches) {
   /*
    * If the location of one of the caches we are tracking is in our LOS, then
@@ -205,7 +205,7 @@ void dpo_perception_subsystem::los_tracking_sync(
 } /* los_tracking_sync() */
 
 void dpo_perception_subsystem::los_tracking_sync(
-    const repr::line_of_sight* const c_los,
+    const cfrepr::foraging_los* const c_los,
     const cds::block2D_vectorno& los_blocks) {
   /*
    * If the location of one of the blocks we are tracking is in our LOS, then

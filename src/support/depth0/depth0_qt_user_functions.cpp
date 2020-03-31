@@ -21,13 +21,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-/*
- * \todo Figure out how to remove this warning properly.
- */
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Woverloaded-virtual"
+#include "rcppsw/common/common.hpp"
+RCPPSW_WARNING_DISABLE_PUSH()
+RCPPSW_WARNING_DISABLE_OVERLOADED_VIRTUAL()
 #include "fordyca/support/depth0/depth0_qt_user_functions.hpp"
-#pragma GCC diagnostic pop
+RCPPSW_WARNING_DISABLE_POP()
 
 #include <argos3/core/simulator/entity/controllable_entity.h>
 
@@ -75,12 +73,13 @@ void depth0_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
 }
 
 using namespace argos; // NOLINT
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wglobal-constructors"
-#pragma clang diagnostic ignored "-Wmissing-prototypes"
-#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+
+RCPPSW_WARNING_DISABLE_PUSH()
+RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
+RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
+RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 REGISTER_QTOPENGL_USER_FUNCTIONS(depth0_qt_user_functions,
                                  "depth0_qt_user_functions"); // NOLINT
-#pragma clang diagnostic pop
+RCPPSW_WARNING_DISABLE_POP()
 
 NS_END(depth0, support, fordyca);

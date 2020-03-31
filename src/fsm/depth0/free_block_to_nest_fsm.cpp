@@ -224,8 +224,7 @@ void free_block_to_nest_fsm::task_execute(void) {
   inject_event(fsm::foraging_signal::ekRUN, rpfsm::event_type::ekNORMAL);
 } /* task_execute() */
 
-foraging_transport_goal free_block_to_nest_fsm::block_transport_goal(
-    void) const {
+foraging_transport_goal free_block_to_nest_fsm::block_transport_goal(void) const {
   if (ekST_TRANSPORT_TO_NEST == current_state() ||
       ekST_WAIT_FOR_DROP == current_state()) {
     return foraging_transport_goal::ekNEST;

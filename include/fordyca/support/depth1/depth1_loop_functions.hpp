@@ -29,14 +29,18 @@
 #include <atomic>
 #include <utility>
 
+#include "cosm/foraging/operations/robot_los_update.hpp"
+
 #include "fordyca/support/depth0/depth0_loop_functions.hpp"
-#include "fordyca/support/robot_los_updater.hpp"
-#include "fordyca/support/robot_metric_extractor.hpp"
 #include "fordyca/support/robot_task_extractor.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::foraging::config {
+struct block_dist_config;
+} /* namespace cosm::foraging::config */
+
 NS_START(fordyca);
 namespace config { namespace caches { struct caches_config; }}
 
@@ -100,19 +104,19 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
                                robot_arena_interactor>::type>;
   using los_updater_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth1::typelist,
-                                robot_los_updater>::type>;
+                              cfops::robot_los_update>::type>;
   using task_extractor_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth1::typelist,
                                 robot_task_extractor>::type>;
   using metric_extractor_typelist = rmpl::typelist<
-    robot_metric_extractor<depth1_metrics_aggregator,
-                           controller::depth1::bitd_dpo_controller>,
-    robot_metric_extractor<depth1_metrics_aggregator,
-                           controller::depth1::bitd_odpo_controller>,
-    robot_metric_extractor<depth1_metrics_aggregator,
-                           controller::depth1::bitd_mdpo_controller>,
-    robot_metric_extractor<depth1_metrics_aggregator,
-                           controller::depth1::bitd_omdpo_controller>
+    ccops::metrics_extract<controller::depth1::bitd_dpo_controller,
+                           depth1_metrics_aggregator>,
+    ccops::metrics_extract<controller::depth1::bitd_odpo_controller,
+                           depth1_metrics_aggregator>,
+    ccops::metrics_extract<controller::depth1::bitd_mdpo_controller,
+                           depth1_metrics_aggregator>,
+    ccops::metrics_extract<controller::depth1::bitd_omdpo_controller,
+                           depth1_metrics_aggregator>
     >;
   using metric_extractor_map_type = rds::type_map<metric_extractor_typelist>;
 

@@ -221,6 +221,8 @@ class cached_block_pickup_interactor
     events::robot_cached_block_pickup_visitor rpickup_op(
         *it, to_pickup, controller.entity_id(), t);
     (*it)->penalty_served(penalty.penalty());
+    controller.block_manip_recorder()->record(metrics::blocks::block_manip_events::ekCACHE_PICKUP,
+                                              penalty.penalty());
 
     uint old_n_caches = m_map->caches().size();
 

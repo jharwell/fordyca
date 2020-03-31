@@ -33,10 +33,13 @@
 
 #include <boost/mpl/for_each.hpp>
 
-#include "cosm/convergence/convergence_calculator.hpp"
 #include "cosm/arena/config/arena_map_config.hpp"
+#include "cosm/controller/operations/applicator.hpp"
+#include "cosm/pal/argos_convergence_calculator.hpp"
+#include "cosm/foraging/repr/foraging_los.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
-#include "cosm/oracle/oracle_manager.hpp"
+#include "cosm/operations/robot_arena_interaction_applicator.hpp"
+#include "cosm/foraging/oracle/foraging_oracle.hpp"
 #include "cosm/pal/argos_swarm_iterator.hpp"
 
 #include "fordyca/controller/depth0/crw_controller.hpp"
@@ -44,16 +47,11 @@
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
 #include "fordyca/controller/depth0/odpo_controller.hpp"
 #include "fordyca/controller/depth0/omdpo_controller.hpp"
-#include "fordyca/repr/line_of_sight.hpp"
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
 #include "fordyca/support/depth0/robot_arena_interactor.hpp"
 #include "fordyca/support/depth0/robot_configurer.hpp"
-#include "fordyca/support/depth0/robot_configurer_adaptor.hpp"
-#include "fordyca/support/depth0/robot_los_updater_adaptor.hpp"
-#include "fordyca/support/robot_interactor_adaptor.hpp"
-#include "fordyca/support/robot_los_updater_adaptor.hpp"
-#include "fordyca/support/robot_metric_extractor.hpp"
-#include "fordyca/support/robot_metric_extractor_adaptor.hpp"
+#include "fordyca/support/depth0/robot_configurer_applicator.hpp"
+#include "fordyca/support/depth0/robot_los_update_applicator.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 
 /*******************************************************************************
@@ -83,28 +81,27 @@ struct functor_maps_initializer {
   RCSW_COLD void operator()(const T& controller) const {
     lf->m_interactor_map->emplace(
         typeid(controller),
-        robot_arena_interactor<T>(lf->arena_map<carena::caching_arena_map>(),
-                                  lf->m_metrics_agg.get(),
-                                  lf->floor(),
-                                  lf->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>()));
+        robot_arena_interactor<T>(
+            lf->arena_map<carena::caching_arena_map>(),
+            lf->m_metrics_agg.get(),
+            lf->floor(),
+            lf->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>()));
     lf->m_metrics_map->emplace(
         typeid(controller),
-        robot_metric_extractor<depth0_metrics_aggregator, T>(
+        ccops::metrics_extract<T, depth0_metrics_aggregator>(
             lf->m_metrics_agg.get()));
     config_map->emplace(
         typeid(controller),
         robot_configurer<T>(
             lf->config()->config_get<cvconfig::visualization_config>(),
-            nullptr != lf->oracle_manager()
-                ? lf->oracle_manager()->entities_oracle()
-                : nullptr));
+            lf->oracle()));
     lf->m_los_update_map->emplace(typeid(controller),
-                                  robot_los_updater<T>(lf->arena_map()));
+                                  cfops::robot_los_update<T>(lf->arena_map()));
   }
 
   /* clang-format off */
-  depth0_loop_functions * const      lf;
-  detail::configurer_map_type* const config_map;
+  depth0_loop_functions * const lf;
+  configurer_map_type* const    config_map;
   /* clang-format on */
 };
 
@@ -150,8 +147,8 @@ void depth0_loop_functions::private_init(void) {
    * arena map. The arena map pads the size obtained from the XML file after
    * initialization, so we just need to grab it.
    */
-  auto padded_size = rmath::vector2d(arena_map()->xrsize(),
-                                     arena_map()->yrsize());
+  auto padded_size =
+      rmath::vector2d(arena_map()->xrsize(), arena_map()->yrsize());
   auto arena = *config()->config_get<caconfig::arena_map_config>();
   arena.grid.upper = padded_size;
   m_metrics_agg = std::make_unique<depth0_metrics_aggregator>(&output->metrics,
@@ -160,13 +157,11 @@ void depth0_loop_functions::private_init(void) {
   /* this starts at 0, and ARGoS starts at 1, so sync up */
   m_metrics_agg->timestep_inc_all();
 
-
   m_interactor_map = std::make_unique<interactor_map_type>();
-  m_metrics_map = std::make_unique<metric_extraction_map_type>();
-  m_los_update_map = std::make_unique<detail::los_updater_map_type>();
+  m_los_update_map = std::make_unique<los_updater_map_type>();
 
   /* only needed for initialization, so not a member */
-  auto config_map = detail::configurer_map_type();
+  auto config_map = configurer_map_type();
 
   /*
    * Intitialize controller interactions with environment via various
@@ -181,8 +176,9 @@ void depth0_loop_functions::private_init(void) {
               "Controller '%s' type '%s' not in depth0 configuration map",
               controller->GetId().c_str(),
               controller->type_index().name());
-    boost::apply_visitor(detail::robot_configurer_adaptor(controller),
-                         config_map.at(controller->type_index()));
+
+    auto applicator = robot_configurer_applicator(controller);
+    boost::apply_visitor(applicator, config_map.at(controller->type_index()));
   };
 
   /*
@@ -193,7 +189,7 @@ void depth0_loop_functions::private_init(void) {
   cpal::argos_swarm_iterator::controllers<argos::CFootBotEntity,
                                           controller::foraging_controller,
                                           cpal::iteration_order::ekSTATIC>(
-                                              this, cb, kARGoSRobotType);
+      this, cb, kARGoSRobotType);
 } /* private_init() */
 
 /*******************************************************************************
@@ -314,7 +310,8 @@ void depth0_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
             "Controller '%s' type '%s' not in depth0 LOS update map",
             controller->GetId().c_str(),
             controller->type_index().name());
-  boost::apply_visitor(detail::robot_los_updater_adaptor(controller),
+  auto applicator = robot_los_update_applicator(controller);
+  boost::apply_visitor(applicator,
                        m_los_update_map->at(controller->type_index()));
 } /* robot_pre_step() */
 
@@ -331,11 +328,12 @@ void depth0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
             controller->GetId().c_str(),
             controller->type_index().name());
 
-  auto iadaptor =
-      robot_interactor_adaptor<depth0::robot_arena_interactor, interactor_status>(
+  auto iapplicator =
+      cops::robot_arena_interaction_applicator<controller::foraging_controller,
+                                               depth0::robot_arena_interactor>(
           controller, rtypes::timestep(GetSpace().GetSimulationClock()));
   auto status =
-      boost::apply_visitor(iadaptor,
+      boost::apply_visitor(iapplicator,
                            m_interactor_map->at(controller->type_index()));
 
   /*
@@ -349,23 +347,19 @@ void depth0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
    * errors that can result are transient and are corrected the next
    * timestep. See #577.
    */
-  if (interactor_status::ekNO_EVENT != status && nullptr != oracle_manager()) {
-    oracle_manager()->update(arena_map<carena::caching_arena_map>());
+  if (interactor_status::ekNO_EVENT != status && nullptr != oracle()) {
+    oracle()->update(arena_map<carena::caching_arena_map>());
   }
   /*
    * Collect metrics from robot, now that it has finished interacting with the
    * environment and no more changes to its state will occur this timestep.
    */
-  auto it2 = m_metrics_map->find(controller->type_index());
-  ER_ASSERT(m_metrics_map->end() != it2,
-            "Controller '%s' type '%s' not in depth0 metrics map",
-            controller->GetId().c_str(),
-            controller->type_index().name());
-  auto madaptor =
-      robot_metric_extractor_adaptor<depth0_metrics_aggregator>(controller);
-  boost::apply_visitor(madaptor, m_metrics_map->at(controller->type_index()));
+  auto mapplicator = ccops::applicator<controller::foraging_controller,
+                                       ccops::metrics_extract,
+                                       depth0_metrics_aggregator>(controller);
+  boost::apply_visitor(mapplicator, m_metrics_map->at(controller->type_index()));
 
-  controller->block_manip_collator()->reset();
+  controller->block_manip_recorder()->reset();
 } /* robot_post_step() */
 
 using namespace argos; // NOLINT

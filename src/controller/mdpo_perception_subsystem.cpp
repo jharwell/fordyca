@@ -25,8 +25,8 @@
 
 #include <algorithm>
 
-#include "cosm/ds/cell2D.hpp"
 #include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/ds/cell2D.hpp"
 #include "cosm/fsm/cell2D_state.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
@@ -68,7 +68,7 @@ void mdpo_perception_subsystem::update(oracular_info_receptor* const receptor) {
 void mdpo_perception_subsystem::reset(void) { m_map->reset(); }
 
 void mdpo_perception_subsystem::process_los(
-    const repr::line_of_sight* const c_los,
+    const cfrepr::foraging_los* const c_los,
     oracular_info_receptor* const receptor) {
   ER_TRACE("LOS LL=%s, LR=%s, UL=%s UR=%s",
            c_los->abs_ll().to_str().c_str(),
@@ -96,7 +96,7 @@ void mdpo_perception_subsystem::process_los(
 } /* process_los() */
 
 void mdpo_perception_subsystem::process_los_blocks(
-    const repr::line_of_sight* const c_los) {
+    const cfrepr::foraging_los* const c_los) {
   /*
    * Because this is computed, rather than a returned reference to a member
    * variable, we can't use separate begin()/end() calls with it, and need to
@@ -163,7 +163,7 @@ void mdpo_perception_subsystem::process_los_blocks(
 } /* process_los_blocks() */
 
 void mdpo_perception_subsystem::process_los_caches(
-    const repr::line_of_sight* const c_los) {
+    const cfrepr::foraging_los* const c_los) {
   /*
    * Because this is computed, rather than a returned reference to a member
    * variable, we can't use separate begin()/end() calls with it, and need to
@@ -231,7 +231,7 @@ void mdpo_perception_subsystem::process_los_caches(
 } /* process_los_caches() */
 
 void mdpo_perception_subsystem::update_cell_stats(
-    const repr::line_of_sight* const c_los) {
+    const cfrepr::foraging_los* const c_los) {
   for (uint i = 0; i < c_los->xsize(); ++i) {
     for (uint j = 0; j < c_los->ysize(); ++j) {
       rmath::vector2u d = c_los->cell(i, j).loc();

@@ -37,13 +37,11 @@ namespace argos {
 class CQTOpenGLUserFunctions;
 }
 
-NS_START(fordyca);
-
-namespace repr {
-class line_of_sight;
+namespace cosm::foraging::repr {
+class foraging_los;
 }
 
-NS_START(support);
+NS_START(fordyca, support);
 
 /*******************************************************************************
  * Classes
@@ -69,7 +67,8 @@ class los_visualizer : public rer::client<los_visualizer> {
    * \param los The LOS to visualize.
    * \param resolution The grid resolution for the arena.
    */
-  void draw(const repr::line_of_sight* los, rtypes::discretize_ratio resolution);
+  void draw(const cfrepr::foraging_los* los,
+            rtypes::discretize_ratio resolution);
 
   /* clang-format off */
   argos::CQTOpenGLUserFunctions* const m_qt{nullptr};

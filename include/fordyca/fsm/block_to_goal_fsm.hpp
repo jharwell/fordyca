@@ -28,11 +28,11 @@
 
 #include "cosm/fsm/metrics/goal_acq_metrics.hpp"
 #include "cosm/fsm/util_hfsm.hpp"
+#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
 #include "cosm/ta/taskable.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
-#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces

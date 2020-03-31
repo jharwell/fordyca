@@ -41,7 +41,7 @@ NS_START(fordyca, metrics, tv);
  ******************************************************************************/
 /**
  * \class env_dynamics_metrics_collector
- * \ingroup metrics blocks
+ * \ingroup metrics tv
  *
  * \brief Collector for \ref env_dynamics_metrics.
  *

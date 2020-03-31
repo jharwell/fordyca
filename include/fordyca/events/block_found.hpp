@@ -74,8 +74,8 @@ class block_found : public rer::client<block_found>, public cdops::cell2D_op {
   explicit block_found(crepr::base_block2D* block);
   ~block_found(void) override = default;
 
-  block_found(const block_found& op) = delete;
-  block_found& operator=(const block_found& op) = delete;
+  block_found(const block_found&) = delete;
+  block_found& operator=(const block_found&) = delete;
 
   /* DPO foraging */
   void visit(ds::dpo_store& store);

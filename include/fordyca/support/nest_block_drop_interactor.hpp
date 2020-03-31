@@ -95,10 +95,8 @@ class nest_block_drop_interactor
         return interactor_status::ekNEST_BLOCK_DROP;
       }
     } else {
-      m_penalty_handler->penalty_init(controller,
-                                      t,
-                                      tv::block_op_src::ekNEST_DROP,
-                                      boost::none);
+      m_penalty_handler->penalty_init(
+          controller, t, tv::block_op_src::ekNEST_DROP, boost::none);
     }
     return interactor_status::ekNO_EVENT;
   }
@@ -145,7 +143,8 @@ class nest_block_drop_interactor
      * event, because the penalty is generic, and the event handles concrete
      * classes--no clean way to mix the two.
      */
-    controller.block_manip_collator()->penalty_served(penalty.penalty());
+    controller.block_manip_recorder()->record(metrics::blocks::block_manip_events::ekFREE_DROP,
+                                              penalty.penalty());
     rtypes::type_uuid id = controller.block()->id();
 
     caops::nest_block_drop_visitor adrop_op(controller.block_release(), t);

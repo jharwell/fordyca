@@ -94,10 +94,8 @@ class free_block_pickup_interactor
         return interactor_status::ekFREE_BLOCK_PICKUP;
       }
     } else {
-      m_penalty_handler->penalty_init(controller,
-                                      t,
-                                      tv::block_op_src::ekFREE_PICKUP,
-                                      boost::none);
+      m_penalty_handler->penalty_init(
+          controller, t, tv::block_op_src::ekFREE_PICKUP, boost::none);
     }
     return interactor_status::ekNO_EVENT;
   }
@@ -108,9 +106,8 @@ class free_block_pickup_interactor
    * is actually on a free block, send it the \ref free_block_pickup event.
    */
   void finish_free_block_pickup(T& controller, const rtypes::timestep& t) {
-    ER_ASSERT(controller.goal_acquired() &&
-                  fsm::foraging_acq_goal::ekBLOCK ==
-                      controller.acquisition_goal(),
+    ER_ASSERT(controller.goal_acquired() && fsm::foraging_acq_goal::ekBLOCK ==
+                                                controller.acquisition_goal(),
               "Controller not waiting for free block pickup");
     ER_ASSERT(m_penalty_handler->is_serving_penalty(controller),
               "Controller not serving pickup penalty");
@@ -189,13 +186,12 @@ class free_block_pickup_interactor
      * event, because the penalty is generic, and the event handles concrete
      * classes--no clean way to mix the two.
      */
-    controller.block_manip_collator()->penalty_served(penalty.penalty());
+    controller.block_manip_recorder()->record(metrics::blocks::block_manip_events::ekFREE_PICKUP,
+                                              penalty.penalty());
     events::robot_free_block_pickup_visitor rpickup_op(*it,
                                                        controller.entity_id(),
                                                        t);
-    caops::free_block_pickup_visitor apickup_op(*it,
-                                                controller.entity_id(),
-                                                t);
+    caops::free_block_pickup_visitor apickup_op(*it, controller.entity_id(), t);
 
     /*
      * Visitation order must be:

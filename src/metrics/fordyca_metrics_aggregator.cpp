@@ -27,13 +27,11 @@
 
 #include "rcppsw/mpl/typelist.hpp"
 
-#include "cosm/convergence/convergence_calculator.hpp"
+#include "cosm/pal/argos_convergence_calculator.hpp"
+#include "cosm/metrics/collector_registerer.hpp"
 
 #include "fordyca/controller/foraging_controller.hpp"
-#include "fordyca/metrics/blocks/manipulation_metrics.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
-#include "cosm/metrics/collector_registerer.hpp"
-#include "fordyca/metrics/tv/env_dynamics_metrics.hpp"
 #include "fordyca/metrics/tv/env_dynamics_metrics_collector.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
@@ -43,9 +41,9 @@
  ******************************************************************************/
 NS_START(fordyca, metrics, detail);
 
-using collector_typelist = rmpl::typelist<
-    rmpl::identity<blocks::manipulation_metrics_collector>,
-    rmpl::identity<tv::env_dynamics_metrics_collector>>;
+using collector_typelist =
+    rmpl::typelist<rmpl::identity<blocks::manipulation_metrics_collector>,
+                   rmpl::identity<tv::env_dynamics_metrics_collector>>;
 
 NS_END(detail);
 
@@ -58,22 +56,19 @@ fordyca_metrics_aggregator::fordyca_metrics_aggregator(
     const std::string& output_root)
     : ER_CLIENT_INIT("fordyca.metrics.aggregator"),
       base_metrics_aggregator(mconfig, gconfig, output_root) {
-
   cmetrics::collector_registerer::creatable_set creatable_set = {
-    {typeid(blocks::manipulation_metrics_collector),
-     "block_manipulation",
-     "blocks::manipulation",
-     rmetrics::output_mode::ekAPPEND},
-    {typeid(tv::env_dynamics_metrics_collector),
-     "tv_environment",
-     "tv::environment",
-     rmetrics::output_mode::ekAPPEND},
+      {typeid(blocks::manipulation_metrics_collector),
+       "block_manipulation",
+       "blocks::manipulation",
+       rmetrics::output_mode::ekAPPEND},
+      {typeid(tv::env_dynamics_metrics_collector),
+       "tv_environment",
+       "tv::environment",
+       rmetrics::output_mode::ekAPPEND},
   };
 
-  cmetrics::collector_registerer registerer(mconfig,
-                                            gconfig,
-                                            creatable_set,
-                                            this);
+  cmetrics::collector_registerer registerer(
+      mconfig, gconfig, creatable_set, this);
   boost::mpl::for_each<detail::collector_typelist>(registerer);
   reset_all();
 }
@@ -84,7 +79,7 @@ fordyca_metrics_aggregator::fordyca_metrics_aggregator(
 void fordyca_metrics_aggregator::collect_from_loop(
     const support::base_loop_functions* const loop) {
   if (nullptr != loop->conv_calculator()) {
-    collect("swarm::convergence", *loop->conv_calculator());
+    collect("swarm::convergence", loop->conv_calculator()->decoratee());
   }
 
   collect("tv::environment",

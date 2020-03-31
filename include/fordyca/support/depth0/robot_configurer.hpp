@@ -48,9 +48,9 @@ class robot_configurer : public boost::static_visitor<void> {
  public:
   using controller_type = TController;
   robot_configurer(const cvconfig::visualization_config* const config,
-                   coracle::entities_oracle* const oracle)
+                   cforacle::foraging_oracle* const oracle)
       : mc_config(config),
-        m_oracle(oracle) {}
+        mc_oracle(oracle) {}
 
   template<typename U = TController,
            RCPPSW_SFINAE_TYPELIST_REJECT(controller::depth0::oracular_typelist,
@@ -69,9 +69,8 @@ class robot_configurer : public boost::static_visitor<void> {
       c->display_los(mc_config->robot_los);
       c->display_id(mc_config->robot_id);
     }
-    if (nullptr != m_oracle) {
-      auto receptor = std::make_unique<controller::oracular_info_receptor>(
-          nullptr, m_oracle);
+    if (nullptr != mc_oracle) {
+      auto receptor = std::make_unique<controller::oracular_info_receptor>(mc_oracle);
       c->oracle_init(std::move(receptor));
     }
   }
@@ -79,7 +78,7 @@ class robot_configurer : public boost::static_visitor<void> {
  private:
   /* clang-format off */
   const cvconfig::visualization_config * const mc_config;
-  coracle::entities_oracle *                   m_oracle;
+  const cforacle::foraging_oracle *            mc_oracle;
   /* clang-format on */
 };
 

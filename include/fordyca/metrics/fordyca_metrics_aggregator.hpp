@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include <string>
 
-#include "cosm/metrics/config/metrics_config.hpp"
 #include "cosm/metrics/base_metrics_aggregator.hpp"
+#include "cosm/metrics/config/metrics_config.hpp"
 
 #include "fordyca/fordyca.hpp"
 
@@ -55,12 +55,13 @@ NS_START(metrics);
  * \brief Extends the \ref cmetrics::base_metrics_aggregator for the FORDYCA
  * project.
  */
-class fordyca_metrics_aggregator : public rer::client<fordyca_metrics_aggregator>,
-                                   public cmetrics::base_metrics_aggregator {
+class fordyca_metrics_aggregator
+    : public rer::client<fordyca_metrics_aggregator>,
+      public cmetrics::base_metrics_aggregator {
  public:
   fordyca_metrics_aggregator(const cmconfig::metrics_config* mconfig,
-                          const cdconfig::grid_config* const gconfig,
-                          const std::string& output_root);
+                             const cdconfig::grid_config* const gconfig,
+                             const std::string& output_root);
   ~fordyca_metrics_aggregator(void) override = default;
 
   void collect_from_loop(const support::base_loop_functions* loop);

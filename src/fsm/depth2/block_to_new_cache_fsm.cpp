@@ -49,19 +49,15 @@ cfsm::metrics::goal_acq_metrics::goal_type block_to_new_cache_fsm::acquisition_g
     void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
-    return fsm::to_goal_type(
-        foraging_acq_goal::ekBLOCK);
+    return fsm::to_goal_type(foraging_acq_goal::ekBLOCK);
   } else if (ekST_TRANSPORT_TO_GOAL == current_state() ||
              ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return fsm::to_goal_type(
-        foraging_acq_goal::ekNEW_CACHE);
+    return fsm::to_goal_type(foraging_acq_goal::ekNEW_CACHE);
   }
-  return fsm::to_goal_type(
-      foraging_acq_goal::ekNONE);
+  return fsm::to_goal_type(foraging_acq_goal::ekNONE);
 } /* acquisition_goal() */
 
-foraging_transport_goal block_to_new_cache_fsm::block_transport_goal(
-    void) const {
+foraging_transport_goal block_to_new_cache_fsm::block_transport_goal(void) const {
   if (ekST_TRANSPORT_TO_GOAL == current_state() ||
       ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
     return foraging_transport_goal::ekNEW_CACHE;

@@ -82,9 +82,8 @@ void harvester::active_interface_update(int) {
   auto* fsm =
       static_cast<fsm::depth1::block_to_existing_cache_fsm*>(mechanism());
 
-  if (fsm->goal_acquired() &&
-      fsm::foraging_transport_goal::ekEXISTING_CACHE ==
-          fsm->block_transport_goal()) {
+  if (fsm->goal_acquired() && fsm::foraging_transport_goal::ekEXISTING_CACHE ==
+                                  fsm->block_transport_goal()) {
     if (interface_in_prog(0)) {
       interface_exit(0);
       interface_time_mark_finish(0);

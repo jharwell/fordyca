@@ -22,10 +22,10 @@
  ******************************************************************************/
 #include "fordyca/support/depth1/static_cache_manager.hpp"
 
-#include "cosm/ds/arena_grid.hpp"
-#include "cosm/ds/operations/cell2D_empty.hpp"
 #include "cosm/arena/operations/free_block_drop.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
+#include "cosm/ds/arena_grid.hpp"
+#include "cosm/ds/operations/cell2D_empty.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/math/cache_respawn_probability.hpp"

@@ -42,7 +42,7 @@
  ******************************************************************************/
 namespace cosm::arena::repr {
 class arena_cache;
-} /* namespace cosm::foraging::repr */
+} // namespace cosm::arena::repr
 
 NS_START(fordyca);
 

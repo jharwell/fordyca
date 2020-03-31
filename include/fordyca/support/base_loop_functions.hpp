@@ -54,9 +54,21 @@ struct convergence_config;
 } /* namespace config */
 } /* namespace cosm::convergence */
 
+namespace cosm::pal {
+template<class TControllerType>
+class argos_convergence_calculator;
+} /* namespace cosm::pal */
+
 namespace cosm::metrics::config {
 struct output_config;
 } /* namespace cosm::metrics::config */
+
+namespace cosm::oracle::config {
+struct aggregate_oracle_config;
+} /* namespace cosm::oracle::config */
+namespace cosm::foraging::oracle {
+class foraging_oracle;
+}
 
 NS_START(fordyca);
 
@@ -86,6 +98,8 @@ NS_START(support);
 class base_loop_functions : public cpal::argos_sm_adaptor,
                             public rer::client<base_loop_functions> {
  public:
+  using convergence_calculator_type = cpal::argos_convergence_calculator<cpal::argos_controller2D_adaptor>;
+
   base_loop_functions(void) RCSW_COLD;
   ~base_loop_functions(void) override RCSW_COLD;
 
@@ -100,8 +114,11 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
   void post_step(void) override;
 
   const tv::tv_manager* tv_manager(void) const { return m_tv_manager.get(); }
-  const cconvergence::convergence_calculator* conv_calculator(void) const {
+  const convergence_calculator_type* conv_calculator(void) const {
     return m_conv_calc.get();
+  }
+  const cforacle::foraging_oracle* oracle(void) const {
+    return m_oracle.get();
   }
 
  protected:
@@ -110,8 +127,11 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
     return &m_config;
   }
   config::loop_function_repository* config(void) { return &m_config; }
-  cconvergence::convergence_calculator* conv_calculator(void) {
+  convergence_calculator_type* conv_calculator(void) {
     return m_conv_calc.get();
+  }
+  cforacle::foraging_oracle* oracle(void) {
+    return m_oracle.get();
   }
 
  private:
@@ -120,8 +140,7 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
    *
    * \param config Parsed convergence parameters.
    */
-  void convergence_init(
-      const cconvergence::config::convergence_config* config) RCSW_COLD;
+  void convergence_init(const ccconfig::convergence_config* config) RCSW_COLD;
 
   /**
    * \brief Initialize temporal variance handling.
@@ -137,14 +156,18 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
    */
   void output_init(const cmconfig::output_config* output) RCSW_COLD;
 
-  std::vector<double> calc_robot_nn(uint n_threads) const;
-  std::vector<rmath::radians> calc_robot_headings(uint n_threads) const;
-  std::vector<rmath::vector2d> calc_robot_positions(uint n_threads) const;
+  /**
+   * \brief Initialize oracular information injection.
+   *
+   * \param oraclep Parsed \ref aggregate_oracle parameters.
+   */
+  void oracle_init(const coconfig::aggregate_oracle_config* oraclep) RCSW_COLD;
 
   /* clang-format off */
-  config::loop_function_repository                      m_config{};
-  std::unique_ptr<tv::tv_manager>                       m_tv_manager;
-  std::unique_ptr<cconvergence::convergence_calculator> m_conv_calc;
+  config::loop_function_repository             m_config{};
+  std::unique_ptr<tv::tv_manager>              m_tv_manager;
+  std::unique_ptr<convergence_calculator_type> m_conv_calc;
+  std::unique_ptr<cforacle::foraging_oracle>   m_oracle;
   /* clang-format on */
 };
 

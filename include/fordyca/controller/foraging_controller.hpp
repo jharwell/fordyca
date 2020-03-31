@@ -28,14 +28,15 @@
 #include <string>
 #include <typeindex>
 
+#include "cosm/controller/block_carrying_controller.hpp"
 #include "cosm/controller/irv_recipient_controller.hpp"
 #include "cosm/metrics/config/output_config.hpp"
 #include "cosm/pal/argos_controller2D_adaptor.hpp"
-#include "cosm/controller/block_carrying_controller.hpp"
-
-#include "fordyca/controller/block_manip_collator.hpp"
-#include "fordyca/fordyca.hpp"
 #include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
+
+#include "cosm/controller/manip_event_recorder.hpp"
+#include "fordyca/metrics/blocks/block_manip_events.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,13 +59,11 @@ namespace rcppsw::math::config {
 struct rng_config;
 } // namespace rcppsw::math::config
 
-NS_START(fordyca);
+namespace cosm::foraging::repr {
+class foraging_los;
+} /* namespace cosm::foraging::repr */
 
-namespace repr {
-class line_of_sight;
-} // namespace repr
-
-NS_START(controller);
+NS_START(fordyca, controller);
 class base_perception_subsystem;
 
 /*******************************************************************************
@@ -85,6 +84,8 @@ class foraging_controller : public cpal::argos_controller2D_adaptor,
                             public ccontroller::irv_recipient_controller,
                             public rer::client<foraging_controller> {
  public:
+  using block_manip_recorder_type = ccontroller::manip_event_recorder<metrics::blocks::block_manip_events::ekMAX_EVENTS>;
+
   foraging_controller(void) RCSW_COLD;
   ~foraging_controller(void) override RCSW_COLD;
 
@@ -123,13 +124,13 @@ class foraging_controller : public cpal::argos_controller2D_adaptor,
    */
   bool in_nest(void) const;
 
+  const block_manip_recorder_type* block_manip_recorder(void) const {
+    return &m_block_manip;
+  }
+  block_manip_recorder_type* block_manip_recorder(void) {
+    return &m_block_manip;
+  }
 
-  const class block_manip_collator* block_manip_collator(void) const {
-    return &m_block_manip;
-  }
-  class block_manip_collator* block_manip_collator(void) {
-    return &m_block_manip;
-  }
  protected:
   class crfootbot::footbot_saa_subsystem2D* saa(void) RCSW_PURE;
   const class crfootbot::footbot_saa_subsystem2D* saa(void) const RCSW_PURE;
@@ -141,7 +142,7 @@ class foraging_controller : public cpal::argos_controller2D_adaptor,
   void output_init(const cmconfig::output_config* outputp);
 
   /* clang-format off */
-  class block_manip_collator            m_block_manip{};
+  block_manip_recorder_type m_block_manip{};
   /* clang-format on */
 };
 

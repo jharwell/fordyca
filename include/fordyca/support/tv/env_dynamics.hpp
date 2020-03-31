@@ -94,7 +94,7 @@ class env_dynamics final : public rer::client<env_dynamics>,
   double avg_motion_throttle(void) const override {
     return m_rda.avg_motion_throttle();
   }
-  rtypes::timestep block_manip_penalty(void) const override;
+  rtypes::timestep arena_block_manip_penalty(void) const override;
   rtypes::timestep cache_usage_penalty(void) const override;
 
   /* COSM env dynamics overrides */

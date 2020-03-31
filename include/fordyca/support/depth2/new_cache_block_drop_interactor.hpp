@@ -232,6 +232,9 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
                                                    loc,
                                                    m_map->grid_resolution());
 
+    controller.block_manip_recorder()->record(metrics::blocks::block_manip_events::ekFREE_DROP,
+                                              penalty.penalty());
+
     rdrop_op.visit(controller);
     adrop_op.visit(*m_map);
     m_floor->SetChanged();

@@ -193,7 +193,8 @@ class existing_cache_block_drop_interactor
                                                     m_map->grid_resolution());
 
     (*cache_it)->penalty_served(penalty.penalty());
-
+    controller.block_manip_recorder()->record(metrics::blocks::block_manip_events::ekCACHE_DROP,
+                                              penalty.penalty());
     /*
      * Order of visitation must be:
      *

@@ -47,7 +47,7 @@ NS_START(fordyca, support, tv);
  * providing additional callbacks to maintain simulation consistency/fidelity
  * during population dynamics application.
  */
-class fordyca_pd_adaptor : rer::client<fordyca_pd_adaptor>,
+class fordyca_pd_adaptor final : rer::client<fordyca_pd_adaptor>,
                            public cptv::argos_pd_adaptor<cpal::argos_controller2D_adaptor>{
  public:
   template <typename... Args>

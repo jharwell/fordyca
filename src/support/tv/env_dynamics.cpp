@@ -23,10 +23,11 @@
  ******************************************************************************/
 #include "fordyca/support/tv/env_dynamics.hpp"
 
+#include "cosm/arena/caching_arena_map.hpp"
+
 #include "fordyca/config/tv/env_dynamics_config.hpp"
 #include "fordyca/controller/foraging_controller.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
-#include "cosm/arena/caching_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -44,19 +45,15 @@ env_dynamics::env_dynamics(const config::tv::env_dynamics_config* const config,
       m_fb_pickup(map, &config->block_manip_penalty, "Free Block Pickup"),
       m_nest_drop(map, &config->block_manip_penalty, "Nest Block Pickup"),
       m_existing_cache(map, &config->cache_usage_penalty, "Existing Cache"),
-      m_new_cache(map,
-                  &config->block_manip_penalty,
-                  "New Cache"),
-      m_cache_site(map,
-                   &config->block_manip_penalty,
-                   "Cache Site") {}
+      m_new_cache(map, &config->block_manip_penalty, "New Cache"),
+      m_cache_site(map, &config->block_manip_penalty, "Cache Site") {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-rtypes::timestep env_dynamics::block_manip_penalty(void) const {
+rtypes::timestep env_dynamics::arena_block_manip_penalty(void) const {
   return penalty_handler(block_op_src::ekNEST_DROP)->penalty_calc(m_timestep);
-} /* block_manip_penalty() */
+} /* arena_block_manip_penalty() */
 
 rtypes::timestep env_dynamics::cache_usage_penalty(void) const {
   return penalty_handler(cache_op_src::ekEXISTING_CACHE_PICKUP)

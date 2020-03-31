@@ -58,13 +58,13 @@ rtypes::type_uuid block_op_penalty_id_calculator::operator()(
       break;
     case block_op_src::ekCACHE_SITE_DROP:
       ER_ASSERT(nullptr != controller.block() &&
-                rtypes::constants::kNoUUID != controller.block()->id(),
+                    rtypes::constants::kNoUUID != controller.block()->id(),
                 "Robot not carrying block?");
       id = controller.block()->id();
       break;
     case block_op_src::ekNEW_CACHE_DROP:
       ER_ASSERT(nullptr != controller.block() &&
-                rtypes::constants::kNoUUID != controller.block()->id(),
+                    rtypes::constants::kNoUUID != controller.block()->id(),
                 "Robot not carrying block?");
       id = controller.block()->id();
       break;

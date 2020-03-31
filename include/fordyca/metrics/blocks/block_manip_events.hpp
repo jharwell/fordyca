@@ -1,7 +1,7 @@
 /**
- * \file robot_metric_extractor.hpp
+ * \file block_manip_events.hpp
  *
- * \copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2020 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -17,47 +17,31 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef INCLUDE_FORDYCA_SUPPORT_ROBOT_METRIC_EXTRACTOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_ROBOT_METRIC_EXTRACTOR_HPP_
+
+#ifndef INCLUDE_FORDYCA_METRICS_BLOCKS_BLOCK_MANIP_EVENTS_HPP_
+#define INCLUDE_FORDYCA_METRICS_BLOCKS_BLOCK_MANIP_EVENTS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <boost/variant/static_visitor.hpp>
-
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca, metrics, blocks);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-/**
- * \struct robot_metric_extractor
- * \ingroup support
- *
- * \brief Functor to perform metric extraction from a controller on each
- * timestep.
- */
-template <class AggregatorType, class ControllerType>
-class robot_metric_extractor : public boost::static_visitor<void> {
- public:
-  using controller_type = ControllerType;
-  explicit robot_metric_extractor(AggregatorType* const agg) : m_agg(agg) {}
-
-  void operator()(const ControllerType* const c) const {
-    m_agg->collect_from_controller(c);
-  }
-
- private:
-  /* clang-format off */
-  AggregatorType* const m_agg;
-  /* clang-format on */
+enum block_manip_events {
+  ekFREE_PICKUP,
+  ekFREE_DROP,
+  ekCACHE_PICKUP,
+  ekCACHE_DROP,
+  ekMAX_EVENTS
 };
 
-NS_END(support, fordyca);
+NS_END(blocks, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_ROBOT_METRIC_EXTRACTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_BLOCKS_BLOCK_MANIP_EVENTS_HPP_ */

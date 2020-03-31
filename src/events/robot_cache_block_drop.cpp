@@ -23,8 +23,8 @@
  ******************************************************************************/
 #include "fordyca/events/robot_cache_block_drop.hpp"
 
-#include "cosm/ds/cell2D.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
+#include "cosm/ds/cell2D.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/controller/cache_sel_matrix.hpp"
@@ -127,7 +127,6 @@ void robot_cache_block_drop::visit(
   controller.ndc_pusht();
 
   dispatch_d1_cache_interactor(controller.current_task());
-  controller.block_manip_collator()->cache_drop_event(true);
 
   ER_INFO("Dropped block%d in cache%d,task='%s'",
           m_block->id().v(),
@@ -145,7 +144,6 @@ void robot_cache_block_drop::visit(
 
   visit(*controller.mdpo_perception()->map());
   dispatch_d1_cache_interactor(controller.current_task());
-  controller.block_manip_collator()->cache_drop_event(true);
 
   ER_INFO("Dropped block%d in cache%d,task='%s'",
           m_block->id().v(),
@@ -162,7 +160,6 @@ void robot_cache_block_drop::visit(
   controller.ndc_pusht();
 
   dispatch_d1_cache_interactor(controller.current_task());
-  controller.block_manip_collator()->cache_drop_event(true);
 
   ER_INFO("Dropped block%d in cache%d,task='%s'",
           m_block->id().v(),
@@ -180,7 +177,6 @@ void robot_cache_block_drop::visit(
 
   visit(*controller.mdpo_perception()->map());
   dispatch_d1_cache_interactor(controller.current_task());
-  controller.block_manip_collator()->cache_drop_event(true);
 
   ER_INFO("Dropped block%d in cache%d,task='%s'",
           m_block->id().v(),
@@ -212,7 +208,6 @@ void robot_cache_block_drop::visit(
                                    controller.cache_sel_matrix())) {
     controller.csel_exception_added(true);
   }
-  controller.block_manip_collator()->cache_drop_event(true);
   ER_INFO("Dropped block%d in cache%d,task='%s'",
           m_block->id().v(),
           m_cache->id().v(),
@@ -232,7 +227,6 @@ void robot_cache_block_drop::visit(
     controller.csel_exception_added(true);
   }
   visit(*controller.mdpo_perception()->map());
-  controller.block_manip_collator()->cache_drop_event(true);
   ER_INFO("Dropped block%d in cache%d,task='%s'",
           m_block->id().v(),
           m_cache->id().v(),
@@ -251,7 +245,6 @@ void robot_cache_block_drop::visit(
                                    controller.cache_sel_matrix())) {
     controller.csel_exception_added(true);
   }
-  controller.block_manip_collator()->cache_drop_event(true);
   ER_INFO("Dropped block%d in cache%d,task='%s'",
           m_block->id().v(),
           m_cache->id().v(),
@@ -271,7 +264,6 @@ void robot_cache_block_drop::visit(
     controller.csel_exception_added(true);
   }
   visit(*controller.mdpo_perception()->map());
-  controller.block_manip_collator()->cache_drop_event(true);
   ER_INFO("Dropped block%d in cache%d,task='%s'",
           m_block->id().v(),
           m_cache->id().v(),

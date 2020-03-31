@@ -23,8 +23,8 @@
  ******************************************************************************/
 #include "fordyca/events/block_found.hpp"
 
-#include "cosm/ds/operations/cell2D_empty.hpp"
 #include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/ds/operations/cell2D_empty.hpp"
 #include "cosm/repr/base_block2D.hpp"
 #include "cosm/repr/pheromone_density.hpp"
 
@@ -199,9 +199,8 @@ void block_found::pheromone_update(ds::dpo_semantic_map& map) {
    * with dangling references as a result of mixing unique_ptr and raw ptr. See
    * #229.
    */
-  auto res =
-      map.store()->block_update(repr::dpo_entity<crepr::base_block2D>(
-          m_block->clone(), density));
+  auto res = map.store()->block_update(
+      repr::dpo_entity<crepr::base_block2D>(m_block->clone(), density));
   if (res.status) {
     if (ds::dpo_store::update_status::kBLOCK_MOVED == res.reason) {
       ER_DEBUG("Updating cell@%s: Block%d moved %s -> %s",

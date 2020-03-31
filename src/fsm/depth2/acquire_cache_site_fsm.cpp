@@ -116,8 +116,7 @@ boost::optional<cfsm::acquire_goal_fsm::candidate_type> acquire_cache_site_fsm::
 
 cfsm::metrics::goal_acq_metrics::goal_type acquire_cache_site_fsm::
     acquisition_goal_internal(void) const {
-  return fsm::to_goal_type(
-      foraging_acq_goal::ekCACHE_SITE);
+  return fsm::to_goal_type(foraging_acq_goal::ekCACHE_SITE);
 } /* acquisition_goal_internal() */
 
 NS_END(depth2, controller, fordyca);

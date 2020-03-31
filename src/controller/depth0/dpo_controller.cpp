@@ -26,10 +26,10 @@
 #include <fstream>
 
 #include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block2D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
-#include "cosm/fsm/supervisor_fsm.hpp"
 
 #include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
 #include "fordyca/config/depth0/dpo_controller_repository.hpp"
@@ -68,10 +68,10 @@ void dpo_controller::perception(
   m_perception = std::move(perception);
 }
 
-const repr::line_of_sight* dpo_controller::los(void) const {
+const cfrepr::foraging_los* dpo_controller::los(void) const {
   return static_cast<const dpo_perception_subsystem*>(m_perception.get())->los();
 }
-void dpo_controller::los(std::unique_ptr<repr::line_of_sight> new_los) {
+void dpo_controller::los(std::unique_ptr<cfrepr::foraging_los> new_los) {
   m_perception->los(std::move(new_los));
 }
 

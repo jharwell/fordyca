@@ -40,6 +40,7 @@
 #include "cosm/fsm/metrics/goal_acq_metrics.hpp"
 #include "cosm/fsm/metrics/goal_acq_metrics_collector.hpp"
 #include "cosm/fsm/metrics/movement_metrics.hpp"
+#include "cosm/metrics/collector_registerer.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tab.hpp"
 #include "cosm/ta/metrics/bi_tab_metrics.hpp"
@@ -50,7 +51,6 @@
 
 #include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
 #include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
-#include "cosm/metrics/collector_registerer.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
@@ -147,10 +147,8 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
 void depth1_metrics_aggregator::collect_from_cache(
     const carepr::arena_cache* const cache) {
   auto util_m =
-      dynamic_cast<const cametrics::caches::utilization_metrics*>(
-          cache);
-  auto loc_m =
-      dynamic_cast<const cametrics::caches::location_metrics*>(cache);
+      dynamic_cast<const cametrics::caches::utilization_metrics*>(cache);
+  auto loc_m = dynamic_cast<const cametrics::caches::location_metrics*>(cache);
   collect("caches::utilization", *util_m);
   collect("caches::locations", *loc_m);
 } /* collect_from_cache() */

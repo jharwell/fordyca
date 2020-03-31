@@ -79,7 +79,6 @@ void robot_nest_block_drop::dispatch_nest_interactor(
 void robot_nest_block_drop::visit(controller::depth0::crw_controller& controller) {
   controller.ndc_pusht();
   visit(*controller.fsm());
-  controller.block_manip_collator()->free_drop_event(true);
 
   ER_INFO("Dropped block%d in nest", m_block->id().v());
   controller.ndc_pop();
@@ -94,7 +93,6 @@ void robot_nest_block_drop::visit(controller::depth0::dpo_controller& controller
   controller.ndc_pusht();
 
   visit(*controller.fsm());
-  controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id().v());
 
   controller.ndc_pop();
@@ -105,7 +103,6 @@ void robot_nest_block_drop::visit(
   controller.ndc_pusht();
 
   visit(*controller.fsm());
-  controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id().v());
 
   controller.ndc_pop();
@@ -121,7 +118,6 @@ void robot_nest_block_drop::visit(
   controller.ndc_pusht();
 
   visit(*controller.fsm());
-  controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id().v());
 
   controller.ndc_pop();
@@ -132,7 +128,6 @@ void robot_nest_block_drop::visit(
   controller.ndc_pusht();
 
   visit(*controller.fsm());
-  controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id().v());
 
   controller.ndc_pop();
@@ -146,7 +141,6 @@ void robot_nest_block_drop::visit(
   controller.ndc_pusht();
 
   dispatch_nest_interactor(controller.current_task());
-  controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id().v());
 
   controller.ndc_pop();
@@ -157,7 +151,6 @@ void robot_nest_block_drop::visit(
   controller.ndc_pusht();
 
   dispatch_nest_interactor(controller.current_task());
-  controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id().v());
 
   controller.ndc_pop();
@@ -168,7 +161,6 @@ void robot_nest_block_drop::visit(
   controller.ndc_pusht();
 
   dispatch_nest_interactor(controller.current_task());
-  controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id().v());
 
   controller.ndc_pop();
@@ -179,7 +171,6 @@ void robot_nest_block_drop::visit(
   controller.ndc_pusht();
 
   dispatch_nest_interactor(controller.current_task());
-  controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id().v());
 
   controller.ndc_pop();
@@ -211,7 +202,6 @@ void robot_nest_block_drop::visit(
   controller.ndc_pusht();
 
   dispatch_nest_interactor(controller.current_task());
-  controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id().v());
 
   controller.ndc_pop();
@@ -222,7 +212,6 @@ void robot_nest_block_drop::visit(
   controller.ndc_pusht();
 
   dispatch_nest_interactor(controller.current_task());
-  controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id().v());
 
   controller.ndc_pop();
@@ -233,7 +222,6 @@ void robot_nest_block_drop::visit(
   controller.ndc_pusht();
 
   dispatch_nest_interactor(controller.current_task());
-  controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id().v());
 
   controller.ndc_pop();
@@ -244,7 +232,6 @@ void robot_nest_block_drop::visit(
   controller.ndc_pusht();
 
   dispatch_nest_interactor(controller.current_task());
-  controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id().v());
 
   controller.ndc_pop();

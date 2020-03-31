@@ -35,16 +35,19 @@
 
 #include "rcppsw/ds/type_map.hpp"
 
-#include "cosm/convergence/convergence_calculator.hpp"
-#include "cosm/foraging/block_dist/base_distributor.hpp"
 #include "cosm/arena/config/arena_map_config.hpp"
+#include "cosm/controller/operations/applicator.hpp"
+#include "cosm/pal/argos_convergence_calculator.hpp"
+#include "cosm/foraging/block_dist/base_distributor.hpp"
+#include "cosm/foraging/operations/robot_los_update.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
-#include "cosm/oracle/oracle_manager.hpp"
+#include "cosm/operations/robot_arena_interaction_applicator.hpp"
+#include "cosm/foraging/oracle/foraging_oracle.hpp"
+#include "cosm/pal/argos_swarm_iterator.hpp"
+#include "cosm/robots/footbot/config/saa_xml_names.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
-#include "cosm/pal/argos_swarm_iterator.hpp"
 
-#include "cosm/robots/footbot/config/saa_xml_names.hpp"
 #include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
 #include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/depth2/birtd_odpo_controller.hpp"
@@ -53,11 +56,6 @@
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
 #include "fordyca/support/depth2/robot_arena_interactor.hpp"
 #include "fordyca/support/depth2/robot_configurer.hpp"
-#include "fordyca/support/depth2/robot_configurer_adaptor.hpp"
-#include "fordyca/support/robot_interactor_adaptor.hpp"
-#include "fordyca/support/robot_los_updater_adaptor.hpp"
-#include "fordyca/support/robot_metric_extractor_adaptor.hpp"
-#include "fordyca/support/robot_task_extractor_adaptor.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 
 /*******************************************************************************
@@ -69,6 +67,11 @@ NS_START(fordyca, support, depth2);
  * Struct Definitions
  ******************************************************************************/
 NS_START(detail);
+
+using configurer_map_type =
+    rds::type_map<rmpl::typelist_wrap_apply<controller::depth2::typelist,
+                                            robot_configurer,
+                                            depth2_metrics_aggregator>::type>;
 
 /**
  * \struct functor_maps_initializer
@@ -86,7 +89,7 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
   template <typename T>
   RCSW_COLD void operator()(const T& controller) const {
     typename robot_arena_interactor<T>::params p{
-      lf->arena_map<carena::caching_arena_map>(),
+        lf->arena_map<carena::caching_arena_map>(),
         lf->m_metrics_agg.get(),
         lf->floor(),
         lf->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>(),
@@ -96,28 +99,16 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
                                   robot_arena_interactor<T>(p));
     lf->m_metric_extractor_map->emplace(
         typeid(controller),
-        robot_metric_extractor<depth2_metrics_aggregator, T>(
+        ccops::metrics_extract<T, depth2_metrics_aggregator>(
             lf->m_metrics_agg.get()));
-    if (nullptr != lf->oracle_manager()) {
-      config_map->emplace(
-          typeid(controller),
-          robot_configurer<T, depth2_metrics_aggregator>(
-              lf->config()->config_get<cvconfig::visualization_config>(),
-              lf->oracle_manager()->entities_oracle(),
-              lf->oracle_manager()->tasking_oracle(),
-              lf->m_metrics_agg.get()));
-    } else {
-      config_map->emplace(
-          typeid(controller),
-          robot_configurer<T, depth2_metrics_aggregator>(
-              lf->config()->config_get<cvconfig::visualization_config>(),
-              nullptr,
-              nullptr,
-              lf->m_metrics_agg.get()));
-    }
-
+    config_map->emplace(
+        typeid(controller),
+        robot_configurer<T, depth2_metrics_aggregator>(
+            lf->config()->config_get<cvconfig::visualization_config>(),
+            lf->oracle(),
+            lf->m_metrics_agg.get()));
     lf->m_los_update_map->emplace(typeid(controller),
-                                  robot_los_updater<T>(lf->arena_map()));
+                                  cfops::robot_los_update<T>(lf->arena_map()));
   }
 
   /* clang-format off */
@@ -170,8 +161,8 @@ void depth2_loop_functions::private_init(void) {
    * arena map. The arena map pads the size obtained from the XML file after
    * initialization, so we just need to grab it.
    */
-  auto padded_size = rmath::vector2d(arena_map()->xrsize(),
-                                     arena_map()->yrsize());
+  auto padded_size =
+      rmath::vector2d(arena_map()->xrsize(), arena_map()->yrsize());
   auto arena = *config()->config_get<caconfig::arena_map_config>();
   arena.grid.upper = padded_size;
   m_metrics_agg = std::make_unique<depth2_metrics_aggregator>(&output->metrics,
@@ -179,7 +170,6 @@ void depth2_loop_functions::private_init(void) {
                                                               output_root());
   /* this starts at 0, and ARGoS starts at 1, so sync up */
   m_metrics_agg->timestep_inc_all();
-
 
   /* initialize cache handling */
   auto* cachep = config()->config_get<config::caches::caches_config>();
@@ -190,7 +180,7 @@ void depth2_loop_functions::private_init(void) {
    * included by default).
    */
   if (nullptr != conv_calculator()) {
-    conv_calculator()->task_dist_init(
+    conv_calculator()->task_dist_entropy_init(
         std::bind(&depth2_loop_functions::robot_tasks_extract,
                   this,
                   std::placeholders::_1));
@@ -218,8 +208,10 @@ void depth2_loop_functions::private_init(void) {
               controller->GetId().c_str(),
               controller->type_index().name());
 
-    boost::apply_visitor(detail::robot_configurer_adaptor(controller),
-                         config_map.at(controller->type_index()));
+    auto applicator = ccops::applicator<controller::foraging_controller,
+                                        robot_configurer,
+                                        depth2_metrics_aggregator>(controller);
+    boost::apply_visitor(applicator, config_map.at(controller->type_index()));
   };
 
   /*
@@ -230,7 +222,7 @@ void depth2_loop_functions::private_init(void) {
   cpal::argos_swarm_iterator::controllers<argos::CFootBotEntity,
                                           controller::foraging_controller,
                                           cpal::iteration_order::ekSTATIC>(
-                                              this, cb, kARGoSRobotType);
+      this, cb, kARGoSRobotType);
 } /* private_init() */
 
 void depth2_loop_functions::cache_handling_init(
@@ -254,9 +246,11 @@ std::vector<int> depth2_loop_functions::robot_tasks_extract(uint) const {
               "Controller '%s' type '%s' not in depth2 task extraction map",
               controller->GetId().c_str(),
               controller->type_index().name());
-    v.push_back(boost::apply_visitor(robot_task_extractor_adaptor(controller),
-                                     m_task_extractor_map->at(
-                                         controller->type_index())));
+    auto applicator =
+        ccops::applicator<controller::foraging_controller, robot_task_extractor>(
+            controller);
+    v.push_back(boost::apply_visitor(
+        applicator, m_task_extractor_map->at(controller->type_index())));
   };
   cpal::argos_swarm_iterator::controllers<argos::CFootBotEntity,
                                           controller::foraging_controller,
@@ -417,7 +411,10 @@ void depth2_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
             controller->GetId().c_str(),
             controller->type_index().name());
 
-  boost::apply_visitor(robot_los_updater_adaptor(controller),
+  auto applicator =
+      ccops::applicator<controller::foraging_controller, cfops::robot_los_update>(
+          controller);
+  boost::apply_visitor(applicator,
                        m_los_update_map->at(controller->type_index()));
 } /* robot_pre_step() */
 
@@ -438,11 +435,12 @@ void depth2_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
             controller->GetId().c_str(),
             controller->type_index().name());
 
-  auto iadaptor =
-      robot_interactor_adaptor<robot_arena_interactor, interactor_status>(
+  auto iapplicator =
+      cops::robot_arena_interaction_applicator<controller::foraging_controller,
+                                               robot_arena_interactor>(
           controller, rtypes::timestep(GetSpace().GetSimulationClock()));
   auto status =
-      boost::apply_visitor(iadaptor,
+      boost::apply_visitor(iapplicator,
                            m_interactor_map->at(controller->type_index()));
   if (interactor_status::ekNO_EVENT != status) {
     /*
@@ -465,14 +463,15 @@ void depth2_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
      * in the arena, as a robot could have dropped a block when it aborted its
      * current task.
      */
-    if (nullptr != oracle_manager()) {
-      oracle_manager()->update(arena_map<carena::caching_arena_map>());
+    if (nullptr != oracle()) {
+      oracle()->update(arena_map<carena::caching_arena_map>());
     }
   }
 
   /* get stats from this robot before its state changes */
-  auto madaptor =
-      robot_metric_extractor_adaptor<depth2_metrics_aggregator>(controller);
+  auto mapplicator = ccops::applicator<controller::foraging_controller,
+                                       ccops::metrics_extract,
+                                       depth2_metrics_aggregator>(controller);
 
   auto it2 = m_metric_extractor_map->find(controller->type_index());
   ER_ASSERT(m_metric_extractor_map->end() != it2,
@@ -480,9 +479,9 @@ void depth2_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
             controller->GetId().c_str(),
             controller->type_index().name());
 
-  boost::apply_visitor(madaptor,
+  boost::apply_visitor(mapplicator,
                        m_metric_extractor_map->at(controller->type_index()));
-  controller->block_manip_collator()->reset();
+  controller->block_manip_recorder()->reset();
 } /* robot_post_step() */
 
 bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
@@ -496,7 +495,7 @@ bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
     return false;
   }
   cache_create_ro_params ccp = {
-    .current_caches = arena_map<carena::caching_arena_map>()->caches(),
+      .current_caches = arena_map<carena::caching_arena_map>()->caches(),
       .clusters = arena_map()->block_distributor()->block_clusters(),
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 

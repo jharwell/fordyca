@@ -24,8 +24,8 @@
 #include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/repr/base_block2D.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
+#include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/config/depth2/controller_repository.hpp"
 #include "fordyca/config/perception/perception_config.hpp"

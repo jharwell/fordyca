@@ -128,8 +128,7 @@ bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
  ******************************************************************************/
 cfsm::metrics::goal_acq_metrics::goal_type acquire_new_cache_fsm::
     acquisition_goal_internal(void) const {
-  return fsm::to_goal_type(
-      foraging_acq_goal::ekNEW_CACHE);
+  return fsm::to_goal_type(foraging_acq_goal::ekNEW_CACHE);
 } /* acquisition_goal() */
 
 NS_END(depth2, controller, fordyca);

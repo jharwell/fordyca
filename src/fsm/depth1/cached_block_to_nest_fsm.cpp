@@ -24,8 +24,8 @@
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
-#include "fordyca/fsm/foraging_signal.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
+#include "fordyca/fsm/foraging_signal.hpp"
 
 /*******************************************************************************
  * Namespaces

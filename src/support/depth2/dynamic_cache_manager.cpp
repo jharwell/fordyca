@@ -22,8 +22,8 @@
  ******************************************************************************/
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
 
-#include "cosm/ds/arena_grid.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
+#include "cosm/ds/arena_grid.hpp"
 #include "cosm/foraging/repr/block_cluster.hpp"
 #include "cosm/repr/base_block2D.hpp"
 

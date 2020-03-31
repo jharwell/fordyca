@@ -49,7 +49,7 @@ class arena_cache;
 } /* namespace repr */
 } /* namespace cosm::arena */
 namespace fordyca::repr {
-class line_of_sight;
+class foraging_los;
 }
 
 NS_START(fordyca, support, utils);

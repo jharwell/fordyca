@@ -23,11 +23,11 @@
  ******************************************************************************/
 #include "fordyca/support/base_cache_creator.hpp"
 
-#include "cosm/arena/operations/free_block_drop.hpp"
 #include "cosm/arena/operations/cell2D_cache_extent.hpp"
+#include "cosm/arena/operations/free_block_drop.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
-#include "cosm/foraging/repr/block_cluster.hpp"
 #include "cosm/arena/repr/light_type_index.hpp"
+#include "cosm/foraging/repr/block_cluster.hpp"
 
 #include "fordyca/events/cell2D_empty.hpp"
 #include "fordyca/support/utils/loop_utils.hpp"
