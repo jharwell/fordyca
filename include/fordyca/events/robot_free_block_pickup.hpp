@@ -125,6 +125,18 @@ class robot_free_block_pickup : public rer::client<robot_free_block_pickup>,
  private:
   void dispatch_robot_free_block_interactor(tasks::base_foraging_task* task);
 
+  template<typename TControllerType>
+  void d1d2_dpo_controller_visit(TControllerType& controller);
+
+  template<typename TControllerType>
+  void d1d2_mdpo_controller_visit(TControllerType& controller);
+
+  template<typename TControllerType>
+  void d0_dpo_controller_visit(TControllerType& controller);
+
+  template<typename TControllerType>
+  void d0_mdpo_controller_visit(TControllerType& controller);
+
   /* clang-format off */
   const rtypes::timestep  mc_timestep;
   const rtypes::type_uuid mc_robot_id;
@@ -134,8 +146,8 @@ class robot_free_block_pickup : public rer::client<robot_free_block_pickup>,
 };
 
 /**
- * \brief We use the precise visitor in order to force compile errors if a call to
- * a visitor is made that involves a visitee that is not in our visit set
+ * \brief We use the precise visitor in order to force compile errors if a call
+ * to a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */

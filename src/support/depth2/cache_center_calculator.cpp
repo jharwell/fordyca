@@ -48,7 +48,7 @@ cache_center_calculator::cache_center_calculator(cds::arena_grid* const grid,
 boost::optional<rmath::vector2u> cache_center_calculator::operator()(
     const cds::block2D_vectorno& c_cache_i_blocks,
     const cads::acache_vectorno& c_existing_caches,
-    const cfds::block_cluster_vector& c_clusters,
+    const cfds::block2D_cluster_vector& c_clusters,
     rmath::rng* rng) const {
   double sumx = std::accumulate(c_cache_i_blocks.begin(),
                                 c_cache_i_blocks.end(),
@@ -111,7 +111,7 @@ boost::optional<rmath::vector2u> cache_center_calculator::operator()(
 
 boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc(
     const cads::acache_vectorno& c_existing_caches,
-    const cfds::block_cluster_vector& c_clusters,
+    const cfds::block2D_cluster_vector& c_clusters,
     const rmath::vector2u& c_center,
     rmath::rng* rng) const {
   bool conflict = false;
@@ -238,7 +238,7 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_entity(
    * Need to pass cache dimensions rather than dimensions of the entity, which
    * may be a block.
    */
-  auto status = cfutils::placement_conflict(
+  auto status = cfutils::placement_conflict2D(
       center_r, rmath::vector2d(mc_cache_dim.v(), mc_cache_dim.v()), ent);
 
   if (status.x_conflict) {

@@ -84,6 +84,73 @@ void robot_free_block_pickup::dispatch_robot_free_block_interactor(
   interactor->accept(*this);
 } /* dispatch_robot_free_block_interactor() */
 
+template<typename TControllerType>
+void robot_free_block_pickup::d1d2_dpo_controller_visit(TControllerType& controller) {
+  controller.ndc_pusht();
+
+  visit(*controller.dpo_perception()->dpo_store());
+
+  auto robot_block = m_block->clone();
+  robot_block->md()->robot_id(mc_robot_id);
+  controller.block(std::move(robot_block));
+
+  dispatch_robot_free_block_interactor(controller.current_task());
+  ER_INFO("Picked up block%d", m_block->id().v());
+
+  controller.ndc_pop();
+} /* d1d2_dpo_controller_visit() */
+
+template<typename TControllerType>
+void robot_free_block_pickup::d1d2_mdpo_controller_visit(
+    TControllerType& controller) {
+  controller.ndc_pusht();
+
+  visit(*controller.mdpo_perception()->dpo_store());
+
+  auto robot_block = m_block->clone();
+  robot_block->md()->robot_id(mc_robot_id);
+  controller.block(std::move(robot_block));
+
+  dispatch_robot_free_block_interactor(controller.current_task());
+  ER_INFO("Picked up block%d", m_block->id().v());
+
+  controller.ndc_pop();
+} /* d1d2_mdpo_controller_visit() */
+
+template<typename TControllerType>
+void robot_free_block_pickup::d0_dpo_controller_visit(
+    TControllerType& controller) {
+  controller.ndc_pusht();
+
+  visit(*controller.dpo_perception()->dpo_store());
+  visit(*controller.fsm());
+
+  auto robot_block = m_block->clone();
+  robot_block->md()->robot_id(mc_robot_id);
+  controller.block(std::move(robot_block));
+
+  ER_INFO("Picked up block%d", m_block->id().v());
+
+  controller.ndc_pop();
+} /* d0_dpo_controller_visit() */
+
+template<typename TControllerType>
+void robot_free_block_pickup::d0_mdpo_controller_visit(
+    TControllerType& controller) {
+  controller.ndc_pusht();
+
+  visit(*controller.mdpo_perception()->map());
+  visit(*controller.fsm());
+
+  auto robot_block = m_block->clone();
+  robot_block->md()->robot_id(mc_robot_id);
+  controller.block(std::move(robot_block));
+
+  ER_INFO("Picked up block%d", m_block->id().v());
+
+  controller.ndc_pop();
+} /* d0_mdpo_controller_visit() */
+
 /*******************************************************************************
  * CRW Foraging
  ******************************************************************************/
@@ -129,10 +196,10 @@ void robot_free_block_pickup::visit(ds::dpo_semantic_map& map) {
             m_block->dloc().to_str().c_str(),
             cell.loc().to_str().c_str());
 
-  ER_ASSERT(m_block->id() == cell.block()->id(),
+  ER_ASSERT(m_block->id() == cell.block2D()->id(),
             "Pickup/cell block mismatch: %d vs %d",
             m_block->id().v(),
-            cell.block()->id().v());
+            cell.block2D()->id().v());
   /*
    * @bug: This should just be an assert. However, due to #242, the fact that
    * blocks can appear close to the wall, and RCPPSW#82, this may not always be
@@ -144,7 +211,7 @@ void robot_free_block_pickup::visit(ds::dpo_semantic_map& map) {
    */
   /* ER_ASSERT(cell.state_has_block(), "cell does not contain block"); */
   if (cell.state_has_block()) {
-    map.block_remove(cell.block());
+    map.block_remove(cell.block2D());
   }
 } /* visit() */
 
@@ -155,66 +222,22 @@ void robot_free_block_pickup::visit(fsm::depth0::dpo_fsm& fsm) {
 
 void robot_free_block_pickup::visit(
     controller::depth0::mdpo_controller& controller) {
-  controller.ndc_pusht();
-
-  visit(*controller.mdpo_perception()->map());
-  visit(*controller.fsm());
-
-  auto robot_block = m_block->clone();
-  robot_block->md()->robot_id(mc_robot_id);
-  controller.block(std::move(robot_block));
-
-  ER_INFO("Picked up block%d", m_block->id().v());
-
-  controller.ndc_pop();
+  d0_mdpo_controller_visit(controller);
 } /* visit() */
 
 void robot_free_block_pickup::visit(
     controller::depth0::omdpo_controller& controller) {
-  controller.ndc_pusht();
-
-  visit(*controller.mdpo_perception()->map());
-  visit(*controller.fsm());
-
-  auto robot_block = m_block->clone();
-  robot_block->md()->robot_id(mc_robot_id);
-  controller.block(std::move(robot_block));
-
-  ER_INFO("Picked up block%d", m_block->id().v());
-
-  controller.ndc_pop();
+  d0_mdpo_controller_visit(controller);
 } /* visit() */
 
 void robot_free_block_pickup::visit(
     controller::depth0::dpo_controller& controller) {
-  controller.ndc_pusht();
-
-  visit(*controller.dpo_perception()->dpo_store());
-  visit(*controller.fsm());
-
-  auto robot_block = m_block->clone();
-  robot_block->md()->robot_id(mc_robot_id);
-  controller.block(std::move(robot_block));
-
-  ER_INFO("Picked up block%d", m_block->id().v());
-
-  controller.ndc_pop();
+  d0_dpo_controller_visit(controller);
 } /* visit() */
 
 void robot_free_block_pickup::visit(
     controller::depth0::odpo_controller& controller) {
-  controller.ndc_pusht();
-
-  visit(*controller.dpo_perception()->dpo_store());
-  visit(*controller.fsm());
-
-  auto robot_block = m_block->clone();
-  robot_block->md()->robot_id(mc_robot_id);
-  controller.block(std::move(robot_block));
-
-  ER_INFO("Picked up block%d", m_block->id().v());
-
-  controller.ndc_pop();
+  d0_dpo_controller_visit(controller);
 } /* visit() */
 
 /*******************************************************************************
@@ -222,66 +245,22 @@ void robot_free_block_pickup::visit(
  ******************************************************************************/
 void robot_free_block_pickup::visit(
     controller::depth1::bitd_dpo_controller& controller) {
-  controller.ndc_pusht();
-
-  visit(*controller.dpo_perception()->dpo_store());
-
-  auto robot_block = m_block->clone();
-  robot_block->md()->robot_id(mc_robot_id);
-  controller.block(std::move(robot_block));
-
-  dispatch_robot_free_block_interactor(controller.current_task());
-  ER_INFO("Picked up block%d", m_block->id().v());
-
-  controller.ndc_pop();
-} /* visit() */
-
-void robot_free_block_pickup::visit(
-    controller::depth1::bitd_mdpo_controller& controller) {
-  controller.ndc_pusht();
-
-  visit(*controller.mdpo_perception()->map());
-
-  auto robot_block = m_block->clone();
-  robot_block->md()->robot_id(mc_robot_id);
-  controller.block(std::move(robot_block));
-
-  dispatch_robot_free_block_interactor(controller.current_task());
-  ER_INFO("Picked up block%d", m_block->id().v());
-
-  controller.ndc_pop();
+  d1d2_dpo_controller_visit(controller);
 } /* visit() */
 
 void robot_free_block_pickup::visit(
     controller::depth1::bitd_odpo_controller& controller) {
-  controller.ndc_pusht();
+  d1d2_dpo_controller_visit(controller);
+} /* visit() */
 
-  visit(*controller.dpo_perception()->dpo_store());
-
-  auto robot_block = m_block->clone();
-  robot_block->md()->robot_id(mc_robot_id);
-  controller.block(std::move(robot_block));
-
-  dispatch_robot_free_block_interactor(controller.current_task());
-  ER_INFO("Picked up block%d", m_block->id().v());
-
-  controller.ndc_pop();
+void robot_free_block_pickup::visit(
+    controller::depth1::bitd_mdpo_controller& controller) {
+  d1d2_mdpo_controller_visit(controller);
 } /* visit() */
 
 void robot_free_block_pickup::visit(
     controller::depth1::bitd_omdpo_controller& controller) {
-  controller.ndc_pusht();
-
-  visit(*controller.mdpo_perception()->map());
-
-  auto robot_block = m_block->clone();
-  robot_block->md()->robot_id(mc_robot_id);
-  controller.block(std::move(robot_block));
-
-  dispatch_robot_free_block_interactor(controller.current_task());
-  ER_INFO("Picked up block%d", m_block->id().v());
-
-  controller.ndc_pop();
+  d1d2_mdpo_controller_visit(controller);
 } /* visit() */
 
 void robot_free_block_pickup::visit(tasks::depth0::generalist& task) {
@@ -307,66 +286,22 @@ void robot_free_block_pickup::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
  ******************************************************************************/
 void robot_free_block_pickup::visit(
     controller::depth2::birtd_dpo_controller& controller) {
-  controller.ndc_pusht();
-
-  visit(*controller.dpo_perception()->dpo_store());
-
-  auto robot_block = m_block->clone();
-  robot_block->md()->robot_id(mc_robot_id);
-  controller.block(std::move(robot_block));
-
-  dispatch_robot_free_block_interactor(controller.current_task());
-  ER_INFO("Picked up block%d", m_block->id().v());
-
-  controller.ndc_pop();
+  d1d2_dpo_controller_visit(controller);
 } /* visit() */
 
 void robot_free_block_pickup::visit(
     controller::depth2::birtd_mdpo_controller& controller) {
-  controller.ndc_pusht();
-
-  visit(*controller.mdpo_perception()->map());
-
-  auto robot_block = m_block->clone();
-  robot_block->md()->robot_id(mc_robot_id);
-  controller.block(std::move(robot_block));
-
-  dispatch_robot_free_block_interactor(controller.current_task());
-  ER_INFO("Picked up block%d", m_block->id().v());
-
-  controller.ndc_pop();
+  d1d2_mdpo_controller_visit(controller);
 } /* visit() */
 
 void robot_free_block_pickup::visit(
     controller::depth2::birtd_odpo_controller& controller) {
-  controller.ndc_pusht();
-
-  visit(*controller.dpo_perception()->dpo_store());
-
-  auto robot_block = m_block->clone();
-  robot_block->md()->robot_id(mc_robot_id);
-  controller.block(std::move(robot_block));
-
-  dispatch_robot_free_block_interactor(controller.current_task());
-  ER_INFO("Picked up block%d", m_block->id().v());
-
-  controller.ndc_pop();
+  d1d2_dpo_controller_visit(controller);
 } /* visit() */
 
 void robot_free_block_pickup::visit(
     controller::depth2::birtd_omdpo_controller& controller) {
-  controller.ndc_pusht();
-
-  visit(*controller.mdpo_perception()->map());
-
-  auto robot_block = m_block->clone();
-  robot_block->md()->robot_id(mc_robot_id);
-  controller.block(std::move(robot_block));
-
-  dispatch_robot_free_block_interactor(controller.current_task());
-  ER_INFO("Picked up block%d", m_block->id().v());
-
-  controller.ndc_pop();
+  d1d2_mdpo_controller_visit(controller);
 } /* visit() */
 
 void robot_free_block_pickup::visit(tasks::depth2::cache_starter& task) {

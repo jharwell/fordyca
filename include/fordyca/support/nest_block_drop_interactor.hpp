@@ -53,11 +53,12 @@ NS_START(fordyca, support);
  * \brief Handle's a robot's (possible) \ref nest_block_drop event on a given
  * timestep.
  */
-template <typename T>
+template <typename TControllerType, typename TArenaMapType>
 class nest_block_drop_interactor
-    : public rer::client<nest_block_drop_interactor<T>> {
+    : public rer::client<nest_block_drop_interactor<TControllerType,
+                                                    TArenaMapType>> {
  public:
-  nest_block_drop_interactor(carena::caching_arena_map* const map,
+  nest_block_drop_interactor(TArenaMapType* const map,
                              depth0::depth0_metrics_aggregator* const metrics_agg,
                              argos::CFloorEntity* const floor,
                              tv::env_dynamics* envd)
@@ -88,7 +89,8 @@ class nest_block_drop_interactor
    * \param controller The controller to handle interactions for.
    * \param t The current timestep.
    */
-  interactor_status operator()(T& controller, const rtypes::timestep& t) {
+  interactor_status operator()(TControllerType& controller,
+                               const rtypes::timestep& t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
       if (m_penalty_handler->is_penalty_satisfied(controller, t)) {
         finish_nest_block_drop(controller, t);
@@ -106,7 +108,8 @@ class nest_block_drop_interactor
    * \brief Determine if a robot is waiting to drop a block in the nest, and if
    * so send it the \ref nest_block_drop event.
    */
-  void finish_nest_block_drop(T& controller, const rtypes::timestep& t) {
+  void finish_nest_block_drop(TControllerType& controller,
+                              const rtypes::timestep& t) {
     ER_ASSERT(controller.in_nest(), "Controller not in nest");
     ER_ASSERT(fsm::foraging_transport_goal::ekNEST ==
                   controller.block_transport_goal(),
@@ -128,7 +131,7 @@ class nest_block_drop_interactor
    * \brief Perform the actual picking up of a free block once all
    * preconditions have been satisfied.
    */
-  void perform_nest_block_drop(T& controller,
+  void perform_nest_block_drop(TControllerType& controller,
                                const ctv::temporal_penalty& penalty,
                                const rtypes::timestep& t) {
     /*
@@ -175,7 +178,7 @@ class nest_block_drop_interactor
   /* clang-format off */
   argos::CFloorEntity* const               m_floor;
   depth0::depth0_metrics_aggregator* const m_metrics_agg;
-  carena::caching_arena_map* const         m_map;
+  TArenaMapType* const                     m_map;
   tv::block_op_penalty_handler* const      m_penalty_handler;
   /* clang-format on */
 };

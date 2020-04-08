@@ -125,11 +125,18 @@ void dpo_perception_subsystem::process_los_blocks(
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  cds::block2D_vectorno los_blocks = c_los->blocks();
+  cds::entity_vector los_blocks = c_los->blocks();
   ER_DEBUG("Blocks in DPO store: [%s]",
            rcppsw::to_string(m_store->blocks()).c_str());
   if (!los_blocks.empty()) {
-    ER_DEBUG("Blocks in LOS: [%s]", rcppsw::to_string(los_blocks).c_str());
+    auto accum = std::accumulate(los_blocks.begin(),
+                                 los_blocks.end(),
+                                 std::string(),
+                           [&](const std::string& a, const auto& b) {
+                                   return a + "b" + rcppsw::to_string(b->id()) + ",";
+                           });
+
+    ER_DEBUG("Blocks in LOS: [%s]", accum.c_str());
   }
 
   /*
@@ -138,7 +145,12 @@ void dpo_perception_subsystem::process_los_blocks(
    */
   los_tracking_sync(c_los, los_blocks);
 
-  for (auto& block : c_los->blocks()) {
+  for (auto* b : c_los->blocks()) {
+    ER_ASSERT(crepr::entity_dimensionality::ek2D == b->dimensionality(),
+              "Block%d is not 2D!",
+              b->id().v());
+    auto* block = static_cast<crepr::base_block2D*>(b);
+
     ER_ASSERT(!block->is_out_of_sight(),
               "Block%d@%s/%s out of sight in LOS?",
               block->id().v(),
@@ -206,7 +218,7 @@ void dpo_perception_subsystem::los_tracking_sync(
 
 void dpo_perception_subsystem::los_tracking_sync(
     const cfrepr::foraging_los* const c_los,
-    const cds::block2D_vectorno& los_blocks) {
+    const cds::entity_vector& los_blocks) {
   /*
    * If the location of one of the blocks we are tracking is in our LOS, then
    * the corresponding block should also be in our LOS. If it is not, then our
@@ -229,10 +241,14 @@ void dpo_perception_subsystem::los_tracking_sync(
       ++it;
       continue;
     }
+    /*
+     * static_cast is safe, because we verified we are only dealing with 2D
+     * blocks earlier in the update chain.
+     */
     auto exists_in_los =
         los_blocks.end() !=
         std::find_if(los_blocks.begin(), los_blocks.end(), [&](const auto& b) {
-          return b->idcmp(*(it->ent()));
+            return static_cast<crepr::base_block2D*>(b)->idcmp(*(it->ent()));
         });
     ER_TRACE("Block%d location in LOS", it->ent()->id().v());
     if (!exists_in_los) {

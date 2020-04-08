@@ -48,7 +48,7 @@ NS_START(support, depth1);
 class depth1_metrics_aggregator;
 class static_cache_manager;
 
-template<typename T>
+template<typename TControllerType, typename TArenaMapType>
 class robot_arena_interactor;
 
 namespace detail {
@@ -101,10 +101,12 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
  private:
   using interactor_map_type = rds::type_map<
    rmpl::typelist_wrap_apply<controller::depth1::typelist,
-                               robot_arena_interactor>::type>;
+                             robot_arena_interactor,
+                             carena::caching_arena_map>::type>;
   using los_updater_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth1::typelist,
-                              cfops::robot_los_update>::type>;
+                              cfops::robot_los_update,
+                              carena::caching_arena_map>::type>;
   using task_extractor_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth1::typelist,
                                 robot_task_extractor>::type>;

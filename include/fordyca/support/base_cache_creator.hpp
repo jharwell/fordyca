@@ -108,7 +108,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
   bool creation_sanity_checks(
       const cads::acache_vectoro& c_caches,
       const cds::block2D_vectorno& c_free_blocks,
-      const cfds::block_cluster_vector& c_clusters) const RCSW_PURE;
+      const cfds::block2D_cluster_vector& c_clusters) const RCSW_PURE;
 
  protected:
   const cds::arena_grid* grid(void) const { return m_grid; }

@@ -43,18 +43,19 @@ NS_START(fordyca, support, depth0);
  * \brief Wrapping functor to update robot LOS each timestep. Needed for use
  * with boost::static_visitor.
  */
+template<typename TArenaMapType>
 class robot_los_update_applicator {
  public:
   explicit robot_los_update_applicator(controller::foraging_controller* const c)
       : controller(c) {}
 
-  void operator()(cfops::robot_los_update<controller::depth0::crw_controller>& ) const {}
+  void operator()(cfops::robot_los_update<controller::depth0::crw_controller, TArenaMapType>& ) const {}
 
-  template<typename ControllerType,
-           RCPPSW_SFINAE_FUNC(!std::is_same<ControllerType,
+  template<typename TControllerType,
+           RCPPSW_SFINAE_FUNC(!std::is_same<TControllerType,
                               controller::depth0::crw_controller>::value)>
-  void operator()(cfops::robot_los_update<ControllerType>& impl) const {
-    impl(dynamic_cast<ControllerType*>(controller));
+  void operator()(cfops::robot_los_update<TControllerType, TArenaMapType>& impl) const {
+    impl(dynamic_cast<TControllerType*>(controller));
   }
 
  private:

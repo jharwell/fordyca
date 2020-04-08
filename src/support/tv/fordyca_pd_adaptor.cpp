@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/support/tv/fordyca_pd_adaptor.hpp"
 
-#include "cosm/arena/base_arena_map.hpp"
+#include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/arena/operations/free_block_drop.hpp"
 
 #include "fordyca/controller/foraging_controller.hpp"
@@ -32,6 +32,24 @@
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, support, tv);
+
+/*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+fordyca_pd_adaptor::fordyca_pd_adaptor(const ctv::config::population_dynamics_config* config,
+                                        cpal::argos_sm_adaptor* sm,
+                                        env_dynamics_type *envd,
+                                        carena::caching_arena_map* map,
+                                        rmath::rng* rng)
+    : ER_CLIENT_INIT("fordyca.support.tv.fordyca_pd_adaptor"),
+      argos_pd_adaptor<cpal::argos_controller2D_adaptor>(config,
+                                                         sm,
+                                                         envd,
+                                                         rmath::vector2d(map->xrsize(),
+                                                                         map->yrsize()),
+                                                         rng),
+  m_map(map) {}
+
 
 /*******************************************************************************
  * Member Functions
@@ -47,8 +65,8 @@ void fordyca_pd_adaptor::pre_kill_cleanup(
     ER_INFO("Kill victim robot %s is carrying block%d",
             foraging->GetId().c_str(),
             foraging->block()->id().v());
-    auto it = std::find_if(arena_map()->blocks().begin(),
-                           arena_map()->blocks().end(),
+    auto it = std::find_if(m_map->blocks().begin(),
+                           m_map->blocks().end(),
                            [&](const auto& b) {
                              return foraging->block()->id() == b->id();
                            });
@@ -57,13 +75,13 @@ void fordyca_pd_adaptor::pre_kill_cleanup(
      * dynamics are always applied AFTER all robots have had their control steps
      * run, we are in a non-concurrent context, so no reason to grab them.
      */
-    caops::free_block_drop_visitor adrop_op(
+    caops::free_block_drop_visitor<crepr::base_block2D> adrop_op(
         *it,
-        rmath::dvec2uvec(foraging->pos2D(), arena_map()->grid_resolution().v()),
-        arena_map()->grid_resolution(),
+        rmath::dvec2uvec(foraging->pos2D(), m_map->grid_resolution().v()),
+        m_map->grid_resolution(),
         carena::arena_map_locking::ekALL_HELD);
 
-    adrop_op.visit(*arena_map());
+    adrop_op.visit(*m_map);
   }
 } /* pre_kill_cleanup() */
 

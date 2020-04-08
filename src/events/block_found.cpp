@@ -160,7 +160,7 @@ void block_found::visit(ds::dpo_semantic_map& map) {
    * the one we just found that actually resides there are not the same, we need
    * to reset the density for the cell, and start a new decay count.
    */
-  if (cell.state_has_block() && cell.block()->id() != m_block->id()) {
+  if (cell.state_has_block() && cell.block2D()->id() != m_block->id()) {
     density.reset();
   }
 
@@ -169,11 +169,11 @@ void block_found::visit(ds::dpo_semantic_map& map) {
   ER_ASSERT(cell.state_has_block(),
             "Cell@%s not in HAS_BLOCK",
             cell.loc().to_str().c_str());
-  ER_ASSERT(cell.block()->id() == m_block->id(),
+  ER_ASSERT(cell.block2D()->id() == m_block->id(),
             "Block for cell@%s ID mismatch: %d/%d",
             cell.loc().to_str().c_str(),
             m_block->id().v(),
-            cell.block()->id().v());
+            cell.block2D()->id().v());
 } /* visit() */
 
 void block_found::pheromone_update(ds::dpo_semantic_map& map) {

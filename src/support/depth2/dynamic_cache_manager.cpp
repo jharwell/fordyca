@@ -78,7 +78,7 @@ boost::optional<cads::acache_vectoro> dynamic_cache_manager::create(
 
 boost::optional<cds::block2D_vectorno> dynamic_cache_manager::
     calc_blocks_for_creation(const cads::acache_vectorno& existing_caches,
-                             const cfds::block_cluster_vector& clusters,
+                             const cfds::block2D_cluster_vector& clusters,
                              const cds::block2D_vectorno& blocks) {
   cds::block2D_vectorno to_use;
   auto filter = [&](const auto& b) {

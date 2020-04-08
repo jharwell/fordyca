@@ -54,7 +54,7 @@ NS_START(fordyca, support, utils);
  * \param all_blocks All blocks in the arena.
  */
 cds::block2D_vectorno free_blocks_calc(const cads::acache_vectoro& all_caches,
-                                      const cds::block2D_vectorno& all_blocks);
+                                       const cds::block2D_vectorno& all_blocks);
 
 NS_END(utils, support, fordyca);
 

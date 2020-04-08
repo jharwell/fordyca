@@ -241,7 +241,7 @@ void static_cache_manager::post_creation_blocks_absorb(
          * creation always happens AFTER all robot control steps have been run,
          * no locking is needed.
          */
-        caops::free_block_drop_visitor op(
+        caops::free_block_drop_visitor<crepr::base_block2D> op(
             b,
             rmath::dvec2uvec(c->rloc(), arena_grid()->resolution().v()),
             arena_grid()->resolution(),

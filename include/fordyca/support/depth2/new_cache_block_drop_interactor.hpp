@@ -224,10 +224,11 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
     auto loc = rmath::dvec2uvec(controller.pos2D(),
                                 m_map->grid_resolution().v());
 
-    caops::free_block_drop_visitor adrop_op(m_map->blocks()[penalty.id().v()],
-                                            loc,
-                                            m_map->grid_resolution(),
-                                            carena::arena_map_locking::ekNONE_HELD);
+    caops::free_block_drop_visitor<crepr::base_block2D> adrop_op(
+        m_map->blocks()[penalty.id().v()],
+        loc,
+        m_map->grid_resolution(),
+        carena::arena_map_locking::ekNONE_HELD);
     events::robot_free_block_drop_visitor rdrop_op(controller.block_release(),
                                                    loc,
                                                    m_map->grid_resolution());

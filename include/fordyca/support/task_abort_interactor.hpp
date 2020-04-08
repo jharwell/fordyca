@@ -123,7 +123,7 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
                                                    loc,
                                                    m_map->grid_resolution());
 
-    caops::free_block_drop_visitor adrop_op(
+    caops::free_block_drop_visitor<crepr::base_block2D> adrop_op(
         m_map->blocks()[block_id.v()],
         loc,
         m_map->grid_resolution(),

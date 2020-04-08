@@ -103,7 +103,7 @@ class dpo_perception_subsystem final
   void los_tracking_sync(const cfrepr::foraging_los* c_los,
                          const cads::bcache_vectorno& los_caches);
   void los_tracking_sync(const cfrepr::foraging_los* c_los,
-                         const cds::block2D_vectorno& los_blocks);
+                         const cds::entity_vector& los_blocks);
 
  private:
   /* clang-format off */

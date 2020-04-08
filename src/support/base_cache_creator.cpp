@@ -64,7 +64,7 @@ std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
   rmath::vector2u d = rmath::dvec2uvec(center, grid()->resolution().v());
   cds::cell2D& cell = m_grid->access<arena_grid::kCell>(d);
   if (cell.state_has_block()) {
-    ER_ASSERT(nullptr != cell.block(),
+    ER_ASSERT(nullptr != cell.block2D(),
               "Cell@%s does not have block",
               cell.loc().to_str().c_str());
 
@@ -77,7 +77,7 @@ std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
      * creation). However, it may also NOT be in the list of blocks to use for
      * the new cache, in which case we need to add in (static cache creation).
      */
-    if (blocks.end() == std::find(blocks.begin(), blocks.end(), cell.block())) {
+    if (blocks.end() == std::find(blocks.begin(), blocks.end(), cell.block2D())) {
       /*
        * We use insert() instead of push_back() here so that if there was a
        * leftover block on the cell where a cache used to be that is also where
@@ -86,9 +86,9 @@ std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
        * helps to ensure fairness/better statistics for the simulations.
        */
       ER_DEBUG("Add block%d in from cache host cell@%s to block vector",
-               cell.block()->id().v(),
+               cell.block2D()->id().v(),
                cell.loc().to_str().c_str());
-      blocks.insert(blocks.begin(), cell.block());
+      blocks.insert(blocks.begin(), cell.block2D());
     }
   }
 
@@ -104,7 +104,7 @@ std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
   } /* for(block..) */
 
   for (auto& block : blocks) {
-    caops::free_block_drop_visitor op(
+    caops::free_block_drop_visitor<crepr::base_block2D> op(
         block, d, m_grid->resolution(), carena::arena_map_locking::ekALL_HELD);
     op.visit(m_grid->access<arena_grid::kCell>(op.coord()));
   } /* for(block..) */
@@ -160,7 +160,7 @@ void base_cache_creator::update_host_cells(cads::acache_vectoro& caches) {
       for (uint j = ymin; j < ymax; ++j) {
         rmath::vector2u c = rmath::vector2u(i, j);
         auto& cell = m_grid->access<arena_grid::kCell>(i, j);
-        ER_ASSERT(cache->contains_point(
+        ER_ASSERT(cache->contains_point2D(
                       rmath::uvec2dvec(c, m_grid->resolution().v())),
                   "Cache%d does not contain point (%u, %u) within its extent",
                   cache->id().v(),
@@ -183,7 +183,7 @@ void base_cache_creator::update_host_cells(cads::acache_vectoro& caches) {
 bool base_cache_creator::creation_sanity_checks(
     const cads::acache_vectoro& caches,
     const cds::block2D_vectorno& free_blocks,
-    const cfds::block_cluster_vector& clusters) const {
+    const cfds::block2D_cluster_vector& clusters) const {
   /* check caches against each other and internally for consistency */
   for (auto& c1 : caches) {
     auto& cell = m_grid->access<arena_grid::kCell>(c1->dloc());

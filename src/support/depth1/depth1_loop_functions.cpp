@@ -127,15 +127,16 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
       : lf(lf_in), config_map(cmap) {}
   template <typename T>
   RCSW_COLD void operator()(const T& controller) const {
-    typename robot_arena_interactor<T>::params p{
-        lf->arena_map<carena::caching_arena_map>(),
+    typename robot_arena_interactor<T, carena::caching_arena_map>::params p{
+        lf->arena_map(),
         lf->m_metrics_agg.get(),
         lf->floor(),
         lf->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>(),
         lf->m_cache_manager.get(),
         lf};
     lf->m_interactor_map->emplace(typeid(controller),
-                                  robot_arena_interactor<T>(p));
+                                  robot_arena_interactor<T,
+                                  carena::caching_arena_map>(p));
     lf->m_metric_extractor_map->emplace(
         typeid(controller),
         ccops::metrics_extract<T, depth1_metrics_aggregator>(
@@ -147,7 +148,8 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
             lf->oracle(),
             lf->m_metrics_agg.get()));
     lf->m_los_update_map->emplace(typeid(controller),
-                                  cfops::robot_los_update<T>(lf->arena_map()));
+                                  cfops::robot_los_update<T,
+                                  carena::caching_arena_map>(lf->arena_map()));
     lf->m_subtask_status_map->emplace(typeid(controller),
                                       d1_subtask_status_extractor<T>());
   }
@@ -310,14 +312,14 @@ void depth1_loop_functions::cache_handling_init(
       cachep, &arena_map()->decoratee(), calc_cache_locs(distp), rng());
 
   cache_create_ro_params ccp = {
-      .current_caches = arena_map<carena::caching_arena_map>()->caches(),
+      .current_caches = arena_map()->caches(),
       .clusters = arena_map()->block_distributor()->block_clusters(),
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
   cpal::argos_sm_adaptor::led_medium(
       crfootbot::config::saa_xml_names().leds_saa);
   if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
-    arena_map<carena::caching_arena_map>()->caches_add(*created, this);
+    arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }
 } /* cache_handling_init() */
@@ -325,20 +327,20 @@ void depth1_loop_functions::cache_handling_init(
 std::vector<rmath::vector2d> depth1_loop_functions::calc_cache_locs(
     const cfconfig::block_dist_config* distp) {
   std::vector<rmath::vector2d> cache_locs;
-
+  using dispatcher_type = cfbd::dispatcher<crepr::base_block2D>;
   /*
    * For all block distributions that are supported, each of the static
    * caches is halfway between the center of the nest and a block cluster.
    */
-  if (cfbd::dispatcher::kDistSingleSrc == distp->dist_type ||
-      cfbd::dispatcher::kDistDualSrc == distp->dist_type) {
+  if (dispatcher_type::kDistSingleSrc == distp->dist_type ||
+      dispatcher_type::kDistDualSrc == distp->dist_type) {
     auto clusters = arena_map()->block_distributor()->block_clusters();
     for (auto& c : clusters) {
       cache_locs.push_back(
           {(c->xspan().center() + arena_map()->nest().rloc().x()) / 2.0,
            (c->yspan().center() + arena_map()->nest().rloc().y()) / 2.0});
     } /* for(i..) */
-  } else if (cfbd::dispatcher::kDistQuadSrc == distp->dist_type) {
+  } else if (dispatcher_type::kDistQuadSrc == distp->dist_type) {
     /*
      * Quad source is a tricky distribution to use with static caches, so we
      * have to tweak the static cache locations in tandem with the block cluster
@@ -468,7 +470,7 @@ void depth1_loop_functions::post_step(void) {
       nullptr != conv_calculator() ? conv_calculator()->converged() : false);
 
   /* Collect metrics from/about existing caches */
-  for (auto* c : arena_map<carena::caching_arena_map>()->caches()) {
+  for (auto* c : arena_map()->caches()) {
     m_metrics_agg->collect_from_cache(c);
     c->reset_metrics();
   } /* for(&c..) */
@@ -479,11 +481,11 @@ void depth1_loop_functions::post_step(void) {
    * process as they have been depleted and do not exist anymore in the \ref
    * arena_map::cacheso() array.
    */
-  for (auto& c : arena_map<carena::caching_arena_map>()->zombie_caches()) {
+  for (auto& c : arena_map()->zombie_caches()) {
     m_metrics_agg->collect_from_cache(c.get());
     c->reset_metrics();
   } /* for(&c..) */
-  arena_map<carena::caching_arena_map>()->zombie_caches_clear();
+  arena_map()->zombie_caches_clear();
 
   m_metrics_agg->collect_from_cache_manager(m_cache_manager.get());
   m_cache_manager->reset_metrics();
@@ -513,12 +515,12 @@ void depth1_loop_functions::reset() {
   m_metrics_agg->reset_all();
 
   cache_create_ro_params ccp = {
-      .current_caches = arena_map<carena::caching_arena_map>()->caches(),
+      .current_caches = arena_map()->caches(),
       .clusters = arena_map()->block_distributor()->block_clusters(),
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
   if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
-    arena_map<carena::caching_arena_map>()->caches_add(*created, this);
+    arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }
   ndc_pop();
@@ -542,8 +544,8 @@ argos::CColor depth1_loop_functions::GetFloorColor(
    * Blocks are inside caches, so display the cache the point is inside FIRST,
    * so that you don't have blocks render inside of caches.
    */
-  for (auto* cache : arena_map<carena::caching_arena_map>()->caches()) {
-    if (cache->contains_point(tmp)) {
+  for (auto* cache : arena_map()->caches()) {
+    if (cache->contains_point2D(tmp)) {
       return argos::CColor(cache->color().red(),
                            cache->color().green(),
                            cache->color().blue());
@@ -552,13 +554,21 @@ argos::CColor depth1_loop_functions::GetFloorColor(
 
   for (auto* block : arena_map()->blocks()) {
     /*
+     * Short circuiting tests for out of sight blocks can help in large
+     * swarms with large #s of blocks.
+     */
+    if (block->is_out_of_sight()) {
+      continue;
+    }
+
+    /*
      * Even though each block type has a unique color, the only distinction
      * that robots can make to determine if they are on a block or not is
      * between shades of black/white. So, all blocks must appear as black, even
      * when they are not actually (when blocks are picked up their correct color
      * is shown through visualization).
      */
-    if (block->contains_point(tmp)) {
+    if (block->contains_point2D(tmp)) {
       return argos::CColor::BLACK;
     }
   } /* for(&block..) */
@@ -589,8 +599,9 @@ void depth1_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
             controller->type_index().name());
 
   auto applicator =
-      ccops::applicator<controller::foraging_controller, cfops::robot_los_update>(
-          controller);
+      ccops::applicator<controller::foraging_controller,
+                        cfops::robot_los_update,
+                        carena::caching_arena_map>(controller);
   boost::apply_visitor(applicator,
                        m_los_update_map->at(controller->type_index()));
 } /* robot_pre_step() */
@@ -610,7 +621,8 @@ void depth1_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
             controller->type_index().name());
   auto iapplicator =
       cops::robot_arena_interaction_applicator<controller::foraging_controller,
-                                               robot_arena_interactor>(
+                                               robot_arena_interactor,
+                                               carena::caching_arena_map>(
           controller, rtypes::timestep(GetSpace().GetSimulationClock()));
 
   auto status =
@@ -633,7 +645,7 @@ void depth1_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
    * See #577.
    */
   if (interactor_status::ekNO_EVENT != status && nullptr != oracle()) {
-    oracle()->update(arena_map<carena::caching_arena_map>());
+    oracle()->update(arena_map());
   }
 
   /*
@@ -661,7 +673,7 @@ void depth1_loop_functions::static_cache_monitor(void) {
   }
 
   cache_create_ro_params ccp = {
-      .current_caches = arena_map<carena::caching_arena_map>()->caches(),
+      .current_caches = arena_map()->caches(),
       .clusters = arena_map()->block_distributor()->block_clusters(),
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
@@ -670,7 +682,7 @@ void depth1_loop_functions::static_cache_monitor(void) {
                                               arena_map()->blocks(),
                                               m_cache_counts.first,
                                               m_cache_counts.second)) {
-    arena_map<carena::caching_arena_map>()->caches_add(*created, this);
+    arena_map()->caches_add(*created, this);
     floor()->SetChanged();
     return;
   }
@@ -680,7 +692,7 @@ void depth1_loop_functions::static_cache_monitor(void) {
 } /* static_cache_monitor() */
 
 bool depth1_loop_functions::caches_depleted(void) const {
-  return arena_map<carena::caching_arena_map>()->caches().size() !=
+  return arena_map()->caches().size() !=
          m_cache_manager->n_managed();
 } /* caches_depleted() */
 

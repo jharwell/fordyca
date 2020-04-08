@@ -88,15 +88,16 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
       : lf(lf_in), config_map(cmap) {}
   template <typename T>
   RCSW_COLD void operator()(const T& controller) const {
-    typename robot_arena_interactor<T>::params p{
-        lf->arena_map<carena::caching_arena_map>(),
+    typename robot_arena_interactor<T, carena::caching_arena_map>::params p{
+        lf->arena_map(),
         lf->m_metrics_agg.get(),
         lf->floor(),
         lf->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>(),
         lf->m_cache_manager.get(),
         lf};
     lf->m_interactor_map->emplace(typeid(controller),
-                                  robot_arena_interactor<T>(p));
+                                  robot_arena_interactor<T,
+                                  carena::caching_arena_map>(p));
     lf->m_metric_extractor_map->emplace(
         typeid(controller),
         ccops::metrics_extract<T, depth2_metrics_aggregator>(
@@ -108,7 +109,8 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
             lf->oracle(),
             lf->m_metrics_agg.get()));
     lf->m_los_update_map->emplace(typeid(controller),
-                                  cfops::robot_los_update<T>(lf->arena_map()));
+                                  cfops::robot_los_update<T,
+                                  carena::caching_arena_map>(lf->arena_map()));
   }
 
   /* clang-format off */
@@ -312,7 +314,7 @@ void depth2_loop_functions::post_step(void) {
       nullptr != conv_calculator() ? conv_calculator()->converged() : false);
 
   /* Collect metrics from/about caches */
-  for (auto* c : arena_map<carena::caching_arena_map>()->caches()) {
+  for (auto* c : arena_map()->caches()) {
     m_metrics_agg->collect_from_cache(c);
     c->reset_metrics();
   } /* for(&c..) */
@@ -365,8 +367,8 @@ argos::CColor depth2_loop_functions::GetFloorColor(
    * Blocks are inside caches, so display the cache the point is inside FIRST,
    * so that you don't have blocks rendering inside of caches.
    */
-  for (auto* cache : arena_map<carena::caching_arena_map>()->caches()) {
-    if (cache->contains_point(tmp)) {
+  for (auto* cache : arena_map()->caches()) {
+    if (cache->contains_point2D(tmp)) {
       return argos::CColor(cache->color().red(),
                            cache->color().green(),
                            cache->color().blue());
@@ -375,13 +377,21 @@ argos::CColor depth2_loop_functions::GetFloorColor(
 
   for (auto* block : arena_map()->blocks()) {
     /*
+     * Short circuiting tests for out of sight blocks can help in large
+     * swarms with large #s of blocks.
+     */
+    if (block->is_out_of_sight()) {
+      continue;
+    }
+
+    /*
      * Even though each block type has a unique color, the only distinction
      * that robots can make to determine if they are on a block or not is
      * between shades of black/white. So, all blocks must appear as black, even
      * when they are not actually (when blocks are picked up their correct color
      * is shown through visualization).
      */
-    if (block->contains_point(tmp)) {
+    if (block->contains_point2D(tmp)) {
       return argos::CColor::BLACK;
     }
   } /* for(&block..) */
@@ -412,8 +422,9 @@ void depth2_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
             controller->type_index().name());
 
   auto applicator =
-      ccops::applicator<controller::foraging_controller, cfops::robot_los_update>(
-          controller);
+      ccops::applicator<controller::foraging_controller,
+                        cfops::robot_los_update,
+                        carena::caching_arena_map>(controller);
   boost::apply_visitor(applicator,
                        m_los_update_map->at(controller->type_index()));
 } /* robot_pre_step() */
@@ -437,8 +448,10 @@ void depth2_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
 
   auto iapplicator =
       cops::robot_arena_interaction_applicator<controller::foraging_controller,
-                                               robot_arena_interactor>(
-          controller, rtypes::timestep(GetSpace().GetSimulationClock()));
+                                               robot_arena_interactor,
+                                               carena::caching_arena_map>(
+                                                   controller,
+                                                   rtypes::timestep(GetSpace().GetSimulationClock()));
   auto status =
       boost::apply_visitor(iapplicator,
                            m_interactor_map->at(controller->type_index()));
@@ -464,7 +477,7 @@ void depth2_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
      * current task.
      */
     if (nullptr != oracle()) {
-      oracle()->update(arena_map<carena::caching_arena_map>());
+      oracle()->update(arena_map());
     }
   }
 
@@ -495,12 +508,12 @@ bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
     return false;
   }
   cache_create_ro_params ccp = {
-      .current_caches = arena_map<carena::caching_arena_map>()->caches(),
+      .current_caches = arena_map()->caches(),
       .clusters = arena_map()->block_distributor()->block_clusters(),
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
   if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
-    arena_map<carena::caching_arena_map>()->caches_add(*created, this);
+    arena_map()->caches_add(*created, this);
     floor()->SetChanged();
     return true;
   }

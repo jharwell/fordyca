@@ -65,7 +65,7 @@ void cache_found::visit(ds::dpo_store& store) {
    */
   auto it = store.blocks().values_range().begin();
   while (it != store.blocks().values_range().end()) {
-    if (m_cache->contains_point(it->ent()->rloc())) {
+    if (m_cache->contains_point2D(it->ent()->rloc())) {
       crepr::base_block2D* tmp = (*it).ent();
       ++it;
       ER_TRACE("Remove block%d hidden behind cache%d",
@@ -166,7 +166,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
    */
   std::list<crepr::base_block2D*> rms;
   for (auto&& b : map.blocks().values_range()) {
-    if (m_cache->contains_point(b.ent()->rloc())) {
+    if (m_cache->contains_point2D(b.ent()->rloc())) {
       ER_TRACE("Remove block%d hidden behind cache%d",
                b.ent()->id().v(),
                m_cache->id().v());
@@ -189,7 +189,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
    * kind of cell entity.
    */
   if (cell.state_has_block()) {
-    map.block_remove(cell.block());
+    map.block_remove(cell.block2D());
   }
 
   /*

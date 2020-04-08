@@ -42,7 +42,6 @@ class entity2D;
 class nest;
 } /* namespace cosm::repr */
 namespace cosm::arena {
-class base_arena_map;
 class caching_arena_map;
 namespace repr {
 class arena_cache;
@@ -79,7 +78,7 @@ struct proximity_status_t {
  * not on top of a block.
  */
 rtypes::type_uuid robot_on_block(const controller::foraging_controller& controller,
-                                 const carena::base_arena_map& map) RCSW_PURE;
+                                 const carena::caching_arena_map& map) RCSW_PURE;
 
 /**
  * \brief Check if a robot is on top of a cache. If, so return the cache index.

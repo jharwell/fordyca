@@ -70,7 +70,7 @@ class block_op_penalty_id_calculator : public rer::client<block_op_penalty_id_ca
 
  private:
   /* clang-formatoff */
-  const carena::base_arena_map* mc_map;
+  const carena::base_arena_map<crepr::base_block2D>* mc_map;
   /* clang-format on */
 };
 

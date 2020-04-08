@@ -33,6 +33,9 @@
 namespace fordyca::controller {
 class foraging_controller;
 } /* namespace fordyca::controller */
+namespace cosm::arena {
+class caching_arena_map;
+} /* namespace cosm::arena */
 
 NS_START(fordyca, support, tv);
 
@@ -48,12 +51,13 @@ NS_START(fordyca, support, tv);
  * during population dynamics application.
  */
 class fordyca_pd_adaptor final : rer::client<fordyca_pd_adaptor>,
-                           public cptv::argos_pd_adaptor<cpal::argos_controller2D_adaptor>{
+                                 public cptv::argos_pd_adaptor<cpal::argos_controller2D_adaptor>{
  public:
-  template <typename... Args>
-  fordyca_pd_adaptor(Args&&... args)
-      : ER_CLIENT_INIT("fordyca.support.tv.fordyca_pd_adaptor"),
-        argos_pd_adaptor<cpal::argos_controller2D_adaptor>(std::forward<Args>(args)...) {}
+  fordyca_pd_adaptor(const ctv::config::population_dynamics_config* config,
+                     cpal::argos_sm_adaptor* sm,
+                     env_dynamics_type *envd,
+                     carena::caching_arena_map* map,
+                     rmath::rng* rng);
 
   /* Not copy constructable/assignable by default */
   fordyca_pd_adaptor(const fordyca_pd_adaptor&) = delete;
@@ -61,6 +65,11 @@ class fordyca_pd_adaptor final : rer::client<fordyca_pd_adaptor>,
 
   /* ARGoS PD apdaptor overrides */
   void pre_kill_cleanup(cpal::argos_controller2D_adaptor* controller) override;
+
+ private:
+  /* clang-format off */
+  carena::caching_arena_map* m_map;
+  /* clang-format on */
 };
 
 NS_END(tv, support, fordyca);

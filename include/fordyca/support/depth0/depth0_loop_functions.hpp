@@ -42,7 +42,7 @@ struct functor_maps_initializer;
 } /* namespace detail */
 class depth0_metrics_aggregator;
 
-template<typename ControllerType>
+template<typename ControllerType, typename TArenaMapType>
 class robot_arena_interactor;
 
 /*******************************************************************************
@@ -82,11 +82,13 @@ class depth0_loop_functions : public base_loop_functions,
  private:
   using interactor_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth0::typelist,
-                                robot_arena_interactor>::type
+                              robot_arena_interactor,
+                              carena::caching_arena_map>::type
     >;
   using los_updater_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth0::typelist,
-                              cfops::robot_los_update>::type>;
+                              cfops::robot_los_update,
+                              carena::caching_arena_map>::type>;
 
   using metric_extraction_typelist = rmpl::typelist<
     ccops::metrics_extract<controller::depth0::crw_controller,

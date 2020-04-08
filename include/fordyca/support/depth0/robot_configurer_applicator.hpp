@@ -50,7 +50,7 @@ using configurer_map_type = rds::type_map<
  */
 class robot_configurer_applicator {
  public:
-  explicit robot_configurer_applicator( controller::foraging_controller* const c)
+  explicit robot_configurer_applicator(controller::foraging_controller* const c)
       : controller(c) {}
 
   void operator()(robot_configurer<controller::depth0::crw_controller>& ) const {}

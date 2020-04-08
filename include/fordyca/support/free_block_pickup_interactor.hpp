@@ -53,11 +53,11 @@ NS_START(fordyca, support);
  * \brief Handle's a robot's (possible) \ref free_block_pickup event on a given
  * timestep.
  */
-template <typename T>
+template <typename TControllerType, typename TArenaMapType>
 class free_block_pickup_interactor
-    : public rer::client<free_block_pickup_interactor<T>> {
+    : public rer::client<free_block_pickup_interactor<TControllerType, TArenaMapType>> {
  public:
-  free_block_pickup_interactor(carena::base_arena_map* const map,
+  free_block_pickup_interactor(TArenaMapType* const map,
                                argos::CFloorEntity* const floor,
                                tv::env_dynamics* envd)
       : ER_CLIENT_INIT("fordyca.support.free_block_pickup_interactor"),
@@ -87,7 +87,8 @@ class free_block_pickup_interactor
    * \param controller The controller to handle interactions for.
    * \param t The current timestep.
    */
-  interactor_status operator()(T& controller, const rtypes::timestep& t) {
+  interactor_status operator()(TControllerType& controller,
+                               const rtypes::timestep& t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
       if (m_penalty_handler->is_penalty_satisfied(controller, t)) {
         finish_free_block_pickup(controller, t);
@@ -105,7 +106,7 @@ class free_block_pickup_interactor
    * \brief Determine if a robot is waiting to pick up a free block, and if it
    * is actually on a free block, send it the \ref free_block_pickup event.
    */
-  void finish_free_block_pickup(T& controller, const rtypes::timestep& t) {
+  void finish_free_block_pickup(TControllerType& controller, const rtypes::timestep& t) {
     ER_ASSERT(controller.goal_acquired() && fsm::foraging_acq_goal::ekBLOCK ==
                                                 controller.acquisition_goal(),
               "Controller not waiting for free block pickup");
@@ -167,7 +168,7 @@ class free_block_pickup_interactor
    * \brief Perform the actual picking up of a free block once all
    * preconditions have been satisfied.
    */
-  void perform_free_block_pickup(T& controller,
+  void perform_free_block_pickup(TControllerType& controller,
                                  const ctv::temporal_penalty& penalty,
                                  const rtypes::timestep& t) {
     /* Holding block mutex not necessary here, but does not hurt */
@@ -201,7 +202,7 @@ class free_block_pickup_interactor
      *
      * In order for the pickup event to process properly.
      */
-    apickup_op.visit(*m_map);
+    apickup_op.visit(*static_cast<carena::base_arena_map<crepr::base_block2D>*>(m_map));
     rpickup_op.visit(controller);
 
     /* The floor texture must be updated */
@@ -210,7 +211,7 @@ class free_block_pickup_interactor
 
   /* clang-format off */
   argos::CFloorEntity*const           m_floor;
-  carena::base_arena_map* const       m_map;
+  TArenaMapType* const                m_map;
   tv::block_op_penalty_handler* const m_penalty_handler;
   /* clang-format on */
 };

@@ -81,8 +81,8 @@ struct functor_maps_initializer {
   RCSW_COLD void operator()(const T& controller) const {
     lf->m_interactor_map->emplace(
         typeid(controller),
-        robot_arena_interactor<T>(
-            lf->arena_map<carena::caching_arena_map>(),
+        robot_arena_interactor<T, carena::caching_arena_map>(
+            lf->arena_map(),
             lf->m_metrics_agg.get(),
             lf->floor(),
             lf->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>()));
@@ -96,7 +96,7 @@ struct functor_maps_initializer {
             lf->config()->config_get<cvconfig::visualization_config>(),
             lf->oracle()));
     lf->m_los_update_map->emplace(typeid(controller),
-                                  cfops::robot_los_update<T>(lf->arena_map()));
+                                  cfops::robot_los_update<T, carena::caching_arena_map>(lf->arena_map()));
   }
 
   /* clang-format off */
@@ -147,8 +147,8 @@ void depth0_loop_functions::private_init(void) {
    * arena map. The arena map pads the size obtained from the XML file after
    * initialization, so we just need to grab it.
    */
-  auto padded_size =
-      rmath::vector2d(arena_map()->xrsize(), arena_map()->yrsize());
+  auto padded_size = rmath::vector2d(arena_map()->xrsize(),
+                                     arena_map()->yrsize());
   auto arena = *config()->config_get<caconfig::arena_map_config>();
   arena.grid.upper = padded_size;
   m_metrics_agg = std::make_unique<depth0_metrics_aggregator>(&output->metrics,
@@ -275,13 +275,20 @@ argos::CColor depth0_loop_functions::GetFloorColor(
 
   for (auto* block : arena_map()->blocks()) {
     /*
+     * Short circuiting tests for out of sight blocks can help in large
+     * swarms with large #s of blocks.
+     */
+    if (block->is_out_of_sight()) {
+      continue;
+    }
+    /*
      * Even though each block type has a unique color, the only distinction
      * that robots can make to determine if they are on a block or not is
      * between shades of black/white. So, all blocks must appear as black, even
      * when they are not actually (when blocks are picked up their correct color
      * is shown through visualization).
      */
-    if (block->contains_point(tmp)) {
+    if (block->contains_point2D(tmp)) {
       return argos::CColor::BLACK;
     }
   } /* for(block..) */
@@ -310,7 +317,7 @@ void depth0_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
             "Controller '%s' type '%s' not in depth0 LOS update map",
             controller->GetId().c_str(),
             controller->type_index().name());
-  auto applicator = robot_los_update_applicator(controller);
+  auto applicator = robot_los_update_applicator<carena::caching_arena_map>(controller);
   boost::apply_visitor(applicator,
                        m_los_update_map->at(controller->type_index()));
 } /* robot_pre_step() */
@@ -330,7 +337,8 @@ void depth0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
 
   auto iapplicator =
       cops::robot_arena_interaction_applicator<controller::foraging_controller,
-                                               depth0::robot_arena_interactor>(
+                                               depth0::robot_arena_interactor,
+                                               carena::caching_arena_map>(
           controller, rtypes::timestep(GetSpace().GetSimulationClock()));
   auto status =
       boost::apply_visitor(iapplicator,
@@ -348,7 +356,7 @@ void depth0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
    * timestep. See #577.
    */
   if (interactor_status::ekNO_EVENT != status && nullptr != oracle()) {
-    oracle()->update(arena_map<carena::caching_arena_map>());
+    oracle()->update(arena_map());
   }
   /*
    * Collect metrics from robot, now that it has finished interacting with the

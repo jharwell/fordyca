@@ -94,7 +94,7 @@ class dynamic_cache_manager final : public base_cache_manager,
    */
   boost::optional<cds::block2D_vectorno> calc_blocks_for_creation(
       const cads::acache_vectorno& existing_caches,
-      const cfds::block_cluster_vector& clusters,
+      const cfds::block2D_cluster_vector& clusters,
       const cds::block2D_vectorno& blocks);
 
   /* clang-format off */

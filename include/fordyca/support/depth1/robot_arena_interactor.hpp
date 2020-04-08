@@ -58,10 +58,11 @@ NS_START(depth1);
  * - Free block drop due to task abort.
  * - Task abort.
  */
-template <typename T>
-class robot_arena_interactor final : public rer::client<robot_arena_interactor<T>> {
+template <typename TControllerType, typename TArenaMapType>
+class robot_arena_interactor final : public rer::client<robot_arena_interactor<TControllerType,
+                                                                               TArenaMapType>> {
  public:
-  using controller_type = T;
+  using controller_type = TControllerType;
   struct params {
     carena::caching_arena_map* const map;
     depth0::depth0_metrics_aggregator *const metrics_agg;
@@ -102,7 +103,7 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
    * \param controller The controller to handle interactions for.
    * \param t The current timestep.
    */
-  interactor_status operator()(T& controller, const rtypes::timestep& t) {
+  interactor_status operator()(TControllerType& controller, const rtypes::timestep& t) {
     if (m_task_abort_interactor(controller)) {
       /*
        * This needs to be here, rather than in each robot's control step
@@ -132,11 +133,13 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
 
  private:
   /* clang-format off */
-  free_block_pickup_interactor<T>         m_free_pickup_interactor;
-  nest_block_drop_interactor<T>           m_nest_drop_interactor;
-  task_abort_interactor<T>                m_task_abort_interactor;
-  cached_block_pickup_interactor<T>       m_cached_pickup_interactor;
-  existing_cache_block_drop_interactor<T> m_existing_cache_drop_interactor;
+  free_block_pickup_interactor<TControllerType,
+                               TArenaMapType>           m_free_pickup_interactor;
+  nest_block_drop_interactor<TControllerType,
+                             TArenaMapType>             m_nest_drop_interactor;
+  task_abort_interactor<TControllerType>                m_task_abort_interactor;
+  cached_block_pickup_interactor<TControllerType>       m_cached_pickup_interactor;
+  existing_cache_block_drop_interactor<TControllerType> m_existing_cache_drop_interactor;
   /* clang-format on */
 };
 

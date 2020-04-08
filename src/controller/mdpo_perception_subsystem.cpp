@@ -102,9 +102,16 @@ void mdpo_perception_subsystem::process_los_blocks(
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  cds::block2D_vectorno blocks = c_los->blocks();
+  cds::entity_vector blocks = c_los->blocks();
   if (!blocks.empty()) {
-    ER_DEBUG("Blocks in LOS: [%s]", rcppsw::to_string(blocks).c_str());
+    auto accum = std::accumulate(blocks.begin(),
+                                 blocks.end(),
+                                 std::string(),
+                                 [&](const std::string& a, const auto& b) {
+                                   return a + "b" + rcppsw::to_string(b->id()) + ",";
+                                 });
+
+    ER_DEBUG("Blocks in LOS: [%s]", accum.c_str());
     ER_DEBUG("Blocks in DPO store: [%s]",
              rcppsw::to_string(m_map->store()->blocks()).c_str());
   }
@@ -121,12 +128,16 @@ void mdpo_perception_subsystem::process_los_blocks(
       rmath::vector2u d = c_los->cell(i, j).loc();
       if (!c_los->cell(i, j).state_has_block() &&
           m_map->access<occupancy_grid::kCell>(d).state_has_block()) {
-        auto block = m_map->access<occupancy_grid::kCell>(d).block();
+        auto* los_entity = c_los->cell(i, j).entity();
+        ER_ASSERT(crepr::entity_dimensionality::ek2D == los_entity->dimensionality(),
+                  "LOS block%d is not 2D!",
+                  los_entity->id().v());
+        auto* map_block = m_map->access<occupancy_grid::kCell>(d).block2D();
         ER_DEBUG("Correct block%d %s/%s discrepency",
-                 block->id().v(),
-                 block->rloc().to_str().c_str(),
-                 block->dloc().to_str().c_str());
-        m_map->block_remove(block);
+                 map_block->id().v(),
+                 map_block->rloc().to_str().c_str(),
+                 map_block->dloc().to_str().c_str());
+        m_map->block_remove(map_block);
       } else if (c_los->cell(i, j).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_is_known()) {
         ER_TRACE("Cell@%s now known to be empty", d.to_str().c_str());
@@ -136,7 +147,8 @@ void mdpo_perception_subsystem::process_los_blocks(
     } /* for(j..) */
   }   /* for(i..) */
 
-  for (auto& block : c_los->blocks()) {
+  for (auto* b : c_los->blocks()) {
+    auto* block = static_cast<crepr::base_block2D*>(b);
     ER_ASSERT(!block->is_out_of_sight(),
               "Block%d out of sight in LOS?",
               block->id().v());
@@ -152,8 +164,8 @@ void mdpo_perception_subsystem::process_los_blocks(
                block->rloc().to_str().c_str(),
                block->dloc().to_str().c_str());
       auto range = m_map->blocks().const_values_range();
-      auto it = std::find_if(range.begin(), range.end(), [&](const auto& b) {
-        return b.ent()->id() == cell.block()->id();
+      auto it = std::find_if(range.begin(), range.end(), [&](const auto& b2) {
+        return b2.ent()->id() == cell.block2D()->id();
       });
       ER_ASSERT(it != range.end(), "Known block%d not in PAM", block->id().v());
     }

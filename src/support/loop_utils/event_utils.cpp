@@ -23,7 +23,6 @@
  ******************************************************************************/
 #include "fordyca/support/utils/event_utils.hpp"
 
-#include "cosm/arena/base_arena_map.hpp"
 #include "cosm/arena/caching_arena_map.hpp"
 
 #include "fordyca/controller/foraging_controller.hpp"
@@ -37,7 +36,7 @@ NS_START(fordyca, support, utils);
  * Functions
  ******************************************************************************/
 rtypes::type_uuid robot_on_block(const controller::foraging_controller& controller,
-                                 const carena::base_arena_map& map) {
+                                 const carena::caching_arena_map& map) {
   return map.robot_on_block(controller.pos2D(), controller.entity_acquired_id());
 } /* robot_on_block() */
 

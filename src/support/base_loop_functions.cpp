@@ -109,10 +109,14 @@ void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
    * they are omitted is waaayyyy too much work. See #621 too.
    */
   auto envd = std::make_unique<tv::env_dynamics>(
-      &tvp->env_dynamics, this, arena_map<carena::caching_arena_map>());
+      &tvp->env_dynamics, this, arena_map());
 
   auto popd = std::make_unique<tv::fordyca_pd_adaptor>(
-      &tvp->population_dynamics, this, arena_map(), envd.get(), rng());
+      &tvp->population_dynamics,
+      this,
+      envd.get(),
+      arena_map(),
+      rng());
 
   m_tv_manager =
       std::make_unique<tv::tv_manager>(std::move(envd), std::move(popd));
@@ -172,7 +176,7 @@ void base_loop_functions::pre_step(void) {
   }
 
   if (nullptr != oracle()) {
-    oracle()->update(arena_map<carena::caching_arena_map>());
+    oracle()->update(arena_map());
   }
 } /* pre_step() */
 
