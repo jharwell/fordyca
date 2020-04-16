@@ -29,9 +29,9 @@
 #include <argos3/core/simulator/entity/floor_entity.h>
 
 #include "rcppsw/math/vector2.hpp"
-#include "fordyca/fordyca.hpp"
 #include "rcppsw/types/spatial_dist.hpp"
 #include "rcppsw/types/type_uuid.hpp"
+
 #include "fordyca/controller/controller_fwd.hpp"
 
 /*******************************************************************************

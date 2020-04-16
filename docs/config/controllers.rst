@@ -34,23 +34,12 @@ The following controllers are available:
 +--------------+-------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
 
 
-The following root XML tags are defined under the ``<params>`` tag for all
-controller types:
+The following root XML tags are defined under ``<params>`` in addition to the ones defined in :xref:`COSM`.
 
 +---------------------------+---------------------------+----------------------------------------------------------------+
 | Root XML tag              | Mandatory For?            | Description                                                    |
 +---------------------------+---------------------------+----------------------------------------------------------------+
-| ``output``                | All controllers           | See :xref:`COSM` docs.                                         |
-|                           |                           |                                                                |
-+---------------------------+---------------------------+----------------------------------------------------------------+
-| ``perception``            | All but CRW               | See :xref:`COSM` docs.                                         |
-+---------------------------+---------------------------+----------------------------------------------------------------+
-| ``task_executive``        | depth1, depth2 controllers| See :xref:`COSM` docs.                                         |
-|                           |                           |                                                                |
-|                           |                           |                                                                |
-+---------------------------+---------------------------+----------------------------------------------------------------+
-| ``task_alloc``            |depth1 depth2 controllers  | See :xref:`COSM` docs.                                         |
-|                           |                           |                                                                |
+| ``perception``            | All but CRW               | See :xref:`COSM` docs also; only augmented slightly here.      |
 +---------------------------+---------------------------+----------------------------------------------------------------+
 | ``block_sel_matrix``      | All but CRW controller    | Parameters used by robots when selecting which block to acquire|
 |                           |                           | as part of the task they are currently executing.              |

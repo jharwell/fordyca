@@ -76,16 +76,16 @@ class crw_fsm final : public cfsm::util_hfsm,
   bool entered_collision_avoidance(void) const override RCSW_PURE;
   bool exited_collision_avoidance(void) const override RCSW_PURE;
   rtypes::timestep collision_avoidance_duration(void) const override RCSW_PURE;
-  rmath::vector2u avoidance_loc(void) const override;
+  rmath::vector2z avoidance_loc(void) const override;
   /* goal acquisition metrics */
   cfsm::metrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
   exp_status is_exploring_for_goal(void) const override RCSW_PURE;
   bool is_vectoring_to_goal(void) const override { return false; }
   bool goal_acquired(void) const override RCSW_PURE;
-  rmath::vector2u acquisition_loc(void) const override;
+  rmath::vector2z acquisition_loc(void) const override;
   rtypes::type_uuid entity_acquired_id(void) const override RCSW_PURE;
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, current_explore_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, current_vector_loc, const);
 
   /* block transportation */
   foraging_transport_goal block_transport_goal(void) const override RCSW_PURE;

@@ -70,7 +70,7 @@ rtypes::timestep localized_search::collision_avoidance_duration(void) const {
   }
 } /* collision_avoidance_duration() */
 
-rmath::vector2u localized_search::avoidance_loc(void) const {
+rmath::vector2z localized_search::avoidance_loc(void) const {
   ER_ASSERT(m_vfsm.task_running() || m_crw.task_running(),
             "In collision avoidance without running task?");
   if (m_vfsm.task_running()) {

@@ -191,7 +191,7 @@ rtypes::timestep block_to_goal_fsm::collision_avoidance_duration(void) const {
   return rtypes::timestep(0);
 } /* collision_avoidance_duration() */
 
-rmath::vector2u block_to_goal_fsm::avoidance_loc(void) const {
+rmath::vector2z block_to_goal_fsm::avoidance_loc(void) const {
   ER_ASSERT(m_block_fsm->task_running() || m_goal_fsm->task_running(),
             "In collision avoidance without running task?");
   if (m_block_fsm->task_running()) {
@@ -234,15 +234,15 @@ cfsm::metrics::goal_acq_metrics::goal_type block_to_goal_fsm::acquisition_goal(
   return fsm::to_goal_type(foraging_acq_goal::ekNONE);
 } /* acquisition_goal() */
 
-rmath::vector2u block_to_goal_fsm::acquisition_loc(void) const {
+rmath::vector2z block_to_goal_fsm::acquisition_loc(void) const {
   return m_goal_fsm->acquisition_loc();
 } /* acquisition_loc() */
 
-rmath::vector2u block_to_goal_fsm::current_explore_loc(void) const {
+rmath::vector2z block_to_goal_fsm::current_explore_loc(void) const {
   return saa()->sensing()->discrete_position();
 } /* current_explore_loc() */
 
-rmath::vector2u block_to_goal_fsm::current_vector_loc(void) const {
+rmath::vector2z block_to_goal_fsm::current_vector_loc(void) const {
   return saa()->sensing()->discrete_position();
 } /* current_vector_loc() */
 

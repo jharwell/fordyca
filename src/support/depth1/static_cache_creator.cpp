@@ -56,7 +56,7 @@ cads::acache_vectoro static_cache_creator::create_all(
   auto it = c_alloc_blocks.begin();
   for (auto& center : mc_centers) {
     auto filter = [&](const auto& c) {
-      return rmath::dvec2uvec(center, grid()->resolution().v()) == c->dloc();
+      return rmath::dvec2zvec(center, grid()->resolution().v()) == c->dloc();
     };
     /* static cache already exists */
     if (c_params.current_caches.end() !=

@@ -127,7 +127,7 @@ bool los_proc_verify::operator()(const ds::dpo_semantic_map* const c_map) const 
    */
   for (uint i = 0; i < mc_los->xsize(); ++i) {
     for (uint j = 0; j < mc_los->ysize(); ++j) {
-      rmath::vector2u d = mc_los->cell(i, j).loc();
+      rmath::vector2z d = mc_los->cell(i, j).loc();
       auto& cell1 = mc_los->cell(i, j);
       auto& cell2 = c_map->access<ds::occupancy_grid::kCell>(d);
 

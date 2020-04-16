@@ -55,7 +55,7 @@ using ds::occupancy_grid;
  ******************************************************************************/
 robot_free_block_drop::robot_free_block_drop(
     std::unique_ptr<crepr::base_block2D> block,
-    const rmath::vector2u& coord,
+    const rmath::vector2z& coord,
     const rtypes::discretize_ratio& resolution)
     : ER_CLIENT_INIT("fordyca.events.robot_free_block_drop"),
       cell2D_op(coord),
@@ -177,7 +177,7 @@ void robot_free_block_drop::visit(cfsm::cell2D_fsm& fsm) {
 void robot_free_block_drop::visit(crepr::base_block2D& block) {
   block.md()->robot_id_reset();
 
-  block.rloc(rmath::uvec2dvec(cell2D_op::coord(), mc_resolution.v()));
+  block.rloc(rmath::zvec2dvec(cell2D_op::coord(), mc_resolution.v()));
   block.dloc(cell2D_op::coord());
 } /* visit() */
 

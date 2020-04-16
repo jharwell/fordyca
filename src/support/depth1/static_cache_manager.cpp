@@ -141,8 +141,8 @@ boost::optional<cds::block2D_vectorno> static_cache_manager::cache_i_blocks_allo
     const rmath::vector2d& loc,
     size_t n_blocks) const {
   cds::block2D_vectorno cache_i_blocks;
-  rmath::vector2u dcenter =
-      rmath::dvec2uvec(loc, arena_grid()->resolution().v());
+  rmath::vector2z dcenter =
+      rmath::dvec2zvec(loc, arena_grid()->resolution().v());
   std::copy_if(
       all_blocks.begin(),
       all_blocks.end(),
@@ -168,7 +168,7 @@ boost::optional<cds::block2D_vectorno> static_cache_manager::cache_i_blocks_allo
                            mc_cache_locs.end(),
                            [&](const auto& l) {
                              return b->dloc() !=
-                                    rmath::dvec2uvec(
+                                    rmath::dvec2zvec(
                                         l, arena_grid()->resolution().v());
                            });
       });
@@ -243,7 +243,7 @@ void static_cache_manager::post_creation_blocks_absorb(
          */
         caops::free_block_drop_visitor<crepr::base_block2D> op(
             b,
-            rmath::dvec2uvec(c->rloc(), arena_grid()->resolution().v()),
+            rmath::dvec2zvec(c->rloc(), arena_grid()->resolution().v()),
             arena_grid()->resolution(),
             carena::arena_map_locking::ekALL_HELD);
         op.visit(arena_grid()->access<arena_grid::kCell>(op.x(), op.y()));

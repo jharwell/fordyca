@@ -125,7 +125,7 @@ void mdpo_perception_subsystem::process_los_blocks(
    */
   for (uint i = 0; i < c_los->xsize(); ++i) {
     for (uint j = 0; j < c_los->ysize(); ++j) {
-      rmath::vector2u d = c_los->cell(i, j).loc();
+      rmath::vector2z d = c_los->cell(i, j).loc();
       if (!c_los->cell(i, j).state_has_block() &&
           m_map->access<occupancy_grid::kCell>(d).state_has_block()) {
         auto* los_entity = c_los->cell(i, j).entity();
@@ -164,8 +164,8 @@ void mdpo_perception_subsystem::process_los_blocks(
                block->rloc().to_str().c_str(),
                block->dloc().to_str().c_str());
       auto range = m_map->blocks().const_values_range();
-      auto it = std::find_if(range.begin(), range.end(), [&](const auto& b2) {
-        return b2.ent()->id() == cell.block2D()->id();
+      auto it = std::find_if(range.begin(), range.end(), [&](const auto& b1) {
+        return b1.ent()->id() == cell.block2D()->id();
       });
       ER_ASSERT(it != range.end(), "Known block%d not in PAM", block->id().v());
     }
@@ -196,7 +196,7 @@ void mdpo_perception_subsystem::process_los_caches(
    */
   for (uint i = 0; i < c_los->xsize(); ++i) {
     for (uint j = 0; j < c_los->ysize(); ++j) {
-      rmath::vector2u d = c_los->cell(i, j).loc();
+      rmath::vector2z d = c_los->cell(i, j).loc();
       if (!c_los->cell(i, j).state_has_cache() &&
           map()->access<occupancy_grid::kCell>(d).state_has_cache()) {
         auto cache = map()->access<occupancy_grid::kCell>(d).cache();
@@ -246,7 +246,7 @@ void mdpo_perception_subsystem::update_cell_stats(
     const cfrepr::foraging_los* const c_los) {
   for (uint i = 0; i < c_los->xsize(); ++i) {
     for (uint j = 0; j < c_los->ysize(); ++j) {
-      rmath::vector2u d = c_los->cell(i, j).loc();
+      rmath::vector2z d = c_los->cell(i, j).loc();
       if (c_los->cell(i, j).state_is_empty() &&
           m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
           !m_map->access<occupancy_grid::kCell>(d).state_is_empty()) {

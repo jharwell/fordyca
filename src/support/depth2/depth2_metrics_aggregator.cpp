@@ -43,13 +43,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, depth2, detail);
-using collector_typelist = rmpl::typelist<
-    rmpl::identity<ctametrics::bi_tab_metrics_collector>,
-    rmpl::identity<ctametrics::execution_metrics_collector>,
-    rmpl::identity<ctametrics::bi_tdgraph_metrics_collector>,
-    rmpl::identity<metrics::caches::site_selection_metrics_collector> >;
-NS_END(detail);
+NS_START(fordyca, support, depth2);
 
 using task0 = tasks::depth0::foraging_task;
 using task1 = tasks::depth1::foraging_task;
@@ -64,46 +58,11 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
     const std::string& output_root)
     : depth1_metrics_aggregator(mconfig, gconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth2.metrics_aggregator") {
-  cmetrics::collector_registerer::creatable_set creatable_set = {
-      {typeid(ctametrics::bi_tab_metrics_collector),
-       "task_tab_harvester",
-       "tasks::tab::harvester",
-       rmetrics::output_mode::ekAPPEND},
-      {typeid(ctametrics::bi_tab_metrics_collector),
-       "task_tab_collector",
-       "tasks::tab::collector",
-       rmetrics::output_mode::ekAPPEND},
-      {typeid(ctametrics::execution_metrics_collector),
-       "task_execution_cache_starter",
-       "tasks::execution::" + std::string(task2::kCacheStarterName),
-       rmetrics::output_mode::ekAPPEND},
-      {typeid(ctametrics::execution_metrics_collector),
-       "task_execution_cache_finisher",
-       "tasks::execution::" + std::string(task2::kCacheFinisherName),
-       rmetrics::output_mode::ekAPPEND},
-      {typeid(ctametrics::execution_metrics_collector),
-       "task_execution_cache_transferer",
-       "tasks::execution::" + std::string(task2::kCacheTransfererName),
-       rmetrics::output_mode::ekAPPEND},
-      {typeid(ctametrics::execution_metrics_collector),
-       "task_execution_cache_collector",
-       "tasks::execution::" + std::string(task2::kCacheCollectorName),
-       rmetrics::output_mode::ekAPPEND},
-      {typeid(ctametrics::bi_tdgraph_metrics_collector),
-       "task_distribution",
-       "tasks::distribution",
-       rmetrics::output_mode::ekAPPEND},
-      {typeid(metrics::caches::site_selection_metrics_collector),
-       "cache_site_selection",
-       "caches::site_selection",
-       rmetrics::output_mode::ekAPPEND}};
+  register_standard(mconfig);
 
   /* Overwrite depth1; we have a deeper decomposition now */
   collector_remove("tasks::distribution");
-
-  cmetrics::collector_registerer registerer(
-      mconfig, gconfig, creatable_set, this, 2);
-  boost::mpl::for_each<detail::collector_typelist>(registerer);
+  register_with_decomp_depth(mconfig, 2);
 
   reset_all();
 }
@@ -134,5 +93,48 @@ void depth2_metrics_aggregator::task_finish_or_abort_cb(
   collect("tasks::execution::" + task->name(),
           dynamic_cast<const ctametrics::execution_metrics&>(*task));
 } /* task_finish_or_abort_cb() */
+
+void depth2_metrics_aggregator::register_standard(
+    const cmconfig::metrics_config* const mconfig) {
+  using collector_typelist = rmpl::typelist<
+    rmpl::identity<ctametrics::bi_tab_metrics_collector>,
+    rmpl::identity<ctametrics::execution_metrics_collector>,
+    rmpl::identity<metrics::caches::site_selection_metrics_collector>
+    >;
+  cmetrics::collector_registerer<>::creatable_set creatable_set = {
+      {typeid(ctametrics::bi_tab_metrics_collector),
+       "task_tab_harvester",
+       "tasks::tab::harvester",
+       rmetrics::output_mode::ekAPPEND},
+      {typeid(ctametrics::bi_tab_metrics_collector),
+       "task_tab_collector",
+       "tasks::tab::collector",
+       rmetrics::output_mode::ekAPPEND},
+      {typeid(ctametrics::execution_metrics_collector),
+       "task_execution_cache_starter",
+       "tasks::execution::" + std::string(task2::kCacheStarterName),
+       rmetrics::output_mode::ekAPPEND},
+      {typeid(ctametrics::execution_metrics_collector),
+       "task_execution_cache_finisher",
+       "tasks::execution::" + std::string(task2::kCacheFinisherName),
+       rmetrics::output_mode::ekAPPEND},
+      {typeid(ctametrics::execution_metrics_collector),
+       "task_execution_cache_transferer",
+       "tasks::execution::" + std::string(task2::kCacheTransfererName),
+       rmetrics::output_mode::ekAPPEND},
+      {typeid(ctametrics::execution_metrics_collector),
+       "task_execution_cache_collector",
+       "tasks::execution::" + std::string(task2::kCacheCollectorName),
+       rmetrics::output_mode::ekAPPEND},
+      {typeid(metrics::caches::site_selection_metrics_collector),
+       "cache_site_selection",
+       "caches::site_selection",
+       rmetrics::output_mode::ekAPPEND}};
+
+  cmetrics::collector_registerer<> registerer(mconfig,
+                                              creatable_set,
+                                              this);
+  boost::mpl::for_each<collector_typelist>(registerer);
+} /* register_standard() */
 
 NS_END(depth2, support, fordyca);

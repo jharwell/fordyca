@@ -143,15 +143,15 @@ bool crw_fsm::goal_acquired(void) const {
   return false;
 } /* goal_acquired() */
 
-rmath::vector2u crw_fsm::acquisition_loc(void) const {
+rmath::vector2z crw_fsm::acquisition_loc(void) const {
   return saa()->sensing()->discrete_position();
 } /* acquisition_loc() */
 
-rmath::vector2u crw_fsm::current_explore_loc(void) const {
+rmath::vector2z crw_fsm::current_explore_loc(void) const {
   return saa()->sensing()->discrete_position();
 } /* current_explore_loc() */
 
-rmath::vector2u crw_fsm::current_vector_loc(void) const {
+rmath::vector2z crw_fsm::current_vector_loc(void) const {
   ER_FATAL_SENTINEL("CRW_FSM current vector location undefined");
   return saa()->sensing()->discrete_position();
 } /* current_vector_loc() */
@@ -190,7 +190,7 @@ rtypes::timestep crw_fsm::collision_avoidance_duration(void) const {
   }
 } /* collision_avoidance_duration() */
 
-rmath::vector2u crw_fsm::avoidance_loc(void) const {
+rmath::vector2z crw_fsm::avoidance_loc(void) const {
   return saa()->sensing()->discrete_position();
 } /* avoidance_loc() */
 

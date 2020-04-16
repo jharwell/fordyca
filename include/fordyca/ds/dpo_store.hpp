@@ -83,7 +83,7 @@ class dpo_store final : public rer::client<dpo_store> {
   struct update_res_t {
     bool status{false};
     update_status reason{kNO_CHANGE};
-    rmath::vector2u old_loc{};
+    rmath::vector2z old_loc{};
   };
 
   /**

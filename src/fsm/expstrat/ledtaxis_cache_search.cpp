@@ -102,7 +102,7 @@ rtypes::timestep ledtaxis_cache_search::collision_avoidance_duration(void) const
   }
 } /* collision_avoidance_duration() */
 
-rmath::vector2u ledtaxis_cache_search::avoidance_loc(void) const {
+rmath::vector2z ledtaxis_cache_search::avoidance_loc(void) const {
   ER_ASSERT(m_taxis.task_running() || m_crw.task_running(),
             "In collision avoidance without running task?");
   if (m_taxis.task_running()) {

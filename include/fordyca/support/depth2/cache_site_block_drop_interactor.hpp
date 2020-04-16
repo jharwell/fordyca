@@ -193,7 +193,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
    */
   void perform_cache_site_block_drop(T& controller,
                                      const ctv::temporal_penalty& penalty) {
-    auto loc = rmath::dvec2uvec(controller.pos2D(),
+    auto loc = rmath::dvec2zvec(controller.pos2D(),
                                 m_map->grid_resolution().v());
     /*
      * Safe to directly index into arena map block vector without locking

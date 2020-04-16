@@ -1,11 +1,11 @@
 # FORDYCA (FOraging Robots use DYnamic CAches)
 
-[![Build Status](https://travis-ci.org/swarm-robotics/fordyca.svg?branch=devel)](https://travis-ci.org/swarm-robotics/fordyca.svg?branch=devel)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Documentation Status](https://readthedocs.org/projects/swarm-robotics-fordyca/badge/?version=latest)](https://swarm-robotics-fordyca.readthedocs.io/en/latest/?badge=latest)
 ![Example Simulation](docs/example-ss.png?raw=true "Example Single Source Foraging Scenario")
 
-This is the main entry point for getting started on the project. The project
-documentation is [here](https://fordyca.readthedocs.io/en/latest/).
+Project documentation is
+[here](https://swarm-robotics-fordyca.readthedocs.io/en/latest/).
 
 # Papers
 

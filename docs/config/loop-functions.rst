@@ -1,7 +1,7 @@
 Loop Functions XML Configuration
 ================================
 
-The following root XML tags are defined under ``<loop_functions>`` in addition to the ones specified in :xref:`COSM`.
+The following root XML tags are defined under ``<loop_functions>`` in addition to the ones defined in :xref:`COSM`.
 
 +------------------------+----------------------------+------------------------------------------------------------------------------------------------------------------------------+
 | Root XML tag           | Mandatory For?             | Description                                                                                                                  |

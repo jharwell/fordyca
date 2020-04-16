@@ -68,7 +68,7 @@ class cell2D_unknown : public cdops::cell2D_unknown,
   /* parent class visit functions */
   using cdops::cell2D_unknown::visit;
 
-  explicit cell2D_unknown(const rmath::vector2u& coord)
+  explicit cell2D_unknown(const rmath::vector2z& coord)
       : cdops::cell2D_unknown(coord),
         ER_CLIENT_INIT("fordyca.events.cell2D_unknown") {}
 

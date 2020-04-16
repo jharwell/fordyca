@@ -156,7 +156,7 @@ rtypes::timestep free_block_to_nest_fsm::collision_avoidance_duration(void) cons
   }
 } /* collision_avoidance_duration() */
 
-rmath::vector2u free_block_to_nest_fsm::avoidance_loc(void) const {
+rmath::vector2z free_block_to_nest_fsm::avoidance_loc(void) const {
   if (m_block_fsm.task_running()) {
     return m_block_fsm.avoidance_loc();
   } else {

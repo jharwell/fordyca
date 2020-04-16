@@ -126,9 +126,9 @@ void dpo_perception_subsystem::process_los_blocks(
    * explicitly assign it.
    */
   cds::entity_vector los_blocks = c_los->blocks();
-  ER_DEBUG("Blocks in DPO store: [%s]",
-           rcppsw::to_string(m_store->blocks()).c_str());
   if (!los_blocks.empty()) {
+    ER_DEBUG("Blocks in DPO store: [%s]",
+             rcppsw::to_string(m_store->blocks()).c_str());
     auto accum = std::accumulate(los_blocks.begin(),
                                  los_blocks.end(),
                                  std::string(),
@@ -136,7 +136,6 @@ void dpo_perception_subsystem::process_los_blocks(
                                    return a + "b" + rcppsw::to_string(b->id()) + ",";
                            });
 
-    ER_DEBUG("Blocks in LOS: [%s]", accum.c_str());
   }
 
   /*
@@ -150,7 +149,6 @@ void dpo_perception_subsystem::process_los_blocks(
               "Block%d is not 2D!",
               b->id().v());
     auto* block = static_cast<crepr::base_block2D*>(b);
-
     ER_ASSERT(!block->is_out_of_sight(),
               "Block%d@%s/%s out of sight in LOS?",
               block->id().v(),

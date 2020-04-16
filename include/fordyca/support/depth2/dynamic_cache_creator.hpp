@@ -97,7 +97,7 @@ class dynamic_cache_creator : public base_cache_creator,
       const cds::block2D_vectorno& c_alloc_blocks,
       const cds::block2D_vectorno& c_cache_i_blocks,
       const cds::block2D_vectorno& c_used_blocks,
-      const rmath::vector2u& c_center,
+      const rmath::vector2z& c_center,
       rtypes::spatial_dist cache_dim) const;
 
   /**

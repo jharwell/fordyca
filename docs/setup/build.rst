@@ -59,13 +59,13 @@ in the ``output.txt`` for the error and fix it and try running the script again
 Optimized Build
 ---------------
 
-To build ``FORYDCA`` with optimizations (necessary for using ``SIERRA`` or
+To build ``FORDYCA`` with optimizations (necessary for using ``SIERRA`` or
 running large scale simulations), will need a different cmake command than the
 one ``bootstrap.sh`` uses for you. Something like the following, run from the
 ``build`` directory prior to building will do the trick::
 
-  cmake -DCMAKE_C_COMPILER=gcc-8 \
-  -DCMAKE_CXX_COMPILER=g++-8 \
+  cmake -DCMAKE_C_COMPILER=gcc-9 \
+  -DCMAKE_CXX_COMPILER=g++-9 \
   -DWITH_FOOTBOT_BATTERY=NO \
   -DWITH_FOOTBOT_RAB=NO \
   -DWITH_FOOTBOT_LEDS=NO \

@@ -95,12 +95,12 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
   }
   template <size_t Index>
   typename occupancy_grid::layer_value_type<Index>::value_type& access(
-      const rmath::vector2u& d) {
+      const rmath::vector2z& d) {
     return decoratee().access<Index>(d);
   }
   template <size_t Index>
   const typename occupancy_grid::layer_value_type<Index>::value_type& access(
-      const rmath::vector2u& d) const {
+      const rmath::vector2z& d) const {
     return decoratee().access<Index>(d);
   }
 

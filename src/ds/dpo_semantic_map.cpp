@@ -73,7 +73,7 @@ void dpo_semantic_map::decay_all(void) {
   m_store.decay_all();
 
   for (auto& b : m_store.blocks().const_values_range()) {
-    const rmath::vector2u& loc = b.ent()->dloc();
+    const rmath::vector2z& loc = b.ent()->dloc();
     crepr::pheromone_density& map_density =
         decoratee().access<occupancy_grid::kPheromone>(loc);
 
@@ -87,7 +87,7 @@ void dpo_semantic_map::decay_all(void) {
   } /* for(&b..) */
 
   for (auto&& c : m_store.caches().const_values_range()) {
-    const rmath::vector2u& loc = c.ent()->dloc();
+    const rmath::vector2z& loc = c.ent()->dloc();
     crepr::pheromone_density& map_density =
         decoratee().access<occupancy_grid::kPheromone>(loc);
 

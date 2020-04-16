@@ -61,7 +61,7 @@ std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
    * The cell that will be the location of the new cache may already contain a
    * block. If so, it should be added to the list of blocks for the cache.
    */
-  rmath::vector2u d = rmath::dvec2uvec(center, grid()->resolution().v());
+  rmath::vector2z d = rmath::dvec2zvec(center, grid()->resolution().v());
   cds::cell2D& cell = m_grid->access<arena_grid::kCell>(d);
   if (cell.state_has_block()) {
     ER_ASSERT(nullptr != cell.block2D(),
@@ -158,10 +158,10 @@ void base_cache_creator::update_host_cells(cads::acache_vectoro& caches) {
 
     for (uint i = xmin; i < xmax; ++i) {
       for (uint j = ymin; j < ymax; ++j) {
-        rmath::vector2u c = rmath::vector2u(i, j);
+        rmath::vector2z c = rmath::vector2z(i, j);
         auto& cell = m_grid->access<arena_grid::kCell>(i, j);
         ER_ASSERT(cache->contains_point2D(
-                      rmath::uvec2dvec(c, m_grid->resolution().v())),
+            rmath::zvec2dvec(c, m_grid->resolution().v())),
                   "Cache%d does not contain point (%u, %u) within its extent",
                   cache->id().v(),
                   i,

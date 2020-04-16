@@ -28,6 +28,7 @@
 
 #include "cosm/metrics/base_metrics_aggregator.hpp"
 #include "cosm/metrics/config/metrics_config.hpp"
+#include "cosm/ds/config/grid_config.hpp"
 
 #include "fordyca/fordyca.hpp"
 

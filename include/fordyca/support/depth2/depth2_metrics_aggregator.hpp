@@ -74,6 +74,8 @@ class depth2_metrics_aggregator final : public depth1::depth1_metrics_aggregator
       collect("caches::site_selection", *task);
     }
   }
+ private:
+  void register_standard(const cmconfig::metrics_config* mconfig);
 };
 
 NS_END(depth2, support, fordyca);

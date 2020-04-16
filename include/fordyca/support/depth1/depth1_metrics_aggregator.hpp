@@ -134,6 +134,17 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
   void collect_from_cache_manager(
       const support::base_cache_manager* manager);
 
+ protected:
+  /**
+   * \brief Register all collectors which require the task decomposition graph
+   * depth.
+   *
+   * This is a protected function so that derived classes aggregating metrics
+   * from deeper decomposition graphs can overwrite the original version, and
+   * thereby reduce code duplication.
+   */
+  void register_with_decomp_depth(const cmconfig::metrics_config* mconfig,
+                                  size_t depth);
  private:
   template<typename ControllerType>
   void collect_controller_common(const ControllerType* const controller) {
@@ -234,6 +245,11 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         });
     collect("tasks::distribution", *controller);
   } /* collect_controller_common() */
+
+  void register_standard(const cmconfig::metrics_config* mconfig);
+
+  void register_with_arena_dims2D(const cmconfig::metrics_config* mconfig,
+                                  const rmath::vector2z& dims);
 };
 
 NS_END(depth1, support, fordyca);

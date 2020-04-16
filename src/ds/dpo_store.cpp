@@ -51,7 +51,7 @@ dpo_store::update_res_t dpo_store::cache_update(
     dpo_entity<carepr::base_cache> cache) {
   update_res_t res = {.status = true,
                       .reason = kNO_CHANGE,
-                      .old_loc = rmath::vector2u()};
+                      .old_loc = rmath::vector2z()};
   ER_TRACE("Updating cache%d@%s",
            cache.ent()->id().v(),
            cache.ent()->dloc().to_str().c_str());
@@ -140,7 +140,7 @@ dpo_store::update_res_t dpo_store::block_update(
        * it1 will point to new block after this, so we need to save the old
        * location beforehand.
        */
-      rmath::vector2u old_loc = it1->ent()->dloc();
+      rmath::vector2z old_loc = it1->ent()->dloc();
       m_blocks.obj_add({block_in.ent()->id(), std::move(block_in)});
       RCSW_UNUSED rtypes::type_uuid id = block_in.ent()->id();
       ER_TRACE("Add block%d@%s (n_blocks=%zu)",
@@ -168,9 +168,9 @@ dpo_store::update_res_t dpo_store::block_update(
              block_in.ent()->id().v(),
              block_in.ent()->dloc().to_str().c_str(),
              m_blocks.size());
-    return {true, kNEW_BLOCK_ADDED, rmath::vector2u()};
+    return {true, kNEW_BLOCK_ADDED, rmath::vector2z()};
   }
-  return {false, kNO_CHANGE, rmath::vector2u()};
+  return {false, kNO_CHANGE, rmath::vector2z()};
 } /* block_update() */
 
 bool dpo_store::block_remove(crepr::base_block2D* const victim) {

@@ -95,7 +95,7 @@ cads::acache_vectoro dynamic_cache_creator::create_all(
          * creation, which can happen otherwise.
          */
         auto cache_p = std::shared_ptr<carepr::arena_cache>(create_single_cache(
-            rmath::uvec2dvec(*center), cache_i_blocks, c_params.t));
+            rmath::zvec2dvec(*center), cache_i_blocks, c_params.t));
         created_caches.push_back(cache_p);
       }
 
@@ -130,7 +130,7 @@ cds::block2D_vectorno dynamic_cache_creator::absorb_blocks_calc(
     const cds::block2D_vectorno& c_alloc_blocks,
     const cds::block2D_vectorno& c_cache_i_blocks,
     const cds::block2D_vectorno& c_used_blocks,
-    const rmath::vector2u& c_center,
+    const rmath::vector2z& c_center,
     rtypes::spatial_dist cache_dim) const {
   cds::block2D_vectorno absorb_blocks;
   std::copy_if(c_alloc_blocks.begin(),

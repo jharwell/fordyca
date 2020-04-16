@@ -25,6 +25,9 @@
  * Includes
  ******************************************************************************/
 #include <string>
+
+#include "cosm/ds/config/grid_config.hpp"
+
 #include "fordyca/metrics/fordyca_metrics_aggregator.hpp"
 
 /*******************************************************************************
@@ -51,7 +54,6 @@ class depth0_metrics_aggregator : public metrics::fordyca_metrics_aggregator,
   depth0_metrics_aggregator(const cmconfig::metrics_config* mconfig,
                             const cdconfig::grid_config* const gconfig,
                             const std::string& output_root);
-
 
   template<class T>
   void collect_from_controller(const T* controller);

@@ -124,7 +124,7 @@ class robot_free_block_drop : public rer::client<robot_free_block_drop>,
    * \param resolution The resolution of the arena map.
    */
   robot_free_block_drop(std::unique_ptr<crepr::base_block2D> block,
-                        const rmath::vector2u& coord,
+                        const rmath::vector2z& coord,
                         const rtypes::discretize_ratio& resolution);
 
  private:

@@ -153,7 +153,7 @@ rtypes::timestep cached_block_to_nest_fsm::collision_avoidance_duration(
   }
 } /* collision_avoidance_duration() */
 
-rmath::vector2u cached_block_to_nest_fsm::avoidance_loc(void) const {
+rmath::vector2z cached_block_to_nest_fsm::avoidance_loc(void) const {
   if (m_cache_fsm.task_running()) {
     return m_cache_fsm.avoidance_loc();
   } else {

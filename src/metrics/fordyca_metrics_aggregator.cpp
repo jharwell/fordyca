@@ -55,8 +55,13 @@ fordyca_metrics_aggregator::fordyca_metrics_aggregator(
     const cdconfig::grid_config* const gconfig,
     const std::string& output_root)
     : ER_CLIENT_INIT("fordyca.metrics.aggregator"),
-      base_metrics_aggregator(mconfig, gconfig, output_root) {
-  cmetrics::collector_registerer::creatable_set creatable_set = {
+      base_metrics_aggregator(mconfig, output_root) {
+  /* register collectors from base class */
+  auto dims2D = rmath::dvec2zvec(gconfig->upper, gconfig->resolution.v());
+  register_with_arena_dims2D(mconfig, dims2D);
+
+  /* register collectors common to all of FORDYCA */
+  cmetrics::collector_registerer<>::creatable_set creatable_set = {
       {typeid(blocks::manipulation_metrics_collector),
        "block_manipulation",
        "blocks::manipulation",
@@ -67,8 +72,8 @@ fordyca_metrics_aggregator::fordyca_metrics_aggregator(
        rmetrics::output_mode::ekAPPEND},
   };
 
-  cmetrics::collector_registerer registerer(
-      mconfig, gconfig, creatable_set, this);
+  cmetrics::collector_registerer<> registerer(
+      mconfig, creatable_set, this);
   boost::mpl::for_each<detail::collector_typelist>(registerer);
   reset_all();
 }

@@ -29,6 +29,8 @@
 
 #include "rcppsw/er/client.hpp"
 
+#include "cosm/ds/entity_vector.hpp"
+
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/metrics/perception/dpo_perception_metrics.hpp"

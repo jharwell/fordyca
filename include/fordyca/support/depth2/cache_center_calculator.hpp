@@ -96,7 +96,7 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    *
    * \return Coordinates of the new cache, if any were found.
    */
-  boost::optional<rmath::vector2u> operator()(
+  boost::optional<rmath::vector2z> operator()(
       const cds::block2D_vectorno& c_cache_i_blocks,
       const cads::acache_vectorno& c_existing_caches,
       const cfds::block2D_cluster_vector& c_clusters,
@@ -109,10 +109,10 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    *
    * \return An updated cache center, if one is needed.
    */
-  boost::optional<rmath::vector2u> deconflict_loc(
+  boost::optional<rmath::vector2z> deconflict_loc(
       const cads::acache_vectorno& c_existing_caches,
       const cfds::block2D_cluster_vector& c_clusters,
-      const rmath::vector2u& c_center,
+      const rmath::vector2z& c_center,
       rmath::rng* rng) const;
 
   /**
@@ -127,8 +127,8 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    *               location, but it is a *REAL* location (i.e. not
    *               discretized).
    */
-  boost::optional<rmath::vector2u> deconflict_loc_boundaries(
-      const rmath::vector2u& center) const;
+  boost::optional<rmath::vector2z> deconflict_loc_boundaries(
+      const rmath::vector2z& center) const;
 
   /**
    * \brief Given an existing entity (cache or a block) that must be avoided
@@ -140,9 +140,9 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    *               location, but it is a *REAL* location (i.e. not
    *               discretized).
    */
-  boost::optional<rmath::vector2u> deconflict_loc_entity(
+  boost::optional<rmath::vector2z> deconflict_loc_entity(
       const crepr::entity2D* ent,
-      const rmath::vector2u& center,
+      const rmath::vector2z& center,
       rmath::rng* rng) const;
 
  private:

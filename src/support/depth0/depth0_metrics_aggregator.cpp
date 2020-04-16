@@ -66,7 +66,7 @@ depth0_metrics_aggregator::depth0_metrics_aggregator(
     const std::string& output_root)
     : fordyca_metrics_aggregator(mconfig, gconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth0.depth0_aggregator") {
-  cmetrics::collector_registerer::creatable_set creatable_set = {
+  cmetrics::collector_registerer<>::creatable_set creatable_set = {
       {typeid(metrics::perception::mdpo_perception_metrics_collector),
        "perception_mdpo",
        "perception::mdpo",
@@ -76,8 +76,7 @@ depth0_metrics_aggregator::depth0_metrics_aggregator(
        "perception::dpo",
        rmetrics::output_mode::ekAPPEND}};
 
-  cmetrics::collector_registerer registerer(
-      mconfig, gconfig, creatable_set, this);
+  cmetrics::collector_registerer<> registerer(mconfig, creatable_set, this);
   boost::mpl::for_each<detail::collector_typelist>(registerer);
 
   reset_all();

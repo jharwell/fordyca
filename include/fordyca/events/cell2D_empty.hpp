@@ -72,7 +72,7 @@ class cell2D_empty : public cdops::cell2D_empty,
   /* parent class visit functions */
   using cdops::cell2D_empty::visit;
 
-  explicit cell2D_empty(const rmath::vector2u& coord)
+  explicit cell2D_empty(const rmath::vector2z& coord)
       : cdops::cell2D_empty(coord),
         ER_CLIENT_INIT("fordyca.events.cell2D_empty") {}
 
