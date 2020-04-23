@@ -34,8 +34,10 @@ NS_START(fordyca, metrics, tv);
  * Constructors/Destructor
  ******************************************************************************/
 env_dynamics_metrics_collector::env_dynamics_metrics_collector(
-    const std::string& ofname)
-    : base_metrics_collector(ofname, 1) {}
+    const std::string& ofname_stem)
+    : base_metrics_collector(ofname_stem,
+                             rtypes::timestep(1),
+                             rmetrics::output_mode::ekAPPEND) {}
 
 /*******************************************************************************
  * Member Functions
@@ -66,7 +68,7 @@ void env_dynamics_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const env_dynamics_metrics&>(metrics);
   m_avg_motion_throttle = m.avg_motion_throttle();
-  m_block_manip_penalty = m.block_manip_penalty();
+  m_block_manip_penalty = m.arena_block_manip_penalty();
   m_cache_usage_penalty = m.cache_usage_penalty();
 } /* collect() */
 

@@ -58,13 +58,13 @@ class block_sel_matrix_parser final : public rconfig::xml::xml_config_parser {
    */
   static constexpr char kXMLRoot[] = "block_sel_matrix";
 
-  void parse(const ticpp::Element& node) override;
-  bool validate(void) const override RCSW_PURE;
+  void parse(const ticpp::Element& node) override RCSW_COLD;
+  bool validate(void) const override RCSW_ATTR(pure, cold);
 
-  std::string xml_root(void) const override { return kXMLRoot; }
+  RCSW_COLD std::string xml_root(void) const override { return kXMLRoot; }
 
  private:
-  const rconfig::base_config* config_get_impl(void) const override {
+  RCSW_COLD const rconfig::base_config* config_get_impl(void) const override {
     return m_config.get();
   }
 

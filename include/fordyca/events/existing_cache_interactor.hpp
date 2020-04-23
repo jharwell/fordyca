@@ -34,8 +34,8 @@
 NS_START(fordyca, events);
 
 namespace detail {
-class cached_block_pickup;
-class cache_block_drop;
+class robot_cached_block_pickup;
+class robot_cache_block_drop;
 class cache_vanished;
 } // namespace detail
 
@@ -50,8 +50,8 @@ class cache_vanished;
  * interact with existing caches in FORDYCA.
  */
 class existing_cache_interactor
-    : public rpvisitor::polymorphic_accept_set<detail::cache_block_drop,
-                                               detail::cached_block_pickup,
+    : public rpvisitor::polymorphic_accept_set<detail::robot_cache_block_drop,
+                                               detail::robot_cached_block_pickup,
                                                detail::cache_vanished> {};
 
 NS_END(events, fordyca);

@@ -25,8 +25,10 @@
 
 #include <fstream>
 
+#include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block2D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 
 #include "fordyca/config/depth2/controller_repository.hpp"
@@ -53,18 +55,24 @@ birtd_dpo_controller::birtd_dpo_controller(void)
 void birtd_dpo_controller::control_step(void) {
   ndc_pusht();
   ER_ASSERT(!(nullptr != block() &&
-              rtypes::constants::kNoUUID == block()->robot_id()),
+              rtypes::constants::kNoUUID == block()->md()->robot_id()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
-            block()->robot_id().v());
+            block()->md()->robot_id().v());
   dpo_perception()->update(nullptr);
-  executive()->run();
-  saa()->steer_force2D_apply();
+
+  /*
+   * Execute the current task/allocate a new task/abort a task/etc and apply
+   * steering forces if normal operation, otherwise handle abnormal operation
+   * state.
+   */
+  supervisor()->run();
+
   ndc_pop();
 } /* control_step() */
 
 void birtd_dpo_controller::init(ticpp::Element& node) {
-  base_controller::init(node);
+  foraging_controller::init(node);
   ndc_push();
   ER_INFO("Initializing");
 
@@ -103,18 +111,11 @@ void birtd_dpo_controller::private_init(
                                            std::placeholders::_2));
   executive()->task_abort_notify(std::bind(
       &birtd_dpo_controller::task_abort_cb, this, std::placeholders::_1));
+  supervisor()->supervisee_update(executive());
 } /* private_init() */
 
-void birtd_dpo_controller::task_start_cb(const cta::polled_task* const task,
+void birtd_dpo_controller::task_start_cb(cta::polled_task* const task,
                                          const cta::ds::bi_tab* const) {
-  /**
-   * \brief Callback for task alloc. Needed to reset the task state of the
-   * controller (not the task, which is handled by the executive) in the case
-   * that the previous task was aborted. Not reseting this results in erroneous
-   * handling of the newly allocated task as if it was aborted by the loop
-   * functions, resulting in inconsistent state with the robot's executive. See
-   * #532,#587.
-   */
   if (tasks::task_status::ekABORT_PENDING != task_status()) {
     task_status_update(tasks::task_status::ekRUNNING);
   }
@@ -136,7 +137,13 @@ void birtd_dpo_controller::task_start_cb(const cta::polled_task* const task,
   }
   m_bsel_exception_added = false;
   m_csel_exception_added = false;
-} /* task_alloc_cb() */
+
+  /*
+   * This is set in the BITD DPO controller's task start cb, but we don't use
+   * that here, so it needs to also be here. See #622.
+   */
+  current_task(dynamic_cast<tasks::base_foraging_task*>(task));
+} /* task_start_cb() */
 
 using namespace argos; // NOLINT
 

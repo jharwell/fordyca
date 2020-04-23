@@ -61,7 +61,7 @@ class mdpo_controller : public dpo_controller,
   mdpo_controller(void) RCSW_COLD;
   ~mdpo_controller(void) override RCSW_COLD;
 
-  /* base_controller overrides */
+  /* foraging_controller overrides */
   void init(ticpp::Element& node) override RCSW_COLD;
   void control_step(void) override;
   std::type_index type_index(void) const override {return typeid(*this); }
@@ -84,7 +84,7 @@ class mdpo_controller : public dpo_controller,
    *
    * - DPO FSM
    *
-   * Called after \ref shared_init() in \ref Init().
+   * Called after \ref shared_init() in \ref init().
    */
   void private_init(const config::depth0::mdpo_controller_repository& config_repo) RCSW_COLD;
 };

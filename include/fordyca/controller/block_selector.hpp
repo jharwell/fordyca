@@ -61,11 +61,10 @@ class block_selector : public rer::client<block_selector> {
    * which block to go attempt to pickup.
    *
    * \return A pointer to the "best" block, along with its utility value, if a
-   * best block is found, and empty otherwise.
+   * best block is found, and NULL.
    */
-  boost::optional<ds::dp_block_map::value_type> operator()(
-      const ds::dp_block_map& blocks,
-      const rmath::vector2d& position);
+  const crepr::base_block2D* operator()(const ds::dp_block_map& blocks,
+                                        const rmath::vector2d& position);
 
  private:
   /**

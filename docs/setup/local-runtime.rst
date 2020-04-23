@@ -49,6 +49,12 @@ scenario on your local laptop.
    GUI appears, verify that the ``<visualization>`` subtree of ``demo.argos``
    file is not commented out.
 
+.. IMPORTANT:: You should (probably) have ``n_threads`` set to 0 in the
+   ``.argos`` file or omit the attribute altogether when running debug
+   builds. When debugging you want things to be executed in a deterministic
+   manner, and non-deterministic parallel execution with multiple threads should
+   be used only for optimized builds once you are confident of code correctness.
+
 Runtime Issues
 --------------
 

@@ -28,10 +28,12 @@
 
 #include <argos3/core/simulator/entity/floor_entity.h>
 
+#include "cosm/arena/caching_arena_map.hpp"
+#include "cosm/arena/operations/free_block_drop.hpp"
 #include "cosm/ta/logical_task.hpp"
 #include "cosm/ta/polled_task.hpp"
 
-#include "fordyca/ds/arena_map.hpp"
+#include "fordyca/events/robot_free_block_drop.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/tasks/task_status.hpp"
 
@@ -53,7 +55,7 @@ NS_START(fordyca, support);
 template <typename T>
 class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
  public:
-  task_abort_interactor(ds::arena_map* const map,
+  task_abort_interactor(carena::caching_arena_map* const map,
                         tv::env_dynamics* envd,
                         argos::CFloorEntity* const floor)
       : ER_CLIENT_INIT("fordyca.support.task_abort_interactor"),
@@ -114,43 +116,29 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
 
  private:
   void task_abort_with_block(T& controller) {
-    /*
-     * The robot owns a unique copy of a block originally from the arena, so we
-     * need to look it up rather than implicitly converting its unique_ptr to a
-     * shared_ptr and distributing it--this will cause lots of problems later.
-     * This needs to be *BEFORE* releasing the robot's owned block.
-     *
-     * Holding the block mutex here is not necessary.
-     */
-    auto it = std::find_if(m_map->blocks().begin(),
-                           m_map->blocks().end(),
-                           [&](const auto& b) {
-                             return controller.block()->id() == b->id();
-                           });
-    ER_ASSERT(m_map->blocks().end() != it,
-              "Block%d carried by %s not found in arena map blocks",
-              controller.block()->id().v(),
-              controller.GetId().c_str());
+    auto loc =
+        rmath::dvec2zvec(controller.pos2D(), m_map->grid_resolution().v());
+    rtypes::type_uuid block_id = controller.block()->id();
+    events::robot_free_block_drop_visitor rdrop_op(controller.block_release(),
+                                                   loc,
+                                                   m_map->grid_resolution());
 
-    events::free_block_drop_visitor drop_op(
-        *it,
-        rmath::dvec2uvec(controller.position2D(), m_map->grid_resolution().v()),
+    caops::free_block_drop_visitor<crepr::base_block2D> adrop_op(
+        m_map->blocks()[block_id.v()],
+        loc,
         m_map->grid_resolution(),
-        true);
+        carena::arena_map_locking::ekNONE_HELD);
 
-    bool conflict = utils::free_block_drop_conflict(*m_map,
-                                                    it->get(),
-                                                    controller.position2D());
-    utils::handle_arena_free_block_drop(drop_op, *m_map, conflict);
+    adrop_op.visit(*m_map);
+    rdrop_op.visit(controller);
 
-    drop_op.visit(controller);
     m_floor->SetChanged();
   } /* perform_block_drop() */
 
   /* clang-format off */
-  ds::arena_map* const       m_map;
-  tv::env_dynamics* const    m_envd;
-  argos::CFloorEntity* const m_floor;
+  carena::caching_arena_map* const m_map;
+  tv::env_dynamics* const          m_envd;
+  argos::CFloorEntity* const       m_floor;
   /* clang-format on */
 };
 

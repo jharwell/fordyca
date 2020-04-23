@@ -23,12 +23,12 @@
  ******************************************************************************/
 #include "fordyca/controller/los_proc_verify.hpp"
 
+#include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/foraging/repr/foraging_los.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/ds/dpo_store.hpp"
-#include "fordyca/repr/base_cache.hpp"
-#include "fordyca/repr/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -49,12 +49,17 @@ bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
    * block's location, and it is therefore not occluded.
    */
   for (auto& cache : c_dpo->caches().const_values_range()) {
-    for (auto& block : mc_los->blocks()) {
-      if (!cache.ent()->contains_point(block->rloc())) {
+    for (auto* b : mc_los->blocks()) {
+      ER_ASSERT(crepr::entity_dimensionality::ek2D == b->dimensionality(),
+                "Block%d is not 2D!",
+                b->id().v());
+      auto* block = static_cast<crepr::base_block2D*>(b);
+
+      if (!cache.ent()->contains_point2D(block->rloc2D())) {
         ER_ASSERT(c_dpo->contains(block),
                   "Store does not contain block%d@%s",
                   block->id().v(),
-                  block->dloc().to_str().c_str());
+                  block->dloc2D().to_str().c_str());
       }
     } /* for(&block..) */
   }   /* for(&cache..) */
@@ -99,16 +104,21 @@ bool los_proc_verify::operator()(const ds::dpo_semantic_map* const c_map) const 
    * Verify that for each cell that contained a block in the LOS, the
    * corresponding cell in the map also contains the same block.
    */
-  for (auto& block : mc_los->blocks()) {
+  for (auto* b : mc_los->blocks()) {
+    ER_ASSERT(crepr::entity_dimensionality::ek2D == b->dimensionality(),
+              "Block%d is not 2D!",
+              b->id().v());
+    auto* block = static_cast<crepr::base_block2D*>(b);
     auto& cell = c_map->access<ds::occupancy_grid::kCell>(block->dloc());
+
     ER_ASSERT(cell.state_has_block(),
               "Cell@%s not in HAS_BLOCK state",
               block->dloc().to_str().c_str());
-    ER_ASSERT(cell.block()->id() == block->id(),
+    ER_ASSERT(cell.block2D()->id() == block->id(),
               "Cell@%s has wrong block ID (%d vs %d)",
               block->dloc().to_str().c_str(),
               block->id().v(),
-              cell.block()->id().v());
+              cell.block2D()->id().v());
   } /* for(&block..) */
 
   /*
@@ -117,7 +127,7 @@ bool los_proc_verify::operator()(const ds::dpo_semantic_map* const c_map) const 
    */
   for (uint i = 0; i < mc_los->xsize(); ++i) {
     for (uint j = 0; j < mc_los->ysize(); ++j) {
-      rmath::vector2u d = mc_los->cell(i, j).loc();
+      rmath::vector2z d = mc_los->cell(i, j).loc();
       auto& cell1 = mc_los->cell(i, j);
       auto& cell2 = c_map->access<ds::occupancy_grid::kCell>(d);
 
@@ -128,11 +138,15 @@ bool los_proc_verify::operator()(const ds::dpo_semantic_map* const c_map) const 
                   cell1.fsm().current_state(),
                   cell2.fsm().current_state());
         if (cell1.state_has_block()) {
-          ER_ASSERT(cell1.block()->id() == cell2.block()->id(),
+          ER_ASSERT(crepr::entity_dimensionality::ek2D == cell1.entity()->dimensionality(),
+                    "Block%d is not 2D!",
+                    cell1.entity()->id().v());
+
+          ER_ASSERT(cell1.block2D()->id() == cell2.block2D()->id(),
                     "LOS/DPO map disagree on block id in cell@%s: %d/%d",
                     d.to_str().c_str(),
-                    cell1.block()->id().v(),
-                    cell2.block()->id().v());
+                    cell1.block2D()->id().v(),
+                    cell2.block2D()->id().v());
         }
       }
     } /* for(j..) */

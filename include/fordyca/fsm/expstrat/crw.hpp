@@ -30,7 +30,7 @@
 #include "rcppsw/er/client.hpp"
 #include "cosm/fsm/collision_tracker.hpp"
 #include "fordyca/fordyca.hpp"
-#include "fordyca/fsm/subsystem_fwd.hpp"
+#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,7 +53,7 @@ class crw final : public foraging_expstrat,
   crw(const fsm::expstrat::foraging_expstrat::params* const c_params,
       rmath::rng* rng);
 
-  crw(crfootbot::footbot_saa_subsystem* saa, rmath::rng* rng);
+  crw(crfootbot::footbot_saa_subsystem2D* saa, rmath::rng* rng);
 
   ~crw(void) override = default;
   crw(const crw&) = delete;

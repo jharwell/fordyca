@@ -24,9 +24,9 @@
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
 
 #include "fordyca/events/block_found.hpp"
-#include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cache_vanished.hpp"
-#include "fordyca/events/cached_block_pickup.hpp"
+#include "fordyca/events/robot_cache_block_drop.hpp"
+#include "fordyca/events/robot_cached_block_pickup.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/fsm/depth2/cache_transferer_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
@@ -101,11 +101,11 @@ void cache_transferer::active_interface_update(int) {
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void cache_transferer::accept(events::detail::cache_block_drop& visitor) {
+void cache_transferer::accept(events::detail::robot_cache_block_drop& visitor) {
   visitor.visit(*this);
 }
 
-void cache_transferer::accept(events::detail::cached_block_pickup& visitor) {
+void cache_transferer::accept(events::detail::robot_cached_block_pickup& visitor) {
   visitor.visit(*this);
 }
 
@@ -160,6 +160,12 @@ RCPPSW_WRAP_OVERRIDE_DEF(
 RCPPSW_WRAP_OVERRIDE_DEF(
     cache_transferer,
     current_explore_loc,
+    *static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()),
+    const);
+
+RCPPSW_WRAP_OVERRIDE_DEF(
+    cache_transferer,
+    entity_acquired_id,
     *static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()),
     const);
 

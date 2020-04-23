@@ -29,13 +29,13 @@
 #include <vector>
 #include <boost/optional.hpp>
 
-#include "fordyca/ds/arena_grid.hpp"
-#include "fordyca/ds/block_list.hpp"
-#include "fordyca/ds/block_vector.hpp"
-#include "fordyca/ds/cache_vector.hpp"
+#include "cosm/ds/arena_grid.hpp"
+#include "cosm/ds/block2D_vector.hpp"
+#include "cosm/arena/ds/cache_vector.hpp"
+#include "cosm/foraging/ds/block_cluster_vector.hpp"
+
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "fordyca/ds/block_cluster_vector.hpp"
 #include "rcppsw/types/spatial_dist.hpp"
 #include "rcppsw/math/rng.hpp"
 
@@ -43,15 +43,10 @@
  * Namespaces
  ******************************************************************************/
 namespace cosm::repr {
-class base_block2D;
 class entity2D;
 } /* namespace cosm::repr */
 
-NS_START(fordyca);
-namespace repr {
-class arena_cache;
-} // namespace repr
-NS_START(support, depth2);
+NS_START(fordyca, support, depth2);
 
 /*******************************************************************************
  * Class Definitions
@@ -78,7 +73,7 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    * \param cache_dim Dimension of the cache (caches are square so can use a
    *                  scalar).
    */
-  cache_center_calculator(ds::arena_grid* grid,
+  cache_center_calculator(cds::arena_grid* grid,
                           rtypes::spatial_dist cache_dim);
 
   cache_center_calculator(const cache_center_calculator&) = delete;
@@ -101,10 +96,10 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    *
    * \return Coordinates of the new cache, if any were found.
    */
-  boost::optional<rmath::vector2u> operator()(
-      const ds::block_vector& c_cache_i_blocks,
-      const ds::cache_vector& c_existing_caches,
-      const ds::block_cluster_vector& c_clusters,
+  boost::optional<rmath::vector2z> operator()(
+      const cds::block2D_vectorno& c_cache_i_blocks,
+      const cads::acache_vectorno& c_existing_caches,
+      const cfds::block2D_cluster_vector& c_clusters,
       rmath::rng* rng) const;
 
  private:
@@ -114,10 +109,10 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    *
    * \return An updated cache center, if one is needed.
    */
-  boost::optional<rmath::vector2u> deconflict_loc(
-      const ds::cache_vector& c_existing_caches,
-      const ds::block_cluster_vector& c_clusters,
-      const rmath::vector2u& c_center,
+  boost::optional<rmath::vector2z> deconflict_loc(
+      const cads::acache_vectorno& c_existing_caches,
+      const cfds::block2D_cluster_vector& c_clusters,
+      const rmath::vector2z& c_center,
       rmath::rng* rng) const;
 
   /**
@@ -132,8 +127,8 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    *               location, but it is a *REAL* location (i.e. not
    *               discretized).
    */
-  boost::optional<rmath::vector2u> deconflict_loc_boundaries(
-      const rmath::vector2u& center) const;
+  boost::optional<rmath::vector2z> deconflict_loc_boundaries(
+      const rmath::vector2z& center) const;
 
   /**
    * \brief Given an existing entity (cache or a block) that must be avoided
@@ -145,15 +140,15 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    *               location, but it is a *REAL* location (i.e. not
    *               discretized).
    */
-  boost::optional<rmath::vector2u> deconflict_loc_entity(
+  boost::optional<rmath::vector2z> deconflict_loc_entity(
       const crepr::entity2D* ent,
-      const rmath::vector2u& center,
+      const rmath::vector2z& center,
       rmath::rng* rng) const;
 
  private:
   /* clang-format off */
   const rtypes::spatial_dist mc_cache_dim;
-  ds::arena_grid*            m_grid;
+  cds::arena_grid*           m_grid;
   /* clang-format on */
 };
 NS_END(depth2, support, fordyca);

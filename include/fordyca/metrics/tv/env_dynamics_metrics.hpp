@@ -24,8 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/metrics/base_metrics.hpp"
-#include "rcppsw/types/timestep.hpp"
+#include "cosm/tv/metrics/base_env_dynamics_metrics.hpp"
 
 #include "fordyca/fordyca.hpp"
 
@@ -48,23 +47,11 @@ NS_START(fordyca, metrics, tv);
  * Not really "metrics" per-se, but more of a way to record variances for later
  * usage in post-processing.
  *
- * Metrics are collected and output every timestep.
+ * Metrics are collected and output EVERY timestep.
  */
-class env_dynamics_metrics : public virtual rmetrics::base_metrics {
+class env_dynamics_metrics : public ctv::metrics::base_env_dynamics_metrics {
  public:
   env_dynamics_metrics(void) = default;
-
-  /**
-   * \brief Return the average motion throttling within the swarm, as a
-   * percentage [0, 1.0].
-   */
-  virtual double avg_motion_throttle(void) const = 0;
-
-  /**
-   * \brief Return the current value of the block manipulation penalty present
-   * in the environment.
-   */
-  virtual rtypes::timestep block_manip_penalty(void) const = 0;
 
   /**
    * \brief Return the current value of the cache usage penalty present in the

@@ -24,7 +24,6 @@
 #include "fordyca/fsm/depth0/free_block_to_nest_fsm.hpp"
 
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
-#include "fordyca/fsm/foraging_goal_type.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
 
 /*******************************************************************************
@@ -32,14 +31,14 @@
  ******************************************************************************/
 NS_START(fordyca, fsm, depth0);
 
-using goal_type = cfmetrics::goal_acq_metrics::goal_type;
+using goal_type = cfsm::metrics::goal_acq_metrics::goal_type;
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 free_block_to_nest_fsm::free_block_to_nest_fsm(
     const fsm_ro_params* c_params,
-    crfootbot::footbot_saa_subsystem* saa,
+    crfootbot::footbot_saa_subsystem2D* saa,
     std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
     rmath::rng* rng)
     : util_hfsm(saa, rng, ekST_MAX_STATES),
@@ -157,7 +156,7 @@ rtypes::timestep free_block_to_nest_fsm::collision_avoidance_duration(void) cons
   }
 } /* collision_avoidance_duration() */
 
-rmath::vector2u free_block_to_nest_fsm::avoidance_loc(void) const {
+rmath::vector2z free_block_to_nest_fsm::avoidance_loc(void) const {
   if (m_block_fsm.task_running()) {
     return m_block_fsm.avoidance_loc();
   } else {
@@ -191,18 +190,23 @@ RCPPSW_WRAP_OVERRIDE_DEF(free_block_to_nest_fsm,
                          m_block_fsm,
                          const);
 
+RCPPSW_WRAP_OVERRIDE_DEF(free_block_to_nest_fsm,
+                         entity_acquired_id,
+                         m_block_fsm,
+                         const);
+
 goal_type free_block_to_nest_fsm::acquisition_goal(void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_PICKUP == current_state()) {
-    return goal_type(foraging_acq_goal::type::ekBLOCK);
+    return fsm::to_goal_type(foraging_acq_goal::ekBLOCK);
   }
-  return goal_type(foraging_acq_goal::type::ekNONE);
+  return fsm::to_goal_type(foraging_acq_goal::ekNONE);
 } /* acquisition_goal() */
 
 bool free_block_to_nest_fsm::goal_acquired(void) const {
-  if (foraging_acq_goal::type::ekBLOCK == acquisition_goal()) {
+  if (foraging_acq_goal::ekBLOCK == acquisition_goal()) {
     return current_state() == ekST_WAIT_FOR_PICKUP;
-  } else if (foraging_transport_goal::type::ekNEST == block_transport_goal()) {
+  } else if (foraging_transport_goal::ekNEST == block_transport_goal()) {
     return current_state() == ekST_WAIT_FOR_DROP;
   }
   return false;
@@ -220,13 +224,12 @@ void free_block_to_nest_fsm::task_execute(void) {
   inject_event(fsm::foraging_signal::ekRUN, rpfsm::event_type::ekNORMAL);
 } /* task_execute() */
 
-foraging_transport_goal::type free_block_to_nest_fsm::block_transport_goal(
-    void) const {
+foraging_transport_goal free_block_to_nest_fsm::block_transport_goal(void) const {
   if (ekST_TRANSPORT_TO_NEST == current_state() ||
       ekST_WAIT_FOR_DROP == current_state()) {
-    return foraging_transport_goal::type::ekNEST;
+    return foraging_transport_goal::ekNEST;
   }
-  return foraging_transport_goal::type::ekNONE;
+  return foraging_transport_goal::ekNONE;
 } /* acquisition_goal() */
 
 NS_END(depth0, fsm, fordyca);

@@ -46,16 +46,19 @@ NS_START(fordyca, metrics, perception);
  *
  * \brief Collector for \ref dpo_perception_metrics.
  *
- * Metrics are written out at the specified collection interval.
+ * Metrics CAN be collected in parallel from robots; concurrent updates to the
+ * gathered stats are supported. Metrics are written out at the specified
+ * collection interval.
  */
 class dpo_perception_metrics_collector final
     : public rmetrics::base_metrics_collector {
  public:
   /**
-   * \param ofname The output file name.
+   * \param ofname_stem The output file name stem.
    * \param interval Collection interval.
    */
-  dpo_perception_metrics_collector(const std::string& ofname, uint interval);
+  dpo_perception_metrics_collector(const std::string& ofname_stem,
+                                   const rtypes::timestep& interval);
 
   void reset(void) override;
   void collect(const rmetrics::base_metrics& metrics) override;

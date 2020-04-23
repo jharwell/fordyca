@@ -41,19 +41,20 @@ NS_START(fordyca, metrics, tv);
  ******************************************************************************/
 /**
  * \class env_dynamics_metrics_collector
- * \ingroup metrics blocks
+ * \ingroup metrics tv
  *
  * \brief Collector for \ref env_dynamics_metrics.
  *
- * Metrics are written out every timestep.
+ * Metrics CANNOT be collected in parallel; concurrent updates to the gathered
+ * stats are not supported. Metrics are written out every timestep.
  */
 class env_dynamics_metrics_collector final
     : public rmetrics::base_metrics_collector {
  public:
   /**
-   * \param ofname The output file name.
+   * \param ofname_stem The output file name stem.
    */
-  explicit env_dynamics_metrics_collector(const std::string& ofname);
+  explicit env_dynamics_metrics_collector(const std::string& ofname_stem);
 
   void collect(const rmetrics::base_metrics& metrics) override;
 

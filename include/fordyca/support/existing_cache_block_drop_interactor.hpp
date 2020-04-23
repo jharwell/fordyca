@@ -26,10 +26,12 @@
  ******************************************************************************/
 #include <argos3/core/simulator/entity/floor_entity.h>
 
-#include "fordyca/ds/arena_map.hpp"
-#include "fordyca/events/cache_block_drop.hpp"
+#include "cosm/arena/caching_arena_map.hpp"
+#include "cosm/arena/operations/cache_block_drop.hpp"
+
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
+#include "fordyca/events/robot_cache_block_drop.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
@@ -53,7 +55,7 @@ template <typename T>
 class existing_cache_block_drop_interactor
     : public rer::client<existing_cache_block_drop_interactor<T>> {
  public:
-  existing_cache_block_drop_interactor(ds::arena_map* const map_in,
+  existing_cache_block_drop_interactor(carena::caching_arena_map* const map_in,
                                        tv::env_dynamics* envd)
       : ER_CLIENT_INIT("fordyca.support.existing_cache_block_drop_interactor"),
         m_map(map_in),
@@ -98,14 +100,14 @@ class existing_cache_block_drop_interactor
    * has acquired a cache and is looking to drop an object in it.
    */
   void finish_cache_block_drop(T& controller) {
-    const tv::temporal_penalty& p = m_penalty_handler->penalty_next();
+    const ctv::temporal_penalty& p = m_penalty_handler->penalty_next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
     ER_ASSERT(nullptr != dynamic_cast<events::existing_cache_interactor*>(
                              controller.current_task()),
               "Non-cache interface task!");
     ER_ASSERT(controller.current_task()->goal_acquired() &&
-                  fsm::foraging_acq_goal::type::ekEXISTING_CACHE ==
+                  fsm::foraging_acq_goal::ekEXISTING_CACHE ==
                       controller.current_task()->acquisition_goal(),
               "Controller not waiting for cache block drop");
     /*
@@ -120,7 +122,7 @@ class existing_cache_block_drop_interactor
      * Grid and block mutexes are also required, but only within the actual \ref
      * cached_block_pickup event visit to the arena map.
      */
-    m_map->cache_mtx().lock();
+    m_map->cache_mtx()->lock();
 
     /*
      * If two collector robots enter a cache that only contains 2 blocks on the
@@ -151,7 +153,7 @@ class existing_cache_block_drop_interactor
     } else {
       perform_cache_block_drop(controller, p);
     }
-    m_map->cache_mtx().unlock();
+    m_map->cache_mtx()->unlock();
 
     m_penalty_handler->penalty_remove(p);
     ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),
@@ -163,7 +165,7 @@ class existing_cache_block_drop_interactor
    * preconditions have been satisfied.
    */
   void perform_cache_block_drop(T& controller,
-                                const tv::temporal_penalty& penalty) {
+                                const ctv::temporal_penalty& penalty) {
     auto cache_it =
         std::find_if(m_map->caches().begin(),
                      m_map->caches().end(),
@@ -172,11 +174,27 @@ class existing_cache_block_drop_interactor
               "Cache%d from penalty does not exist",
               penalty.id().v());
 
-    events::cache_block_drop_visitor drop_op(controller.block_release(),
-                                             *cache_it,
-                                             m_map->grid_resolution());
-    (*cache_it)->penalty_served(penalty.penalty());
+    rtypes::type_uuid block_id = controller.block()->id();
 
+    /*
+     * Safe to directly index into arena map block vector without locking
+     * because the blocks never move from their original locations.
+     *
+     * Need to tell event to perform \ref arena_map block locking because there
+     * we are only holding the cache mutex.
+     */
+    caops::cache_block_drop_visitor adrop_op(
+        m_map->blocks()[block_id.v()],
+        *cache_it,
+        m_map->grid_resolution(),
+        carena::arena_map_locking::ekCACHES_HELD);
+    events::robot_cache_block_drop_visitor rdrop_op(controller.block_release(),
+                                                    *cache_it,
+                                                    m_map->grid_resolution());
+
+    (*cache_it)->penalty_served(penalty.penalty());
+    controller.block_manip_recorder()->record(metrics::blocks::block_manip_events::ekCACHE_DROP,
+                                              penalty.penalty());
     /*
      * Order of visitation must be:
      *
@@ -185,12 +203,12 @@ class existing_cache_block_drop_interactor
      *
      * In order for proper \ref events::cache_block_drop processing.
      */
-    drop_op.visit(*m_map);
-    drop_op.visit(controller);
+    adrop_op.visit(*m_map);
+    rdrop_op.visit(controller);
   }
 
   /* clang-format off */
-  ds::arena_map* const               m_map;
+  carena::caching_arena_map* const   m_map;
   tv::cache_op_penalty_handler*const m_penalty_handler;
   /* clang-format on */
 };

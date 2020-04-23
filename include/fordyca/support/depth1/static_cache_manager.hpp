@@ -29,10 +29,9 @@
 
 #include "fordyca/config/caches/caches_config.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
-#include "fordyca/ds/block_vector.hpp"
-#include "fordyca/ds/block_list.hpp"
-#include "fordyca/ds/block_cluster_vector.hpp"
-#include "fordyca/ds/cache_vector.hpp"
+#include "cosm/ds/block2D_vector.hpp"
+#include "cosm/foraging/ds/block_cluster_vector.hpp"
+#include "cosm/arena/ds/cache_vector.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/math/rng.hpp"
 #include "rcppsw/er/client.hpp"
@@ -41,13 +40,8 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace ds { class arena_grid; }
-namespace repr {
-class base_block2D;
-class arena_cache;
-}
-NS_START(support, depth1);
+NS_START(fordyca, support, depth1);
+
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
@@ -62,7 +56,7 @@ class static_cache_manager final : public base_cache_manager,
                                    public rer::client<static_cache_manager> {
  public:
   static_cache_manager(const config::caches::caches_config* config,
-                       ds::arena_grid* arena_grid,
+                       cds::arena_grid* arena_grid,
                        const std::vector<rmath::vector2d>& cache_locs,
                        rmath::rng* rng);
   static_cache_manager(const static_cache_manager&) = delete;
@@ -76,12 +70,12 @@ class static_cache_manager final : public base_cache_manager,
    * and there are not enough free blocks with which to create a cache of the
    * specified minimum size.
    */
-  boost::optional<ds::cache_vector> create(const cache_create_ro_params& c_params,
-                                           const ds::block_vector&  c_alloc_blocks);
+  boost::optional<cads::acache_vectoro> create(const cache_create_ro_params& c_params,
+                                             const cds::block2D_vectorno&  c_alloc_blocks);
 
-  boost::optional<ds::cache_vector> create_conditional(
+  boost::optional<cads::acache_vectoro> create_conditional(
       const cache_create_ro_params& c_params,
-      const ds::block_vector&  c_alloc_blocks,
+      const cds::block2D_vectorno&  c_alloc_blocks,
       uint n_harvesters,
       uint n_collectors);
 
@@ -102,9 +96,9 @@ class static_cache_manager final : public base_cache_manager,
    * the arena to meet the desired initial size of at least one cache, which is
    * not an error (all blocks can currently be carried by robots, for example).
    */
-  boost::optional<ds::block_vector> blocks_alloc(
-      const ds::cache_vector& existing_caches,
-      const ds::block_vector& all_blocks) const;
+  boost::optional<cds::block2D_vectorno> blocks_alloc(
+      const cads::acache_vectorno& existing_caches,
+      const cds::block2D_vectorno& all_blocks) const;
 
   /**
    * \brief Allocate the blocks that should be used when re-creating cache i.
@@ -130,10 +124,10 @@ class static_cache_manager final : public base_cache_manager,
    * \param loc The location the new cache is to be created at.
    * \param n_blocks How many blocks to try to allocate for cache i.
    */
-  boost::optional<ds::block_vector> cache_i_blocks_alloc(
-      const ds::cache_vector& existing_caches,
-      const ds::block_vector& allocated_blocks,
-      const ds::block_vector& all_blocks,
+  boost::optional<cds::block2D_vectorno> cache_i_blocks_alloc(
+      const cads::acache_vectorno& existing_caches,
+      const cds::block2D_vectorno& allocated_blocks,
+      const cds::block2D_vectorno& all_blocks,
       const rmath::vector2d& loc,
       size_t n_blocks) const;
 
@@ -151,8 +145,8 @@ class static_cache_manager final : public base_cache_manager,
    * drop as well, so it is best to be safe and do it unconditionally after
    * creation.
    */
-  void post_creation_blocks_absorb(const ds::cache_vector& caches,
-                                   const ds::block_vector& blocks);
+  void post_creation_blocks_absorb(const cads::acache_vectoro& caches,
+                                   const cds::block2D_vectorno& blocks);
 
   /* clang-format off */
   const config::caches::caches_config mc_cache_config;

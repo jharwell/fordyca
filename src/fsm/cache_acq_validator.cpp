@@ -23,10 +23,11 @@
  ******************************************************************************/
 #include "fordyca/fsm/cache_acq_validator.hpp"
 
+#include "cosm/arena/repr/base_cache.hpp"
+
 #include "fordyca/config/cache_sel/cache_pickup_policy_config.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
-#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -64,11 +65,11 @@ bool cache_acq_validator::operator()(const rmath::vector2d& loc,
   });
 
   if (range.end() == it) {
-    ER_WARN("Cache%d near %s invalid for acquisition: no such cache",
+    ER_WARN("Cache%d near %s invalid for acquisition: cache unknown",
             id.v(),
             loc.to_str().c_str());
     return false;
-  } else if (!it->ent()->contains_point(loc)) {
+  } else if (!it->ent()->contains_point2D(loc)) {
     ER_WARN("Cache%d@%s invalid for acquisition: does not contain %s",
             id.v(),
             it->ent()->dloc().to_str().c_str(),
@@ -85,13 +86,18 @@ bool cache_acq_validator::operator()(const rmath::vector2d& loc,
     return true;
   }
 
-  auto cache = it->ent();
+  /* verify pickup policy */
+  return pickup_policy_validate(it->ent(), t);
+} /* operator()() */
+
+bool cache_acq_validator::pickup_policy_validate(const carepr::base_cache* cache,
+                                                 const rtypes::timestep& t) const {
   auto& config = boost::get<config::cache_sel::cache_pickup_policy_config>(
       mc_csel_matrix->find(cselm::kPickupPolicy)->second);
 
   if (cselm::kPickupPolicyTime == config.policy && t < config.timestep) {
     ER_WARN("Cache%d invalid for acquisition: policy=%s, %u < %u",
-            id.v(),
+            cache->id().v(),
             config.policy.c_str(),
             t.v(),
             config.timestep.v());
@@ -99,13 +105,13 @@ bool cache_acq_validator::operator()(const rmath::vector2d& loc,
   } else if (cselm::kPickupPolicyCacheSize == config.policy &&
              cache->n_blocks() < config.cache_size) {
     ER_WARN("Cache%d invalid for acquisition: policy=%s, %zu < %u",
-            id.v(),
+            cache->id().v(),
             config.policy.c_str(),
             cache->n_blocks(),
             config.cache_size);
     return false;
   }
   return true;
-} /* operator()() */
+} /* pickup_policy_validate() */
 
 NS_END(fsm, fordyca);

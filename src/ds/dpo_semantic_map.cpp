@@ -23,9 +23,10 @@
  ******************************************************************************/
 #include "fordyca/ds/dpo_semantic_map.hpp"
 
+#include "cosm/arena/repr/base_cache.hpp"
+
 #include "fordyca/config/perception/perception_config.hpp"
-#include "fordyca/events/cell_empty.hpp"
-#include "fordyca/repr/base_cache.hpp"
+#include "fordyca/events/cell2D_empty.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,24 +46,22 @@ dpo_semantic_map::dpo_semantic_map(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool dpo_semantic_map::cache_remove(
-    const std::shared_ptr<repr::base_cache>& victim) {
+bool dpo_semantic_map::cache_remove(carepr::base_cache* const victim) {
   if (m_store.cache_remove(victim)) {
     ER_DEBUG("Updating cell@%s for removed cache",
              victim->dloc().to_str().c_str());
-    events::cell_empty_visitor op(victim->dloc());
+    cdops::cell2D_empty_visitor op(victim->dloc());
     op.visit(decoratee().access<occupancy_grid::kCell>(victim->dloc()));
     return true;
   }
   return false;
 } /* cache_remove() */
 
-bool dpo_semantic_map::block_remove(
-    const std::shared_ptr<crepr::base_block2D>& victim) {
+bool dpo_semantic_map::block_remove(crepr::base_block2D* const victim) {
   if (m_store.block_remove(victim)) {
     ER_DEBUG("Updating cell@%s for removed block",
              victim->dloc().to_str().c_str());
-    events::cell_empty_visitor op(victim->dloc());
+    events::cell2D_empty_visitor op(victim->dloc());
     op.visit(access<occupancy_grid::kCell>(victim->dloc()));
     return true;
   }
@@ -74,7 +73,7 @@ void dpo_semantic_map::decay_all(void) {
   m_store.decay_all();
 
   for (auto& b : m_store.blocks().const_values_range()) {
-    const rmath::vector2u& loc = b.ent()->dloc();
+    const rmath::vector2z& loc = b.ent()->dloc();
     crepr::pheromone_density& map_density =
         decoratee().access<occupancy_grid::kPheromone>(loc);
 
@@ -88,7 +87,7 @@ void dpo_semantic_map::decay_all(void) {
   } /* for(&b..) */
 
   for (auto&& c : m_store.caches().const_values_range()) {
-    const rmath::vector2u& loc = c.ent()->dloc();
+    const rmath::vector2z& loc = c.ent()->dloc();
     crepr::pheromone_density& map_density =
         decoratee().access<occupancy_grid::kPheromone>(loc);
 

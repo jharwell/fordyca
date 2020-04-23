@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/events/cache_proximity.hpp"
 
+#include "cosm/arena/repr/base_cache.hpp"
+
 #include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
 #include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/depth2/birtd_odpo_controller.hpp"
@@ -34,7 +36,6 @@
 #include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
-#include "fordyca/repr/base_cache.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
 #include "fordyca/tasks/depth2/cache_starter.hpp"
 
@@ -46,7 +47,7 @@ NS_START(fordyca, events, detail);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_proximity::cache_proximity(const std::shared_ptr<repr::base_cache>& cache)
+cache_proximity::cache_proximity(carepr::base_cache* cache)
     : ER_CLIENT_INIT("fordyca.events.cache_proximity"), m_cache(cache) {}
 
 /*******************************************************************************
@@ -66,7 +67,7 @@ void cache_proximity::dispatch_cache_interactor(
  * Depth2 Foraging
  ******************************************************************************/
 void cache_proximity::visit(controller::depth2::birtd_dpo_controller& c) {
-  c.ndc_push();
+  c.ndc_pusht();
 
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
 
@@ -79,7 +80,7 @@ void cache_proximity::visit(controller::depth2::birtd_dpo_controller& c) {
 } /* visit() */
 
 void cache_proximity::visit(controller::depth2::birtd_mdpo_controller& c) {
-  c.ndc_push();
+  c.ndc_pusht();
 
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
 
@@ -92,7 +93,7 @@ void cache_proximity::visit(controller::depth2::birtd_mdpo_controller& c) {
 } /* visit() */
 
 void cache_proximity::visit(controller::depth2::birtd_odpo_controller& c) {
-  c.ndc_push();
+  c.ndc_pusht();
 
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
 
@@ -105,7 +106,7 @@ void cache_proximity::visit(controller::depth2::birtd_odpo_controller& c) {
 } /* visit() */
 
 void cache_proximity::visit(controller::depth2::birtd_omdpo_controller& c) {
-  c.ndc_push();
+  c.ndc_pusht();
 
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
 

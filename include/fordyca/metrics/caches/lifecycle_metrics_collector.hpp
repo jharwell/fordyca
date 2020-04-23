@@ -44,15 +44,17 @@ NS_START(fordyca, metrics, caches);
  *
  * \brief Collector for \ref lifecycle_metrics.
  *
- * Metrics are output at the specified interval.
+ * Metrics CANNOT be collected in parallel; concurrent updates to the gathered
+ * stats are not supported. Metrics are output at the specified interval.
  */
 class lifecycle_metrics_collector final : public rmetrics::base_metrics_collector {
  public:
   /**
-   * \param ofname Output file name.
+   * \param ofname_stem Output file name stem.
    * \param interval Collection interval.
    */
-  lifecycle_metrics_collector(const std::string& ofname, uint interval);
+  lifecycle_metrics_collector(const std::string& ofname_stem,
+                              const rtypes::timestep& interval);
 
   void reset(void) override;
   void reset_after_interval(void) override;

@@ -69,13 +69,13 @@ NS_START(depth1);
  */
 class cached_block_to_nest_fsm final : public cfsm::util_hfsm,
                                        public rer::client<cached_block_to_nest_fsm>,
-                                       public cfmetrics::goal_acq_metrics,
+                                       public cfsm::metrics::goal_acq_metrics,
                                        public block_transporter,
                                        public cta::taskable {
  public:
   cached_block_to_nest_fsm(
       const fsm_ro_params* c_params,
-      crfootbot::footbot_saa_subsystem* saa,
+      crfootbot::footbot_saa_subsystem2D* saa,
       std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
       rmath::rng *rng);
   ~cached_block_to_nest_fsm(void) override = default;
@@ -104,19 +104,20 @@ class cached_block_to_nest_fsm final : public cfsm::util_hfsm,
   bool entered_collision_avoidance(void) const override RCSW_PURE;
   bool exited_collision_avoidance(void) const override RCSW_PURE;
   rtypes::timestep collision_avoidance_duration(void) const override RCSW_PURE;
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, avoidance_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, avoidance_loc, const);
 
   /* goal acquisition metrics */
   bool goal_acquired(void) const override RCSW_PURE;
   RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
-  cfmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, acquisition_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, current_explore_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, current_vector_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid, entity_acquired_id, const);
+  cfsm::metrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
 
   /* block transportation */
-  foraging_transport_goal::type block_transport_goal(void) const override RCSW_PURE;
+  foraging_transport_goal block_transport_goal(void) const override RCSW_PURE;
 
   /**
    * \brief Reset the FSM

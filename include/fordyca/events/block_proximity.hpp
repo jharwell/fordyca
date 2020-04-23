@@ -29,6 +29,8 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitor.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
@@ -37,10 +39,6 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::repr {
-class base_block2D;
-}
-
 NS_START(fordyca, events, detail);
 
 /*******************************************************************************
@@ -66,7 +64,7 @@ class block_proximity : public rer::client<block_proximity> {
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  explicit block_proximity(const std::shared_ptr<crepr::base_block2D>& block);
+  explicit block_proximity(crepr::base_block2D* block);
   ~block_proximity(void) override = default;
 
   block_proximity(const block_proximity& op) = delete;
@@ -84,12 +82,12 @@ class block_proximity : public rer::client<block_proximity> {
   void dispatch_cache_starter(tasks::base_foraging_task* task);
 
   /* clang-format off */
-  std::shared_ptr<crepr::base_block2D> m_block;
+  crepr::base_block2D* m_block;
   /* clang-format on */
 };
 
 /**
- * \brief We use the picky visitor in order to force compile errors if a call to
+ * \brief We use the precise visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).

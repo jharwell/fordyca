@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/controller/depth0/crw_controller.hpp"
 
 /*******************************************************************************
@@ -59,7 +61,7 @@ class dpo_controller : public crw_controller,
   dpo_controller(void) RCSW_COLD;
   ~dpo_controller(void) override RCSW_COLD;
 
-  /* base_controller overrides */
+  /* foraging_controller overrides */
   void init(ticpp::Element& node) override RCSW_COLD;
   void control_step(void) override;
   void reset(void) override RCSW_COLD;
@@ -69,28 +71,38 @@ class dpo_controller : public crw_controller,
   RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(cfmetrics::goal_acq_metrics::goal_type,
+  RCPPSW_WRAP_OVERRIDE_DECL(cfsm::metrics::goal_acq_metrics::goal_type,
                             acquisition_goal,
                             const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, acquisition_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, current_explore_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, current_vector_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid, entity_acquired_id, const);
 
   /* block transportation */
-  RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal::type,
+  RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal,
                             block_transport_goal,
                             const);
 
   /**
+   * \brief Mutator to allow replacement of the the FSM used by this class to
+   * perform foraging tasks (strategy pattern), so that derived classes can
+   * reuse the same accessors that this classes provides. Cleaner to do it this
+   * way than to have each derived class have its own private version and
+   * require duplicate accessors in each derived class.
+   */
+    void fsm(std::unique_ptr<class fsm::depth0::dpo_fsm> fsm);
+
+  /**
    * \brief Set the robot's current line of sight (LOS).
    */
-  void los(std::unique_ptr<repr::line_of_sight> new_los);
+  void los(std::unique_ptr<cfrepr::foraging_los> new_los);
   double los_dim(void) const RCSW_PURE;
 
   /**
    * \brief Get the current LOS for the robot.
    */
-  const repr::line_of_sight* los(void) const RCSW_PURE;
+  const cfrepr::foraging_los* los(void) const RCSW_PURE;
 
   /**
    * \brief Set whether or not a robot is supposed to display it's LOS as a
@@ -138,15 +150,6 @@ class dpo_controller : public crw_controller,
   void perception(std::unique_ptr<base_perception_subsystem> perception);
 
   /**
-   * \brief Mutator to allow replacement of the the FSM used by this class to
-   * perform foraging tasks (strategy pattern), so that derived classes can
-   * reuse the same accessors that this classes provides. Cleaner to do it this
-   * way than to have each derived class have its own private version and
-   * require duplicate accessors in each derived class.
-   */
-  void fsm(std::unique_ptr<class fsm::depth0::dpo_fsm> fsm);
-
-  /**
    * \brief Initialization that derived classes may also need to perform, if
    * they want to use any of the following parts of this class's functionality
    * as-is:
@@ -165,7 +168,9 @@ class dpo_controller : public crw_controller,
    *   perception subsystem, and derived classes can override the copy
    *   instantiated in \ref shared_init if they wish.
    *
-   * This is called after \ref shared_init() during \ref Init().xo
+   * - Supervisor FSM.
+   *
+   * This is called after \ref shared_init() during \ref init().
    */
   void private_init(const config::depth0::dpo_controller_repository& config_repo) RCSW_COLD;
 

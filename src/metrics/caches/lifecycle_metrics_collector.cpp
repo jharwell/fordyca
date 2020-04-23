@@ -35,9 +35,12 @@ NS_START(fordyca, metrics, caches);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-lifecycle_metrics_collector::lifecycle_metrics_collector(const std::string& ofname,
-                                                         uint interval)
-    : base_metrics_collector(ofname, interval) {}
+lifecycle_metrics_collector::lifecycle_metrics_collector(
+    const std::string& ofname_stem,
+    const rtypes::timestep& interval)
+    : base_metrics_collector(ofname_stem,
+                             interval,
+                             rmetrics::output_mode::ekAPPEND) {}
 
 /*******************************************************************************
  * Member Functions
@@ -66,7 +69,7 @@ void lifecycle_metrics_collector::reset(void) {
 } /* reset() */
 
 boost::optional<std::string> lifecycle_metrics_collector::csv_line_build(void) {
-  if (!((timestep() + 1) % interval() == 0)) {
+  if (!(timestep() % interval() == 0)) {
     return boost::none;
   }
   std::string line;

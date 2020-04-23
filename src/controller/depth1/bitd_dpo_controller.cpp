@@ -25,8 +25,11 @@
 
 #include <fstream>
 
+#include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block2D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/config/saa_xml_names.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 #include "cosm/subsystem/config/sensing_subsystem2D_config.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
@@ -34,11 +37,11 @@
 #include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
 #include "fordyca/config/cache_sel/cache_sel_matrix_config.hpp"
 #include "fordyca/config/depth1/controller_repository.hpp"
-#include "fordyca/config/saa_xml_names.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth1/task_executive_builder.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
 
 /*******************************************************************************
@@ -62,19 +65,25 @@ bitd_dpo_controller::~bitd_dpo_controller(void) = default;
 void bitd_dpo_controller::control_step(void) {
   ndc_pusht();
   ER_ASSERT(!(nullptr != block() &&
-              rtypes::constants::kNoUUID == block()->robot_id()),
+              rtypes::constants::kNoUUID == block()->md()->robot_id()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
-            block()->robot_id().v());
+            block()->md()->robot_id().v());
 
   dpo_perception()->update(nullptr);
-  executive()->run();
-  saa()->steer_force2D_apply();
+
+  /*
+   * Execute the current task/allocate a new task/abort a task/etc and apply
+   * steering forces if normal operation, otherwise handle abnormal operation
+   * state.
+   */
+  supervisor()->run();
+
   ndc_pop();
 } /* control_step() */
 
 void bitd_dpo_controller::init(ticpp::Element& node) {
-  base_controller::Init(node);
+  foraging_controller::init(node);
 
   ndc_push();
   ER_INFO("Initializing...");
@@ -110,9 +119,9 @@ void bitd_dpo_controller::shared_init(
   /*
    * Cache detection via ground sensors. This is *NOT* enabled by the
    * initialization in the base controller, and needs to happen here when we
-   * have an XML repository with the correct configuration init.
+   * have an XML repository with the correct configuration in it.
    */
-  auto saa_names = config::saa_xml_names();
+  auto saa_names = crfootbot::config::saa_xml_names();
   auto sensing_p =
       config_repo.config_get<csubsystem::config::sensing_subsystem2D_config>();
   auto ground = chal::sensors::ground_sensor(
@@ -132,30 +141,23 @@ void bitd_dpo_controller::private_init(
       &bitd_dpo_controller::task_abort_cb, this, std::placeholders::_1));
   executive()->task_start_notify(std::bind(
       &bitd_dpo_controller::task_start_cb, this, std::placeholders::_1));
+  supervisor()->supervisee_update(executive());
 } /* private_init() */
 
 void bitd_dpo_controller::task_abort_cb(const cta::polled_task*) {
   m_task_status = tasks::task_status::ekABORT_PENDING;
 } /* task_abort_cb() */
 
-void bitd_dpo_controller::task_start_cb(const cta::polled_task*) {
+void bitd_dpo_controller::task_start_cb(cta::polled_task* task) {
   if (tasks::task_status::ekABORT_PENDING != m_task_status) {
     m_task_status = tasks::task_status::ekRUNNING;
   }
+  m_current_task = dynamic_cast<tasks::base_foraging_task*>(task);
 } /* task_start_cb() */
 
 const cta::ds::bi_tab* bitd_dpo_controller::active_tab(void) const {
   return m_executive->active_tab();
 } /* active_tab() */
-
-tasks::base_foraging_task* bitd_dpo_controller::current_task(void) {
-  return dynamic_cast<tasks::base_foraging_task*>(m_executive->current_task());
-} /* current_task() */
-
-const tasks::base_foraging_task* bitd_dpo_controller::current_task(void) const {
-  return dynamic_cast<const tasks::base_foraging_task*>(
-      m_executive->current_task());
-} /* current_task() */
 
 void bitd_dpo_controller::executive(
     std::unique_ptr<cta::bi_tdgraph_executive> executive) {
@@ -174,12 +176,11 @@ RCPPSW_WRAP_OVERRIDE_DEFP(bitd_dpo_controller,
 /*******************************************************************************
  * Goal Acquisition
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEFP(
-    bitd_dpo_controller,
-    acquisition_goal,
-    current_task(),
-    cfmetrics::goal_acq_metrics::goal_type(fsm::foraging_acq_goal::ekNONE),
-    const);
+RCPPSW_WRAP_OVERRIDE_DEFP(bitd_dpo_controller,
+                          acquisition_goal,
+                          current_task(),
+                          fsm::to_goal_type(fsm::foraging_acq_goal::ekNONE),
+                          const);
 
 RCPPSW_WRAP_OVERRIDE_DEFP(bitd_dpo_controller,
                           goal_acquired,
@@ -187,18 +188,22 @@ RCPPSW_WRAP_OVERRIDE_DEFP(bitd_dpo_controller,
                           false,
                           const);
 
+RCPPSW_WRAP_OVERRIDE_DEFP(bitd_dpo_controller,
+                          entity_acquired_id,
+                          current_task(),
+                          rtypes::constants::kNoUUID,
+                          const);
+
 /*******************************************************************************
  * Task Distribution Metrics
  ******************************************************************************/
 int bitd_dpo_controller::current_task_depth(void) const {
-  return executive()->graph()->vertex_depth(
-      dynamic_cast<const cta::polled_task*>(current_task()));
+  return executive()->graph()->vertex_depth(executive()->current_task());
 } /* current_task_depth() */
 
 int bitd_dpo_controller::current_task_id(void) const {
-  auto task = dynamic_cast<const cta::polled_task*>(current_task());
-  if (nullptr != task) {
-    return executive()->graph()->vertex_id(task);
+  if (nullptr != executive()->current_task()) {
+    return executive()->graph()->vertex_id(executive()->current_task());
   }
   return -1;
 } /* current_task_id() */
@@ -209,8 +214,7 @@ int bitd_dpo_controller::task_id(const std::string& task_name) const {
 } /* task_id() */
 
 int bitd_dpo_controller::current_task_tab(void) const {
-  return dynamic_cast<const cta::ds::bi_tdgraph*>(executive()->graph())
-      ->active_tab_id();
+  return executive()->graph()->active_tab_id();
 } /* current_task_tab() */
 
 using namespace argos; // NOLINT

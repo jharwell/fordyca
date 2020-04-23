@@ -26,8 +26,8 @@ v * \file generalist.cpp
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 #include "fordyca/events/block_vanished.hpp"
-#include "fordyca/events/free_block_pickup.hpp"
-#include "fordyca/events/nest_block_drop.hpp"
+#include "fordyca/events/robot_free_block_pickup.hpp"
+#include "fordyca/events/robot_nest_block_drop.hpp"
 #include "fordyca/fsm/depth0/free_block_to_nest_fsm.hpp"
 
 /*******************************************************************************
@@ -59,10 +59,10 @@ rtypes::timestep generalist::current_time(void) const {
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void generalist::accept(events::detail::nest_block_drop& visitor) {
+void generalist::accept(events::detail::robot_nest_block_drop& visitor) {
   visitor.visit(*this);
 }
-void generalist::accept(events::detail::free_block_pickup& visitor) {
+void generalist::accept(events::detail::robot_free_block_pickup& visitor) {
   visitor.visit(*this);
 }
 void generalist::accept(events::detail::block_vanished& visitor) {
@@ -115,6 +115,12 @@ RCPPSW_WRAP_OVERRIDE_DEF(generalist,
 
 RCPPSW_WRAP_OVERRIDE_DEF(generalist,
                          current_vector_loc,
+                         *static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                             polled_task::mechanism()),
+                         const);
+
+RCPPSW_WRAP_OVERRIDE_DEF(generalist,
+                         entity_acquired_id,
                          *static_cast<fsm::depth0::free_block_to_nest_fsm*>(
                              polled_task::mechanism()),
                          const);

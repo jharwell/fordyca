@@ -23,8 +23,10 @@
  ******************************************************************************/
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
 
+#include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block2D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 
 #include "fordyca/config/depth0/mdpo_controller_repository.hpp"
 #include "fordyca/config/exploration_config.hpp"
@@ -53,10 +55,10 @@ mdpo_controller::~mdpo_controller(void) = default;
 void mdpo_controller::control_step(void) {
   ndc_pusht();
   ER_ASSERT(!(nullptr != block() &&
-              rtypes::constants::kNoUUID == block()->robot_id()),
+              rtypes::constants::kNoUUID == block()->md()->robot_id()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
-            block()->robot_id().v());
+            block()->md()->robot_id().v());
   perception()->update(nullptr);
   saa()->steer_force2D_apply();
   fsm()->run();
@@ -68,7 +70,7 @@ void mdpo_controller::init(ticpp::Element& node) {
    * Note that we do not call \ref crw_controller::init()--there
    * is nothing in there that we need.
    */
-  base_controller::init(node);
+  foraging_controller::init(node);
 
   ndc_push();
   ER_INFO("Initializing...");
@@ -119,6 +121,9 @@ void mdpo_controller::private_init(
       saa(),
       f.create(exp_config->block_strategy, &expstrat_params, rng()),
       rng()));
+
+  /* Set MDPO FSM supervision */
+  supervisor()->supervisee_update(fsm());
 } /* private_init() */
 
 mdpo_perception_subsystem* mdpo_controller::mdpo_perception(void) {

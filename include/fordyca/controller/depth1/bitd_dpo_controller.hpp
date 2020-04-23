@@ -80,7 +80,10 @@ class bitd_dpo_controller : public depth0::dpo_controller,
   bitd_dpo_controller(void) RCSW_COLD;
   ~bitd_dpo_controller(void) override RCSW_COLD;
 
-  /* base_controller overrides */
+  bitd_dpo_controller(const bitd_dpo_controller&) = delete;
+  bitd_dpo_controller& operator=(const bitd_dpo_controller&) = delete;
+
+  /* foraging_controller overrides */
   void init(ticpp::Element& node) override RCSW_COLD;
   void control_step(void) override;
   std::type_index type_index(void) const override { return typeid(*this); }
@@ -92,20 +95,25 @@ class bitd_dpo_controller : public depth0::dpo_controller,
 
   /* goal acquisition metrics */
   RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const final);
-  RCPPSW_WRAP_OVERRIDE_DECL(cfmetrics::goal_acq_metrics::goal_type,
+  RCPPSW_WRAP_OVERRIDE_DECL(cfsm::metrics::goal_acq_metrics::goal_type,
                             acquisition_goal,
                             const final);
+  RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid, entity_acquired_id, const);
 
   /* block transportation */
-  RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal::type,
+  RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal,
                             block_transport_goal,
                             const final);
 
   /**
    * \brief Get the current task the controller is executing.
    */
-  tasks::base_foraging_task* current_task(void) RCSW_PURE;
-  const tasks::base_foraging_task* current_task(void) const RCSW_PURE;
+  tasks::base_foraging_task* current_task(void) RCSW_PURE {
+    return m_current_task;
+  }
+  const tasks::base_foraging_task* current_task(void) const RCSW_PURE {
+    return m_current_task;
+  }
 
   int task_id(const std::string& task_name) const;
 
@@ -186,13 +194,26 @@ class bitd_dpo_controller : public depth0::dpo_controller,
    * handling of the newly allocated task as if it was aborted by the loop
    * functions, resulting in inconsistent state with the robot's executive.
    */
-  void task_start_cb(const cta::polled_task*);
+  void task_start_cb(cta::polled_task* task);
+
+ protected:
+  void current_task(tasks::base_foraging_task* t) { m_current_task = t; }
 
  private:
   void private_init(const config::depth1::controller_repository& config_repo) RCSW_COLD;
 
   /* clang-format off */
   bool                                       m_display_task{false};
+
+  /**
+   * \brief The current task the controller is executing. This is also tracked
+   * by the executive, so it might seem redundant to also track it here. This is
+   * done to avoid having to dynamically cast from \ref cta::polled_task to \ref
+   * tasks::base_foraging_task multiple times EVERY timestep for EVERY robot,
+   * which was enough to make it show up in VTune as a minor bottleneck. See
+   * #547.
+   */
+  tasks::base_foraging_task*                 m_current_task{nullptr};
   tasks::task_status                         m_task_status{tasks::task_status::ekNULL};
   std::unique_ptr<class cache_sel_matrix>    m_cache_sel_matrix;
   std::unique_ptr<cta::bi_tdgraph_executive> m_executive;

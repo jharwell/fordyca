@@ -29,19 +29,18 @@
 
 #include "cosm/fsm/metrics/goal_acq_metrics.hpp"
 #include "cosm/fsm/metrics/movement_metrics.hpp"
+#include "cosm/metrics/collector_registerer.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
-#include "fordyca/controller/base_controller.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
 #include "fordyca/controller/depth0/odpo_controller.hpp"
 #include "fordyca/controller/depth0/omdpo_controller.hpp"
-#include "fordyca/ds/arena_map.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
-#include "fordyca/metrics/collector_registerer.hpp"
 #include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
 #include "fordyca/metrics/perception/dpo_perception_metrics_collector.hpp"
 #include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
@@ -52,46 +51,32 @@
  ******************************************************************************/
 NS_START(fordyca, support, depth0, detail);
 
-using collector_typelist =
-    rmpl::typelist<metrics::collector_registerer::type_wrap<
-                       metrics::perception::mdpo_perception_metrics_collector>,
-                   metrics::collector_registerer::type_wrap<
-                       metrics::perception::dpo_perception_metrics_collector> >;
+using collector_typelist = rmpl::typelist<
+    rmpl::identity<metrics::perception::mdpo_perception_metrics_collector>,
+    rmpl::identity<metrics::perception::dpo_perception_metrics_collector> >;
 
 NS_END(detail);
-
-/*******************************************************************************
- * Template Instantiations
- ******************************************************************************/
-template void depth0_metrics_aggregator::collect_from_controller(
-    const controller::depth0::crw_controller* const c);
-template void depth0_metrics_aggregator::collect_from_controller(
-    const controller::depth0::dpo_controller* const c);
-template void depth0_metrics_aggregator::collect_from_controller(
-    const controller::depth0::mdpo_controller* const c);
-template void depth0_metrics_aggregator::collect_from_controller(
-    const controller::depth0::odpo_controller* const c);
-template void depth0_metrics_aggregator::collect_from_controller(
-    const controller::depth0::omdpo_controller* const c);
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 depth0_metrics_aggregator::depth0_metrics_aggregator(
     const cmconfig::metrics_config* const mconfig,
-    const config::grid_config* const gconfig,
+    const cdconfig::grid_config* const gconfig,
     const std::string& output_root)
-    : base_metrics_aggregator(mconfig, gconfig, output_root),
+    : fordyca_metrics_aggregator(mconfig, gconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth0.depth0_aggregator") {
-  metrics::collector_registerer::creatable_set creatable_set = {
+  cmetrics::collector_registerer<>::creatable_set creatable_set = {
       {typeid(metrics::perception::mdpo_perception_metrics_collector),
        "perception_mdpo",
-       "perception::mdpo"},
+       "perception::mdpo",
+       rmetrics::output_mode::ekAPPEND},
       {typeid(metrics::perception::dpo_perception_metrics_collector),
        "perception_dpo",
-       "perception::dpo"}};
+       "perception::dpo",
+       rmetrics::output_mode::ekAPPEND}};
 
-  metrics::collector_registerer registerer(mconfig, gconfig, creatable_set, this);
+  cmetrics::collector_registerer<> registerer(mconfig, creatable_set, this);
   boost::mpl::for_each<detail::collector_typelist>(registerer);
 
   reset_all();
@@ -111,7 +96,7 @@ void depth0_metrics_aggregator::collect_from_controller(
   collect("fsm::movement", *controller);
   collect("fsm::collision_counts", *controller->fsm());
   collect("blocks::acq_counts", *controller);
-  collect("blocks::manipulation", *controller->block_manip_collator());
+  collect("blocks::manipulation", *controller->block_manip_recorder());
 
   collect_if("fsm::collision_locs",
              *controller->fsm(),
@@ -123,9 +108,8 @@ void depth0_metrics_aggregator::collect_from_controller(
              *controller,
              [&](const rmetrics::base_metrics& metrics) {
                auto& m =
-                   dynamic_cast<const cfmetrics::goal_acq_metrics&>(metrics);
-               return fsm::foraging_acq_goal::type::ekBLOCK ==
-                          m.acquisition_goal() &&
+                   dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(metrics);
+               return fsm::foraging_acq_goal::ekBLOCK == m.acquisition_goal() &&
                       m.goal_acquired();
              });
 
@@ -137,14 +121,14 @@ void depth0_metrics_aggregator::collect_from_controller(
              *controller,
              [&](const rmetrics::base_metrics& metrics) {
                auto& m =
-                   dynamic_cast<const cfmetrics::goal_acq_metrics&>(metrics);
+                   dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(metrics);
                return m.is_exploring_for_goal().first;
              });
   collect_if("blocks::acq_vector_locs",
              *controller,
              [&](const rmetrics::base_metrics& metrics) {
                auto& m =
-                   dynamic_cast<const cfmetrics::goal_acq_metrics&>(metrics);
+                   dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(metrics);
                return m.is_vectoring_to_goal();
              });
   /*
@@ -164,5 +148,19 @@ void depth0_metrics_aggregator::collect_from_controller(
     collect("perception::dpo", *dpo);
   }
 } /* collect_from_controller() */
+
+/*******************************************************************************
+ * Template Instantiations
+ ******************************************************************************/
+template void depth0_metrics_aggregator::collect_from_controller(
+    const controller::depth0::crw_controller* const c);
+template void depth0_metrics_aggregator::collect_from_controller(
+    const controller::depth0::dpo_controller* const c);
+template void depth0_metrics_aggregator::collect_from_controller(
+    const controller::depth0::mdpo_controller* const c);
+template void depth0_metrics_aggregator::collect_from_controller(
+    const controller::depth0::odpo_controller* const c);
+template void depth0_metrics_aggregator::collect_from_controller(
+    const controller::depth0::omdpo_controller* const c);
 
 NS_END(depth0, support, fordyca);

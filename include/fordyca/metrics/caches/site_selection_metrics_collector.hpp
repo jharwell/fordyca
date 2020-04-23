@@ -44,15 +44,17 @@ NS_START(fordyca, metrics, caches);
  *
  * \brief Collector for \ref site_selection_metrics.
  *
- * Metrics are output at the specified interval.
+ * Metrics CANNOT be collected in parallel; concurrent updates to the gathered
+ * stats are not supported. Metrics are output at the specified interval.
  */
 class site_selection_metrics_collector final : public rmetrics::base_metrics_collector {
  public:
   /**
-   * \param ofname Output file name.
+   * \param ofname_stem Output file name stem.
    * \param interval Collection interval.
    */
-  site_selection_metrics_collector(const std::string& ofname, uint interval);
+  site_selection_metrics_collector(const std::string& ofname_stem,
+                                   const rtypes::timestep& interval);
 
   void reset(void) override;
   void reset_after_interval(void) override;

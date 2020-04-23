@@ -28,7 +28,7 @@
 
 #include "cosm/fsm/acquire_goal_fsm.hpp"
 #include "fordyca/fordyca.hpp"
-#include "fordyca/fsm/subsystem_fwd.hpp"
+#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
 
 /*******************************************************************************
@@ -64,7 +64,7 @@ class acquire_new_cache_fsm final : public rer::client<acquire_new_cache_fsm>,
                               public cfsm::acquire_goal_fsm {
  public:
   acquire_new_cache_fsm(const fsm_ro_params* c_params,
-                        crfootbot::footbot_saa_subsystem* saa,
+                        crfootbot::footbot_saa_subsystem2D* saa,
                         std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
                         rmath::rng* rng);
   ~acquire_new_cache_fsm(void) override = default;
@@ -76,7 +76,7 @@ class acquire_new_cache_fsm final : public rer::client<acquire_new_cache_fsm>,
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  cfmetrics::goal_acq_metrics::goal_type acquisition_goal_internal(void) const RCSW_CONST;
+  cfsm::metrics::goal_acq_metrics::goal_type acquisition_goal_internal(void) const RCSW_CONST;
   boost::optional<acquire_goal_fsm::candidate_type> cache_select(void) const;
   bool candidates_exist(void) const RCSW_PURE;
   bool cache_acquired_cb(bool explore_result) const;

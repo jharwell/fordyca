@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include "cosm/fsm/expstrat/base_expstrat.hpp"
 #include "fordyca/fordyca.hpp"
-#include "fordyca/fsm/subsystem_fwd.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
 
 /*******************************************************************************
@@ -59,13 +59,13 @@ NS_START(fsm, expstrat);
 class foraging_expstrat : public cfsm::expstrat::base_expstrat,
                           public rpprototype::clonable<foraging_expstrat> {
  public:
-  foraging_expstrat(crfootbot::footbot_saa_subsystem* saa,
+  foraging_expstrat(crfootbot::footbot_saa_subsystem2D* saa,
                     rmath::rng* rng) :
       base_expstrat(saa),
       m_rng(rng) {}
 
   struct params {
-    params(crfootbot::footbot_saa_subsystem* const saa_in,
+    params(crfootbot::footbot_saa_subsystem2D* const saa_in,
            const controller::block_sel_matrix *const bsel_matrix_in,
            const controller::cache_sel_matrix *const csel_matrix_in,
            const ds::dpo_store *const dpo_store_in,
@@ -76,7 +76,7 @@ class foraging_expstrat : public cfsm::expstrat::base_expstrat,
         dpo_store(dpo_store_in),
         ledtaxis_target(ledtaxis_target_in) {}
 
-    crfootbot::footbot_saa_subsystem* saa;
+    crfootbot::footbot_saa_subsystem2D* saa;
     const controller::block_sel_matrix *bsel_matrix;
     const controller::cache_sel_matrix *csel_matrix;
     const ds::dpo_store *dpo_store;
@@ -86,8 +86,8 @@ class foraging_expstrat : public cfsm::expstrat::base_expstrat,
   foraging_expstrat& operator=(const foraging_expstrat&) = delete;
 
  protected:
-  crfootbot::footbot_saa_subsystem* saa(void) const;
-  crfootbot::footbot_saa_subsystem* saa(void);
+  crfootbot::footbot_saa_subsystem2D* saa(void) const RCSW_PURE;
+  crfootbot::footbot_saa_subsystem2D* saa(void) RCSW_PURE;
   rmath::rng* rng(void) { return m_rng; }
   rmath::rng* rng(void) const { return m_rng; }
 

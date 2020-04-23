@@ -45,15 +45,18 @@ NS_START(fordyca, metrics, blocks);
  *
  * \brief Collector for \ref manipulation_metrics.
  *
- * Metrics are written out at the specified collection interval.
+ * Metrics CAN be collected in parallel from robots; concurrent updates to the
+ * gathered stats are supported. Metrics are written out at the specified
+ * collection interval.
  */
 class manipulation_metrics_collector final : public rmetrics::base_metrics_collector {
  public:
   /**
-   * \param ofname The output file name.
+   * \param ofname_stem The output file name stem.
    * \param interval Collection interval.
    */
-  manipulation_metrics_collector(const std::string& ofname, uint interval);
+  manipulation_metrics_collector(const std::string& ofname_stem,
+                                 const rtypes::timestep& interval);
 
   void reset(void) override;
   void collect(const rmetrics::base_metrics& metrics) override;

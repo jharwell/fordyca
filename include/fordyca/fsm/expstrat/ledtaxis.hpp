@@ -53,7 +53,7 @@ class ledtaxis : public foraging_expstrat,
       : ledtaxis(c_params->saa,
                  c_params->ledtaxis_target,
                  rng) {}
-  ledtaxis(crfootbot::footbot_saa_subsystem* saa,
+  ledtaxis(crfootbot::footbot_saa_subsystem2D* saa,
            const rutils::color& target,
            rmath::rng* rng);
 

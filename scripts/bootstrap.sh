@@ -18,10 +18,10 @@
 mkdir -p $1 && cd $1
 
 fordyca_pkgs=(qtbase5-dev libnlopt-dev libnlopt-cxx-dev libfreeimageplus-dev
-              freeglut3-dev libeigen3-dev libudev-dev)
+              freeglut3-dev libeigen3-dev libudev-dev liblua5.3-dev)
 rcppsw_pkgs=(libboost-all-dev liblog4cxx-dev catch ccache python3-pip)
-libra_pkgs=(make cmake git npm graphviz doxygen cppcheck cmake make gcc-8 g++-8
-            libclang-6.0-dev clang-tools-6.0 clang-format-6.0 clang-tidy-6.0)
+libra_pkgs=(make cmake git npm graphviz doxygen cppcheck cmake make gcc-9 g++-9
+            libclang-9.0-dev clang-tools-9.0 clang-format-9.0 clang-tidy-9.0)
 
 python_pkgs=(cpplint breathe)
 
@@ -47,6 +47,8 @@ mkdir -p build && cd build
 
 git checkout devel
 cmake -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_C_COMPILER=gcc-9\
+      -DCMAKE_CXX_COMPILER=g++-9\
       -DARGOS_BUILD_FOR=simulator\
       -DARGOS_BUILD_NATIVE=ON\
       -DARGOS_THREADSAFE_LOG=ON\
@@ -66,22 +68,12 @@ fi;
 
 cd ../../
 
-# Bootstrap rcppsw
-if [ -d rcppsw ]; then rm -rf rcppsw; fi
-git clone https://github.com/swarm-robotics/rcppsw.git
-cd rcppsw
-git checkout devel
-git submodule update --init --recursive --remote
-cd ..
-
 # Bootstrap cosm
 if [ -d cosm ]; then rm -rf cosm; fi
 git clone https://github.com/swarm-robotics/cosm.git
 cd cosm
 git checkout devel
 git submodule update --init --recursive --remote
-
-ln -s $1/rcppsw ext/rcppsw
 
 cd ..
 
@@ -93,16 +85,14 @@ git checkout devel
 git submodule update --init --recursive --remote
 npm install
 
-rm -rf ext/rcppsw
 rm -rf ext/cosm
-ln -s $1/rcppsw ext/rcppsw
 ln -s $1/cosm ext/cosm
 
 # Build fordyca and documentation
 mkdir -p build && cd build
 cmake \
-    -DCMAKE_C_COMPILER=gcc-8\
-    -DCMAKE_CXX_COMPILER=g++-8\
+    -DCMAKE_C_COMPILER=gcc-9\
+    -DCMAKE_CXX_COMPILER=g++-9\
     -DLIBRA_BUILD_FOR=ARGOS \
     ..
 make -j $4

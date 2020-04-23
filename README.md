@@ -1,11 +1,11 @@
 # FORDYCA (FOraging Robots use DYnamic CAches)
 
-[![Build Status](https://travis-ci.org/swarm-robotics/fordyca.svg?branch=devel)](https://travis-ci.org/swarm-robotics/fordyca.svg?branch=devel)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Documentation Status](https://readthedocs.org/projects/swarm-robotics-fordyca/badge/?version=latest)](https://swarm-robotics-fordyca.readthedocs.io/en/latest/?badge=latest)
 ![Example Simulation](docs/example-ss.png?raw=true "Example Single Source Foraging Scenario")
 
-This is the main entry point for getting started on the project. The project
-documentation is [here](https://fordyca.readthedocs.io).
+Project documentation is
+[here](https://swarm-robotics-fordyca.readthedocs.io/en/latest/).
 
 # Papers
 
@@ -20,10 +20,19 @@ documentation is [here](https://fordyca.readthedocs.io).
   Conference on Artificial Intelligence (IJCAI), Macau,
   China, 2019. [Link](https://www.ijcai.org/proceedings/2019/0048.pdf)
 
-- J. Harwell , "A Unified Mathematical Approach for Foraging and Construction
+- J. Harwell, "A Unified Mathematical Approach for Foraging and Construction
   Systems in a 1,000,000 Robot Swarm", 2019 International Joint Conference on
   Artificial Intelligence (IJCAI), Macau,
   China, 2019. [Link](https://www.ijcai.org/proceedings/2019/0908.pdf).
+
+- J. Harwell, L. Lowmanstone, M. Gini, "Demystifying Emergent Intelligence and
+  Its Effect on Performance in Large Robot Swarms", 2020 International
+  Conference on Autonomous Agents and MultiAgent Systems (AAMAS '20). Auckland,
+  New Zealand, 2020.
+
+- J. Harwell, "A Theoretical Framework For Self-Organized Task Allocation in
+  Large Swarms", 2020 International Conference on Autonomous Agents and
+  MultiAgent Systems (AAMAS '20). Auckland, New Zealand, 2020.
 
 - A. Chen, J. Harwell, M. Gini, "Maximizing Energy Efficiency in Swarm
   Robotics," arXiv:1906.01957 [cs.MA], June 2019.
@@ -35,9 +44,3 @@ documentation is [here](https://fordyca.readthedocs.io).
 
 # License
 This project is licensed under GPL 3.0. See [LICENSE](LICENSE.md).
-
-# Donate
-If you've found this project helpful, please consider donating somewhere between
-a cup of coffe and a nice meal:
-
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.me/jharwell1406)

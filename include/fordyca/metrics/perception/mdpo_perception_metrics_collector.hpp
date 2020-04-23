@@ -30,7 +30,7 @@
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 #include "fordyca/fordyca.hpp"
-#include "fordyca/fsm/cell2D_states.hpp"
+#include "cosm/fsm/cell2D_state.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,15 +46,18 @@ NS_START(fordyca, metrics, perception);
  *
  * \brief Collector for \ref mdpo_perception_metrics.
  *
- * Metrics are written out at the specified collection interval.
+ * Metrics CAN be collected in parallel from robots; concurrent updates to the
+ * gathered stats are supported. Metrics are written out at the specified
+ * collection interval.
  */
 class mdpo_perception_metrics_collector final : public rmetrics::base_metrics_collector {
  public:
   /**
-   * \param ofname The output file name.
+   * \param ofname_stem The output file name stem.
    * \param interval Collection interval.
    */
-  mdpo_perception_metrics_collector(const std::string& ofname, uint interval);
+  mdpo_perception_metrics_collector(const std::string& ofname_stem,
+                                    const rtypes::timestep& interval);
 
   void reset(void) override;
   void collect(const rmetrics::base_metrics& metrics) override;
@@ -65,7 +68,7 @@ class mdpo_perception_metrics_collector final : public rmetrics::base_metrics_co
   boost::optional<std::string> csv_line_build(void) override;
 
   struct stats {
-    std::atomic_uint    states[::fordyca::fsm::cell2D_states::ekST_MAX_STATES];
+    std::atomic_uint    states[cfsm::cell2D_state::ekST_MAX_STATES];
     std::atomic<double> known_percent{0.0};
     std::atomic<double> unknown_percent{0.0};
     std::atomic_uint    robots{0};

@@ -25,7 +25,7 @@
 
 #include "cosm/repr/base_block2D.hpp"
 #include "cosm/robots/footbot/footbot_actuation_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 #include "fordyca/controller/block_selector.hpp"
@@ -45,7 +45,7 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 acquire_free_block_fsm::acquire_free_block_fsm(
     const fsm_ro_params* c_params,
-    crfootbot::footbot_saa_subsystem* saa,
+    crfootbot::footbot_saa_subsystem2D* saa,
     std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_free_block"),
@@ -54,34 +54,40 @@ acquire_free_block_fsm::acquire_free_block_fsm(
           std::move(exp_behavior),
           rng,
           acquire_goal_fsm::hook_list{
-              .acquisition_goal =
-                  std::bind(&acquire_free_block_fsm::acq_goal_internal),
-              .goal_select =
-                  std::bind(&acquire_free_block_fsm::block_select, this),
-              .candidates_exist =
-                  std::bind(&acquire_free_block_fsm::candidates_exist, this),
-              .goal_acquired_cb =
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  acquisition_goal,
+                  std::bind(&acquire_free_block_fsm::acq_goal_internal)),
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  goal_select,
+                  std::bind(&acquire_free_block_fsm::block_select, this)),
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  candidates_exist,
+                  std::bind(&acquire_free_block_fsm::candidates_exist, this)),
+              RCPPSW_STRUCT_DOT_INITIALIZER(begin_acq_cb, nullptr),
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  goal_acquired_cb,
                   std::bind(&acquire_free_block_fsm::block_acquired_cb,
                             this,
-                            std::placeholders::_1),
-              .explore_term_cb =
+                            std::placeholders::_1)),
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  explore_term_cb,
                   std::bind(&acquire_free_block_fsm::block_exploration_term_cb,
-                            this),
-              .goal_valid_cb =
+                            this)),
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  goal_valid_cb,
                   std::bind(&acquire_free_block_fsm::block_acq_valid,
                             this,
                             std::placeholders::_1,
-                            std::placeholders::_2)}),
+                            std::placeholders::_2))}),
       mc_matrix(c_params->bsel_matrix),
       mc_store(c_params->store) {}
 
 /*******************************************************************************
  * Non-Member Functions
  ******************************************************************************/
-cfmetrics::goal_acq_metrics::goal_type acquire_free_block_fsm::acq_goal_internal(
+cfsm::metrics::goal_acq_metrics::goal_type acquire_free_block_fsm::acq_goal_internal(
     void) {
-  return cfmetrics::goal_acq_metrics::goal_type(
-      foraging_acq_goal::type::ekBLOCK);
+  return fsm::to_goal_type(foraging_acq_goal::ekBLOCK);
 } /* acq_goal_internal() */
 
 /*******************************************************************************
@@ -113,7 +119,7 @@ boost::optional<cfsm::acquire_goal_fsm::candidate_type> acquire_free_block_fsm::
 
   if (auto best = selector(mc_store->blocks(), saa()->sensing()->position())) {
     return boost::make_optional(acquire_goal_fsm::candidate_type(
-        best->ent()->rloc(), kBLOCK_ARRIVAL_TOL, best->ent()->id()));
+        best->rloc(), kBLOCK_ARRIVAL_TOL, best->id()));
   } else {
     return boost::optional<acquire_goal_fsm::candidate_type>();
   }

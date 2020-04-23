@@ -24,22 +24,23 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/patterns/visitor/visitor.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
-#include "fordyca/events/cell_op.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace repr {
+namespace cosm::arena::repr {
 class base_cache;
 }
 
-NS_START(events, detail);
+NS_START(fordyca, events, detail);
 
 /*******************************************************************************
  * Class Definitions
@@ -64,7 +65,7 @@ class cache_proximity : public rer::client<cache_proximity> {
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  explicit cache_proximity(const std::shared_ptr<repr::base_cache>& cache);
+  explicit cache_proximity(carepr::base_cache* cache);
   ~cache_proximity(void) override = default;
 
   cache_proximity(const cache_proximity& op) = delete;
@@ -80,14 +81,15 @@ class cache_proximity : public rer::client<cache_proximity> {
   void visit(fsm::block_to_goal_fsm& fsm);
 
  private:
-  /* clang-format off */
   void dispatch_cache_interactor(tasks::base_foraging_task* task);
-  std::shared_ptr<repr::base_cache> m_cache;
+
+  /* clang-format off */
+  carepr::base_cache* m_cache;
   /* clang-format on */
 };
 
 /**
- * \brief We use the picky visitor in order to force compile errors if a call to
+ * \brief We use the precise visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).

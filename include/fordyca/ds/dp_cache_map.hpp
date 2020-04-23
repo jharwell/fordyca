@@ -34,11 +34,11 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace repr {
+namespace cosm::arena::repr {
 class base_cache;
 }
-NS_START(ds);
+
+NS_START(fordyca, ds);
 
 /*******************************************************************************
  * Class Definitions
@@ -46,6 +46,7 @@ NS_START(ds);
 /**
  * \class dp_cache_map
  * \ingroup ds
+ *
  * \brief The cache map is a repr of the robot's perception of caches
  * in the arena. It uses the locations of caches as keys, as caches are
  * immovable during simulation. Using cache IDs as keys for insertion/removal
@@ -54,9 +55,9 @@ NS_START(ds);
  * during LOS process (it would be inserted into the map, but the old version
  * would not be removed, as they would be considered different objects).
  */
-class dp_cache_map : public dpo_map<rmath::vector2u, repr::base_cache> {
+class dp_cache_map : public dpo_map<rmath::vector2z, carepr::base_cache> {
  public:
-  using dpo_map<rmath::vector2u, repr::base_cache>::dpo_map;
+  using dpo_map<rmath::vector2z, carepr::base_cache>::dpo_map;
 
   /**
    * \brief Build a string from the list of DP caches that a robot is tracking

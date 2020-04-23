@@ -79,7 +79,7 @@
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, controller);
-class base_controller;
+class foraging_controller;
 namespace depth0 {
 class crw_controller;
 class dpo_controller;

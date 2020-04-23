@@ -24,11 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <utility>
-#include <memory>
+#include "cosm/tv/tv_manager.hpp"
 
 #include "fordyca/support/tv/env_dynamics.hpp"
-#include "fordyca/support/tv/argos_pd_adaptor.hpp"
+#include "cosm/pal/tv/argos_pd_adaptor.hpp"
+#include "fordyca/support/tv/fordyca_pd_adaptor.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -38,47 +38,7 @@ NS_START(fordyca, support, tv);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-/**
- * \class tv_manager
- * \ingroup support tv
- *
- * \brief Orchestrates all application of temporal variance to robot interations
- * with the environment/robotic mechanical functioning.
- */
-
-class tv_manager {
- public:
-  tv_manager(std::unique_ptr<env_dynamics> envd,
-             std::unique_ptr<argos_pd_adaptor> popd) :
-      m_envd(std::move(envd)),
-      m_popd(std::move(popd)) {}
-
-  tv_manager(const tv_manager&) = delete;
-  const tv_manager& operator=(const tv_manager&) = delete;
-
-  const env_dynamics* environ_dynamics(void) const { return m_envd.get(); }
-  env_dynamics* environ_dynamics(void) { return m_envd.get(); }
-  const argos_pd_adaptor* population_dynamics(void) const { return m_popd.get(); }
-
-  /**
-   * \brief Update the state of all applied variances. Should be called once per
-   * timestep.
-   */
-  void update(const rtypes::timestep& t) {
-    if (m_envd) {
-      m_envd->update(t);
-    }
-    if (m_popd) {
-      m_popd->update(t);
-    }
-  }
-
- private:
-  /* clang-format off */
-  std::unique_ptr<env_dynamics>     m_envd;
-  std::unique_ptr<argos_pd_adaptor> m_popd;
-  /* clang-format on */
-};
+using tv_manager = ctv::tv_manager<env_dynamics, fordyca_pd_adaptor>;
 
 NS_END(tv, support, fordyca);
 

@@ -23,14 +23,14 @@
  ******************************************************************************/
 #include "fordyca/fsm/depth2/acquire_new_cache_fsm.hpp"
 
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 
 #include "fordyca/controller/depth2/new_cache_selector.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
-#include "fordyca/fsm/foraging_goal_type.hpp"
-#include "fordyca/repr/base_cache.hpp"
+#include "fordyca/fsm/foraging_acq_goal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,7 +42,7 @@ NS_START(fordyca, fsm, depth2);
  ******************************************************************************/
 acquire_new_cache_fsm::acquire_new_cache_fsm(
     const fsm_ro_params* c_params,
-    crfootbot::footbot_saa_subsystem* saa,
+    crfootbot::footbot_saa_subsystem2D* saa,
     std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_new_cache"),
@@ -51,22 +51,33 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
           std::move(exp_behavior),
           rng,
           acquire_goal_fsm::hook_list{
-              .acquisition_goal =
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  acquisition_goal,
                   std::bind(&acquire_new_cache_fsm::acquisition_goal_internal,
-                            this),
-              .goal_select =
-                  std::bind(&acquire_new_cache_fsm::cache_select, this),
-              .candidates_exist =
-                  std::bind(&acquire_new_cache_fsm::candidates_exist, this),
-              .goal_acquired_cb =
+                            this)),
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  goal_select,
+                  std::bind(&acquire_new_cache_fsm::cache_select, this)),
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  candidates_exist,
+                  std::bind(&acquire_new_cache_fsm::candidates_exist, this)),
+              RCPPSW_STRUCT_DOT_INITIALIZER(begin_acq_cb, nullptr),
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  goal_acquired_cb,
                   std::bind(&acquire_new_cache_fsm::cache_acquired_cb,
                             this,
-                            std::placeholders::_1),
+                            std::placeholders::_1)),
 
               /* new caches never acquired via exploration */
-              .explore_term_cb = std::bind([](void) noexcept { return false; }),
-              .goal_valid_cb = [](const rmath::vector2d&,
-                                  const rtypes::type_uuid&) { return true; }}),
+              RCPPSW_STRUCT_DOT_INITIALIZER(explore_term_cb,
+                                            std::bind([](void) noexcept {
+                                              return false;
+                                            })),
+              RCPPSW_STRUCT_DOT_INITIALIZER(goal_valid_cb,
+                                            [](const rmath::vector2d&,
+                                               const rtypes::type_uuid&) {
+                                              return true;
+                                            })}),
       mc_matrix(c_params->csel_matrix),
       mc_store(c_params->store) {}
 
@@ -84,13 +95,12 @@ boost::optional<cfsm::acquire_goal_fsm::candidate_type> acquire_new_cache_fsm::
   /* A "new" cache is the same as a single block  */
   if (auto best = selector(
           mc_store->blocks(), mc_store->caches(), sensing()->position())) {
-    ER_INFO("Select new cache%d@%s/%s,density=%f for acquisition",
-            best->ent()->id().v(),
-            best->ent()->rloc().to_str().c_str(),
-            best->ent()->dloc().to_str().c_str(),
-            best->density().v());
+    ER_INFO("Select new cache%d@%s/%s for acquisition",
+            best->id().v(),
+            best->rloc().to_str().c_str(),
+            best->dloc().to_str().c_str());
     return boost::make_optional(acquire_goal_fsm::candidate_type(
-        best->ent()->rloc(), kNEW_CACHE_ARRIVAL_TOL, best->ent()->id()));
+        best->rloc(), kNEW_CACHE_ARRIVAL_TOL, best->id()));
   } else {
     /*
      * If this happens, all the blocks we know of are ineligible for us to
@@ -116,10 +126,9 @@ bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-cfmetrics::goal_acq_metrics::goal_type acquire_new_cache_fsm::
+cfsm::metrics::goal_acq_metrics::goal_type acquire_new_cache_fsm::
     acquisition_goal_internal(void) const {
-  return cfmetrics::goal_acq_metrics::goal_type(
-      foraging_acq_goal::type::ekNEW_CACHE);
+  return fsm::to_goal_type(foraging_acq_goal::ekNEW_CACHE);
 } /* acquisition_goal() */
 
 NS_END(depth2, controller, fordyca);

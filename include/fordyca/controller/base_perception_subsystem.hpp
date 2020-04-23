@@ -26,9 +26,10 @@
  ******************************************************************************/
 #include <memory>
 
+#include "cosm/foraging/repr/foraging_los.hpp"
+
 #include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/fordyca.hpp"
-#include "fordyca/repr/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -84,12 +85,14 @@ class base_perception_subsystem {
    *
    * \param los The new los
    */
-  void los(std::unique_ptr<repr::line_of_sight> los) { m_los = std::move(los); }
+  void los(std::unique_ptr<cfrepr::foraging_los> los) {
+    m_los = std::move(los);
+  }
 
   /**
    * \brief Get the robot's current line-of-sight (LOS)
    */
-  const repr::line_of_sight* los(void) const { return m_los.get(); }
+  const cfrepr::foraging_los* los(void) const { return m_los.get(); }
 
   double los_dim(void) const { return mc_los_dim; }
 
@@ -97,7 +100,7 @@ class base_perception_subsystem {
   /* clang-format off */
   const double mc_los_dim;
 
-  std::unique_ptr<repr::line_of_sight> m_los{nullptr};
+  std::unique_ptr<cfrepr::foraging_los> m_los{nullptr};
   /* clang-format on */
 };
 

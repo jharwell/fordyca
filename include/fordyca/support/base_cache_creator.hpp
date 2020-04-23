@@ -35,20 +35,15 @@
 #include "rcppsw/types/spatial_dist.hpp"
 #include "rcppsw/types/timestep.hpp"
 
-#include "fordyca/ds/arena_grid.hpp"
-#include "fordyca/ds/block_vector.hpp"
+#include "cosm/ds/arena_grid.hpp"
+#include "cosm/ds/block2D_vector.hpp"
+
 #include "fordyca/support/cache_create_ro_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace repr {
-class arena_cache;
-class base_block2D;
-class multicell_entity;
-} // namespace repr
-NS_START(support);
+NS_START(fordyca, support);
 
 /*******************************************************************************
  * Class Definitions
@@ -68,7 +63,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    * \param cache_dim Dimension of the cache (caches are square so can use a
    *                  scalar).
    */
-  base_cache_creator(ds::arena_grid* grid, rtypes::spatial_dist cache_dim);
+  base_cache_creator(cds::arena_grid* grid, rtypes::spatial_dist cache_dim);
 
   base_cache_creator(const base_cache_creator&) = delete;
   base_cache_creator& operator=(const base_cache_creator&) = delete;
@@ -82,8 +77,9 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    *
    * \return A vector of created caches.
    */
-  virtual ds::cache_vector create_all(const cache_create_ro_params& c_params,
-                                      const ds::block_vector& c_alloc_blocks) = 0;
+  virtual cads::acache_vectoro create_all(
+      const cache_create_ro_params& c_params,
+      const cds::block2D_vectorno& c_alloc_blocks) = 0;
 
   /**
    * \brief Update the cells for all newly created caches to reflect the fact
@@ -91,7 +87,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    *
    * \param caches Vector of newly created caches.
    */
-  void update_host_cells(ds::cache_vector& caches);
+  void update_host_cells(cads::acache_vectoro& caches);
 
   /**
    * \brief Basic sanity checks on newly created caches:
@@ -110,13 +106,13 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    * otherwise.
    */
   bool creation_sanity_checks(
-      const ds::cache_vector& c_caches,
-      const ds::block_vector& c_free_blocks,
-      const ds::block_cluster_vector& c_clusters) const RCSW_PURE;
+      const cads::acache_vectoro& c_caches,
+      const cds::block2D_vectorno& c_free_blocks,
+      const cfds::block2D_cluster_vector& c_clusters) const RCSW_PURE;
 
  protected:
-  const ds::arena_grid* grid(void) const { return m_grid; }
-  ds::arena_grid* grid(void) { return m_grid; }
+  const cds::arena_grid* grid(void) const { return m_grid; }
+  cds::arena_grid* grid(void) { return m_grid; }
 
   /**
    * \brief Create a single cache in the arena from the specified set of blocks
@@ -128,17 +124,18 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    *               way that callers probably do not want.
    * \param t The current timestep.
    */
-  std::unique_ptr<repr::arena_cache> create_single_cache(
+  std::unique_ptr<carepr::arena_cache> create_single_cache(
       const rmath::vector2d& center,
-      ds::block_vector blocks,
-      rtypes::timestep t);
+      cds::block2D_vectorno blocks,
+      const rtypes::timestep& t);
 
   rtypes::spatial_dist cache_dim(void) const { return mc_cache_dim; }
 
  private:
   /* clang-format off */
-  const rtypes::spatial_dist         mc_cache_dim;
-  ds::arena_grid*                    m_grid;
+  const rtypes::spatial_dist mc_cache_dim;
+
+  cds::arena_grid*           m_grid;
   /* clang-format on */
 };
 NS_END(support, fordyca);

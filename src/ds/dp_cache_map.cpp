@@ -25,7 +25,7 @@
 
 #include <numeric>
 
-#include "fordyca/repr/base_cache.hpp"
+#include "cosm/arena/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces

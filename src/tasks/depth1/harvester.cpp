@@ -28,12 +28,11 @@
 
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/block_vanished.hpp"
-#include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/cache_vanished.hpp"
-#include "fordyca/events/cached_block_pickup.hpp"
-#include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/events/free_block_pickup.hpp"
+#include "fordyca/events/robot_cache_block_drop.hpp"
+#include "fordyca/events/robot_cached_block_pickup.hpp"
+#include "fordyca/events/robot_free_block_pickup.hpp"
 #include "fordyca/fsm/depth1/block_to_existing_cache_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
 
@@ -83,16 +82,15 @@ void harvester::active_interface_update(int) {
   auto* fsm =
       static_cast<fsm::depth1::block_to_existing_cache_fsm*>(mechanism());
 
-  if (fsm->goal_acquired() &&
-      fsm::foraging_transport_goal::type::ekEXISTING_CACHE ==
-          fsm->block_transport_goal()) {
+  if (fsm->goal_acquired() && fsm::foraging_transport_goal::ekEXISTING_CACHE ==
+                                  fsm->block_transport_goal()) {
     if (interface_in_prog(0)) {
       interface_exit(0);
       interface_time_mark_finish(0);
       ER_DEBUG("Interface finished at timestep %u", current_time().v());
     }
     ER_TRACE("Interface time: %u", interface_time(0).v());
-  } else if (fsm::foraging_transport_goal::type::ekEXISTING_CACHE ==
+  } else if (fsm::foraging_transport_goal::ekEXISTING_CACHE ==
              fsm->block_transport_goal()) {
     if (!interface_in_prog(0)) {
       interface_enter(0);
@@ -105,10 +103,10 @@ void harvester::active_interface_update(int) {
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void harvester::accept(events::detail::cache_block_drop& visitor) {
+void harvester::accept(events::detail::robot_cache_block_drop& visitor) {
   visitor.visit(*this);
 }
-void harvester::accept(events::detail::free_block_pickup& visitor) {
+void harvester::accept(events::detail::robot_free_block_pickup& visitor) {
   visitor.visit(*this);
 }
 void harvester::accept(events::detail::cache_vanished& visitor) {
@@ -169,13 +167,19 @@ RCPPSW_WRAP_OVERRIDE_DEF(harvester,
                              polled_task::mechanism()),
                          const);
 
+RCPPSW_WRAP_OVERRIDE_DEF(harvester,
+                         entity_acquired_id,
+                         *static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()),
+                         const);
+
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/
 bool harvester::task_at_interface(void) const {
   auto* fsm =
       static_cast<fsm::depth1::block_to_existing_cache_fsm*>(mechanism());
-  return fsm::foraging_transport_goal::type::ekEXISTING_CACHE ==
+  return fsm::foraging_transport_goal::ekEXISTING_CACHE ==
          fsm->block_transport_goal();
 } /* task_at_interface()() */
 

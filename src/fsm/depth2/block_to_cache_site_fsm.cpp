@@ -35,7 +35,7 @@ NS_START(fordyca, fsm, depth2);
  ******************************************************************************/
 block_to_cache_site_fsm::block_to_cache_site_fsm(
     const fsm_ro_params* c_params,
-    crfootbot::footbot_saa_subsystem* saa,
+    crfootbot::footbot_saa_subsystem2D* saa,
     std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
     rmath::rng* rng)
     : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, saa, rng),
@@ -45,27 +45,24 @@ block_to_cache_site_fsm::block_to_cache_site_fsm(
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-cfmetrics::goal_acq_metrics::goal_type block_to_cache_site_fsm::acquisition_goal(
+cfsm::metrics::goal_acq_metrics::goal_type block_to_cache_site_fsm::acquisition_goal(
     void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
-    return cfmetrics::goal_acq_metrics::goal_type(
-        foraging_acq_goal::type::ekBLOCK);
+    return fsm::to_goal_type(foraging_acq_goal::ekBLOCK);
   } else if (ekST_TRANSPORT_TO_GOAL == current_state() ||
              ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return cfmetrics::goal_acq_metrics::goal_type(
-        foraging_acq_goal::type::ekCACHE_SITE);
+    return fsm::to_goal_type(foraging_acq_goal::ekCACHE_SITE);
   }
-  return cfmetrics::goal_acq_metrics::goal_type(foraging_acq_goal::type::ekNONE);
+  return fsm::to_goal_type(foraging_acq_goal::ekNONE);
 } /* acquisition_goal() */
 
-foraging_transport_goal::type block_to_cache_site_fsm::block_transport_goal(
-    void) const {
+foraging_transport_goal block_to_cache_site_fsm::block_transport_goal(void) const {
   if (ekST_TRANSPORT_TO_GOAL == current_state() ||
       ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return foraging_transport_goal::type::ekCACHE_SITE;
+    return foraging_transport_goal::ekCACHE_SITE;
   }
-  return foraging_transport_goal::type::ekNONE;
+  return foraging_transport_goal::ekNONE;
 } /* acquisition_goal() */
 
 NS_END(depth2, controller, fordyca);

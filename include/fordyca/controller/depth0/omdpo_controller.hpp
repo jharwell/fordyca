@@ -52,7 +52,7 @@ class omdpo_controller : public mdpo_controller,
   omdpo_controller(void) RCSW_COLD;
   ~omdpo_controller(void) override RCSW_COLD;
 
-  /* base_controller overrides */
+  /* foraging_controller overrides */
   void control_step(void) override;
   std::type_index type_index(void) const override { return typeid(*this); }
 

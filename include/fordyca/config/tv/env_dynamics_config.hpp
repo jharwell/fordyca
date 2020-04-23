@@ -24,9 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/config/base_config.hpp"
-#include "cosm/tv/config/robot_dynamics_applicator_config.hpp"
-#include "cosm/tv/config/population_dynamics_config.hpp"
+#include "cosm/tv/config/base_env_dynamics_config.hpp"
+
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
@@ -43,9 +42,7 @@ NS_START(fordyca, config, tv);
  *
  * \brief Configuration for the \ref env_dynamics.
  */
-struct env_dynamics_config final : public rconfig::base_config {
-  ctv::config::robot_dynamics_applicator_config rda{};
-  rct::config::waveform_config block_manip_penalty{};
+struct env_dynamics_config final : public ctv::config::base_env_dynamics_config {
   rct::config::waveform_config cache_usage_penalty{};
 };
 

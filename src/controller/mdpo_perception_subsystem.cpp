@@ -25,17 +25,17 @@
 
 #include <algorithm>
 
+#include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/ds/cell2D.hpp"
+#include "cosm/fsm/cell2D_state.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/controller/los_proc_verify.hpp"
 #include "fordyca/controller/oracular_info_receptor.hpp"
-#include "fordyca/ds/cell2D.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_found.hpp"
-#include "fordyca/events/cell_empty.hpp"
-#include "fordyca/fsm/cell2D_states.hpp"
-#include "fordyca/repr/base_cache.hpp"
+#include "fordyca/events/cell2D_empty.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,7 +51,7 @@ mdpo_perception_subsystem::mdpo_perception_subsystem(
     const std::string& id)
     : ER_CLIENT_INIT("fordyca.controller.mdpo_perception"),
       base_perception_subsystem(config),
-      m_cell_stats(fsm::cell2D_states::ekST_MAX_STATES),
+      m_cell_stats(cfsm::cell2D_state::ekST_MAX_STATES),
       m_los(),
       m_map(std::make_unique<ds::dpo_semantic_map>(config, id)) {}
 
@@ -68,7 +68,7 @@ void mdpo_perception_subsystem::update(oracular_info_receptor* const receptor) {
 void mdpo_perception_subsystem::reset(void) { m_map->reset(); }
 
 void mdpo_perception_subsystem::process_los(
-    const repr::line_of_sight* const c_los,
+    const cfrepr::foraging_los* const c_los,
     oracular_info_receptor* const receptor) {
   ER_TRACE("LOS LL=%s, LR=%s, UL=%s UR=%s",
            c_los->abs_ll().to_str().c_str(),
@@ -96,15 +96,22 @@ void mdpo_perception_subsystem::process_los(
 } /* process_los() */
 
 void mdpo_perception_subsystem::process_los_blocks(
-    const repr::line_of_sight* const c_los) {
+    const cfrepr::foraging_los* const c_los) {
   /*
    * Because this is computed, rather than a returned reference to a member
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  ds::block_list blocks = c_los->blocks();
+  cds::entity_vector blocks = c_los->blocks();
   if (!blocks.empty()) {
-    ER_DEBUG("Blocks in LOS: [%s]", rcppsw::to_string(blocks).c_str());
+    auto accum = std::accumulate(blocks.begin(),
+                                 blocks.end(),
+                                 std::string(),
+                                 [&](const std::string& a, const auto& b) {
+                                   return a + "b" + rcppsw::to_string(b->id()) + ",";
+                                 });
+
+    ER_DEBUG("Blocks in LOS: [%s]", accum.c_str());
     ER_DEBUG("Blocks in DPO store: [%s]",
              rcppsw::to_string(m_map->store()->blocks()).c_str());
   }
@@ -118,25 +125,30 @@ void mdpo_perception_subsystem::process_los_blocks(
    */
   for (uint i = 0; i < c_los->xsize(); ++i) {
     for (uint j = 0; j < c_los->ysize(); ++j) {
-      rmath::vector2u d = c_los->cell(i, j).loc();
+      rmath::vector2z d = c_los->cell(i, j).loc();
       if (!c_los->cell(i, j).state_has_block() &&
           m_map->access<occupancy_grid::kCell>(d).state_has_block()) {
-        auto block = m_map->access<occupancy_grid::kCell>(d).block();
+        auto* los_entity = c_los->cell(i, j).entity();
+        ER_ASSERT(crepr::entity_dimensionality::ek2D == los_entity->dimensionality(),
+                  "LOS block%d is not 2D!",
+                  los_entity->id().v());
+        auto* map_block = m_map->access<occupancy_grid::kCell>(d).block2D();
         ER_DEBUG("Correct block%d %s/%s discrepency",
-                 block->id().v(),
-                 block->rloc().to_str().c_str(),
-                 block->dloc().to_str().c_str());
-        m_map->block_remove(block);
+                 map_block->id().v(),
+                 map_block->rloc().to_str().c_str(),
+                 map_block->dloc().to_str().c_str());
+        m_map->block_remove(map_block);
       } else if (c_los->cell(i, j).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_is_known()) {
         ER_TRACE("Cell@%s now known to be empty", d.to_str().c_str());
-        events::cell_empty_visitor e(d);
+        events::cell2D_empty_visitor e(d);
         e.visit(*m_map);
       }
     } /* for(j..) */
   }   /* for(i..) */
 
-  for (auto& block : c_los->blocks()) {
+  for (auto* b : c_los->blocks()) {
+    auto* block = static_cast<crepr::base_block2D*>(b);
     ER_ASSERT(!block->is_out_of_sight(),
               "Block%d out of sight in LOS?",
               block->id().v());
@@ -152,24 +164,24 @@ void mdpo_perception_subsystem::process_los_blocks(
                block->rloc().to_str().c_str(),
                block->dloc().to_str().c_str());
       auto range = m_map->blocks().const_values_range();
-      auto it = std::find_if(range.begin(), range.end(), [&](const auto& b) {
-        return b.ent()->id() == cell.block()->id();
+      auto it = std::find_if(range.begin(), range.end(), [&](const auto& b1) {
+        return b1.ent()->id() == cell.block2D()->id();
       });
       ER_ASSERT(it != range.end(), "Known block%d not in PAM", block->id().v());
     }
-    events::block_found_visitor op(block->clone());
+    events::block_found_visitor op(block);
     op.visit(*m_map);
   } /* for(block..) */
 } /* process_los_blocks() */
 
 void mdpo_perception_subsystem::process_los_caches(
-    const repr::line_of_sight* const c_los) {
+    const cfrepr::foraging_los* const c_los) {
   /*
    * Because this is computed, rather than a returned reference to a member
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  ds::cache_list los_caches = c_los->caches();
+  cads::bcache_vectorno los_caches = c_los->caches();
   if (!los_caches.empty()) {
     ER_DEBUG("Caches in LOS: [%s]", rcppsw::to_string(los_caches).c_str());
     ER_DEBUG("Caches in DPO store: [%s]",
@@ -184,7 +196,7 @@ void mdpo_perception_subsystem::process_los_caches(
    */
   for (uint i = 0; i < c_los->xsize(); ++i) {
     for (uint j = 0; j < c_los->ysize(); ++j) {
-      rmath::vector2u d = c_los->cell(i, j).loc();
+      rmath::vector2z d = c_los->cell(i, j).loc();
       if (!c_los->cell(i, j).state_has_cache() &&
           map()->access<occupancy_grid::kCell>(d).state_has_cache()) {
         auto cache = map()->access<occupancy_grid::kCell>(d).cache();
@@ -225,40 +237,28 @@ void mdpo_perception_subsystem::process_los_caches(
               cache->n_blocks(),
               cell.cache()->n_blocks());
     }
-    /*
-     * The cache we get a handle to is owned by the simulation, and we don't
-     * want to just pass that into the robot's arena_map, as keeping them in
-     * sync is not possible in all situations.
-     *
-     * For example, if a block executing the collector task picks up a block and
-     * tries to compute the best cache to bring it to, only to have one or more
-     * of its cache references be invalid due to other robots causing caches to
-     * be created/destroyed.
-     *
-     * Cloning is definitely necessary here.
-     */
-    events::cache_found_visitor op(cache->clone());
+    events::cache_found_visitor op(cache);
     op.visit(*m_map);
   } /* for(cache..) */
 } /* process_los_caches() */
 
 void mdpo_perception_subsystem::update_cell_stats(
-    const repr::line_of_sight* const c_los) {
+    const cfrepr::foraging_los* const c_los) {
   for (uint i = 0; i < c_los->xsize(); ++i) {
     for (uint j = 0; j < c_los->ysize(); ++j) {
-      rmath::vector2u d = c_los->cell(i, j).loc();
+      rmath::vector2z d = c_los->cell(i, j).loc();
       if (c_los->cell(i, j).state_is_empty() &&
           m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
           !m_map->access<occupancy_grid::kCell>(d).state_is_empty()) {
-        m_cell_stats[fsm::cell2D_states::ekST_EMPTY]++;
+        m_cell_stats[cfsm::cell2D_state::ekST_EMPTY]++;
       } else if (c_los->cell(i, j).state_has_block() &&
                  m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_has_block()) {
-        m_cell_stats[fsm::cell2D_states::ekST_HAS_BLOCK]++;
+        m_cell_stats[cfsm::cell2D_state::ekST_HAS_BLOCK]++;
       } else if (c_los->cell(i, j).state_has_cache() &&
                  m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_has_cache()) {
-        m_cell_stats[fsm::cell2D_states::ekST_HAS_CACHE]++;
+        m_cell_stats[cfsm::cell2D_state::ekST_HAS_CACHE]++;
       }
     } /* for(j..) */
   }   /* for(i..) */

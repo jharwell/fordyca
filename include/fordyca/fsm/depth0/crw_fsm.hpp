@@ -32,8 +32,9 @@
 #include "cosm/fsm/metrics/collision_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/fordyca.hpp"
-#include "fordyca/fsm/foraging_goal_type.hpp"
-#include "fordyca/fsm/subsystem_fwd.hpp"
+#include "fordyca/fsm/foraging_acq_goal.hpp"
+#include "fordyca/fsm/foraging_transport_goal.hpp"
+#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -59,10 +60,11 @@ NS_START(depth0);
  */
 class crw_fsm final : public cfsm::util_hfsm,
                       public rer::client<crw_fsm>,
-                      public cfmetrics::goal_acq_metrics,
-                      public block_transporter {
+                      public cfsm::metrics::goal_acq_metrics,
+                      public block_transporter,
+                      public cta::taskable {
  public:
-  crw_fsm(crfootbot::footbot_saa_subsystem* saa,
+  crw_fsm(crfootbot::footbot_saa_subsystem2D* saa,
           std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
           rmath::rng* rng);
 
@@ -74,19 +76,26 @@ class crw_fsm final : public cfsm::util_hfsm,
   bool entered_collision_avoidance(void) const override RCSW_PURE;
   bool exited_collision_avoidance(void) const override RCSW_PURE;
   rtypes::timestep collision_avoidance_duration(void) const override RCSW_PURE;
-  rmath::vector2u avoidance_loc(void) const override;
-
+  rmath::vector2z avoidance_loc(void) const override;
   /* goal acquisition metrics */
-  cfmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
+  cfsm::metrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
   exp_status is_exploring_for_goal(void) const override RCSW_PURE;
   bool is_vectoring_to_goal(void) const override { return false; }
   bool goal_acquired(void) const override RCSW_PURE;
-  rmath::vector2u acquisition_loc(void) const override;
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
+  rmath::vector2z acquisition_loc(void) const override;
+  rtypes::type_uuid entity_acquired_id(void) const override RCSW_PURE;
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, current_explore_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, current_vector_loc, const);
 
   /* block transportation */
-  foraging_transport_goal::type block_transport_goal(void) const override RCSW_PURE;
+  foraging_transport_goal block_transport_goal(void) const override RCSW_PURE;
+
+  /* taskable overrides */
+  void task_execute(void) override { run(); }
+  void task_start(const cta::taskable_argument*) override {}
+  bool task_finished(void) const override { return m_task_finished; }
+  bool task_running(void) const override { return !m_task_finished; }
+  void task_reset(void) override { init(); }
 
   /**
    * \brief (Re)-initialize the FSM.
@@ -144,6 +153,7 @@ class crw_fsm final : public cfsm::util_hfsm,
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 
   /* clang-format off */
+  bool                       m_task_finished{false};
   cfsm::explore_for_goal_fsm m_explore_fsm;
   /* clang-format on */
 };

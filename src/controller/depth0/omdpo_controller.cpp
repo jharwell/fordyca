@@ -23,8 +23,9 @@
  ******************************************************************************/
 #include "fordyca/controller/depth0/omdpo_controller.hpp"
 
+#include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/oracular_info_receptor.hpp"
@@ -49,10 +50,10 @@ omdpo_controller::~omdpo_controller(void) = default;
 void omdpo_controller::control_step(void) {
   ndc_pusht();
   ER_ASSERT(!(nullptr != block() &&
-              rtypes::constants::kNoUUID == block()->robot_id()),
+              rtypes::constants::kNoUUID == block()->md()->robot_id()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
-            block()->robot_id().v());
+            block()->md()->robot_id().v());
 
   mdpo_perception()->update(m_receptor.get());
   fsm()->run();

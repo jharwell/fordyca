@@ -23,12 +23,10 @@
  ******************************************************************************/
 #include "fordyca/support/depth2/dynamic_cache_creator.hpp"
 
+#include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
-#include "fordyca/ds/block_list.hpp"
-#include "fordyca/events/cell_empty.hpp"
-#include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/repr/arena_cache.hpp"
+#include "fordyca/events/cell2D_empty.hpp"
 #include "fordyca/support/depth2/cache_center_calculator.hpp"
 #include "fordyca/support/utils/loop_utils.hpp"
 
@@ -51,10 +49,10 @@ dynamic_cache_creator::dynamic_cache_creator(const params* const p,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-ds::cache_vector dynamic_cache_creator::create_all(
+cads::acache_vectoro dynamic_cache_creator::create_all(
     const cache_create_ro_params& c_params,
-    const ds::block_vector& c_alloc_blocks) {
-  ds::cache_vector created_caches;
+    const cds::block2D_vectorno& c_alloc_blocks) {
+  cads::acache_vectoro created_caches;
 
   ER_DEBUG("Creating caches: min_dist=%f,min_blocks=%u,free_blocks=[%s] (%zu)",
            mc_min_dist.v(),
@@ -62,9 +60,9 @@ ds::cache_vector dynamic_cache_creator::create_all(
            rcppsw::to_string(c_alloc_blocks).c_str(),
            c_alloc_blocks.size());
 
-  ds::block_vector used_blocks;
+  cds::block2D_vectorno used_blocks;
   for (size_t i = 0; i < c_alloc_blocks.size() - 1; ++i) {
-    ds::block_vector cache_i_blocks =
+    cds::block2D_vectorno cache_i_blocks =
         cache_i_blocks_alloc(used_blocks, c_alloc_blocks, i);
 
     /*
@@ -72,7 +70,7 @@ ds::cache_vector dynamic_cache_creator::create_all(
      * included in a new cache, so attempt cache creation.
      */
     if (cache_i_blocks.size() >= mc_min_blocks) {
-      ds::cache_vector c_avoid =
+      cads::acache_vectorno c_avoid =
           avoidance_caches_calc(c_params.current_caches, created_caches);
 
       if (auto center = cache_center_calculator(grid(), cache_dim())(
@@ -96,8 +94,8 @@ ds::cache_vector dynamic_cache_creator::create_all(
          * which keeps asserts about cache extent from triggering right after
          * creation, which can happen otherwise.
          */
-        auto cache_p = std::shared_ptr<repr::arena_cache>(create_single_cache(
-            rmath::uvec2dvec(*center), cache_i_blocks, c_params.t));
+        auto cache_p = std::shared_ptr<carepr::arena_cache>(create_single_cache(
+            rmath::zvec2dvec(*center), cache_i_blocks, c_params.t));
         created_caches.push_back(cache_p);
       }
 
@@ -109,7 +107,7 @@ ds::cache_vector dynamic_cache_creator::create_all(
     }
   } /* for(i..) */
 
-  ds::block_vector free_blocks =
+  cds::block2D_vectorno free_blocks =
       utils::free_blocks_calc(created_caches, c_alloc_blocks);
 
   ER_ASSERT(
@@ -118,25 +116,27 @@ ds::cache_vector dynamic_cache_creator::create_all(
   return created_caches;
 } /* create_all() */
 
-ds::cache_vector dynamic_cache_creator::avoidance_caches_calc(
-    const ds::cache_vector& c_previous_caches,
-    const ds::cache_vector& c_created_caches) const {
-  ds::cache_vector avoid = c_previous_caches;
-  avoid.insert(avoid.end(), c_created_caches.begin(), c_created_caches.end());
+cads::acache_vectorno dynamic_cache_creator::avoidance_caches_calc(
+    const cads::acache_vectorno& c_previous_caches,
+    const cads::acache_vectoro& c_created_caches) const {
+  cads::acache_vectorno avoid = c_previous_caches;
+  for (auto& c : c_created_caches) {
+    avoid.push_back(c.get());
+  } /* for(&c..) */
   return avoid;
 } /* avoidance_caches_calc() */
 
-ds::block_vector dynamic_cache_creator::absorb_blocks_calc(
-    const ds::block_vector& c_alloc_blocks,
-    const ds::block_vector& c_cache_i_blocks,
-    const ds::block_vector& c_used_blocks,
-    const rmath::vector2u& c_center,
+cds::block2D_vectorno dynamic_cache_creator::absorb_blocks_calc(
+    const cds::block2D_vectorno& c_alloc_blocks,
+    const cds::block2D_vectorno& c_cache_i_blocks,
+    const cds::block2D_vectorno& c_used_blocks,
+    const rmath::vector2z& c_center,
     rtypes::spatial_dist cache_dim) const {
-  ds::block_vector absorb_blocks;
+  cds::block2D_vectorno absorb_blocks;
   std::copy_if(c_alloc_blocks.begin(),
                c_alloc_blocks.end(),
                std::back_inserter(absorb_blocks),
-               [&](const auto& b) RCSW_PURE {
+               [&](crepr::base_block2D* b) RCSW_PURE {
                  auto xspan = rmath::ranged(c_center.x() - cache_dim.v() / 2.0,
                                             c_center.x() + cache_dim.v() / 2.0);
                  auto yspan = rmath::ranged(c_center.y() - cache_dim.v() / 2.0,
@@ -154,11 +154,11 @@ ds::block_vector dynamic_cache_creator::absorb_blocks_calc(
   return absorb_blocks;
 } /* absorb_blocks_calc() */
 
-ds::block_vector dynamic_cache_creator::cache_i_blocks_alloc(
-    const ds::block_vector& c_used_blocks,
-    const ds::block_vector& c_alloc_blocks,
+cds::block2D_vectorno dynamic_cache_creator::cache_i_blocks_alloc(
+    const cds::block2D_vectorno& c_used_blocks,
+    const cds::block2D_vectorno& c_alloc_blocks,
     uint index) const {
-  ds::block_vector src_blocks;
+  cds::block2D_vectorno src_blocks;
 
   /*
    * Block already in a new cache, so bail out.

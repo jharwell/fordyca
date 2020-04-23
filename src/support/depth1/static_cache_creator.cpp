@@ -23,21 +23,19 @@
  ******************************************************************************/
 #include "fordyca/support/depth1/static_cache_creator.hpp"
 
-#include "fordyca/events/cell_empty.hpp"
-#include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/repr/arena_cache.hpp"
+#include "cosm/arena/repr/arena_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
-using repr::base_cache;
+using carepr::base_cache;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 static_cache_creator::static_cache_creator(
-    ds::arena_grid* const grid,
+    cds::arena_grid* const grid,
     const std::vector<rmath::vector2d>& centers,
     rtypes::spatial_dist cache_dim)
     : base_cache_creator(grid, cache_dim),
@@ -47,18 +45,18 @@ static_cache_creator::static_cache_creator(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-ds::cache_vector static_cache_creator::create_all(
+cads::acache_vectoro static_cache_creator::create_all(
     const cache_create_ro_params& c_params,
-    const ds::block_vector& c_alloc_blocks) {
+    const cds::block2D_vectorno& c_alloc_blocks) {
   ER_DEBUG("Creating caches: alloc_blocks=[%s] (%zu)",
            rcppsw::to_string(c_alloc_blocks).c_str(),
            c_alloc_blocks.size());
 
-  ds::cache_vector created;
+  cads::acache_vectoro created;
   auto it = c_alloc_blocks.begin();
   for (auto& center : mc_centers) {
     auto filter = [&](const auto& c) {
-      return rmath::dvec2uvec(center, grid()->resolution().v()) == c->dloc();
+      return rmath::dvec2zvec(center, grid()->resolution().v()) == c->dloc();
     };
     /* static cache already exists */
     if (c_params.current_caches.end() !=
@@ -78,7 +76,7 @@ ds::cache_vector static_cache_creator::create_all(
     }
     auto it2 = it;
     std::advance(it, base_cache::kMinBlocks);
-    ds::block_vector cache_i_blocks(it2, it);
+    cds::block2D_vectorno cache_i_blocks(it2, it);
 
     ER_INFO("Creating static cache@%s: blocks=[%s] (%zu)",
             center.to_str().c_str(),

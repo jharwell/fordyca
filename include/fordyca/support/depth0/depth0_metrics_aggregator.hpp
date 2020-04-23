@@ -25,7 +25,10 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "fordyca/metrics/base_metrics_aggregator.hpp"
+
+#include "cosm/ds/config/grid_config.hpp"
+
+#include "fordyca/metrics/fordyca_metrics_aggregator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,13 +48,12 @@ NS_START(fordyca, support, depth0);
  * - FSM distance/block acquisition metrics
  */
 
-class depth0_metrics_aggregator : public metrics::base_metrics_aggregator,
+class depth0_metrics_aggregator : public metrics::fordyca_metrics_aggregator,
                                   public rer::client<depth0_metrics_aggregator> {
  public:
   depth0_metrics_aggregator(const cmconfig::metrics_config* mconfig,
-                            const config::grid_config* const gconfig,
+                            const cdconfig::grid_config* const gconfig,
                             const std::string& output_root);
-
 
   template<class T>
   void collect_from_controller(const T* controller);

@@ -55,7 +55,7 @@ class block_to_cache_site_fsm final : public block_to_goal_fsm,
                                       public virtual metrics::caches::site_selection_metrics {
  public:
   block_to_cache_site_fsm(const fsm_ro_params* c_params,
-                          crfootbot::footbot_saa_subsystem* saa,
+                          crfootbot::footbot_saa_subsystem2D* saa,
                           std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
                           rmath::rng* rng);
 
@@ -64,10 +64,13 @@ class block_to_cache_site_fsm final : public block_to_goal_fsm,
   block_to_cache_site_fsm& operator=(const block_to_cache_site_fsm&) = delete;
 
   /* goal acquisition metrics */
-  cfmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
+  cfsm::metrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
+  rtypes::type_uuid entity_acquired_id(void) const override {
+    return rtypes::constants::kNoUUID;
+  }
 
   /* block transportation */
-  foraging_transport_goal::type block_transport_goal(void) const override RCSW_PURE;
+  foraging_transport_goal block_transport_goal(void) const override RCSW_PURE;
 
  private:
   /* clang-format off */

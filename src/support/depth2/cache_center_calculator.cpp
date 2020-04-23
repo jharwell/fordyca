@@ -23,24 +23,20 @@
  ******************************************************************************/
 #include "fordyca/support/depth2/cache_center_calculator.hpp"
 
-#include "fordyca/ds/cell2D.hpp"
-#include "fordyca/events/cell_cache_extent.hpp"
-#include "fordyca/events/cell_empty.hpp"
-#include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/repr/arena_cache.hpp"
-#include "fordyca/repr/block_cluster.hpp"
-#include "fordyca/support/utils/loop_utils.hpp"
+#include "cosm/arena/repr/arena_cache.hpp"
+#include "cosm/ds/cell2D.hpp"
+#include "cosm/foraging/repr/block_cluster.hpp"
+#include "cosm/foraging/utils/utils.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth2);
-using ds::arena_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_center_calculator::cache_center_calculator(ds::arena_grid* const grid,
+cache_center_calculator::cache_center_calculator(cds::arena_grid* const grid,
                                                  rtypes::spatial_dist cache_dim)
     : ER_CLIENT_INIT("fordyca.support.depth2.cache_center_calculator"),
       mc_cache_dim(cache_dim),
@@ -49,10 +45,10 @@ cache_center_calculator::cache_center_calculator(ds::arena_grid* const grid,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-boost::optional<rmath::vector2u> cache_center_calculator::operator()(
-    const ds::block_vector& c_cache_i_blocks,
-    const ds::cache_vector& c_existing_caches,
-    const ds::block_cluster_vector& c_clusters,
+boost::optional<rmath::vector2z> cache_center_calculator::operator()(
+    const cds::block2D_vectorno& c_cache_i_blocks,
+    const cads::acache_vectorno& c_existing_caches,
+    const cfds::block2D_cluster_vector& c_clusters,
     rmath::rng* rng) const {
   double sumx = std::accumulate(c_cache_i_blocks.begin(),
                                 c_cache_i_blocks.end(),
@@ -68,7 +64,7 @@ boost::optional<rmath::vector2u> cache_center_calculator::operator()(
                                 });
 
   /* center is discretized real coordinates WITHOUT converting via resolution */
-  rmath::vector2u center(static_cast<uint>(sumx / c_cache_i_blocks.size()),
+  rmath::vector2z center(static_cast<uint>(sumx / c_cache_i_blocks.size()),
                          static_cast<uint>(sumy / c_cache_i_blocks.size()));
   ER_DEBUG("Guess center=%s", center.to_str().c_str());
 
@@ -107,19 +103,19 @@ boost::optional<rmath::vector2u> cache_center_calculator::operator()(
     ER_WARN("No conflict-free center found in %u tries: caches=[%s]",
             kOVERLAP_SEARCH_MAX_TRIES,
             rcppsw::to_string(c_existing_caches).c_str());
-    return boost::optional<rmath::vector2u>();
+    return boost::optional<rmath::vector2z>();
   }
 
-  return boost::make_optional(rmath::vector2u(center.x(), center.y()));
+  return boost::make_optional(rmath::vector2z(center.x(), center.y()));
 } /* calc_center() */
 
-boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc(
-    const ds::cache_vector& c_existing_caches,
-    const ds::block_cluster_vector& c_clusters,
-    const rmath::vector2u& c_center,
+boost::optional<rmath::vector2z> cache_center_calculator::deconflict_loc(
+    const cads::acache_vectorno& c_existing_caches,
+    const cfds::block2D_cluster_vector& c_clusters,
+    const rmath::vector2z& c_center,
     rmath::rng* rng) const {
   bool conflict = false;
-  rmath::vector2u new_center = c_center;
+  rmath::vector2z new_center = c_center;
   for (size_t i = 0; i < c_clusters.size(); ++i) {
     for (size_t j = 0; j < c_existing_caches.size(); ++j) {
       /* check arena boundaries */
@@ -130,7 +126,7 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc(
 
       /* check the current cache */
       if (auto new_loc =
-              deconflict_loc_entity(c_existing_caches[j].get(), c_center, rng)) {
+              deconflict_loc_entity(c_existing_caches[j], c_center, rng)) {
         new_center = new_loc.get();
         conflict = true;
       }
@@ -143,11 +139,11 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc(
   }   /* for(i..) */
 
   return (conflict) ? boost::make_optional(new_center)
-                    : boost::optional<rmath::vector2u>();
+                    : boost::optional<rmath::vector2z>();
 } /* deconflict_loc() */
 
-boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_boundaries(
-    const rmath::vector2u& c_center) const {
+boost::optional<rmath::vector2z> cache_center_calculator::deconflict_loc_boundaries(
+    const rmath::vector2z& c_center) const {
   /*
    * We need to be sure the center of the new cache is not near the arena
    * boundaries, in order to avoid all sorts of weird corner cases.
@@ -162,7 +158,7 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_boundar
   rmath::rangeu ybounds(static_cast<uint>(std::ceil(y_min)),
                         static_cast<uint>(std::floor(y_max)));
   bool conflict = false;
-  rmath::vector2u new_center = c_center;
+  rmath::vector2z new_center = c_center;
 
   if (!xbounds.contains(new_center.x())) {
     new_center.x(xbounds.wrap_value(new_center.x()));
@@ -194,12 +190,12 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_boundar
               y_max);
     return boost::make_optional(new_center);
   }
-  return boost::optional<rmath::vector2u>();
+  return boost::optional<rmath::vector2z>();
 } /* deconflict_loc_boundaries() */
 
-boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_entity(
+boost::optional<rmath::vector2z> cache_center_calculator::deconflict_loc_entity(
     const crepr::entity2D* ent,
-    const rmath::vector2u& center,
+    const rmath::vector2z& center,
     rmath::rng* rng) const {
   /*
    * The cache center is already a "real" coordinate, just one that has been
@@ -226,7 +222,7 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_entity(
            ent->id().v(),
            exc_yspan.to_str().c_str());
 
-  rmath::vector2u new_center = center;
+  rmath::vector2z new_center = center;
 
   /*
    * We move the cache by units of the grid size when we discover a conflict in
@@ -242,7 +238,7 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_entity(
    * Need to pass cache dimensions rather than dimensions of the entity, which
    * may be a block.
    */
-  auto status = utils::placement_conflict(
+  auto status = cfutils::placement_conflict2D(
       center_r, rmath::vector2d(mc_cache_dim.v(), mc_cache_dim.v()), ent);
 
   if (status.x_conflict) {
@@ -265,7 +261,7 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_entity(
   }
   return (status.x_conflict && status.y_conflict)
              ? boost::make_optional(new_center)
-             : boost::optional<rmath::vector2u>();
+             : boost::optional<rmath::vector2z>();
 } /* deconflict_loc_entity() */
 
 NS_END(depth2, support, fordyca);

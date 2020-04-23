@@ -23,8 +23,10 @@
  ******************************************************************************/
 #include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
 
+#include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block2D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 
 #include "fordyca/config/depth1/controller_repository.hpp"
@@ -50,7 +52,7 @@ bitd_mdpo_controller::~bitd_mdpo_controller(void) = default;
  * Member Functions
  ******************************************************************************/
 void bitd_mdpo_controller::init(ticpp::Element& node) {
-  base_controller::init(node);
+  foraging_controller::init(node);
 
   ndc_push();
   ER_INFO("Initializing...");
@@ -70,14 +72,20 @@ void bitd_mdpo_controller::init(ticpp::Element& node) {
 void bitd_mdpo_controller::control_step(void) {
   ndc_pusht();
   ER_ASSERT(!(nullptr != block() &&
-              rtypes::constants::kNoUUID == block()->robot_id()),
+              rtypes::constants::kNoUUID == block()->md()->robot_id()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
-            block()->robot_id().v());
+            block()->md()->robot_id().v());
 
   perception()->update(nullptr);
-  executive()->run();
-  saa()->steer_force2D_apply();
+
+  /*
+   * Execute the current task/allocate a new task/abort a task/etc and apply
+   * steering forces if normal operation, otherwise handle abnormal operation
+   * state.
+   */
+  supervisor()->run();
+
   ndc_pop();
 } /* control_step() */
 
@@ -97,8 +105,8 @@ void bitd_mdpo_controller::shared_init(
 
   /*
    * Task executive. Even though we use the same executive as the \ref
-   * bitd_dpo_controller, we have to replace it because we have our own perception
-   * subsystem, which is used to create the executive's graph.
+   * bitd_dpo_controller, we have to replace it because we have our own
+   * perception subsystem, which is used to create the executive's graph.
    */
   executive(task_executive_builder(block_sel_matrix(),
                                    cache_sel_matrix(),
@@ -106,7 +114,6 @@ void bitd_mdpo_controller::shared_init(
                                    perception())(config_repo, rng()));
   executive()->task_abort_notify(std::bind(
       &bitd_mdpo_controller::task_abort_cb, this, std::placeholders::_1));
-
 } /* shared_init() */
 
 mdpo_perception_subsystem* bitd_mdpo_controller::mdpo_perception(void) {

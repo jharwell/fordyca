@@ -25,8 +25,8 @@
 
 #include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/cache_proximity.hpp"
-#include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/events/free_block_pickup.hpp"
+#include "fordyca/events/robot_free_block_drop.hpp"
+#include "fordyca/events/robot_free_block_pickup.hpp"
 #include "fordyca/fsm/depth2/block_to_new_cache_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
 
@@ -69,7 +69,7 @@ rtypes::timestep cache_finisher::interface_time_calc(
 void cache_finisher::active_interface_update(int) {
   auto* fsm = static_cast<fsm::depth2::block_to_new_cache_fsm*>(mechanism());
 
-  if (fsm->goal_acquired() && fsm::foraging_transport_goal::type::ekNEW_CACHE ==
+  if (fsm->goal_acquired() && fsm::foraging_transport_goal::ekNEW_CACHE ==
                                   fsm->block_transport_goal()) {
     if (interface_in_prog(0)) {
       interface_exit(0);
@@ -77,7 +77,7 @@ void cache_finisher::active_interface_update(int) {
       ER_TRACE("Interface finished at timestep %u", current_time().v());
     }
     ER_TRACE("Interface time: %u", interface_time(0).v());
-  } else if (fsm::foraging_transport_goal::type::ekNEW_CACHE ==
+  } else if (fsm::foraging_transport_goal::ekNEW_CACHE ==
              fsm->block_transport_goal()) {
     if (!interface_in_prog(0)) {
       interface_enter(0);
@@ -137,13 +137,19 @@ RCPPSW_WRAP_OVERRIDE_DEF(cache_finisher,
                              polled_task::mechanism()),
                          const);
 
+RCPPSW_WRAP_OVERRIDE_DEF(cache_finisher,
+                         entity_acquired_id,
+                         *static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+                             polled_task::mechanism()),
+                         const);
+
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void cache_finisher::accept(events::detail::free_block_drop& visitor) {
+void cache_finisher::accept(events::detail::robot_free_block_drop& visitor) {
   visitor.visit(*this);
 }
-void cache_finisher::accept(events::detail::free_block_pickup& visitor) {
+void cache_finisher::accept(events::detail::robot_free_block_pickup& visitor) {
   visitor.visit(*this);
 }
 void cache_finisher::accept(events::detail::block_vanished& visitor) {

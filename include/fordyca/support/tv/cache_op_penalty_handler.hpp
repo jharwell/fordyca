@@ -29,7 +29,7 @@
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/support/tv/cache_op_filter.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
-#include "fordyca/support/tv/temporal_penalty_handler.hpp"
+#include "cosm/tv/temporal_penalty_handler.hpp"
 #include "fordyca/support/utils/event_utils.hpp"
 
 /*******************************************************************************
@@ -40,23 +40,22 @@ NS_START(fordyca, support, tv);
 /*******************************************************************************
  * Classes
  ******************************************************************************/
-
 /**
  * \class cache_op_penalty_handler
- * \ingroup support
+ * \ingroup support tv
  *
  * \brief The handler for block operation penalties for robots (e.g. picking
  * up, dropping in places that do not involve existing caches.
  */
 class cache_op_penalty_handler final
-    : public temporal_penalty_handler,
+    : public ctv::temporal_penalty_handler,
       public rer::client<cache_op_penalty_handler> {
  public:
-  cache_op_penalty_handler(ds::arena_map* const map,
+  cache_op_penalty_handler(carena::caching_arena_map* const map,
                            const rct::config::waveform_config* const config,
                            const std::string& name)
       : temporal_penalty_handler(config, name),
-        ER_CLIENT_INIT("fordyca.support.cache_op_penalty_handler"),
+        ER_CLIENT_INIT("fordyca.support.tv.cache_op_penalty_handler"),
         m_map(map) {}
 
   ~cache_op_penalty_handler(void) override = default;
@@ -70,8 +69,8 @@ class cache_op_penalty_handler final
    * and associate it with the robot.
    *
    * \tparam TControllerType The type of the controller. Must be a template
-   * parameter, rather than \ref controller::base_controller, because of the
-   * goal acquisition determination done by \ref cacheilter.
+   * parameter, rather than \ref controller::foraging_controller, because of the
+   * goal acquisition determination done by \ref cache_op_filter.
 
    * \param controller The robot to check.
    * \param src The penalty source (i.e. what event caused this penalty to be
@@ -79,7 +78,7 @@ class cache_op_penalty_handler final
    * \param t The current timestep.
   */
   template<typename TControllerType>
-  op_filter_status penalty_init(TControllerType& controller,
+  op_filter_status penalty_init(const TControllerType& controller,
                                 cache_op_src src,
                                 const rtypes::timestep& t) {
     /*
@@ -96,11 +95,12 @@ class cache_op_penalty_handler final
               controller.GetId().c_str());
 
     rtypes::timestep orig_duration = penalty_calc(t);
-    rtypes::timestep duration = penalty_finish_uniqueify(orig_duration);
     auto id = utils::robot_on_cache(controller, *m_map);
     ER_ASSERT(rtypes::constants::kNoUUID != id,
               "%s not in cache?",
               controller.GetId().c_str());
+
+    RCSW_UNUSED auto duration = penalty_add(&controller, id, orig_duration, t);
     ER_INFO("%s: cache%d start=%u, penalty=%u, adjusted penalty=%u src=%d",
             controller.GetId().c_str(),
             id.v(),
@@ -109,13 +109,12 @@ class cache_op_penalty_handler final
             duration.v(),
             static_cast<int>(src));
 
-    penalty_add(temporal_penalty(&controller, id, duration, t));
     return filter;
   }
 
  private:
   /* clang-format off */
-  ds::arena_map* const m_map;
+  carena::caching_arena_map* const m_map;
   /* clang-format on */
 };
 NS_END(tv, support, fordyca);

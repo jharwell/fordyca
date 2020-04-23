@@ -28,6 +28,11 @@
 
 #include "rcppsw/mpl/typelist.hpp"
 
+#include "cosm/arena/metrics/caches/location_metrics.hpp"
+#include "cosm/arena/metrics/caches/location_metrics_collector.hpp"
+#include "cosm/arena/metrics/caches/utilization_metrics.hpp"
+#include "cosm/arena/metrics/caches/utilization_metrics_collector.hpp"
+#include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/fsm/metrics/collision_metrics.hpp"
 #include "cosm/fsm/metrics/current_explore_locs_metrics_collector.hpp"
 #include "cosm/fsm/metrics/current_vector_locs_metrics_collector.hpp"
@@ -35,6 +40,7 @@
 #include "cosm/fsm/metrics/goal_acq_metrics.hpp"
 #include "cosm/fsm/metrics/goal_acq_metrics_collector.hpp"
 #include "cosm/fsm/metrics/movement_metrics.hpp"
+#include "cosm/metrics/collector_registerer.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tab.hpp"
 #include "cosm/ta/metrics/bi_tab_metrics.hpp"
@@ -45,11 +51,6 @@
 
 #include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
 #include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
-#include "fordyca/metrics/caches/location_metrics.hpp"
-#include "fordyca/metrics/caches/location_metrics_collector.hpp"
-#include "fordyca/metrics/caches/utilization_metrics_collector.hpp"
-#include "fordyca/metrics/collector_registerer.hpp"
-#include "fordyca/repr/arena_cache.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
@@ -57,26 +58,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, depth1, detail);
-
-using collector_typelist = rmpl::typelist<
-    metrics::collector_registerer::type_wrap<cfmetrics::goal_acq_metrics_collector>,
-    metrics::collector_registerer::type_wrap<
-        cfmetrics::goal_acq_locs_metrics_collector>,
-    metrics::collector_registerer::type_wrap<
-        cfmetrics::current_explore_locs_metrics_collector>,
-    metrics::collector_registerer::type_wrap<
-        cfmetrics::current_vector_locs_metrics_collector>,
-    metrics::collector_registerer::type_wrap<ctametrics::execution_metrics_collector>,
-    metrics::collector_registerer::type_wrap<ctametrics::bi_tab_metrics_collector>,
-    metrics::collector_registerer::type_wrap<ctametrics::bi_tdgraph_metrics_collector>,
-    metrics::collector_registerer::type_wrap<
-        metrics::caches::utilization_metrics_collector>,
-    metrics::collector_registerer::type_wrap<
-        metrics::caches::lifecycle_metrics_collector>,
-    metrics::collector_registerer::type_wrap<
-        metrics::caches::location_metrics_collector> >;
-NS_END(detail);
+NS_START(fordyca, support, depth1);
 
 using task0 = tasks::depth0::foraging_task;
 using task1 = tasks::depth1::foraging_task;
@@ -86,50 +68,15 @@ using task1 = tasks::depth1::foraging_task;
  ******************************************************************************/
 depth1_metrics_aggregator::depth1_metrics_aggregator(
     const cmconfig::metrics_config* const mconfig,
-    const config::grid_config* const gconfig,
+    const cdconfig::grid_config* const gconfig,
     const std::string& output_root)
     : depth0_metrics_aggregator(mconfig, gconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth1.metrics_aggregator") {
-  metrics::collector_registerer::creatable_set creatable_set = {
-      {typeid(cfmetrics::goal_acq_metrics_collector),
-       "cache_acq_counts",
-       "caches::acq_counts"},
-      {typeid(cfmetrics::goal_acq_locs_metrics_collector),
-       "cache_acq_locs",
-       "caches::acq_locs"},
-      {typeid(cfmetrics::current_explore_locs_metrics_collector),
-       "cache_acq_explore_locs",
-       "caches::acq_explore_locs"},
-      {typeid(cfmetrics::current_vector_locs_metrics_collector),
-       "cache_acq_vector_locs",
-       "caches::acq_vector_locs"},
-      {typeid(ctametrics::execution_metrics_collector),
-       "task_execution_collector",
-       "tasks::execution::" + std::string(task1::kCollectorName)},
-      {typeid(ctametrics::execution_metrics_collector),
-       "task_execution_harvester",
-       "tasks::execution::" + std::string(task1::kHarvesterName)},
-      {typeid(ctametrics::execution_metrics_collector),
-       "task_execution_generalist",
-       "tasks::execution::" + std::string(task0::kGeneralistName)},
-      {typeid(ctametrics::bi_tab_metrics_collector),
-       "task_tab_generalist",
-       "tasks::tab::generalist"},
-      {typeid(ctametrics::bi_tdgraph_metrics_collector),
-       "task_distribution",
-       "tasks::distribution"},
-      {typeid(metrics::caches::utilization_metrics_collector),
-       "cache_utilization",
-       "caches::utilization"},
-      {typeid(metrics::caches::lifecycle_metrics_collector),
-       "cache_lifecycle",
-       "caches::lifecycle"},
-      {typeid(metrics::caches::location_metrics_collector),
-       "cache_locations",
-       "caches::locations"}};
-  metrics::collector_registerer registerer(
-      mconfig, gconfig, creatable_set, this, 1);
-  boost::mpl::for_each<detail::collector_typelist>(registerer);
+  auto dims2D = rmath::dvec2zvec(gconfig->upper, gconfig->resolution.v());
+
+  register_standard(mconfig);
+  register_with_decomp_depth(mconfig, 1);
+  register_with_arena_dims2D(mconfig, dims2D);
 
   reset_all();
 }
@@ -138,9 +85,10 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
  * Member Functions
  ******************************************************************************/
 void depth1_metrics_aggregator::collect_from_cache(
-    const repr::arena_cache* const cache) {
-  auto util_m = dynamic_cast<const metrics::caches::utilization_metrics*>(cache);
-  auto loc_m = dynamic_cast<const metrics::caches::location_metrics*>(cache);
+    const carepr::arena_cache* const cache) {
+  auto util_m =
+      dynamic_cast<const cametrics::caches::utilization_metrics*>(cache);
+  auto loc_m = dynamic_cast<const cametrics::caches::location_metrics*>(cache);
   collect("caches::utilization", *util_m);
   collect("caches::locations", *loc_m);
 } /* collect_from_cache() */
@@ -180,5 +128,104 @@ void depth1_metrics_aggregator::task_start_cb(const cta::polled_task* const,
   }
   collect("tasks::tab::generalist", *tab);
 } /* task_start_cb() */
+
+void depth1_metrics_aggregator::register_standard(
+    const cmconfig::metrics_config*  mconfig) {
+  using collector_typelist = rmpl::typelist<
+    rmpl::identity<cfsm::metrics::goal_acq_metrics_collector>,
+    rmpl::identity<ctametrics::execution_metrics_collector>,
+    rmpl::identity<ctametrics::bi_tab_metrics_collector>,
+    rmpl::identity<cametrics::caches::utilization_metrics_collector>,
+    rmpl::identity<metrics::caches::lifecycle_metrics_collector>
+     >;
+cmetrics::collector_registerer<>::creatable_set creatable_set = {
+      {typeid(cfsm::metrics::goal_acq_metrics_collector),
+       "cache_acq_counts",
+       "caches::acq_counts",
+       rmetrics::output_mode::ekAPPEND},
+      {typeid(ctametrics::execution_metrics_collector),
+       "task_execution_collector",
+       "tasks::execution::" + std::string(task1::kCollectorName),
+       rmetrics::output_mode::ekAPPEND},
+      {typeid(ctametrics::execution_metrics_collector),
+       "task_execution_harvester",
+       "tasks::execution::" + std::string(task1::kHarvesterName),
+       rmetrics::output_mode::ekAPPEND},
+      {typeid(ctametrics::execution_metrics_collector),
+       "task_execution_generalist",
+       "tasks::execution::" + std::string(task0::kGeneralistName),
+       rmetrics::output_mode::ekAPPEND},
+      {typeid(ctametrics::bi_tab_metrics_collector),
+       "task_tab_generalist",
+       "tasks::tab::generalist",
+       rmetrics::output_mode::ekAPPEND},
+      {typeid(cametrics::caches::utilization_metrics_collector),
+       "cache_utilization",
+       "caches::utilization",
+       rmetrics::output_mode::ekAPPEND},
+      {typeid(metrics::caches::lifecycle_metrics_collector),
+       "cache_lifecycle",
+       "caches::lifecycle",
+       rmetrics::output_mode::ekAPPEND}
+      };
+  cmetrics::collector_registerer<> registerer(mconfig, creatable_set, this);
+  boost::mpl::for_each<collector_typelist>(registerer);
+} /* register_standard() */
+
+void depth1_metrics_aggregator::register_with_decomp_depth(
+    const cmconfig::metrics_config* const mconfig,
+    size_t depth) {
+  using collector_typelist = rmpl::typelist<
+    rmpl::identity<ctametrics::bi_tdgraph_metrics_collector>
+    >;
+  using extra_args_type = std::tuple<size_t>;
+  cmetrics::collector_registerer<extra_args_type>::creatable_set creatable_set = {
+    {typeid(ctametrics::bi_tdgraph_metrics_collector),
+     "task_distribution",
+     "tasks::distribution",
+     rmetrics::output_mode::ekAPPEND}
+  };
+
+  cmetrics::collector_registerer<extra_args_type> registerer(mconfig,
+                                                             creatable_set,
+                                                             this,
+                                                             std::make_tuple(depth));
+  boost::mpl::for_each<collector_typelist>(registerer);
+} /* register_with_decomp_depth() */
+
+void depth1_metrics_aggregator::register_with_arena_dims2D(
+    const cmconfig::metrics_config* const mconfig,
+    const rmath::vector2z& dims) {
+  using collector_typelist = rmpl::typelist<
+    rmpl::identity<cfsm::metrics::goal_acq_locs_metrics_collector>,
+    rmpl::identity<cfsm::metrics::current_explore_locs_metrics_collector>,
+    rmpl::identity<cfsm::metrics::current_vector_locs_metrics_collector>,
+    rmpl::identity<cametrics::caches::location_metrics_collector>
+    >;
+
+  using extra_args_type = std::tuple<rmath::vector2z>;
+    cmetrics::collector_registerer<extra_args_type>::creatable_set creatable_set = {
+      {typeid(cfsm::metrics::goal_acq_locs_metrics_collector),
+       "cache_acq_locs",
+       "caches::acq_locs",
+       rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE},
+      {typeid(cfsm::metrics::current_explore_locs_metrics_collector),
+       "cache_acq_explore_locs",
+       "caches::acq_explore_locs",
+       rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE},
+      {typeid(cfsm::metrics::current_vector_locs_metrics_collector),
+       "cache_acq_vector_locs",
+       "caches::acq_vector_locs",
+       rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE},
+      {typeid(cametrics::caches::location_metrics_collector),
+       "cache_locations",
+       "caches::locations",
+       rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE}};
+  cmetrics::collector_registerer<extra_args_type> registerer(mconfig,
+                                                             creatable_set,
+                                                             this,
+                                                             std::make_tuple(dims));
+  boost::mpl::for_each<collector_typelist>(registerer);
+} /* register_with_arena_dims2D() */
 
 NS_END(depth1, support, fordyca);

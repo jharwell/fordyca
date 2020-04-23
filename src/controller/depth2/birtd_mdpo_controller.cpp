@@ -23,6 +23,10 @@
  ******************************************************************************/
 #include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
 
+#include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/fsm/supervisor_fsm.hpp"
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/config/depth2/controller_repository.hpp"
 #include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
@@ -45,7 +49,7 @@ birtd_mdpo_controller::~birtd_mdpo_controller(void) = default;
  * Member Functions
  ******************************************************************************/
 void birtd_mdpo_controller::init(ticpp::Element& node) {
-  base_controller::init(node);
+  foraging_controller::init(node);
   ndc_push();
   ER_INFO("Initializing");
 

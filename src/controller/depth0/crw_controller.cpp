@@ -25,8 +25,9 @@
 
 #include <fstream>
 
+#include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block2D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/expstrat/block_factory.hpp"
@@ -48,7 +49,7 @@ crw_controller::~crw_controller(void) = default;
  * Member Functions
  ******************************************************************************/
 void crw_controller::init(ticpp::Element& node) {
-  base_controller::init(node);
+  foraging_controller::init(node);
   ndc_push();
   ER_INFO("Initializing...");
 
@@ -58,12 +59,14 @@ void crw_controller::init(ticpp::Element& node) {
       fsm::expstrat::block_factory().create(
           fsm::expstrat::block_factory::kCRW, &p, rng()),
       rng());
+  /* Set CRW FSM supervision */
+  supervisor()->supervisee_update(m_fsm.get());
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* init() */
 
 void crw_controller::reset(void) {
-  base_controller::reset();
+  foraging_controller::reset();
   if (nullptr != m_fsm) {
     m_fsm->init();
   }
@@ -72,12 +75,16 @@ void crw_controller::reset(void) {
 void crw_controller::control_step(void) {
   ndc_pusht();
   ER_ASSERT(!(nullptr != block() &&
-              rtypes::constants::kNoUUID == block()->robot_id()),
+              rtypes::constants::kNoUUID == block()->md()->robot_id()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
-            block()->robot_id().v());
-  m_fsm->run();
-  saa()->steer_force2D_apply();
+            block()->md()->robot_id().v());
+
+  /*
+   * Run the FSM and apply steering forces if normal operation, otherwise handle
+   * abnormal operation state.
+   */
+  supervisor()->run();
   ndc_pop();
 } /* control_step() */
 
@@ -85,6 +92,7 @@ void crw_controller::control_step(void) {
  * FSM Metrics
  ******************************************************************************/
 RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, goal_acquired, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, entity_acquired_id, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, is_exploring_for_goal, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, acquisition_goal, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, block_transport_goal, *m_fsm, const);

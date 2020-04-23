@@ -26,15 +26,21 @@
  ******************************************************************************/
 #include <vector>
 #include <memory>
+#include <atomic>
+#include <utility>
+
+#include "cosm/foraging/operations/robot_los_update.hpp"
 
 #include "fordyca/support/depth0/depth0_loop_functions.hpp"
-#include "fordyca/support/robot_los_updater.hpp"
-#include "fordyca/support/robot_metric_extractor.hpp"
 #include "fordyca/support/robot_task_extractor.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::foraging::config {
+struct block_dist_config;
+} /* namespace cosm::foraging::config */
+
 NS_START(fordyca);
 namespace config { namespace caches { struct caches_config; }}
 
@@ -42,7 +48,7 @@ NS_START(support, depth1);
 class depth1_metrics_aggregator;
 class static_cache_manager;
 
-template<typename T>
+template<typename TControllerType, typename TArenaMapType>
 class robot_arena_interactor;
 
 namespace detail {
@@ -74,11 +80,12 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
   depth1_loop_functions(void) RCSW_COLD;
   ~depth1_loop_functions(void) override RCSW_COLD;
 
-  void Init(ticpp::Element& node) override RCSW_COLD;
-  void PreStep() override;
-  void PostStep() override;
-  void Reset(void) override RCSW_COLD;
-  void Destroy(void) override RCSW_COLD;
+  /* swarm manager overrides */
+  void init(ticpp::Element& node) override RCSW_COLD;
+  void pre_step() override;
+  void post_step() override;
+  void reset(void) override RCSW_COLD;
+  void destroy(void) override RCSW_COLD;
 
  protected:
   /**
@@ -94,22 +101,24 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
  private:
   using interactor_map_type = rds::type_map<
    rmpl::typelist_wrap_apply<controller::depth1::typelist,
-                               robot_arena_interactor>::type>;
+                             robot_arena_interactor,
+                             carena::caching_arena_map>::type>;
   using los_updater_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth1::typelist,
-                                robot_los_updater>::type>;
+                              cfops::robot_los_update,
+                              carena::caching_arena_map>::type>;
   using task_extractor_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth1::typelist,
                                 robot_task_extractor>::type>;
   using metric_extractor_typelist = rmpl::typelist<
-    robot_metric_extractor<depth1_metrics_aggregator,
-                           controller::depth1::bitd_dpo_controller>,
-    robot_metric_extractor<depth1_metrics_aggregator,
-                           controller::depth1::bitd_odpo_controller>,
-    robot_metric_extractor<depth1_metrics_aggregator,
-                           controller::depth1::bitd_mdpo_controller>,
-    robot_metric_extractor<depth1_metrics_aggregator,
-                           controller::depth1::bitd_omdpo_controller>
+    ccops::metrics_extract<controller::depth1::bitd_dpo_controller,
+                           depth1_metrics_aggregator>,
+    ccops::metrics_extract<controller::depth1::bitd_odpo_controller,
+                           depth1_metrics_aggregator>,
+    ccops::metrics_extract<controller::depth1::bitd_mdpo_controller,
+                           depth1_metrics_aggregator>,
+    ccops::metrics_extract<controller::depth1::bitd_omdpo_controller,
+                           depth1_metrics_aggregator>
     >;
   using metric_extractor_map_type = rds::type_map<metric_extractor_typelist>;
 
@@ -138,7 +147,7 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
    * \brief Initialize static cache handling/management:
    */
   void cache_handling_init(const config::caches::caches_config *cachep,
-                           const config::arena::block_dist_config* distp) RCSW_COLD;
+                           const cfconfig::block_dist_config* distp) RCSW_COLD;
 
   /**
    * \brief Map the block distribution type to the locations of one or more
@@ -146,7 +155,7 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
    * initialization.
    */
   std::vector<rmath::vector2d> calc_cache_locs(
-      const config::arena::block_dist_config* distp) RCSW_COLD;
+      const cfconfig::block_dist_config* distp) RCSW_COLD;
 
   /**
    * \brief Initialize all oracles.
@@ -189,6 +198,20 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
    */
   void static_cache_monitor(void);
 
+  /**
+   * \brief Return \c TRUE iff one or more static caches have been depleted this
+   * timestep (or on previous timesteps and have not been re-created yet, for
+   * whatever reason).
+   */
+  bool caches_depleted(void) const;
+
+  /**
+   * \brief Collect task counts from controllers on timesteps one or more static
+   * caches have been depleted in order to calculate re-creation probabilities.
+   */
+  void caches_recreation_task_counts_collect(
+      const controller::foraging_controller* const controller);
+
   /* clang-format off */
   std::unique_ptr<interactor_map_type>                m_interactor_map;
   std::unique_ptr<metric_extractor_map_type>          m_metric_extractor_map;
@@ -198,6 +221,7 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
 
   std::unique_ptr<depth1_metrics_aggregator>          m_metrics_agg;
   std::unique_ptr<static_cache_manager>               m_cache_manager;
+  std::pair<std::atomic_uint, std::atomic_uint>       m_cache_counts{0, 0};
   /* clang-format on */
 };
 

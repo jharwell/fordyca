@@ -29,6 +29,8 @@
 
 #include "rcppsw/er/client.hpp"
 
+#include "cosm/ds/entity_vector.hpp"
+
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
@@ -54,7 +56,7 @@ NS_START(controller);
  * \class dpo_perception_subsystem
  * \ingroup controller
  *
- * \brief Translates the sensor readings of the robot (i.e. \ref line_of_sight),
+ * \brief Translates the sensor readings of the robot (i.e. \ref foraging_los),
  * into a useful internal repr: a \ref dpo_store.
  */
 class dpo_perception_subsystem final
@@ -94,16 +96,16 @@ class dpo_perception_subsystem final
    *
    * \param c_los The LOS to process.
    */
-  void process_los(const repr::line_of_sight* c_los,
+  void process_los(const cfrepr::foraging_los* c_los,
                    oracular_info_receptor* receptor);
 
-  void process_los_blocks(const repr::line_of_sight* c_los);
-  void process_los_caches(const repr::line_of_sight* c_los);
+  void process_los_blocks(const cfrepr::foraging_los* c_los);
+  void process_los_caches(const cfrepr::foraging_los* c_los);
 
-  void los_tracking_sync(const repr::line_of_sight* c_los,
-                         const ds::cache_list& los_caches);
-  void los_tracking_sync(const repr::line_of_sight* c_los,
-                         const ds::block_list& los_blocks);
+  void los_tracking_sync(const cfrepr::foraging_los* c_los,
+                         const cads::bcache_vectorno& los_caches);
+  void los_tracking_sync(const cfrepr::foraging_los* c_los,
+                         const cds::entity_vector& los_blocks);
 
  private:
   /* clang-format off */

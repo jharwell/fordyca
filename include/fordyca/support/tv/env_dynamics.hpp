@@ -26,23 +26,32 @@
  ******************************************************************************/
 #include <list>
 
-#include "fordyca/controller/controller_fwd.hpp"
+#include "rcppsw/er/client.hpp"
+
+#include "cosm/tv/temporal_penalty_handler.hpp"
+#include "cosm/pal/tv/argos_rda_adaptor.hpp"
+#include "cosm/tv/env_dynamics.hpp"
+
 #include "fordyca/support/tv/block_op_penalty_handler.hpp"
 #include "fordyca/support/tv/cache_op_penalty_handler.hpp"
 #include "fordyca/support/tv/block_op_src.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/metrics/tv/env_dynamics_metrics.hpp"
-#include "fordyca/support/tv/argos_rda_adaptor.hpp"
-
-#include "rcppsw/er/client.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
+namespace cosm::foraging::ds {
+class caching_arena_map;
+} /* namespace cosm::foraging::ds */
+namespace cosm::pal {
+class argos_controller2D_adaptor;
+} /* namespace cosm::pal */
+
 NS_START(fordyca);
 
 namespace config { namespace tv { struct env_dynamics_config; }}
-namespace ds { class arena_map; }
 NS_START(support);
 
 class base_loop_functions;
@@ -60,14 +69,23 @@ NS_START(tv);
  * conditions to the swarm.
  */
 class env_dynamics final : public rer::client<env_dynamics>,
+                           public ctv::env_dynamics<cpal::argos_controller2D_adaptor>,
                            public metrics::tv::env_dynamics_metrics {
  public:
-  using const_penalty_handlers = std::list<const tv::temporal_penalty_handler*>;
-  using penalty_handlers = std::list<tv::temporal_penalty_handler*>;
+  using const_penalty_handlers = std::list<const ctv::temporal_penalty_handler*>;
+  using penalty_handlers = std::list<ctv::temporal_penalty_handler*>;
+
+  /**
+   * \brief We use the \ref controller::foraging_controller, rather than the 2D
+   * adaptor it is derived from because we need the \ref
+   * ccontroller::irv_recipient_controller that it derives from within the RDA
+   * class.
+   */
+  using rda_adaptor_type = cpal::tv::argos_rda_adaptor<controller::foraging_controller>;
 
   env_dynamics(const config::tv::env_dynamics_config * config,
                const support::base_loop_functions* lf,
-               ds::arena_map* map);
+               carena::caching_arena_map* map);
 
   env_dynamics(const env_dynamics&) = delete;
   const env_dynamics& operator=(const env_dynamics&) = delete;
@@ -76,8 +94,13 @@ class env_dynamics final : public rer::client<env_dynamics>,
   double avg_motion_throttle(void) const override {
     return m_rda.avg_motion_throttle();
   }
-  rtypes::timestep block_manip_penalty(void) const override;
+  rtypes::timestep arena_block_manip_penalty(void) const override;
   rtypes::timestep cache_usage_penalty(void) const override;
+
+  /* COSM env dynamics overrides */
+  void register_controller(const cpal::argos_controller2D_adaptor& c) override;
+  void unregister_controller(const cpal::argos_controller2D_adaptor& c) override;
+  bool penalties_flush(const cpal::argos_controller2D_adaptor& c) override;
 
   /**
    * \brief Update the state of applied variances. Should be called once per
@@ -88,21 +111,8 @@ class env_dynamics final : public rer::client<env_dynamics>,
     m_rda.update();
   }
 
-  /**
-   * \brief Register a robot controller for all possible types of environmental
-   * variance that could be applied to it.
-   */
-  void register_controller(const controller::base_controller& c);
 
-  /**
-   * \brief Undo \ref register_controller, as well as flushing the controller
-   * from any penalty handlers it might be serving penalties for.
-   */
-  void unregister_controller(const controller::base_controller& c);
-
-  bool penalties_flush(const controller::base_controller& c);
-
-  const argos_rda_adaptor* rda_adaptor(void) const { return &m_rda; }
+  const rda_adaptor_type* rda_adaptor(void) const { return &m_rda; }
 
   /**
    * \brief Return non-owning reference to a penalty handler for the specified
@@ -112,7 +122,7 @@ class env_dynamics final : public rer::client<env_dynamics>,
   const block_op_penalty_handler* penalty_handler(const block_op_src& src) const {
     return const_cast<env_dynamics*>(this)->penalty_handler(src);
   }
-   block_op_penalty_handler* penalty_handler(const block_op_src& src) {
+  block_op_penalty_handler* penalty_handler(const block_op_src& src) {
     switch (src) {
       case block_op_src::ekFREE_PICKUP:
         return &m_fb_pickup;
@@ -176,7 +186,7 @@ class env_dynamics final : public rer::client<env_dynamics>,
 
   /* clang-format off */
   rtypes::timestep         m_timestep{rtypes::timestep(0)};
-  argos_rda_adaptor        m_rda;
+  rda_adaptor_type         m_rda;
   block_op_penalty_handler m_fb_pickup;
   block_op_penalty_handler m_nest_drop;
   cache_op_penalty_handler m_existing_cache;

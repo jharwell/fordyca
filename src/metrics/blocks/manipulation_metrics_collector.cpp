@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
-
-#include "fordyca/metrics/blocks/manipulation_metrics.hpp"
+#include "fordyca/metrics/blocks/block_manip_events.hpp"
+#include "cosm/controller/metrics/manipulation_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,9 +34,11 @@ NS_START(fordyca, metrics, blocks);
  * Constructors/Destructor
  ******************************************************************************/
 manipulation_metrics_collector::manipulation_metrics_collector(
-    const std::string& ofname,
-    uint interval)
-    : base_metrics_collector(ofname, interval) {}
+    const std::string& ofname_stem,
+    const rtypes::timestep& interval)
+    : base_metrics_collector(ofname_stem,
+                             interval,
+                             rmetrics::output_mode::ekAPPEND) {}
 
 /*******************************************************************************
  * Member Functions
@@ -66,21 +68,21 @@ void manipulation_metrics_collector::reset(void) {
 } /* reset() */
 
 boost::optional<std::string> manipulation_metrics_collector::csv_line_build(void) {
-  if (!((timestep() + 1) % interval() == 0)) {
+  if (!(timestep() % interval() == 0)) {
     return boost::none;
   }
   std::string line;
 
-  line += rcppsw::to_string(m_interval.free_pickup_events) + separator();
-  line += rcppsw::to_string(m_interval.free_drop_events) + separator();
+  line += csv_entry_intavg(m_interval.free_pickup_events);
+  line += csv_entry_intavg(m_interval.free_drop_events);
 
   line += csv_entry_domavg(m_interval.free_pickup_penalty,
                            m_interval.free_pickup_events);
   line += csv_entry_domavg(m_interval.free_drop_penalty,
                            m_interval.free_drop_events);
 
-  line += rcppsw::to_string(m_interval.cache_pickup_events) + separator();
-  line += rcppsw::to_string(m_interval.cache_drop_events) + separator();
+  line += csv_entry_intavg(m_interval.cache_pickup_events);
+  line += csv_entry_intavg(m_interval.cache_drop_events);
 
   line += csv_entry_domavg(m_interval.cache_pickup_penalty,
                            m_interval.cache_pickup_events);
@@ -93,20 +95,18 @@ boost::optional<std::string> manipulation_metrics_collector::csv_line_build(void
 
 void manipulation_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
-  auto& m = dynamic_cast<const manipulation_metrics&>(metrics);
-  if (m.free_pickup_event()) {
-    ++m_interval.free_pickup_events;
-    m_interval.free_pickup_penalty += m.penalty_served().v();
-  } else if (m.free_drop_event()) {
-    ++m_interval.free_drop_events;
-    m_interval.free_drop_penalty += m.penalty_served().v();
-  } else if (m.cache_pickup_event()) {
-    ++m_interval.cache_pickup_events;
-    m_interval.cache_pickup_penalty += m.penalty_served().v();
-  } else if (m.cache_drop_event()) {
-    ++m_interval.cache_drop_events;
-    m_interval.cache_drop_penalty += m.penalty_served().v();
-  }
+  auto& m = dynamic_cast<const ccmetrics::manipulation_metrics&>(metrics);
+  m_interval.free_pickup_events += m.status(metrics::blocks::block_manip_events::ekFREE_PICKUP);
+  m_interval.free_pickup_penalty += m.penalty(metrics::blocks::block_manip_events::ekFREE_PICKUP).v();
+
+  m_interval.free_drop_events += m.status(metrics::blocks::block_manip_events::ekFREE_DROP);
+  m_interval.free_drop_penalty += m.penalty(metrics::blocks::block_manip_events::ekFREE_DROP).v();
+
+  m_interval.cache_pickup_events += m.status(metrics::blocks::block_manip_events::ekCACHE_PICKUP);
+  m_interval.cache_pickup_penalty += m.penalty(metrics::blocks::block_manip_events::ekCACHE_PICKUP).v();
+
+  m_interval.cache_drop_events += m.status(metrics::blocks::block_manip_events::ekCACHE_DROP);
+  m_interval.cache_drop_penalty += m.penalty(metrics::blocks::block_manip_events::ekCACHE_DROP).v();
 } /* collect() */
 
 void manipulation_metrics_collector::reset_after_interval(void) {

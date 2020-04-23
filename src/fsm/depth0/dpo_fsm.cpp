@@ -35,7 +35,7 @@ NS_START(fordyca, fsm, depth0);
  * Constructors/Destructors
  ******************************************************************************/
 dpo_fsm::dpo_fsm(const fsm_ro_params* params,
-                 crfootbot::footbot_saa_subsystem* saa,
+                 crfootbot::footbot_saa_subsystem2D* saa,
                  std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
                  rmath::rng* rng)
     : util_hfsm(saa, rng, ekST_MAX_STATES),
@@ -77,6 +77,7 @@ HFSM_STATE_DEFINE(dpo_fsm, block_to_nest, rpfsm::event_data* data) {
     return fsm::foraging_signal::ekHANDLED;
   }
   if (m_block_fsm.task_finished()) {
+    m_task_finished = true;
     m_block_fsm.task_reset();
     internal_event(ekST_LEAVING_NEST);
   } else {
@@ -106,6 +107,7 @@ RCPPSW_WRAP_DEF(dpo_fsm, goal_acquired, m_block_fsm, const);
 RCPPSW_WRAP_DEF(dpo_fsm, acquisition_loc, m_block_fsm, const);
 RCPPSW_WRAP_DEF(dpo_fsm, current_explore_loc, m_block_fsm, const);
 RCPPSW_WRAP_DEF(dpo_fsm, current_vector_loc, m_block_fsm, const);
+RCPPSW_WRAP_DEF(dpo_fsm, entity_acquired_id, m_block_fsm, const);
 
 /*******************************************************************************
  * General Member Functions
@@ -116,6 +118,7 @@ void dpo_fsm::init(void) {
 } /* init() */
 
 void dpo_fsm::run(void) {
+  m_task_finished = false;
   inject_event(fsm::foraging_signal::ekRUN, rpfsm::event_type::ekNORMAL);
 } /* run() */
 

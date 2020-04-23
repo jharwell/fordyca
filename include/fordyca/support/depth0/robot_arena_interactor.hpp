@@ -48,12 +48,11 @@ NS_START(fordyca, support, depth0);
  * - Picking up a free block.
  * - Dropping a carried block in the nest.
  */
-template <typename T>
-class robot_arena_interactor final : public rer::client<robot_arena_interactor<T>> {
+template <typename TControllerType, typename TArenaMapType>
+class robot_arena_interactor final : public rer::client<robot_arena_interactor<TControllerType,
+                                                                               TArenaMapType>> {
  public:
-  using controller_type = T;
-
-  robot_arena_interactor(ds::arena_map* const map,
+  robot_arena_interactor(TArenaMapType* const map,
                          depth0_metrics_aggregator *const metrics_agg,
                          argos::CFloorEntity* const floor,
                          tv::env_dynamics* const envd)
@@ -79,7 +78,8 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
    * \param controller The controller to handle interactions for.
    * \param t The current timestep.
    */
-  interactor_status operator()(T& controller, const rtypes::timestep& t) {
+  interactor_status operator()(TControllerType& controller,
+                               const rtypes::timestep& t) {
     if (controller.is_carrying_block()) {
       return m_nest_drop_interactor(controller, t);
     } else { /* The foot-bot has no block item */
@@ -89,8 +89,10 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
 
  private:
   /* clang-format off */
-  free_block_pickup_interactor<T> m_free_pickup_interactor;
-  nest_block_drop_interactor<T>   m_nest_drop_interactor;
+  free_block_pickup_interactor<TControllerType,
+                               TArenaMapType> m_free_pickup_interactor;
+  nest_block_drop_interactor<TControllerType,
+                             TArenaMapType>   m_nest_drop_interactor;
   /* clang-format on */
 };
 

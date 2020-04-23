@@ -59,29 +59,24 @@ in the ``output.txt`` for the error and fix it and try running the script again
 Optimized Build
 ---------------
 
-To build ``FORYDCA`` with optimizations (necessary for using ``SIERRA`` or
+To build ``FORDYCA`` with optimizations (necessary for using ``SIERRA`` or
 running large scale simulations), will need a different cmake command than the
 one ``bootstrap.sh`` uses for you. Something like the following, run from the
 ``build`` directory prior to building will do the trick::
 
-  cmake -DCMAKE_C_COMPILER=gcc-8 \
-  -DCMAKE_CXX_COMPILER=g++-8 \
+  cmake -DCMAKE_C_COMPILER=gcc-9 \
+  -DCMAKE_CXX_COMPILER=g++-9 \
   -DWITH_FOOTBOT_BATTERY=NO \
   -DWITH_FOOTBOT_RAB=NO \
   -DWITH_FOOTBOT_LEDS=NO \
   -DCMAKE_BUILD_TYPE=OPT \
   -DLIBRA_ER=NONE \
-  -DLIBRA_OPENMP=YES \
   -DLIBRA_BUILD_FOR=ARGOS \
   \..
 
 To get an idea of what some of the non-project specific options mean, head over
 to the `libra <https://github.com/swarm-robotics/libra/tree/devel/README.md>`_
 repo and look at the README.
-
-.. IMPORTANT:: ``LIBRA_OPENMP`` should only be set to ``YES`` if you are going
-   to be running with really large swarms (> 1000), otherwise the overhead from
-   using threads will probably be greater than any speedup you will get. YMMV.
 
 ``WITH_FOOTBOT_BATTERY``, ``WITH_FOOTBOT_RAB``, ``WITH_FOOTBOT_LEDS`` are things
 that are only needed if you are running experiments which utilize those

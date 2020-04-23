@@ -54,7 +54,7 @@ class birtd_odpo_controller : public depth2::birtd_dpo_controller,
   birtd_odpo_controller(void) RCSW_COLD;
   ~birtd_odpo_controller(void) override RCSW_COLD;
 
-  /* base_controller overrides */
+  /* foraging_controller overrides */
   void control_step(void) override;
   std::type_index type_index(void) const override { return {typeid(*this)}; }
 

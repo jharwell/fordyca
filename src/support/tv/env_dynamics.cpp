@@ -23,8 +23,10 @@
  ******************************************************************************/
 #include "fordyca/support/tv/env_dynamics.hpp"
 
+#include "cosm/arena/caching_arena_map.hpp"
+
 #include "fordyca/config/tv/env_dynamics_config.hpp"
-#include "fordyca/controller/base_controller.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 
 /*******************************************************************************
@@ -37,7 +39,7 @@ NS_START(fordyca, support, tv);
  ******************************************************************************/
 env_dynamics::env_dynamics(const config::tv::env_dynamics_config* const config,
                            const support::base_loop_functions* const lf,
-                           ds::arena_map* const map)
+                           carena::caching_arena_map* const map)
     : ER_CLIENT_INIT("fordyca.support.tv.env_dynamics"),
       m_rda(&config->rda, lf),
       m_fb_pickup(map, &config->block_manip_penalty, "Free Block Pickup"),
@@ -49,25 +51,26 @@ env_dynamics::env_dynamics(const config::tv::env_dynamics_config* const config,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-rtypes::timestep env_dynamics::block_manip_penalty(void) const {
+rtypes::timestep env_dynamics::arena_block_manip_penalty(void) const {
   return penalty_handler(block_op_src::ekNEST_DROP)->penalty_calc(m_timestep);
-} /* block_manip_penalty() */
+} /* arena_block_manip_penalty() */
 
 rtypes::timestep env_dynamics::cache_usage_penalty(void) const {
   return penalty_handler(cache_op_src::ekEXISTING_CACHE_PICKUP)
       ->penalty_calc(m_timestep);
 } /* cache_usage_penalty() */
 
-void env_dynamics::register_controller(const controller::base_controller& c) {
+void env_dynamics::register_controller(const cpal::argos_controller2D_adaptor& c) {
   m_rda.register_controller(c.entity_id());
 } /* register_controller() */
 
-void env_dynamics::unregister_controller(const controller::base_controller& c) {
+void env_dynamics::unregister_controller(
+    const cpal::argos_controller2D_adaptor& c) {
   m_rda.unregister_controller(c.entity_id());
   penalties_flush(c);
 } /* unregister_controller() */
 
-bool env_dynamics::penalties_flush(const controller::base_controller& c) {
+bool env_dynamics::penalties_flush(const cpal::argos_controller2D_adaptor& c) {
   bool aborted = false;
   for (auto& h : all_penalty_handlers()) {
     if (h->is_serving_penalty(c)) {

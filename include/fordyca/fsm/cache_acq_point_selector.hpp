@@ -34,13 +34,11 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace repr {
+namespace cosm::arena::repr {
 class base_cache;
-} /* namespace repr */
+} // namespace cosm::arena::repr
 
-NS_START(fsm);
+NS_START(fordyca, fsm);
 
 /*******************************************************************************
  * Class Definitions
@@ -69,7 +67,7 @@ class cache_acq_point_selector : public rer::client<cache_acq_point_selector> {
         m_arrival_tol(arrival_tol) {}
 
   rmath::vector2d operator()(const rmath::vector2d& robot_loc,
-                             const repr::base_cache* cache,
+                             const carepr::base_cache* cache,
                              rmath::rng* rng);
 
  private:

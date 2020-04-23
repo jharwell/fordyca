@@ -25,7 +25,9 @@
 
 #include <vector>
 
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/repr/base_block2D.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 #include "cosm/ta/bi_tdgraph_allocator.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
@@ -59,7 +61,7 @@ NS_START(fordyca, controller, depth1);
 task_executive_builder::task_executive_builder(
     const controller::block_sel_matrix* bsel_matrix,
     const controller::cache_sel_matrix* csel_matrix,
-    crfootbot::footbot_saa_subsystem* const saa,
+    crfootbot::footbot_saa_subsystem2D* const saa,
     base_perception_subsystem* const perception)
     : ER_CLIENT_INIT("fordyca.controller.depth1.task_executive_builder"),
       mc_csel_matrix(csel_matrix),

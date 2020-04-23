@@ -28,24 +28,23 @@
 
 #include "rcppsw/er/client.hpp"
 
+#include "cosm/ds/operations/cell2D_op.hpp"
+
 #include "fordyca/controller/controller_fwd.hpp"
-#include "fordyca/events/cell_op.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace repr {
+namespace cosm::arena::repr {
 class base_cache;
 }
 
-namespace ds {
+namespace fordyca::ds {
 class dpo_store;
 class dpo_semantic_map;
-} // namespace ds
+} // namespace fordyca::ds
 
-NS_START(events, detail);
+NS_START(fordyca, events, detail);
 
 /*******************************************************************************
  * Class Definitions
@@ -58,10 +57,10 @@ NS_START(events, detail);
  * a robot, but possibly one that it has seen before and whose relevance had
  * expired) is discovered by the robot via it appearing in the robot's LOS.
  */
-class cache_found : public cell_op, public rer::client<cache_found> {
+class cache_found : public cdops::cell2D_op, public rer::client<cache_found> {
  private:
   struct visit_typelist_impl {
-    using inherited = cell_op::visit_typelist;
+    using inherited = cell2D_op::visit_typelist;
     using others = rmpl::typelist<ds::dpo_store, ds::dpo_semantic_map>;
     using controllers = controller::depth2::typelist;
     using value = boost::mpl::joint_view<
@@ -72,8 +71,7 @@ class cache_found : public cell_op, public rer::client<cache_found> {
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  explicit cache_found(std::unique_ptr<repr::base_cache> cache);
-  explicit cache_found(const std::shared_ptr<repr::base_cache>& cache);
+  explicit cache_found(carepr::base_cache* cache);
   ~cache_found(void) override = default;
 
   cache_found(const cache_found& op) = delete;
@@ -83,9 +81,9 @@ class cache_found : public cell_op, public rer::client<cache_found> {
   void visit(ds::dpo_store& store);
 
   /* MDPO foraging */
-  void visit(ds::cell2D& cell);
+  void visit(cds::cell2D& cell);
   void visit(ds::dpo_semantic_map& map);
-  void visit(fsm::cell2D_fsm& fsm);
+  void visit(cfsm::cell2D_fsm& fsm);
 
   /* depth2 foraging */
   void visit(controller::depth2::birtd_dpo_controller& controller);
@@ -94,11 +92,13 @@ class cache_found : public cell_op, public rer::client<cache_found> {
   void visit(controller::depth2::birtd_omdpo_controller& c);
 
  private:
-  std::shared_ptr<repr::base_cache> m_cache;
+  /* clang-format off */
+  carepr::base_cache* m_cache;
+  /* clang-format on */
 };
 
 /**
- * \brief We use the picky visitor in order to force compile errors if a call to
+ * \brief We use the precise visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).

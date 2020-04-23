@@ -57,37 +57,50 @@ NS_START(fsm, depth0);
  */
 class dpo_fsm final : public cfsm::util_hfsm,
                       public rer::client<dpo_fsm>,
-                      public cfmetrics::goal_acq_metrics,
-                      public block_transporter {
+                      public cfsm::metrics::goal_acq_metrics,
+                      public block_transporter,
+                      public cta::taskable {
  public:
   dpo_fsm(const fsm_ro_params * params,
-          crfootbot::footbot_saa_subsystem* saa,
+          crfootbot::footbot_saa_subsystem2D* saa,
           std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
           rmath::rng* rng);
   ~dpo_fsm(void) override = default;
   dpo_fsm(const dpo_fsm&) = delete;
   dpo_fsm& operator=(const dpo_fsm&) = delete;
 
+  /*
+   * Taskable overrides. The DPO FSM is not really a task, but needs to behave
+   * as one for the purpose of being able to use it with the \ref
+   * supervisor_fsm.
+   */
+  void task_execute(void) override { run(); }
+  void task_start(const cta::taskable_argument*) override {}
+  bool task_finished(void) const override { return m_task_finished; }
+  bool task_running(void) const override { return !m_task_finished; }
+  void task_reset(void) override { init(); }
+
   /* collision metrics */
   RCPPSW_WRAP_OVERRIDE_DECL(bool, in_collision_avoidance, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, entered_collision_avoidance, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, exited_collision_avoidance, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rtypes::timestep, collision_avoidance_duration, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, avoidance_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, avoidance_loc, const);
 
   /* goal acquisition metrics */
   RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(cfmetrics::goal_acq_metrics::goal_type,
+  RCPPSW_WRAP_OVERRIDE_DECL(cfsm::metrics::goal_acq_metrics::goal_type,
                             acquisition_goal,
                             const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, acquisition_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, current_explore_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, current_vector_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid, entity_acquired_id, const);
 
   /* block transportation */
-  RCPPSW_WRAP_OVERRIDE_DECL(foraging_transport_goal::type,
+  RCPPSW_WRAP_OVERRIDE_DECL(foraging_transport_goal,
                             block_transport_goal,
                             const);
 
@@ -129,9 +142,9 @@ class dpo_fsm final : public cfsm::util_hfsm,
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 
   /* clang-format off */
+  bool                   m_task_finished{false};
   free_block_to_nest_fsm m_block_fsm;
   /* clang-format on */
-
 };
 
 NS_END(depth0, fsm, fordyca);

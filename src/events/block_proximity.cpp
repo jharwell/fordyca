@@ -45,7 +45,7 @@ NS_START(fordyca, events, detail);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_proximity::block_proximity(const std::shared_ptr<crepr::base_block2D>& block)
+block_proximity::block_proximity(crepr::base_block2D* block)
     : ER_CLIENT_INIT("fordyca.events.block_proximity"), m_block(block) {}
 
 /*******************************************************************************
@@ -64,7 +64,7 @@ void block_proximity::dispatch_cache_starter(
  * Depth2 Foraging
  ******************************************************************************/
 void block_proximity::visit(controller::depth2::birtd_dpo_controller& c) {
-  c.ndc_push();
+  c.ndc_pusht();
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
   events::block_found_visitor found_op(m_block);
@@ -75,7 +75,7 @@ void block_proximity::visit(controller::depth2::birtd_dpo_controller& c) {
 } /* visit() */
 
 void block_proximity::visit(controller::depth2::birtd_mdpo_controller& c) {
-  c.ndc_push();
+  c.ndc_pusht();
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
   events::block_found_visitor found_op(m_block);
@@ -86,7 +86,7 @@ void block_proximity::visit(controller::depth2::birtd_mdpo_controller& c) {
 } /* visit() */
 
 void block_proximity::visit(controller::depth2::birtd_odpo_controller& c) {
-  c.ndc_push();
+  c.ndc_pusht();
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
   events::block_found_visitor found_op(m_block);
@@ -97,7 +97,7 @@ void block_proximity::visit(controller::depth2::birtd_odpo_controller& c) {
 } /* visit() */
 
 void block_proximity::visit(controller::depth2::birtd_omdpo_controller& c) {
-  c.ndc_push();
+  c.ndc_pusht();
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
   events::block_found_visitor found_op(m_block);

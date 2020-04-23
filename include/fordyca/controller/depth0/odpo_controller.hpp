@@ -50,7 +50,7 @@ class odpo_controller : public dpo_controller,
   odpo_controller(void) RCSW_COLD;
   ~odpo_controller(void) override RCSW_COLD;
 
-  /* base_controller overrides */
+  /* foraging_controller overrides */
   void control_step(void) override;
   std::type_index type_index(void) const override { return typeid(*this); }
 

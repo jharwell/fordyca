@@ -34,6 +34,10 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
+namespace cosm::arena::repr {
+class base_cache;
+} // namespace cosm::arena::repr
+
 NS_START(fordyca);
 namespace ds {
 class dp_cache_map;
@@ -65,9 +69,17 @@ class cache_acq_validator : public rer::client<cache_acq_validator> {
   cache_acq_validator(const cache_acq_validator& v) = delete;
   cache_acq_validator& operator=(const cache_acq_validator& v) = delete;
 
+  /**
+   * \brief Determine if the robot's acquisition of a cache is valid, according
+   * to parameters and the current state of simulation.
+   */
   bool operator()(const rmath::vector2d& loc,
                   const rtypes::type_uuid& id,
                   const rtypes::timestep& t) const;
+
+ private:
+  bool pickup_policy_validate(const carepr::base_cache* cache,
+                              const rtypes::timestep& t) const;
 
   /* clang-format off */
   const bool                                mc_for_pickup;

@@ -28,8 +28,10 @@
 
 #include <argos3/core/simulator/entity/floor_entity.h>
 
-#include "fordyca/ds/arena_map.hpp"
-#include "fordyca/events/nest_block_drop.hpp"
+#include "cosm/arena/caching_arena_map.hpp"
+#include "cosm/arena/operations/nest_block_drop.hpp"
+
+#include "fordyca/events/robot_nest_block_drop.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
 #include "fordyca/support/interactor_status.hpp"
@@ -51,11 +53,12 @@ NS_START(fordyca, support);
  * \brief Handle's a robot's (possible) \ref nest_block_drop event on a given
  * timestep.
  */
-template <typename T>
+template <typename TControllerType, typename TArenaMapType>
 class nest_block_drop_interactor
-    : public rer::client<nest_block_drop_interactor<T>> {
+    : public rer::client<nest_block_drop_interactor<TControllerType,
+                                                    TArenaMapType>> {
  public:
-  nest_block_drop_interactor(ds::arena_map* const map,
+  nest_block_drop_interactor(TArenaMapType* const map,
                              depth0::depth0_metrics_aggregator* const metrics_agg,
                              argos::CFloorEntity* const floor,
                              tv::env_dynamics* envd)
@@ -86,16 +89,16 @@ class nest_block_drop_interactor
    * \param controller The controller to handle interactions for.
    * \param t The current timestep.
    */
-  interactor_status operator()(T& controller, const rtypes::timestep& t) {
+  interactor_status operator()(TControllerType& controller,
+                               const rtypes::timestep& t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
       if (m_penalty_handler->is_penalty_satisfied(controller, t)) {
         finish_nest_block_drop(controller, t);
         return interactor_status::ekNEST_BLOCK_DROP;
       }
     } else {
-      m_penalty_handler->penalty_init(controller,
-                                      tv::block_op_src::ekNEST_DROP,
-                                      t);
+      m_penalty_handler->penalty_init(
+          controller, t, tv::block_op_src::ekNEST_DROP, boost::none);
     }
     return interactor_status::ekNO_EVENT;
   }
@@ -105,9 +108,10 @@ class nest_block_drop_interactor
    * \brief Determine if a robot is waiting to drop a block in the nest, and if
    * so send it the \ref nest_block_drop event.
    */
-  void finish_nest_block_drop(T& controller, rtypes::timestep t) {
+  void finish_nest_block_drop(TControllerType& controller,
+                              const rtypes::timestep& t) {
     ER_ASSERT(controller.in_nest(), "Controller not in nest");
-    ER_ASSERT(fsm::foraging_transport_goal::type::ekNEST ==
+    ER_ASSERT(fsm::foraging_transport_goal::ekNEST ==
                   controller.block_transport_goal(),
               "Controller still has nest as goal");
     ER_ASSERT(m_penalty_handler->is_serving_penalty(controller),
@@ -127,14 +131,14 @@ class nest_block_drop_interactor
    * \brief Perform the actual picking up of a free block once all
    * preconditions have been satisfied.
    */
-  void perform_nest_block_drop(T& controller,
-                               const tv::temporal_penalty& penalty,
-                               rtypes::timestep t) {
+  void perform_nest_block_drop(TControllerType& controller,
+                               const ctv::temporal_penalty& penalty,
+                               const rtypes::timestep& t) {
     /*
      * We have to do this asynchronous to the rest of metric collection, because
      * the \ref nest_block_drop event resets block metrics.
      */
-    controller.block()->dest_drop_time(t);
+    controller.block()->md()->dest_drop_time(t);
     m_metrics_agg->collect_from_block(controller.block());
 
     /*
@@ -142,9 +146,16 @@ class nest_block_drop_interactor
      * event, because the penalty is generic, and the event handles concrete
      * classes--no clean way to mix the two.
      */
-    controller.block_manip_collator()->penalty_served(penalty.penalty());
+    controller.block_manip_recorder()->record(metrics::blocks::block_manip_events::ekFREE_DROP,
+                                              penalty.penalty());
+    rtypes::type_uuid id = controller.block()->id();
 
-    events::nest_block_drop_visitor drop_op(controller.block_release(), t);
+    caops::nest_block_drop_visitor adrop_op(controller.block_release(), t);
+    /*
+     * Safe to index directly even in multi-threaded contexts because the
+     * location of blocks within their arena map vector never changes.
+     */
+    events::robot_nest_block_drop_visitor rdrop_op(m_map->blocks()[id.v()], t);
 
     /*
      * Order of visitation must be:
@@ -152,13 +163,13 @@ class nest_block_drop_interactor
      * 1. Arena map
      * 2. Controller
      *
-     * In order for \ref events::nest_block_drop to process properly.
+     * In order for the event to process properly.
      */
     /* Update arena map state due to a block nest drop */
-    drop_op.visit(*m_map);
+    adrop_op.visit(*m_map);
 
     /* Actually drop the block */
-    drop_op.visit(controller);
+    rdrop_op.visit(controller);
 
     /* The floor texture must be updated */
     m_floor->SetChanged();
@@ -167,7 +178,7 @@ class nest_block_drop_interactor
   /* clang-format off */
   argos::CFloorEntity* const               m_floor;
   depth0::depth0_metrics_aggregator* const m_metrics_agg;
-  ds::arena_map* const                     m_map;
+  TArenaMapType* const                     m_map;
   tv::block_op_penalty_handler* const      m_penalty_handler;
   /* clang-format on */
 };

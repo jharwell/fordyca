@@ -23,10 +23,11 @@
  ******************************************************************************/
 #include "fordyca/fsm/existing_cache_selector.hpp"
 
+#include "cosm/arena/repr/base_cache.hpp"
+
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/fsm/cache_acq_validator.hpp"
 #include "fordyca/math/existing_cache_utility.hpp"
-#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,11 +50,11 @@ existing_cache_selector::existing_cache_selector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-boost::optional<ds::dp_cache_map::value_type> existing_cache_selector::operator()(
+const carepr::base_cache* existing_cache_selector::operator()(
     const ds::dp_cache_map& existing_caches,
     const rmath::vector2d& position,
     const rtypes::timestep& t) {
-  ds::dp_cache_map::value_type best(nullptr, {});
+  const carepr::base_cache* best = nullptr;
   ER_ASSERT(!existing_caches.empty(), "No known existing caches");
 
   double max_utility = 0.0;
@@ -78,28 +79,28 @@ boost::optional<ds::dp_cache_map::value_type> existing_cache_selector::operator(
              utility);
 
     if (utility > max_utility) {
-      best = c;
+      best = c.ent();
       max_utility = utility;
     }
   } /* for(existing_cache..) */
 
-  if (nullptr != best.ent()) {
+  if (nullptr != best) {
     ER_INFO("Best utility: existing_cache%d@%s/%s w/%zu blocks: %f",
-            best.ent()->id().v(),
-            best.ent()->rloc().to_str().c_str(),
-            best.ent()->dloc().to_str().c_str(),
-            best.ent()->n_blocks(),
+            best->id().v(),
+            best->rloc().to_str().c_str(),
+            best->dloc().to_str().c_str(),
+            best->n_blocks(),
             max_utility);
-    return boost::make_optional(best);
+    return best;
   } else {
     ER_WARN("No best existing cache found: all known caches excluded!");
-    return boost::optional<ds::dp_cache_map::value_type>();
+    return best;
   }
 } /* operator()() */
 
 bool existing_cache_selector::cache_is_excluded(
     const rmath::vector2d& position,
-    const repr::base_cache* const cache) const {
+    const carepr::base_cache* const cache) const {
   /**
    * If a robot is currently IN a cache, and wants to pick up from/drop
    * into a cache, it should generally ignored the cache it is currently in,
@@ -109,7 +110,7 @@ bool existing_cache_selector::cache_is_excluded(
    * This threshold prevents that behavior, forcing robots to at least LEAVE
    * the cache, even if they will then immediately return to it.
    */
-  if (cache->contains_point(position)) {
+  if (cache->contains_point2D(position)) {
     ER_DEBUG("Ignoring cache%d@%s/%s: robot@%s inside it",
              cache->id().v(),
              cache->rloc().to_str().c_str(),

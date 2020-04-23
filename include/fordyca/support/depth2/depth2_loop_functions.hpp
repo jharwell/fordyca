@@ -28,8 +28,6 @@
 #include <memory>
 
 #include "fordyca/support/depth1/depth1_loop_functions.hpp"
-#include "fordyca/support/robot_los_updater.hpp"
-#include "fordyca/support/robot_metric_extractor.hpp"
 #include "fordyca/support/robot_task_extractor.hpp"
 
 /*******************************************************************************
@@ -38,7 +36,7 @@
 NS_START(fordyca, support, depth2);
 class depth2_metrics_aggregator;
 class dynamic_cache_manager;
-template<typename T>
+template<typename TControllerType, typename TArenaMapType>
 class robot_arena_interactor;
 
 namespace detail {
@@ -57,17 +55,18 @@ struct functor_maps_initializer;
  * Handles all operations robots perform relating to dynamic caches: pickup,
  * drop, creation, depletion, etc.
  */
-class depth2_loop_functions : public depth1::depth1_loop_functions,
-                              public rer::client<depth2_loop_functions> {
+class depth2_loop_functions final : public depth1::depth1_loop_functions,
+                                    public rer::client<depth2_loop_functions> {
  public:
   depth2_loop_functions(void) RCSW_COLD;
   ~depth2_loop_functions(void) override RCSW_COLD;
 
-  void Init(ticpp::Element& node) override RCSW_COLD;
-  void PreStep() override;
-  void PostStep() override;
-  void Reset(void) override RCSW_COLD;
-  void Destroy(void) override RCSW_COLD;
+  /* swarm manager overrides */
+  void init(ticpp::Element& node) override RCSW_COLD;
+  void pre_step() override;
+  void post_step() override;
+  void reset(void) override RCSW_COLD;
+  void destroy(void) override RCSW_COLD;
 
   /**
    * \brief Initialize depth2 support to be shared with derived classes
@@ -80,23 +79,25 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
  private:
   using interactor_map_type = rds::type_map<
    rmpl::typelist_wrap_apply<controller::depth2::typelist,
-                               robot_arena_interactor>::type>;
+                             robot_arena_interactor,
+                             carena::caching_arena_map>::type>;
   using los_updater_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth2::typelist,
-                                robot_los_updater>::type>;
+                              cfops::robot_los_update,
+                              carena::caching_arena_map>::type>;
   using task_extractor_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth2::typelist,
                                 robot_task_extractor>::type>;
 
   using metric_extractor_typelist = rmpl::typelist<
-    robot_metric_extractor<depth2_metrics_aggregator,
-                           controller::depth2::birtd_dpo_controller>,
-    robot_metric_extractor<depth2_metrics_aggregator,
-                           controller::depth2::birtd_odpo_controller>,
-    robot_metric_extractor<depth2_metrics_aggregator,
-                           controller::depth2::birtd_mdpo_controller>,
-    robot_metric_extractor<depth2_metrics_aggregator,
-                           controller::depth2::birtd_omdpo_controller>
+    ccops::metrics_extract<controller::depth2::birtd_dpo_controller,
+                           depth2_metrics_aggregator>,
+    ccops::metrics_extract<controller::depth2::birtd_odpo_controller,
+                           depth2_metrics_aggregator>,
+    ccops::metrics_extract<controller::depth2::birtd_mdpo_controller,
+                           depth2_metrics_aggregator>,
+    ccops::metrics_extract<controller::depth2::birtd_omdpo_controller,
+                           depth2_metrics_aggregator>
     >;
   using metric_extractor_map_type = rds::type_map<metric_extractor_typelist>;
 
@@ -142,35 +143,23 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
    * \brief Process a single robot on a timestep, before running its controller:
    *
    * - Set its new position, time, LOS from ARGoS.
-   * - Have it interact with the environment.
    */
   void robot_pre_step(argos::CFootBotEntity& robot);
 
   /**
-   * \brief Process a single robot on a timestep, after running its controller,
-   * step1: have it interact with the environment.
+   * \brief Process a single robot on a timestep, after running its controller:
    *
-   * This is done serially for all robots.
-   *
-   * \todo This is separate from step 2 until robot-arena interactions can be
-   * made thread safe and then they can be recombined.
+   * - Have  it interact with the environment.
+   * - Collect metrics from it.
    */
-  void robot_post_step1(argos::CFootBotEntity& robot);
-
-  /**
-   * \brief Process a single robot on a timestep, after running its controller,
-   * step 2: collect metrics from it.
-   *
-   * This is done in parallel for all robots.
-   *
-   * \todo This is separate from step 1 until robot-arena interactions can be
-   * made thread safe and then they can be recombined.
-   */
-  void robot_post_step2(argos::CFootBotEntity& robot);
+  void robot_post_step(argos::CFootBotEntity& robot);
 
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
 
   /* clang-format off */
+  std::mutex                                 m_dynamic_cache_mtx{};
+  bool                                       m_dynamic_cache_create{false};
+
   std::unique_ptr<depth2_metrics_aggregator> m_metrics_agg;
   std::unique_ptr<dynamic_cache_manager>     m_cache_manager;
   std::unique_ptr<interactor_map_type>       m_interactor_map;

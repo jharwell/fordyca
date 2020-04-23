@@ -27,12 +27,13 @@
 #include <memory>
 
 #include "cosm/fsm/acquire_goal_fsm.hpp"
+#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
 #include "cosm/ta/taskable.hpp"
 
 #include "fordyca/controller/block_sel_matrix.hpp"
-#include "fordyca/fsm/foraging_goal_type.hpp"
+#include "fordyca/fsm/foraging_acq_goal.hpp"
+#include "fordyca/fsm/foraging_transport_goal.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
-#include "fordyca/fsm/subsystem_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -68,7 +69,7 @@ class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
  public:
   acquire_free_block_fsm(
       const fsm_ro_params* c_params,
-      crfootbot::footbot_saa_subsystem* saa,
+      crfootbot::footbot_saa_subsystem2D* saa,
       std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
       rmath::rng* rng);
 
@@ -81,7 +82,7 @@ class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  static cfmetrics::goal_acq_metrics::goal_type acq_goal_internal(void)
+  static cfsm::metrics::goal_acq_metrics::goal_type acq_goal_internal(void)
       RCSW_CONST;
   boost::optional<acquire_goal_fsm::candidate_type> block_select(void) const;
   bool candidates_exist(void) const RCSW_PURE;

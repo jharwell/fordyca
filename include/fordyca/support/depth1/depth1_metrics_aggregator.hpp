@@ -28,28 +28,31 @@
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
 #include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
 #include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
-#include "fordyca/metrics/blocks/manipulation_metrics.hpp"
+#include "cosm/controller/metrics/manipulation_metrics.hpp"
 #include "cosm/fsm/metrics/movement_metrics.hpp"
 #include "cosm/fsm/metrics/collision_metrics.hpp"
 #include "cosm/fsm/metrics/goal_acq_metrics.hpp"
 #include "cosm/ta/metrics/bi_tdgraph_metrics.hpp"
 #include "cosm/ta/polled_task.hpp"
-#include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/controller/base_controller.hpp"
 
+#include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca/fsm/foraging_acq_goal.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::ta {
-namespace ds {
+namespace cosm::ta::ds {
 class bi_tab;
 } /* namespace ds */
-}
+
+namespace cosm::foraging::repr {
+class arena_cache;
+} /* namespace cosm::foraging::repr */
+
 NS_START(fordyca);
 
 namespace controller { namespace depth1 { class bitd_mdpo_controller; }}
-namespace repr { class arena_cache; }
 namespace support { class base_cache_manager; }
 NS_START(support, depth1);
 
@@ -74,7 +77,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
                                   public rer::client<depth1_metrics_aggregator> {
  public:
   depth1_metrics_aggregator(const cmconfig::metrics_config* mconfig,
-                            const config::grid_config* const gconfig,
+                            const cdconfig::grid_config* const gconfig,
                             const std::string& output_root);
 
   /**
@@ -123,7 +126,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
    * \brief Collect utilization metrics from a cache in the arena.
    */
   void collect_from_cache(
-      const repr::arena_cache* cache);
+      const carepr::arena_cache* cache);
 
   /**
    * \brief Collect lifecycle metrics across all caches in the arena.
@@ -131,11 +134,22 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
   void collect_from_cache_manager(
       const support::base_cache_manager* manager);
 
+ protected:
+  /**
+   * \brief Register all collectors which require the task decomposition graph
+   * depth.
+   *
+   * This is a protected function so that derived classes aggregating metrics
+   * from deeper decomposition graphs can overwrite the original version, and
+   * thereby reduce code duplication.
+   */
+  void register_with_decomp_depth(const cmconfig::metrics_config* mconfig,
+                                  size_t depth);
  private:
   template<typename ControllerType>
   void collect_controller_common(const ControllerType* const controller) {
     collect("fsm::movement", *controller);
-    collect("blocks::manipulation", *controller->block_manip_collator());
+    collect("blocks::manipulation", *controller->block_manip_recorder());
 
     auto task = dynamic_cast<const cta::polled_task*>(controller->current_task());
     if (nullptr == task) {
@@ -145,24 +159,24 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
     collect_if("fsm::collision_locs",
                *task->mechanism(),
                [&](const rmetrics::base_metrics& metrics) {
-                 auto& m = dynamic_cast<const cfmetrics::collision_metrics&>(metrics);
+                 auto& m = dynamic_cast<const cfsm::metrics::collision_metrics&>(metrics);
                  return m.in_collision_avoidance();
                });
     collect_if(
         "blocks::acq_counts",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+          auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
-          return fsm::foraging_acq_goal::type::ekBLOCK == m.acquisition_goal();
+          return fsm::foraging_acq_goal::ekBLOCK == m.acquisition_goal();
         });
     collect_if(
         "blocks::acq_locs",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+          auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
-          return fsm::foraging_acq_goal::type::ekBLOCK == m.acquisition_goal() &&
+          return fsm::foraging_acq_goal::ekBLOCK == m.acquisition_goal() &&
               m.goal_acquired();
         });
 
@@ -174,18 +188,18 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         "blocks::acq_explore_locs",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+          auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
-          return fsm::foraging_acq_goal::type::ekBLOCK == m.acquisition_goal() &&
+          return fsm::foraging_acq_goal::ekBLOCK == m.acquisition_goal() &&
               m.is_exploring_for_goal().first;
         });
     collect_if(
         "blocks::acq_vector_locs",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+          auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
-          return fsm::foraging_acq_goal::type::ekBLOCK == m.acquisition_goal() &&
+          return fsm::foraging_acq_goal::ekBLOCK == m.acquisition_goal() &&
               m.is_vectoring_to_goal();
         });
 
@@ -193,17 +207,17 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         "caches::acq_counts",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+          auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
-          return fsm::foraging_acq_goal::type::ekEXISTING_CACHE == m.acquisition_goal();
+          return fsm::foraging_acq_goal::ekEXISTING_CACHE == m.acquisition_goal();
         });
     collect_if(
         "caches::acq_locs",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+          auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
-          return fsm::foraging_acq_goal::type::ekEXISTING_CACHE == m.acquisition_goal() &&
+          return fsm::foraging_acq_goal::ekEXISTING_CACHE == m.acquisition_goal() &&
               m.goal_acquired();
         });
 
@@ -215,22 +229,27 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         "caches::acq_explore_locs",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+          auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
-          return fsm::foraging_acq_goal::type::ekEXISTING_CACHE == m.acquisition_goal() &&
+          return fsm::foraging_acq_goal::ekEXISTING_CACHE == m.acquisition_goal() &&
               m.is_exploring_for_goal().first;
         });
     collect_if(
         "caches::acq_vector_locs",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+          auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
-          return fsm::foraging_acq_goal::type::ekEXISTING_CACHE == m.acquisition_goal() &&
+          return fsm::foraging_acq_goal::ekEXISTING_CACHE == m.acquisition_goal() &&
               m.is_vectoring_to_goal();
         });
     collect("tasks::distribution", *controller);
   } /* collect_controller_common() */
+
+  void register_standard(const cmconfig::metrics_config* mconfig);
+
+  void register_with_arena_dims2D(const cmconfig::metrics_config* mconfig,
+                                  const rmath::vector2z& dims);
 };
 
 NS_END(depth1, support, fordyca);

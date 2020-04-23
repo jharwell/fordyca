@@ -25,8 +25,10 @@
 
 #include <fstream>
 
+#include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block2D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 #include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
@@ -66,10 +68,10 @@ void dpo_controller::perception(
   m_perception = std::move(perception);
 }
 
-const repr::line_of_sight* dpo_controller::los(void) const {
+const cfrepr::foraging_los* dpo_controller::los(void) const {
   return static_cast<const dpo_perception_subsystem*>(m_perception.get())->los();
 }
-void dpo_controller::los(std::unique_ptr<repr::line_of_sight> new_los) {
+void dpo_controller::los(std::unique_ptr<cfrepr::foraging_los> new_los) {
   m_perception->los(std::move(new_los));
 }
 
@@ -80,14 +82,19 @@ double dpo_controller::los_dim(void) const {
 void dpo_controller::control_step(void) {
   ndc_pusht();
   ER_ASSERT(!(nullptr != block() &&
-              rtypes::constants::kNoUUID == block()->robot_id()),
+              rtypes::constants::kNoUUID == block()->md()->robot_id()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
-            block()->robot_id().v());
+            block()->md()->robot_id().v());
 
   m_perception->update(nullptr);
-  m_fsm->run();
-  saa()->steer_force2D_apply();
+
+  /*
+   * Run the FSM and apply steering forces if normal operation, otherwise handle
+   * abnormal operation state.
+   */
+  supervisor()->run();
+
   ndc_pop();
 } /* control_step() */
 
@@ -96,7 +103,7 @@ void dpo_controller::init(ticpp::Element& node) {
    * Note that we do not call \ref crw_controller::init()--there
    * is nothing in there that we need.
    */
-  base_controller::init(node);
+  foraging_controller::init(node);
 
   ndc_push();
   ER_INFO("Initializing...");
@@ -146,6 +153,9 @@ void dpo_controller::private_init(
       saa(),
       f.create(exp_config->block_strategy, &expstrat_params, rng()),
       rng());
+
+  /* Set DPO FSM supervision */
+  supervisor()->supervisee_update(m_fsm.get());
 } /* private_init() */
 
 dpo_perception_subsystem* dpo_controller::dpo_perception(void) {
@@ -165,6 +175,7 @@ void dpo_controller::reset(void) {
  * FSM Metrics
  ******************************************************************************/
 RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, block_transport_goal, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, entity_acquired_id, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, acquisition_goal, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, acquisition_loc, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, goal_acquired, *m_fsm, const);

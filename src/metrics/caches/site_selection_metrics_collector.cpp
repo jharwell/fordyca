@@ -34,9 +34,11 @@ NS_START(fordyca, metrics, caches);
  * Constructors/Destructor
  ******************************************************************************/
 site_selection_metrics_collector::site_selection_metrics_collector(
-    const std::string& ofname,
-    uint interval)
-    : base_metrics_collector(ofname, interval) {}
+    const std::string& ofname_stem,
+    const rtypes::timestep& interval)
+    : base_metrics_collector(ofname_stem,
+                             interval,
+                             rmetrics::output_mode::ekAPPEND) {}
 
 /*******************************************************************************
  * Member Functions
@@ -71,7 +73,7 @@ void site_selection_metrics_collector::reset(void) {
 
 boost::optional<std::string> site_selection_metrics_collector::csv_line_build(
     void) {
-  if (!((timestep() + 1) % interval() == 0)) {
+  if (!(timestep() % interval() == 0)) {
     return boost::none;
   }
   std::string line;

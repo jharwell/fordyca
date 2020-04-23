@@ -26,12 +26,14 @@
  ******************************************************************************/
 #include <argos3/core/simulator/entity/floor_entity.h>
 
-#include "fordyca/ds/arena_map.hpp"
+#include "cosm/arena/caching_arena_map.hpp"
+#include "cosm/arena/operations/cached_block_pickup.hpp"
+#include "cosm/arena/repr/arena_cache.hpp"
+
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/events/cache_vanished.hpp"
-#include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
-#include "fordyca/events/free_block_drop.hpp"
+#include "fordyca/events/robot_cached_block_pickup.hpp"
 #include "fordyca/fsm/cache_acq_validator.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/support/interactor_status.hpp"
@@ -57,7 +59,7 @@ template <typename T>
 class cached_block_pickup_interactor
     : public rer::client<cached_block_pickup_interactor<T>> {
  public:
-  cached_block_pickup_interactor(ds::arena_map* const map_in,
+  cached_block_pickup_interactor(carena::caching_arena_map* const map_in,
                                  argos::CFloorEntity* const floor_in,
                                  tv::env_dynamics* envd,
                                  support::base_cache_manager* cache_manager,
@@ -111,13 +113,13 @@ class cached_block_pickup_interactor
    */
   interactor_status finish_cached_block_pickup(T& controller,
                                                rtypes::timestep t) {
-    const tv::temporal_penalty& p = m_penalty_handler->penalty_next();
+    const ctv::temporal_penalty& p = m_penalty_handler->penalty_next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
     ER_ASSERT(nullptr != dynamic_cast<events::existing_cache_interactor*>(
                              controller.current_task()),
               "Non-cache interface task!");
-    ER_ASSERT(fsm::foraging_acq_goal::type::ekEXISTING_CACHE ==
+    ER_ASSERT(fsm::foraging_acq_goal::ekEXISTING_CACHE ==
                   controller.current_task()->acquisition_goal(),
               "Controller not waiting for cached block pickup");
     ER_ASSERT(!controller.is_carrying_block(),
@@ -135,7 +137,7 @@ class cached_block_pickup_interactor
      * Grid and block mutexes are also required, but only within the actual \ref
      * cached_block_pickup event visit to the arena map.
      */
-    m_map->cache_mtx().lock();
+    m_map->cache_mtx()->lock();
 
     /*
      * If two collector robots enter a cache that only contains 2 blocks on the
@@ -163,6 +165,9 @@ class cached_block_pickup_interactor
       events::cache_vanished_visitor vanished_op(p.id());
       vanished_op.visit(controller);
     } else {
+      fsm::cache_acq_validator v(&controller.perception()->dpo_store()->caches(),
+                                 controller.cache_sel_matrix(),
+                                 true);
       /*
        * If the cache still exists after a robot serves its penalty we still
        * need to double check that it does not violate the robot's cache pickup
@@ -176,19 +181,18 @@ class cached_block_pickup_interactor
        * In this case, you don't need to do anything, as the change in the
        * cache's status will be picked up by the second robot next timestep.
        */
-      fsm::cache_acq_validator v(&controller.perception()->dpo_store()->caches(),
-                                 controller.cache_sel_matrix(),
-                                 true);
-      if (v(controller.position2D(), p.id(), t)) {
+      if (v(controller.pos2D(), p.id(), t)) {
         status = perform_cached_block_pickup(controller, p, t);
-        m_floor->SetChanged();
+        if (status == interactor_status::ekCACHE_DEPLETION) {
+          m_floor->SetChanged();
+        }
       } else {
         ER_WARN("%s cannot pickup from cache%d: Violation of pickup policy",
                 controller.GetId().c_str(),
                 p.id().v());
       }
     }
-    m_map->cache_mtx().unlock();
+    m_map->cache_mtx()->unlock();
 
     m_penalty_handler->penalty_remove(p);
     ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),
@@ -202,18 +206,25 @@ class cached_block_pickup_interactor
    */
   interactor_status perform_cached_block_pickup(
       T& controller,
-      const tv::temporal_penalty& penalty,
-      rtypes::timestep t) {
+      const ctv::temporal_penalty& penalty,
+      const rtypes::timestep& t) {
     auto it =
         std::find_if(m_map->caches().begin(),
                      m_map->caches().end(),
                      [&](const auto& c) { return c->id() == penalty.id(); });
     ER_ASSERT(it != m_map->caches().end(),
-              "Cache%d from penalty does not exist",
+              "Cache%d from penalty does not exist?",
               penalty.id().v());
-    events::cached_block_pickup_visitor pickup_op(
-        m_loop, *it, controller.entity_id(), t);
+    caops::cached_block_pickup_visitor apickup_op(
+        *it, m_loop, controller.entity_id(), t);
+    const crepr::base_block2D* to_pickup = (*it)->oldest_block();
+    events::robot_cached_block_pickup_visitor rpickup_op(
+        *it, to_pickup, controller.entity_id(), t);
     (*it)->penalty_served(penalty.penalty());
+    controller.block_manip_recorder()->record(metrics::blocks::block_manip_events::ekCACHE_PICKUP,
+                                              penalty.penalty());
+
+    uint old_n_caches = m_map->caches().size();
 
     /*
      * Visitation order must be:
@@ -225,11 +236,9 @@ class cached_block_pickup_interactor
      * No need to lock arena map cache mutex--already holding it from parent
      * function.
      */
-    uint old_n_caches = m_map->caches().size();
-
-    pickup_op.visit(*m_cache_manager);
-    pickup_op.visit(*m_map);
-    pickup_op.visit(controller);
+    rpickup_op.visit(*m_cache_manager);
+    apickup_op.visit(*m_map);
+    rpickup_op.visit(controller);
 
     if (m_map->caches().size() < old_n_caches) {
       return interactor_status::ekCACHE_DEPLETION;
@@ -240,7 +249,7 @@ class cached_block_pickup_interactor
  private:
   /* clang-format off */
   argos::CFloorEntity* const          m_floor;
-  ds::arena_map* const                m_map;
+  carena::caching_arena_map* const    m_map;
   tv::cache_op_penalty_handler* const m_penalty_handler;
   base_cache_manager *                m_cache_manager;
   base_loop_functions*                m_loop;

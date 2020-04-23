@@ -27,7 +27,7 @@
 #include <string>
 #include <memory>
 
-#include "fordyca/config/grid_parser.hpp"
+#include "cosm/ds/config/xml/grid_parser.hpp"
 #include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/config/perception/pheromone_parser.hpp"
 #include "fordyca/fordyca.hpp"
@@ -58,19 +58,19 @@ class perception_parser final : public rconfig::xml::xml_config_parser {
    */
   static constexpr char kXMLRoot[] = "perception";
 
-  bool validate(void) const override RCSW_PURE;
-  void parse(const ticpp::Element& node) override;
+  bool validate(void) const override RCSW_ATTR(pure, cold);
+  void parse(const ticpp::Element& node) override RCSW_COLD;
 
-  std::string xml_root(void) const override { return kXMLRoot; }
+  RCSW_COLD std::string xml_root(void) const override { return kXMLRoot; }
 
  private:
-  const rconfig::base_config* config_get_impl(void) const override {
+  RCSW_COLD const rconfig::base_config* config_get_impl(void) const override {
     return m_config.get();
   }
 
   /* clang-format off */
   std::unique_ptr<config_type> m_config{nullptr};
-  grid_parser                  m_occupancy{};
+  cdconfig::xml::grid_parser   m_occupancy{};
   pheromone_parser             m_pheromone{};
   /* clang-format on */
 };

@@ -95,12 +95,12 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
   }
   template <size_t Index>
   typename occupancy_grid::layer_value_type<Index>::value_type& access(
-      const rmath::vector2u& d) {
+      const rmath::vector2z& d) {
     return decoratee().access<Index>(d);
   }
   template <size_t Index>
   const typename occupancy_grid::layer_value_type<Index>::value_type& access(
-      const rmath::vector2u& d) const {
+      const rmath::vector2z& d) const {
     return decoratee().access<Index>(d);
   }
 
@@ -123,10 +123,10 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
   RCPPSW_DECORATE_FUNC(known_cells_inc)
   RCPPSW_DECORATE_FUNC(known_cells_dec)
   RCPPSW_DECORATE_FUNC(known_cell_count, const)
-  RCPPSW_DECORATE_FUNC(resolution, const);
+  RCPPSW_DECORATE_FUNC(resolution, const)
 
-  bool cache_remove(const std::shared_ptr<repr::base_cache>& victim);
-  bool block_remove(const std::shared_ptr<crepr::base_block2D>& victim);
+  bool cache_remove(carepr::base_cache* victim);
+  bool block_remove(crepr::base_block2D* victim);
 
   const dpo_store* store(void) const { return &m_store; }
   dpo_store* store(void) { return &m_store; }
@@ -138,8 +138,6 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
 
  public:
   /* wrapping DPO store--must be after declaration -_- */
-  RCPPSW_DECLDEF_WRAP(block_update, (*store()))
-  RCPPSW_DECLDEF_WRAP(cache_update, (*store()))
   RCPPSW_DECLDEF_WRAP(blocks, (*store()))
   RCPPSW_DECLDEF_WRAP(caches, (*store()))
   RCPPSW_DECLDEF_WRAP(blocks, (*store()), const)

@@ -28,6 +28,9 @@
   <category name="cosm.robots.footbot" >
     <priority value ="info" />
   </category>
+    <category name="cosm.tv.population_dynamics" >
+    <priority value ="info" />
+  </category>
   <category name="fordyca.controller" >
     <priority value ="info" />
   </category>

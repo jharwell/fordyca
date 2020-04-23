@@ -28,11 +28,11 @@
 
 #include "cosm/fsm/metrics/goal_acq_metrics.hpp"
 #include "cosm/fsm/util_hfsm.hpp"
+#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
 #include "cosm/ta/taskable.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
-#include "fordyca/fsm/subsystem_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -62,12 +62,12 @@ class acquire_free_block_fsm;
 class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
                           public cfsm::util_hfsm,
                           public cta::taskable,
-                          public cfmetrics::goal_acq_metrics,
+                          public cfsm::metrics::goal_acq_metrics,
                           public fsm::block_transporter {
  public:
   block_to_goal_fsm(cfsm::acquire_goal_fsm* goal_fsm,
                     cfsm::acquire_goal_fsm* block_fsm,
-                    crfootbot::footbot_saa_subsystem* saa,
+                    crfootbot::footbot_saa_subsystem2D* saa,
                     rmath::rng* rng);
   ~block_to_goal_fsm(void) override = default;
 
@@ -91,16 +91,16 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
   bool exited_collision_avoidance(void) const override final RCSW_PURE;
   rtypes::timestep collision_avoidance_duration(
       void) const override final RCSW_PURE;
-  rmath::vector2u avoidance_loc(void) const override final RCSW_PURE;
+  rmath::vector2z avoidance_loc(void) const override final RCSW_PURE;
 
   /* goal acquisition metrics */
-  rmath::vector2u acquisition_loc(void) const override final;
+  rmath::vector2z acquisition_loc(void) const override final;
   bool is_vectoring_to_goal(void) const override final RCSW_PURE;
   exp_status is_exploring_for_goal(void) const override final RCSW_PURE;
   bool goal_acquired(void) const override RCSW_PURE;
-  cfmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override;
-  rmath::vector2u current_explore_loc(void) const override final;
-  rmath::vector2u current_vector_loc(void) const override final;
+  cfsm::metrics::goal_acq_metrics::goal_type acquisition_goal(void) const override;
+  rmath::vector2z current_explore_loc(void) const override final;
+  rmath::vector2z current_vector_loc(void) const override final;
 
   /**
    * \brief Reset the FSM

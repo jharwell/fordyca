@@ -44,7 +44,7 @@ void perception_parser::parse(const ticpp::Element& node) {
     m_occupancy.parse(onode);
     m_pheromone.parse(onode);
     m_config->occupancy_grid =
-        *m_occupancy.config_get<grid_parser::config_type>();
+        *m_occupancy.config_get<cdconfig::xml::grid_parser::config_type>();
     m_config->pheromone =
         *m_pheromone.config_get<pheromone_parser::config_type>();
   }

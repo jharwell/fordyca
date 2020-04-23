@@ -37,15 +37,15 @@ class polled_task;
 class bi_tdgraph_executive;
 } // namespace cosm::ta
 
-NS_START(fordyca);
-namespace support { namespace oracle {
-class tasking_oracle;
-class entities_oracle;
-}} // namespace support::oracle
-namespace ds {
+namespace cosm::foraging::oracle {
+class foraging_oracle;
+} // namespace cosm::foraging::oracle
+
+namespace fordyca::ds {
 class dpo_store;
-} /* namespace ds */
-NS_START(controller);
+} /* namespace fordyca::ds */
+
+NS_START(fordyca, controller);
 
 /*******************************************************************************
  * Class Definitions
@@ -63,14 +63,12 @@ NS_START(controller);
 
 class oracular_info_receptor final : public rer::client<oracular_info_receptor> {
  public:
-  oracular_info_receptor(support::oracle::tasking_oracle* tasking_oracle,
-                         support::oracle::entities_oracle* entities_oracle)
+  oracular_info_receptor(const cforacle::foraging_oracle* oracle)
       : ER_CLIENT_INIT("fordyca.controller.oracular_info_receptor"),
-        m_tasking_oracle(tasking_oracle),
-        m_entities_oracle(entities_oracle) {}
+        mc_oracle(oracle) {}
 
-  oracular_info_receptor(const oracular_info_receptor& s) = delete;
-  oracular_info_receptor& operator=(const oracular_info_receptor& s) = delete;
+  oracular_info_receptor(const oracular_info_receptor&) = delete;
+  oracular_info_receptor& operator=(const oracular_info_receptor&) = delete;
 
   /**
    * \brief Update the \ref dpo_store with the current set of oracular entities.
@@ -105,8 +103,7 @@ class oracular_info_receptor final : public rer::client<oracular_info_receptor> 
   void int_est_update(cta::polled_task* task);
 
   /* clang-format off */
-  support::oracle::tasking_oracle*  m_tasking_oracle;
-  support::oracle::entities_oracle* m_entities_oracle;
+  const cforacle::foraging_oracle* mc_oracle;
   /* clang-format on */
 };
 

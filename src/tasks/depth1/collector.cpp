@@ -26,9 +26,10 @@
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 #include "fordyca/events/cache_vanished.hpp"
-#include "fordyca/events/cached_block_pickup.hpp"
-#include "fordyca/events/nest_block_drop.hpp"
+#include "fordyca/events/robot_cached_block_pickup.hpp"
+#include "fordyca/events/robot_nest_block_drop.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
+#include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/tasks/argument.hpp"
 
 /*******************************************************************************
@@ -80,7 +81,7 @@ rtypes::timestep collector::interface_time_calc(
 
 void collector::active_interface_update(int) {
   auto* fsm = static_cast<fsm::depth1::cached_block_to_nest_fsm*>(mechanism());
-  if (fsm::foraging_acq_goal::type::ekEXISTING_CACHE != fsm->acquisition_goal()) {
+  if (fsm::foraging_acq_goal::ekEXISTING_CACHE != fsm->acquisition_goal()) {
     return;
   }
 
@@ -103,10 +104,10 @@ void collector::active_interface_update(int) {
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void collector::accept(events::detail::cached_block_pickup& visitor) {
+void collector::accept(events::detail::robot_cached_block_pickup& visitor) {
   visitor.visit(*this);
 }
-void collector::accept(events::detail::nest_block_drop& visitor) {
+void collector::accept(events::detail::robot_nest_block_drop& visitor) {
   visitor.visit(*this);
 }
 void collector::accept(events::detail::cache_vanished& visitor) {
@@ -163,13 +164,18 @@ RCPPSW_WRAP_OVERRIDE_DEF(collector,
                              polled_task::mechanism()),
                          const);
 
+RCPPSW_WRAP_OVERRIDE_DEF(collector,
+                         entity_acquired_id,
+                         *static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()),
+                         const);
+
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/
 bool collector::task_at_interface(void) const {
   auto* fsm = static_cast<fsm::depth1::cached_block_to_nest_fsm*>(mechanism());
-  return !(fsm::foraging_transport_goal::type::ekNEST ==
-           fsm->block_transport_goal());
+  return !(fsm::foraging_transport_goal::ekNEST == fsm->block_transport_goal());
 } /* task_at_interface() */
 
 NS_END(depth1, tasks, fordyca);

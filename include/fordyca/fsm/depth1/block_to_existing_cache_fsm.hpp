@@ -62,7 +62,7 @@ NS_START(fsm, depth1);
 class block_to_existing_cache_fsm final : public block_to_goal_fsm {
  public:
    block_to_existing_cache_fsm(const fsm_ro_params* c_params,
-                               crfootbot::footbot_saa_subsystem* saa,
+                               crfootbot::footbot_saa_subsystem2D* saa,
                                rmath::rng* rng);
 
   ~block_to_existing_cache_fsm(void) override = default;
@@ -71,11 +71,12 @@ class block_to_existing_cache_fsm final : public block_to_goal_fsm {
   block_to_existing_cache_fsm& operator=(const block_to_existing_cache_fsm&) = delete;
 
   /* goal acquisition metrics */
-  cfmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
+  cfsm::metrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
   bool goal_acquired(void) const override RCSW_PURE;
+  rtypes::type_uuid entity_acquired_id(void) const override;
 
   /* block transportation */
-  foraging_transport_goal::type block_transport_goal(void) const override RCSW_PURE;
+  foraging_transport_goal block_transport_goal(void) const override RCSW_PURE;
 
  private:
   /* clang-format off */

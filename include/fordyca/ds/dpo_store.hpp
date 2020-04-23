@@ -29,6 +29,9 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 
+#include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/ds/dp_block_map.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
 #include "fordyca/ds/dpo_map.hpp"
@@ -80,7 +83,7 @@ class dpo_store final : public rer::client<dpo_store> {
   struct update_res_t {
     bool status{false};
     update_status reason{kNO_CHANGE};
-    rmath::vector2u old_loc{};
+    rmath::vector2z old_loc{};
   };
 
   /**
@@ -116,14 +119,15 @@ class dpo_store final : public rer::client<dpo_store> {
 
   void clear_all(void);
 
-  bool contains(const std::shared_ptr<crepr::base_block2D>& block) const RCSW_PURE;
-  bool contains(const std::shared_ptr<repr::base_cache>& cache) const;
+  bool contains(const crepr::base_block2D* block) const RCSW_PURE;
+  bool contains(const carepr::base_cache* cache) const;
+
+  const dp_cache_map::value_type* find(const carepr::base_cache* cache) const;
+  dp_cache_map::value_type* find(const carepr::base_cache* cache);
 
   const dp_block_map::value_type* find(
-      const std::shared_ptr<crepr::base_block2D>& block) const RCSW_PURE;
-
-  const dp_cache_map::value_type* find(
-      const std::shared_ptr<repr::base_cache>& cache) const;
+      const crepr::base_block2D* block) const RCSW_PURE;
+  dp_block_map::value_type* find(const crepr::base_block2D* block) RCSW_PURE;
 
   /**
    * \brief Update the known caches set with the new cache.
@@ -131,9 +135,9 @@ class dpo_store final : public rer::client<dpo_store> {
    * If there is already a known cache at the location of the incoming cache, it
    * is removed and replaced with a new one.
    *
-   * \param cache Cache to add.
+   * \param cache Cache to update.
    */
-  update_res_t cache_update(const dpo_entity<repr::base_cache>& cache);
+  update_res_t cache_update(dpo_entity<carepr::base_cache> cache);
 
   /*
    * \brief Update the known blocks set with the new block.
@@ -145,12 +149,12 @@ class dpo_store final : public rer::client<dpo_store> {
    *
    * \return \c TRUE if a block was added, and \c FALSE otherwise.
    */
-  update_res_t block_update(const dpo_entity<crepr::base_block2D>& block_in);
+  update_res_t block_update(dpo_entity<crepr::base_block2D> block_in);
 
   /**
    * \brief Remove a cache from the set of of known caches.
    */
-  bool cache_remove(const std::shared_ptr<repr::base_cache>& victim);
+  bool cache_remove(carepr::base_cache* victim);
 
   /*
    * \brief Remove a block from the set of known blocks. If the victim is not
@@ -158,7 +162,7 @@ class dpo_store final : public rer::client<dpo_store> {
    *
    * \return \c TRUE if a block was removed, \c FALSE otherwise.
    */
-  bool block_remove(const std::shared_ptr<crepr::base_block2D>& victim);
+  bool block_remove(crepr::base_block2D* victim);
 
   double pheromone_rho(void) const { return mc_pheromone_rho; }
 
@@ -170,13 +174,10 @@ class dpo_store final : public rer::client<dpo_store> {
   }
 
  private:
-  /*
-   * Sets are used for object storage because there is no concept of order
-   * among the known blocks/caches.
-   */
   /* clang-format off */
   const bool                       mc_repeat_deposit;
   const double                     mc_pheromone_rho;
+
   ds::dp_block_map                 m_blocks{};
   ds::dp_cache_map                 m_caches{};
   boost::optional<rmath::vector2d> m_last_block_loc{};

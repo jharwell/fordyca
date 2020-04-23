@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/events/block_found.hpp"
 
+#include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/ds/operations/cell2D_empty.hpp"
 #include "cosm/repr/base_block2D.hpp"
 #include "cosm/repr/pheromone_density.hpp"
 
@@ -37,8 +39,6 @@
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
-#include "fordyca/events/cell_empty.hpp"
-#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,14 +49,9 @@ using ds::occupancy_grid;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_found::block_found(std::unique_ptr<crepr::base_block2D> block)
+block_found::block_found(crepr::base_block2D* block)
     : ER_CLIENT_INIT("fordyca.events.block_found"),
-      cell_op(block->dloc()),
-      m_block(std::move(block)) {}
-
-block_found::block_found(const std::shared_ptr<crepr::base_block2D>& block)
-    : ER_CLIENT_INIT("fordyca.events.block_found"),
-      cell_op(block->dloc()),
+      cell2D_op(block->dloc()),
       m_block(block) {}
 
 /*******************************************************************************
@@ -67,18 +62,16 @@ void block_found::visit(ds::dpo_store& store) {
    * If the cell in the arena that we thought contained a cache now contains a
    * block, remove the out-of-date cache.
    */
-  for (auto& c : store.caches().values_range()) {
-    if (m_block->dloc() == c.ent()->dloc()) {
-      store.cache_remove(c.ent_obj());
-
-      /*
-       * We need to start a new decay count because the type of object in a
-       * given cell has changed. This is regardless of the status repeat
-       * deposits, which only affect repeated sightings of KNOWN objects.
-       */
-      c.density().reset();
+  auto it = store.caches().values_range().begin();
+  while (it != store.caches().values_range().end()) {
+    if (m_block->dloc() == it->ent()->dloc()) {
+      carepr::base_cache* tmp = (*it).ent();
+      ++it;
+      store.cache_remove(tmp);
+    } else {
+      ++it;
     }
-  } /* for(&&c..) */
+  } /* while(it..) */
 
   crepr::pheromone_density density(store.pheromone_rho());
   auto known = store.find(m_block);
@@ -93,7 +86,7 @@ void block_found::visit(ds::dpo_store& store) {
               known->ent()->id().v(),
               known->ent()->dloc().to_str().c_str(),
               m_block->dloc().to_str().c_str());
-      store.block_remove(known->ent_obj());
+      store.block_remove(known->ent());
       density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
     } else { /* block has not moved */
       density = known->density();
@@ -113,18 +106,19 @@ void block_found::visit(ds::dpo_store& store) {
     density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
   }
 
-  store.block_update(ds::dp_block_map::value_type(m_block, density));
+  store.block_update(
+      repr::dpo_entity<crepr::base_block2D>(m_block->clone(), density));
 } /* visit() */
 
 /*******************************************************************************
  * MDPO Foraging
  ******************************************************************************/
-void block_found::visit(ds::cell2D& cell) {
+void block_found::visit(cds::cell2D& cell) {
   cell.entity(m_block);
   this->visit(cell.fsm());
 } /* visit() */
 
-void block_found::visit(fsm::cell2D_fsm& fsm) {
+void block_found::visit(cfsm::cell2D_fsm& fsm) {
   if (fsm.state_has_cache()) {
     for (size_t i = fsm.block_count(); i > 1; --i) {
       fsm.event_block_pickup();
@@ -137,7 +131,7 @@ void block_found::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void block_found::visit(ds::dpo_semantic_map& map) {
-  ds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
+  cds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
   crepr::pheromone_density& density =
       map.access<occupancy_grid::kPheromone>(x(), y());
 
@@ -166,7 +160,7 @@ void block_found::visit(ds::dpo_semantic_map& map) {
    * the one we just found that actually resides there are not the same, we need
    * to reset the density for the cell, and start a new decay count.
    */
-  if (cell.state_has_block() && cell.block()->id() != m_block->id()) {
+  if (cell.state_has_block() && cell.block2D()->id() != m_block->id()) {
     density.reset();
   }
 
@@ -175,17 +169,17 @@ void block_found::visit(ds::dpo_semantic_map& map) {
   ER_ASSERT(cell.state_has_block(),
             "Cell@%s not in HAS_BLOCK",
             cell.loc().to_str().c_str());
-  ER_ASSERT(cell.block()->id() == m_block->id(),
+  ER_ASSERT(cell.block2D()->id() == m_block->id(),
             "Block for cell@%s ID mismatch: %d/%d",
             cell.loc().to_str().c_str(),
             m_block->id().v(),
-            cell.block()->id().v());
+            cell.block2D()->id().v());
 } /* visit() */
 
 void block_found::pheromone_update(ds::dpo_semantic_map& map) {
   crepr::pheromone_density& density =
       map.access<occupancy_grid::kPheromone>(x(), y());
-  ds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
+  cds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
   if (map.pheromone_repeat_deposit()) {
     density.pheromone_add(crepr::pheromone_density::kUNIT_QUANTITY);
   } else {
@@ -205,7 +199,8 @@ void block_found::pheromone_update(ds::dpo_semantic_map& map) {
    * with dangling references as a result of mixing unique_ptr and raw ptr. See
    * #229.
    */
-  auto res = map.block_update(ds::dp_block_map::value_type(m_block, density));
+  auto res = map.store()->block_update(
+      repr::dpo_entity<crepr::base_block2D>(m_block->clone(), density));
   if (res.status) {
     if (ds::dpo_store::update_status::kBLOCK_MOVED == res.reason) {
       ER_DEBUG("Updating cell@%s: Block%d moved %s -> %s",
@@ -213,7 +208,7 @@ void block_found::pheromone_update(ds::dpo_semantic_map& map) {
                m_block->id().v(),
                res.old_loc.to_str().c_str(),
                m_block->dloc().to_str().c_str());
-      events::cell_empty_visitor op(res.old_loc);
+      cdops::cell2D_empty_visitor op(res.old_loc);
       op.visit(map.access<occupancy_grid::kCell>(res.old_loc));
     } else {
       ER_ASSERT(ds::dpo_store::update_status::kNEW_BLOCK_ADDED == res.reason,
@@ -234,7 +229,7 @@ void block_found::pheromone_update(ds::dpo_semantic_map& map) {
  * Depth2 Foraging
  ******************************************************************************/
 void block_found::visit(controller::depth2::birtd_mdpo_controller& c) {
-  c.ndc_push();
+  c.ndc_pusht();
 
   visit(*c.mdpo_perception()->map());
 
@@ -242,7 +237,7 @@ void block_found::visit(controller::depth2::birtd_mdpo_controller& c) {
 } /* visit() */
 
 void block_found::visit(controller::depth2::birtd_dpo_controller& c) {
-  c.ndc_push();
+  c.ndc_pusht();
 
   visit(*c.dpo_perception()->dpo_store());
 
@@ -250,7 +245,7 @@ void block_found::visit(controller::depth2::birtd_dpo_controller& c) {
 } /* visit() */
 
 void block_found::visit(controller::depth2::birtd_omdpo_controller& c) {
-  c.ndc_push();
+  c.ndc_pusht();
 
   visit(*c.mdpo_perception()->map());
 
@@ -258,7 +253,7 @@ void block_found::visit(controller::depth2::birtd_omdpo_controller& c) {
 } /* visit() */
 
 void block_found::visit(controller::depth2::birtd_odpo_controller& c) {
-  c.ndc_push();
+  c.ndc_pusht();
 
   visit(*c.dpo_perception()->dpo_store());
 

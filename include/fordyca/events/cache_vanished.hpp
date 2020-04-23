@@ -25,10 +25,10 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/patterns/visitor/visitor.hpp"
 #include "rcppsw/types/type_uuid.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
-#include "fordyca/events/cell_op.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
 
@@ -98,7 +98,7 @@ class cache_vanished : public rer::client<cache_vanished> {
 };
 
 /**
- * \brief We use the picky visitor in order to force compile errors if a call to
+ * \brief We use the precise visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).

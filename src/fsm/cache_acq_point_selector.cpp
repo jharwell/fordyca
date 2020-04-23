@@ -26,7 +26,7 @@
 #include <algorithm>
 #include <list>
 
-#include "fordyca/repr/base_cache.hpp"
+#include "cosm/arena/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -42,7 +42,7 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 rmath::vector2d cache_acq_point_selector::operator()(
     const rmath::vector2d& robot_loc,
-    const repr::base_cache* const cache,
+    const carepr::base_cache* const cache,
     rmath::rng* rng) {
   auto xspan = cache->xspan();
   auto yspan = cache->yspan();
@@ -53,7 +53,7 @@ rmath::vector2d cache_acq_point_selector::operator()(
 
   rmath::vector2d loc(rng->uniform(xrange), rng->uniform(yrange));
 
-  ER_ASSERT(cache->contains_point(loc),
+  ER_ASSERT(cache->contains_point2D(loc),
             "Cache%d@%s/%s with xspan=%s,yspan=%s does not contain %s",
             cache->id().v(),
             cache->rloc().to_str().c_str(),
