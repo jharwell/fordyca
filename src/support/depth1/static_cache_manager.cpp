@@ -112,12 +112,12 @@ boost::optional<cads::acache_vectoro> static_cache_manager::create_conditional(
 
 boost::optional<cds::block2D_vectorno> static_cache_manager::blocks_alloc(
     const cads::acache_vectorno& existing_caches,
-    const cds::block2D_vectorno& blocks) const {
+    const cds::block2D_vectorno& all_blocks) const {
   cds::block2D_vectorno alloc_i;
   for (auto& loc : mc_cache_locs) {
     if (auto cache_i = cache_i_blocks_alloc(existing_caches,
                                             alloc_i,
-                                            blocks,
+                                            all_blocks,
                                             loc,
                                             carepr::base_cache::kMinBlocks)) {
       ER_DEBUG("Alloc_blocks=[%s] for cache@%s",

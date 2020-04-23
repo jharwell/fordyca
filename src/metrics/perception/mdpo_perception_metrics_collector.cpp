@@ -132,9 +132,9 @@ void mdpo_perception_metrics_collector::collect(
 } /* collect() */
 
 void mdpo_perception_metrics_collector::reset_after_interval(void) {
-  for (size_t i = 0; i < cfsm::cell2D_state::ekST_MAX_STATES; ++i) {
-    std::atomic_init(&m_interval.states[i], 0U);
-  } /* for(i..) */
+  for (auto& state : m_interval.states) {
+    std::atomic_init(&state, 0U);
+  } /* for(state..) */
 
   m_interval.known_percent = 0.0;
   m_interval.unknown_percent = 0.0;

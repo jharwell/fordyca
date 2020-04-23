@@ -55,7 +55,6 @@
  ******************************************************************************/
 NS_START(fordyca, events, detail);
 using carepr::base_cache;
-using cds::arena_grid;
 using ds::occupancy_grid;
 
 /*******************************************************************************
@@ -111,7 +110,7 @@ bool robot_cached_block_pickup::dispatch_d2_cache_interactor(
             mc_cache->rloc().to_str().c_str(),
             polled->name().c_str());
     csel_matrix->sel_exception_add(
-        {mc_cache->id(), controller::cache_sel_exception::kDrop});
+        {mc_cache->id(), controller::cache_sel_exception::ekDROP});
     ret = true;
   }
   interactor->accept(*this);

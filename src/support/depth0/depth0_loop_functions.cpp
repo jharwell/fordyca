@@ -159,6 +159,7 @@ void depth0_loop_functions::private_init(void) {
 
   m_interactor_map = std::make_unique<interactor_map_type>();
   m_los_update_map = std::make_unique<los_updater_map_type>();
+  m_metrics_map = std::make_unique<metric_extraction_map_type>();
 
   /* only needed for initialization, so not a member */
   auto config_map = configurer_map_type();

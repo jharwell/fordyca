@@ -34,14 +34,6 @@
 NS_START(fordyca, fsm, expstrat);
 
 /*******************************************************************************
- * Class Constants
- ******************************************************************************/
-constexpr char cache_factory::kCRW[];
-constexpr char cache_factory::kLikelihoodSearch[];
-constexpr char cache_factory::kUtilitySearch[];
-constexpr char cache_factory::kLEDTaxisSearch[];
-
-/*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 cache_factory::cache_factory(void) {

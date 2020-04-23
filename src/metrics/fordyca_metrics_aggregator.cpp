@@ -90,7 +90,7 @@ void fordyca_metrics_aggregator::collect_from_loop(
   collect("tv::environment",
           *loop->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>());
 
-  if (loop->tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>()) {
+  if (nullptr != loop->tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>()) {
     collect("tv::population",
             *loop->tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>());
   }

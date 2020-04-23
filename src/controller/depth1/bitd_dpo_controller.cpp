@@ -121,11 +121,11 @@ void bitd_dpo_controller::shared_init(
    * initialization in the base controller, and needs to happen here when we
    * have an XML repository with the correct configuration in it.
    */
-  auto saa_names = crfootbot::config::saa_xml_names();
+  using saa_names = crfootbot::config::saa_xml_names;
   auto sensing_p =
       config_repo.config_get<csubsystem::config::sensing_subsystem2D_config>();
   auto ground = chal::sensors::ground_sensor(
-      GetSensor<argos::CCI_FootBotMotorGroundSensor>(saa_names.ground_sensor),
+      GetSensor<argos::CCI_FootBotMotorGroundSensor>(saa_names::ground_sensor),
       &sensing_p->ground);
   saa()->sensing()->replace(ground);
 } /* shared_init() */

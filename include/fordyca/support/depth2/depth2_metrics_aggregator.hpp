@@ -52,7 +52,7 @@ class depth2_metrics_aggregator final : public depth1::depth1_metrics_aggregator
                                   public rer::client<depth2_metrics_aggregator> {
  public:
   depth2_metrics_aggregator(const cmconfig::metrics_config* mconfig,
-                            const cdconfig::grid_config* const gconfig,
+                            const cdconfig::grid_config* gconfig,
                             const std::string& output_root);
 
   void task_start_cb(const cta::polled_task* task,

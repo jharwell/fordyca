@@ -128,7 +128,7 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    *               discretized).
    */
   boost::optional<rmath::vector2z> deconflict_loc_boundaries(
-      const rmath::vector2z& center) const;
+      const rmath::vector2z& c_center) const;
 
   /**
    * \brief Given an existing entity (cache or a block) that must be avoided

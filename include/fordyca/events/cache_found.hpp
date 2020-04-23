@@ -86,9 +86,9 @@ class cache_found : public cdops::cell2D_op, public rer::client<cache_found> {
   void visit(cfsm::cell2D_fsm& fsm);
 
   /* depth2 foraging */
-  void visit(controller::depth2::birtd_dpo_controller& controller);
+  void visit(controller::depth2::birtd_dpo_controller& c);
   void visit(controller::depth2::birtd_mdpo_controller& c);
-  void visit(controller::depth2::birtd_odpo_controller& controller);
+  void visit(controller::depth2::birtd_odpo_controller& c);
   void visit(controller::depth2::birtd_omdpo_controller& c);
 
  private:

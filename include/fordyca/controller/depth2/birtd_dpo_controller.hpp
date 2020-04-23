@@ -29,14 +29,9 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace rta {
-class bi_tdgraph_executive;
-}}
+namespace fordyca::config::depth2 { class controller_repository; }
 
-NS_START(fordyca);
-
-namespace config { namespace depth2 { class controller_repository; }}
-NS_START(controller, depth2);
+NS_START(fordyca, controller, depth2);
 
 /*******************************************************************************
  * Class Definitions

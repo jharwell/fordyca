@@ -49,7 +49,7 @@ class static_cache_creator : public base_cache_creator,
                              public rer::client<static_cache_creator> {
  public:
   static_cache_creator(cds::arena_grid* grid,
-                       const std::vector<rmath::vector2d>& cache_locs,
+                       const std::vector<rmath::vector2d>& centers,
                        rtypes::spatial_dist cache_dim);
 
   /**

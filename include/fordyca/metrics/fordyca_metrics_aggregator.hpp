@@ -61,7 +61,7 @@ class fordyca_metrics_aggregator
       public cmetrics::base_metrics_aggregator {
  public:
   fordyca_metrics_aggregator(const cmconfig::metrics_config* mconfig,
-                             const cdconfig::grid_config* const gconfig,
+                             const cdconfig::grid_config* gconfig,
                              const std::string& output_root);
   ~fordyca_metrics_aggregator(void) override = default;
 

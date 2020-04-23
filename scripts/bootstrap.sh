@@ -92,8 +92,7 @@ ln -s $1/cosm ext/cosm
 mkdir -p build && cd build
 cmake \
     -DCMAKE_C_COMPILER=gcc-9\
-    -DCMAKE_CXX_COMPILER=g++-9\
-    -DLIBRA_BUILD_FOR=ARGOS \
+    -DCMAKE_CXX_COMPILER=g++-9
     ..
 make -j $4
 make documentation

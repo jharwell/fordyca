@@ -56,12 +56,12 @@ cache_sel_matrix::cache_sel_matrix(
  ******************************************************************************/
 void cache_sel_matrix::sel_exception_add(const cache_sel_exception& ex) {
   switch (ex.type) {
-    case cache_sel_exception::kPickup: {
+    case cache_sel_exception::ekPICKUP: {
       auto& vec = boost::get<std::vector<rtypes::type_uuid>>(
           this->find(kPickupExceptions)->second);
       vec.push_back(ex.id);
     } break;
-    case cache_sel_exception::kDrop: {
+    case cache_sel_exception::ekDROP: {
       auto& vec = boost::get<std::vector<rtypes::type_uuid>>(
           this->find(kDropExceptions)->second);
       vec.push_back(ex.id);

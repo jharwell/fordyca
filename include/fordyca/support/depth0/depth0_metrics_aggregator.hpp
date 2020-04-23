@@ -52,7 +52,7 @@ class depth0_metrics_aggregator : public metrics::fordyca_metrics_aggregator,
                                   public rer::client<depth0_metrics_aggregator> {
  public:
   depth0_metrics_aggregator(const cmconfig::metrics_config* mconfig,
-                            const cdconfig::grid_config* const gconfig,
+                            const cdconfig::grid_config* gconfig,
                             const std::string& output_root);
 
   template<class T>

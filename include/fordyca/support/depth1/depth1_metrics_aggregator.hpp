@@ -46,10 +46,6 @@ namespace cosm::ta::ds {
 class bi_tab;
 } /* namespace ds */
 
-namespace cosm::foraging::repr {
-class arena_cache;
-} /* namespace cosm::foraging::repr */
-
 NS_START(fordyca);
 
 namespace controller { namespace depth1 { class bitd_mdpo_controller; }}
@@ -77,7 +73,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
                                   public rer::client<depth1_metrics_aggregator> {
  public:
   depth1_metrics_aggregator(const cmconfig::metrics_config* mconfig,
-                            const cdconfig::grid_config* const gconfig,
+                            const cdconfig::grid_config* gconfig,
                             const std::string& output_root);
 
   /**

@@ -50,7 +50,7 @@ NS_START(fordyca, fsm, expstrat);
 class crw final : public foraging_expstrat,
                   public rer::client<crw> {
  public:
-  crw(const fsm::expstrat::foraging_expstrat::params* const c_params,
+  crw(const fsm::expstrat::foraging_expstrat::params* c_params,
       rmath::rng* rng);
 
   crw(crfootbot::footbot_saa_subsystem2D* saa, rmath::rng* rng);

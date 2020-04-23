@@ -64,11 +64,11 @@ class dpo_store final : public rer::client<dpo_store> {
   using dpo_entity = repr::dpo_entity<T>;
 
   enum update_status {
-    kNO_CHANGE,
-    kNEW_BLOCK_ADDED,
-    kBLOCK_MOVED,
-    kNEW_CACHE_ADDED,
-    kCACHE_UPDATED /* # blocks can change */
+    ekNO_CHANGE,
+    ekNEW_BLOCK_ADDED,
+    ekBLOCK_MOVED,
+    ekNEW_CACHE_ADDED,
+    ekCACHE_UPDATED /* # blocks can change */
   };
 
   /**
@@ -82,7 +82,7 @@ class dpo_store final : public rer::client<dpo_store> {
 
   struct update_res_t {
     bool status{false};
-    update_status reason{kNO_CHANGE};
+    update_status reason{ekNO_CHANGE};
     rmath::vector2z old_loc{};
   };
 

@@ -101,7 +101,7 @@ class mdpo_perception_subsystem final
    * \param c_los The LOS to process.
    */
   void process_los(const cfrepr::foraging_los* c_los,
-                   oracular_info_receptor* const receptor);
+                   oracular_info_receptor* receptor);
   void process_los_blocks(const cfrepr::foraging_los* c_los);
   void process_los_caches(const cfrepr::foraging_los* c_los);
 

@@ -317,7 +317,7 @@ void depth1_loop_functions::cache_handling_init(
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
   cpal::argos_sm_adaptor::led_medium(
-      crfootbot::config::saa_xml_names().leds_saa);
+      crfootbot::config::saa_xml_names::leds_saa);
   if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();

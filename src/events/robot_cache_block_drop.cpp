@@ -92,7 +92,7 @@ bool robot_cache_block_drop::dispatch_d2_cache_interactor(
             m_cache->rloc().to_str().c_str(),
             polled->name().c_str());
     csel_matrix->sel_exception_add(
-        {m_cache->id(), controller::cache_sel_exception::kPickup});
+        {m_cache->id(), controller::cache_sel_exception::ekPICKUP});
     ret = true;
   }
   interactor->accept(*this);

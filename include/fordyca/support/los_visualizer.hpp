@@ -65,10 +65,10 @@ class los_visualizer : public rer::client<los_visualizer> {
    * \brief Draw visualizations related to block LOS:
    *
    * \param los The LOS to visualize.
-   * \param resolution The grid resolution for the arena.
+   * \param grid_resolution The grid resolution for the arena.
    */
   void draw(const cfrepr::foraging_los* los,
-            rtypes::discretize_ratio resolution);
+            const rtypes::discretize_ratio& grid_resolution);
 
   /* clang-format off */
   argos::CQTOpenGLUserFunctions* const m_qt{nullptr};

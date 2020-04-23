@@ -202,7 +202,7 @@ void block_found::pheromone_update(ds::dpo_semantic_map& map) {
   auto res = map.store()->block_update(
       repr::dpo_entity<crepr::base_block2D>(m_block->clone(), density));
   if (res.status) {
-    if (ds::dpo_store::update_status::kBLOCK_MOVED == res.reason) {
+    if (ds::dpo_store::update_status::ekBLOCK_MOVED == res.reason) {
       ER_DEBUG("Updating cell@%s: Block%d moved %s -> %s",
                res.old_loc.to_str().c_str(),
                m_block->id().v(),
@@ -211,7 +211,7 @@ void block_found::pheromone_update(ds::dpo_semantic_map& map) {
       cdops::cell2D_empty_visitor op(res.old_loc);
       op.visit(map.access<occupancy_grid::kCell>(res.old_loc));
     } else {
-      ER_ASSERT(ds::dpo_store::update_status::kNEW_BLOCK_ADDED == res.reason,
+      ER_ASSERT(ds::dpo_store::update_status::ekNEW_BLOCK_ADDED == res.reason,
                 "Bad reason for DPO store update: %d",
                 res.reason);
     }

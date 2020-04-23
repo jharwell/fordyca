@@ -42,9 +42,6 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-namespace cosm::foraging::ds {
-class caching_arena_map;
-} /* namespace cosm::foraging::ds */
 namespace cosm::pal {
 class argos_controller2D_adaptor;
 } /* namespace cosm::pal */

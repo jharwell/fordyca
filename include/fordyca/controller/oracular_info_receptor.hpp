@@ -63,7 +63,7 @@ NS_START(fordyca, controller);
 
 class oracular_info_receptor final : public rer::client<oracular_info_receptor> {
  public:
-  oracular_info_receptor(const cforacle::foraging_oracle* oracle)
+  explicit oracular_info_receptor(const cforacle::foraging_oracle* oracle)
       : ER_CLIENT_INIT("fordyca.controller.oracular_info_receptor"),
         mc_oracle(oracle) {}
 

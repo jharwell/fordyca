@@ -39,7 +39,7 @@ NS_START(fordyca, support);
  * Member Functions
  ******************************************************************************/
 void los_visualizer::draw(const cfrepr::foraging_los* const los,
-                          rtypes::discretize_ratio grid_resolution) {
+                          const rtypes::discretize_ratio& grid_resolution) {
   /* has not been populated yet on first timestep */
   if (nullptr == los) {
     return;

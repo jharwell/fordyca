@@ -65,8 +65,8 @@ const crepr::base_block2D* new_cache_selector::operator()(
     ER_ASSERT(utility > 0.0, "Bad utility calculation");
     ER_DEBUG("Utility for new cache%d@%s/%s, density=%f: %f",
              c.ent()->id().v(),
-             best->rloc().to_str().c_str(),
-             best->dloc().to_str().c_str(),
+             c.ent()->rloc().to_str().c_str(),
+             c.ent()->dloc().to_str().c_str(),
              c.density().v(),
              utility);
 
