@@ -34,15 +34,12 @@
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/ds/occupancy_grid.hpp"
 
+#include "cosm/controller/config/perception/perception_config.hpp"
+
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca);
-namespace config { namespace perception {
-struct perception_config;
-}} // namespace config::perception
-
-NS_START(ds);
+NS_START(fordyca, ds);
 
 /*******************************************************************************
  * Class Definitions
@@ -67,7 +64,7 @@ NS_START(ds);
 class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
                                public rpdecorator::decorator<occupancy_grid> {
  public:
-  dpo_semantic_map(const config::perception::perception_config* c_config,
+  dpo_semantic_map(const ccontconfig::perception::perception_config* c_config,
                    const std::string& robot_id);
 
   RCPPSW_DECORATE_FUNC(pheromone_repeat_deposit, const);

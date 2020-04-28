@@ -29,8 +29,6 @@
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
-#include "fordyca/config/perception/pheromone_config.hpp"
-
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -39,7 +37,7 @@ NS_START(fordyca, ds);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-dpo_store::dpo_store(const config::perception::pheromone_config* const config)
+dpo_store::dpo_store(const ccontconfig::perception::pheromone_config* const config)
     : ER_CLIENT_INIT("fordyca.ds.dpo_store"),
       mc_repeat_deposit(config->repeat_deposit),
       mc_pheromone_rho(config->rho) {}

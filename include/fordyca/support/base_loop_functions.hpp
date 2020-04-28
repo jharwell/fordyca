@@ -145,7 +145,7 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
    *
    * \param config Parsed convergence parameters.
    */
-  void convergence_init(const ccconfig::convergence_config* config) RCSW_COLD;
+  void convergence_init(const cconvconfig::convergence_config* config) RCSW_COLD;
 
   /**
    * \brief Initialize temporal variance handling.

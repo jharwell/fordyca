@@ -37,7 +37,7 @@
 
 #include "fordyca/config/depth1/controller_repository.hpp"
 #include "fordyca/config/exploration_config.hpp"
-#include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/controller/foraging_perception_subsystem.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
@@ -62,7 +62,7 @@ task_executive_builder::task_executive_builder(
     const controller::block_sel_matrix* bsel_matrix,
     const controller::cache_sel_matrix* csel_matrix,
     crfootbot::footbot_saa_subsystem2D* const saa,
-    base_perception_subsystem* const perception)
+    foraging_perception_subsystem* const perception)
     : ER_CLIENT_INIT("fordyca.controller.depth1.task_executive_builder"),
       mc_csel_matrix(csel_matrix),
       mc_bsel_matrix(bsel_matrix),

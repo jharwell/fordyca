@@ -68,11 +68,11 @@ using task1 = tasks::depth1::foraging_task;
  ******************************************************************************/
 depth1_metrics_aggregator::depth1_metrics_aggregator(
     const cmconfig::metrics_config* const mconfig,
-    const cdconfig::grid_config* const gconfig,
+    const cdconfig::grid2D_config* const gconfig,
     const std::string& output_root)
     : depth0_metrics_aggregator(mconfig, gconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth1.metrics_aggregator") {
-  auto dims2D = rmath::dvec2zvec(gconfig->upper, gconfig->resolution.v());
+  auto dims2D = rmath::dvec2zvec(gconfig->dims, gconfig->resolution.v());
 
   register_standard(mconfig);
   register_with_decomp_depth(mconfig, 1);

@@ -23,14 +23,23 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fordyca.hpp"
-#include "fordyca/controller/controller_fwd.hpp"
 #include "rcppsw/ds/type_map.hpp"
-#include "cosm/foraging/operations/robot_los_update.hpp"
+
+#include "cosm/controller/operations/robot_los_update.hpp"
+
+#include "fordyca/controller/controller_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
+namespace cosm::ds {
+class arena_grid;
+} /* namespace cosm::ds */
+
+namespace fordyca::repr {
+class forager_los;
+} /* namespace fordyca::repr */
+
 NS_START(fordyca, support, depth0);
 
 /*******************************************************************************
@@ -43,18 +52,22 @@ NS_START(fordyca, support, depth0);
  * \brief Wrapping functor to update robot LOS each timestep. Needed for use
  * with boost::static_visitor.
  */
-template<typename TArenaMapType>
 class robot_los_update_applicator {
  public:
+  template<typename TControllerType>
+  using los_update_op_type = ccops::robot_los_update<TControllerType,
+                                                     rds::grid2D_overlay<cds::cell2D>,
+                                                     repr::forager_los>;
+
   explicit robot_los_update_applicator(controller::foraging_controller* const c)
       : controller(c) {}
 
-  void operator()(cfops::robot_los_update<controller::depth0::crw_controller, TArenaMapType>& ) const {}
+  void operator()(los_update_op_type<controller::depth0::crw_controller>& ) const {}
 
   template<typename TControllerType,
            RCPPSW_SFINAE_FUNC(!std::is_same<TControllerType,
                               controller::depth0::crw_controller>::value)>
-  void operator()(cfops::robot_los_update<TControllerType, TArenaMapType>& impl) const {
+  void operator()(los_update_op_type<TControllerType>& impl) const {
     impl(dynamic_cast<TControllerType*>(controller));
   }
 

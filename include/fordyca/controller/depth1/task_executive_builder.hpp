@@ -57,7 +57,7 @@ NS_START(controller);
 class cache_sel_matrix;
 class block_sel_matrix;
 class saa_subsystem;
-class base_perception_subsystem;
+class foraging_perception_subsystem;
 NS_START(depth1);
 
 /*******************************************************************************
@@ -75,7 +75,7 @@ class task_executive_builder : public rer::client<task_executive_builder> {
   task_executive_builder(const controller::block_sel_matrix* bsel_matrix,
                       const controller::cache_sel_matrix* csel_matrix,
                       crfootbot::footbot_saa_subsystem2D* saa,
-                      base_perception_subsystem* perception) RCSW_COLD;
+                      foraging_perception_subsystem* perception) RCSW_COLD;
 
   ~task_executive_builder(void) override RCSW_COLD;
   task_executive_builder& operator=(const task_executive_builder&) = delete;
@@ -88,8 +88,8 @@ class task_executive_builder : public rer::client<task_executive_builder> {
  protected:
   using tasking_map = std::map<std::string, cta::polled_task*>;
 
-  RCSW_COLD const base_perception_subsystem* perception(void) const { return m_perception; }
-  RCSW_COLD base_perception_subsystem* perception(void) { return m_perception; }
+  RCSW_COLD const foraging_perception_subsystem* perception(void) const { return m_perception; }
+  RCSW_COLD foraging_perception_subsystem* perception(void) { return m_perception; }
 
   RCSW_COLD crfootbot::footbot_saa_subsystem2D* saa(void) const {
     return m_saa;
@@ -119,8 +119,8 @@ class task_executive_builder : public rer::client<task_executive_builder> {
   const controller::cache_sel_matrix* const mc_csel_matrix;
   const controller::block_sel_matrix* const mc_bsel_matrix;
 
-  crfootbot::footbot_saa_subsystem2D* const   m_saa;
-  base_perception_subsystem* const          m_perception;
+  crfootbot::footbot_saa_subsystem2D* const m_saa;
+  foraging_perception_subsystem* const      m_perception;
 
   /* clang-format on */
 };

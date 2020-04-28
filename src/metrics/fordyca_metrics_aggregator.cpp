@@ -52,12 +52,12 @@ NS_END(detail);
  ******************************************************************************/
 fordyca_metrics_aggregator::fordyca_metrics_aggregator(
     const cmconfig::metrics_config* const mconfig,
-    const cdconfig::grid_config* const gconfig,
+    const cdconfig::grid2D_config* const gconfig,
     const std::string& output_root)
     : ER_CLIENT_INIT("fordyca.metrics.aggregator"),
       base_metrics_aggregator(mconfig, output_root) {
   /* register collectors from base class */
-  auto dims2D = rmath::dvec2zvec(gconfig->upper, gconfig->resolution.v());
+  auto dims2D = rmath::dvec2zvec(gconfig->dims, gconfig->resolution.v());
   register_with_arena_dims2D(mconfig, dims2D);
 
   /* register collectors common to all of FORDYCA */

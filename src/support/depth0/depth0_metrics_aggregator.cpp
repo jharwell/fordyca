@@ -32,7 +32,7 @@
 #include "cosm/metrics/collector_registerer.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
-#include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/controller/foraging_perception_subsystem.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
@@ -62,7 +62,7 @@ NS_END(detail);
  ******************************************************************************/
 depth0_metrics_aggregator::depth0_metrics_aggregator(
     const cmconfig::metrics_config* const mconfig,
-    const cdconfig::grid_config* const gconfig,
+    const cdconfig::grid2D_config* const gconfig,
     const std::string& output_root)
     : fordyca_metrics_aggregator(mconfig, gconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth0.depth0_aggregator") {

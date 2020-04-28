@@ -31,9 +31,9 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-namespace cosm::foraging::repr {
-class foraging_los;
-} // namespace cosm::foraging::repr
+namespace fordyca::repr {
+class forager_los;
+} // namespace fordyca::repr
 
 NS_START(fordyca);
 namespace ds {
@@ -54,7 +54,7 @@ NS_START(controller);
  */
 class los_proc_verify : public rer::client<los_proc_verify> {
  public:
-  explicit los_proc_verify(const cfrepr::foraging_los* const c_los)
+  explicit los_proc_verify(const repr::forager_los* const c_los)
       : ER_CLIENT_INIT("fordyca.controller.los_proc_verify"), mc_los(c_los) {}
 
   los_proc_verify(const los_proc_verify& v) = delete;
@@ -65,7 +65,7 @@ class los_proc_verify : public rer::client<los_proc_verify> {
 
  private:
   /* clang-format off */
-  const cfrepr::foraging_los* const mc_los;
+  const repr::forager_los* const mc_los;
   /* clang-format on */
 };
 

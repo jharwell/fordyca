@@ -27,15 +27,22 @@
 #include <memory>
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 
-#include "fordyca/support/base_loop_functions.hpp"
-#include "fordyca/controller/controller_fwd.hpp"
 #include "rcppsw/ds/type_map.hpp"
-#include "cosm/foraging/operations/robot_los_update.hpp"
+#include "rcppsw/ds/grid2D_overlay.hpp"
+
+#include "cosm/controller/operations/robot_los_update.hpp"
 #include "cosm/controller/operations/metrics_extract.hpp"
+#include "fordyca/repr/forager_los.hpp"
+
+#include "fordyca/support/base_loop_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::arena {
+class caching_arena_map;
+} /* namespace cosm::foraging::ds */
+
 NS_START(fordyca, support, depth0);
 namespace detail {
 struct functor_maps_initializer;
@@ -87,8 +94,9 @@ class depth0_loop_functions : public base_loop_functions,
     >;
   using los_updater_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth0::typelist,
-                              cfops::robot_los_update,
-                              carena::caching_arena_map>::type>;
+                              ccops::robot_los_update,
+                              rds::grid2D_overlay<cds::cell2D>,
+                              repr::forager_los>::type>;
 
   using metric_extraction_typelist = rmpl::typelist<
     ccops::metrics_extract<controller::depth0::crw_controller,

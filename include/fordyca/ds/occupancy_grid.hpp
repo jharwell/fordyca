@@ -32,17 +32,12 @@
 
 #include "cosm/ds/cell2D.hpp"
 #include "cosm/repr/pheromone_density.hpp"
+#include "cosm/controller/config/perception/perception_config.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace config { namespace perception {
-struct perception_config;
-}} // namespace config::perception
-
-NS_START(ds);
+NS_START(fordyca, ds);
 
 /**
  * \brief The types of layers used by \ref occupancy_grid (i.e. a heterogeneous
@@ -74,7 +69,7 @@ class occupancy_grid : public rer::client<occupancy_grid>,
    */
   static constexpr uint kCell = 1;
 
-  occupancy_grid(const config::perception::perception_config* c_config,
+  occupancy_grid(const ccontconfig::perception::perception_config* c_config,
                  const std::string& robot_id);
 
   /**

@@ -37,8 +37,8 @@ namespace argos {
 class CQTOpenGLUserFunctions;
 }
 
-namespace cosm::foraging::repr {
-class foraging_los;
+namespace fordyca::repr {
+class forager_los;
 }
 
 NS_START(fordyca, support);
@@ -67,7 +67,7 @@ class los_visualizer : public rer::client<los_visualizer> {
    * \param los The LOS to visualize.
    * \param grid_resolution The grid resolution for the arena.
    */
-  void draw(const cfrepr::foraging_los* los,
+  void draw(const repr::forager_los* los,
             const rtypes::discretize_ratio& grid_resolution);
 
   /* clang-format off */

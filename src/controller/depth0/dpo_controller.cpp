@@ -34,7 +34,7 @@
 #include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
 #include "fordyca/config/depth0/dpo_controller_repository.hpp"
 #include "fordyca/config/exploration_config.hpp"
-#include "fordyca/config/perception/perception_config.hpp"
+#include "cosm/controller/config/perception/perception_config.hpp"
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
@@ -64,15 +64,8 @@ void dpo_controller::fsm(std::unique_ptr<fsm::depth0::dpo_fsm> fsm) {
 } /* fsm() */
 
 void dpo_controller::perception(
-    std::unique_ptr<base_perception_subsystem> perception) {
+    std::unique_ptr<foraging_perception_subsystem> perception) {
   m_perception = std::move(perception);
-}
-
-const cfrepr::foraging_los* dpo_controller::los(void) const {
-  return static_cast<const dpo_perception_subsystem*>(m_perception.get())->los();
-}
-void dpo_controller::los(std::unique_ptr<cfrepr::foraging_los> new_los) {
-  m_perception->los(std::move(new_los));
 }
 
 double dpo_controller::los_dim(void) const {
@@ -126,9 +119,9 @@ void dpo_controller::init(ticpp::Element& node) {
 
 void dpo_controller::shared_init(
     const config::depth0::dpo_controller_repository& config_repo) {
-  auto perception =
-      config_repo.config_get<config::perception::perception_config>();
-  auto block_matrix =
+  auto* perception =
+      config_repo.config_get<ccontconfig::perception::perception_config>();
+  auto* block_matrix =
       config_repo.config_get<config::block_sel::block_sel_matrix_config>();
 
   /* DPO perception subsystem */

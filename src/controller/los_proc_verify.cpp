@@ -24,7 +24,7 @@
 #include "fordyca/controller/los_proc_verify.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/foraging/repr/foraging_los.hpp"
+#include "fordyca/repr/forager_los.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/ds/dpo_semantic_map.hpp"
@@ -127,8 +127,8 @@ bool los_proc_verify::operator()(const ds::dpo_semantic_map* const c_map) const 
    */
   for (uint i = 0; i < mc_los->xsize(); ++i) {
     for (uint j = 0; j < mc_los->ysize(); ++j) {
-      rmath::vector2z d = mc_los->cell(i, j).loc();
-      auto& cell1 = mc_los->cell(i, j);
+      rmath::vector2z d = mc_los->access(i, j).loc();
+      auto& cell1 = mc_los->access(i, j);
       auto& cell2 = c_map->access<ds::occupancy_grid::kCell>(d);
 
       if (cell1.state_has_block() || cell1.state_is_empty()) {

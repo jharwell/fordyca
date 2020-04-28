@@ -26,7 +26,6 @@
 #include "cosm/ds/cell2D.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
-#include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
 #include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"

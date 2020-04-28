@@ -30,7 +30,7 @@
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 
 #include "fordyca/config/depth1/controller_repository.hpp"
-#include "fordyca/config/perception/perception_config.hpp"
+#include "cosm/controller/config/perception/perception_config.hpp"
 #include "fordyca/controller/depth1/task_executive_builder.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
@@ -95,10 +95,10 @@ void bitd_mdpo_controller::shared_init(
   bitd_dpo_controller::shared_init(config_repo);
 
   /* MDPO perception subsystem */
-  config::perception::perception_config p =
-      *config_repo.config_get<config::perception::perception_config>();
-  p.occupancy_grid.upper.x(p.occupancy_grid.upper.x() + 1);
-  p.occupancy_grid.upper.y(p.occupancy_grid.upper.y() + 1);
+  auto p = *config_repo.config_get<ccontconfig::perception::perception_config>();
+  rmath::vector2d padding(p.occupancy_grid.resolution.v() * 5,
+                          p.occupancy_grid.resolution.v() * 5);
+  p.occupancy_grid.dims += padding;
 
   bitd_dpo_controller::perception(
       std::make_unique<mdpo_perception_subsystem>(&p, GetId()));

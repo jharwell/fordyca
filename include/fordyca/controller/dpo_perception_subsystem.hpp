@@ -31,23 +31,18 @@
 
 #include "cosm/ds/entity_vector.hpp"
 
-#include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/controller/foraging_perception_subsystem.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace ds {
+namespace fordyca::ds {
 class dpo_store;
 }
-namespace config { namespace perception {
-struct perception_config;
-}} // namespace config::perception
 
-NS_START(controller);
+NS_START(fordyca, controller);
 
 /*******************************************************************************
  * Class Definitions
@@ -56,16 +51,16 @@ NS_START(controller);
  * \class dpo_perception_subsystem
  * \ingroup controller
  *
- * \brief Translates the sensor readings of the robot (i.e. \ref foraging_los),
+ * \brief Translates the sensor readings of the robot (i.e. \ref forager_los),
  * into a useful internal repr: a \ref dpo_store.
  */
 class dpo_perception_subsystem final
     : public rer::client<dpo_perception_subsystem>,
-      public base_perception_subsystem,
+      public foraging_perception_subsystem,
       public metrics::perception::dpo_perception_metrics {
  public:
   explicit dpo_perception_subsystem(
-      const config::perception::perception_config* config);
+      const ccontconfig::perception::perception_config* config);
   ~dpo_perception_subsystem(void) override;
 
   /* DPO perception metrics */
@@ -96,15 +91,15 @@ class dpo_perception_subsystem final
    *
    * \param c_los The LOS to process.
    */
-  void process_los(const cfrepr::foraging_los* c_los,
+  void process_los(const repr::forager_los* c_los,
                    oracular_info_receptor* receptor);
 
-  void process_los_blocks(const cfrepr::foraging_los* c_los);
-  void process_los_caches(const cfrepr::foraging_los* c_los);
+  void process_los_blocks(const repr::forager_los* c_los);
+  void process_los_caches(const repr::forager_los* c_los);
 
-  void los_tracking_sync(const cfrepr::foraging_los* c_los,
+  void los_tracking_sync(const repr::forager_los* c_los,
                          const cads::bcache_vectorno& los_caches);
-  void los_tracking_sync(const cfrepr::foraging_los* c_los,
+  void los_tracking_sync(const repr::forager_los* c_los,
                          const cds::entity_vector& los_blocks);
 
  private:

@@ -47,10 +47,10 @@ using ds::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 mdpo_perception_subsystem::mdpo_perception_subsystem(
-    const config::perception::perception_config* const config,
+    const ccontconfig::perception::perception_config* const config,
     const std::string& id)
     : ER_CLIENT_INIT("fordyca.controller.mdpo_perception"),
-      base_perception_subsystem(config),
+      foraging_perception_subsystem(config),
       m_cell_stats(cfsm::cell2D_state::ekST_MAX_STATES),
       m_los(),
       m_map(std::make_unique<ds::dpo_semantic_map>(config, id)) {}
@@ -68,7 +68,7 @@ void mdpo_perception_subsystem::update(oracular_info_receptor* const receptor) {
 void mdpo_perception_subsystem::reset(void) { m_map->reset(); }
 
 void mdpo_perception_subsystem::process_los(
-    const cfrepr::foraging_los* const c_los,
+    const repr::forager_los* const c_los,
     oracular_info_receptor* const receptor) {
   ER_TRACE("LOS LL=%s, LR=%s, UL=%s UR=%s",
            c_los->abs_ll().to_str().c_str(),
@@ -96,7 +96,7 @@ void mdpo_perception_subsystem::process_los(
 } /* process_los() */
 
 void mdpo_perception_subsystem::process_los_blocks(
-    const cfrepr::foraging_los* const c_los) {
+    const repr::forager_los* const c_los) {
   /*
    * Because this is computed, rather than a returned reference to a member
    * variable, we can't use separate begin()/end() calls with it, and need to
@@ -125,10 +125,10 @@ void mdpo_perception_subsystem::process_los_blocks(
    */
   for (uint i = 0; i < c_los->xsize(); ++i) {
     for (uint j = 0; j < c_los->ysize(); ++j) {
-      rmath::vector2z d = c_los->cell(i, j).loc();
-      if (!c_los->cell(i, j).state_has_block() &&
+      rmath::vector2z d = c_los->access(i, j).loc();
+      if (!c_los->access(i, j).state_has_block() &&
           m_map->access<occupancy_grid::kCell>(d).state_has_block()) {
-        auto* los_entity = c_los->cell(i, j).entity();
+        auto* los_entity = c_los->access(i, j).entity();
         ER_ASSERT(crepr::entity_dimensionality::ek2D == los_entity->dimensionality(),
                   "LOS block%d is not 2D!",
                   los_entity->id().v());
@@ -138,7 +138,7 @@ void mdpo_perception_subsystem::process_los_blocks(
                  map_block->rloc().to_str().c_str(),
                  map_block->dloc().to_str().c_str());
         m_map->block_remove(map_block);
-      } else if (c_los->cell(i, j).state_is_known() &&
+      } else if (c_los->access(i, j).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_is_known()) {
         ER_TRACE("Cell@%s now known to be empty", d.to_str().c_str());
         events::cell2D_empty_visitor e(d);
@@ -175,7 +175,7 @@ void mdpo_perception_subsystem::process_los_blocks(
 } /* process_los_blocks() */
 
 void mdpo_perception_subsystem::process_los_caches(
-    const cfrepr::foraging_los* const c_los) {
+    const repr::forager_los* const c_los) {
   /*
    * Because this is computed, rather than a returned reference to a member
    * variable, we can't use separate begin()/end() calls with it, and need to
@@ -196,8 +196,8 @@ void mdpo_perception_subsystem::process_los_caches(
    */
   for (uint i = 0; i < c_los->xsize(); ++i) {
     for (uint j = 0; j < c_los->ysize(); ++j) {
-      rmath::vector2z d = c_los->cell(i, j).loc();
-      if (!c_los->cell(i, j).state_has_cache() &&
+      rmath::vector2z d = c_los->access(i, j).loc();
+      if (!c_los->access(i, j).state_has_cache() &&
           map()->access<occupancy_grid::kCell>(d).state_has_cache()) {
         auto cache = map()->access<occupancy_grid::kCell>(d).cache();
         ER_DEBUG("Correct cache%d@%s/%s discrepency",
@@ -243,19 +243,19 @@ void mdpo_perception_subsystem::process_los_caches(
 } /* process_los_caches() */
 
 void mdpo_perception_subsystem::update_cell_stats(
-    const cfrepr::foraging_los* const c_los) {
+    const repr::forager_los* const c_los) {
   for (uint i = 0; i < c_los->xsize(); ++i) {
     for (uint j = 0; j < c_los->ysize(); ++j) {
-      rmath::vector2z d = c_los->cell(i, j).loc();
-      if (c_los->cell(i, j).state_is_empty() &&
+      rmath::vector2z d = c_los->access(i, j).loc();
+      if (c_los->access(i, j).state_is_empty() &&
           m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
           !m_map->access<occupancy_grid::kCell>(d).state_is_empty()) {
         m_cell_stats[cfsm::cell2D_state::ekST_EMPTY]++;
-      } else if (c_los->cell(i, j).state_has_block() &&
+      } else if (c_los->access(i, j).state_has_block() &&
                  m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_has_block()) {
         m_cell_stats[cfsm::cell2D_state::ekST_HAS_BLOCK]++;
-      } else if (c_los->cell(i, j).state_has_cache() &&
+      } else if (c_los->access(i, j).state_has_cache() &&
                  m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_has_cache()) {
         m_cell_stats[cfsm::cell2D_state::ekST_HAS_CACHE]++;

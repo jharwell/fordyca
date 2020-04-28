@@ -55,7 +55,7 @@ class task_executive_builder : public depth1::task_executive_builder,
   task_executive_builder(const controller::block_sel_matrix* bsel_matrix,
                       const controller::cache_sel_matrix* csel_matrix,
                       crfootbot::footbot_saa_subsystem2D* saa,
-                      base_perception_subsystem* perception) RCSW_COLD;
+                      foraging_perception_subsystem* perception) RCSW_COLD;
   ~task_executive_builder(void) override RCSW_COLD;
 
   std::unique_ptr<cta::bi_tdgraph_executive>

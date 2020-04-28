@@ -25,7 +25,6 @@
 
 #include "cosm/arena/repr/base_cache.hpp"
 
-#include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/events/cell2D_empty.hpp"
 
 /*******************************************************************************
@@ -37,7 +36,7 @@ NS_START(fordyca, ds);
  * Constructors/Destructor
  ******************************************************************************/
 dpo_semantic_map::dpo_semantic_map(
-    const config::perception::perception_config* c_config,
+    const ccontconfig::perception::perception_config* c_config,
     const std::string& robot_id)
     : ER_CLIENT_INIT("fordyca.ds.dpo_semantic_map"),
       decorator(c_config, robot_id),

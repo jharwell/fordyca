@@ -80,8 +80,7 @@ void base_loop_functions::init(ticpp::Element& node) {
   arena_map_init<carena::caching_arena_map>(aconfig, vconfig);
 
   /* initialize convergence calculations */
-  convergence_init(
-      config()->config_get<cconvergence::config::convergence_config>());
+  convergence_init(config()->config_get<cconvconfig::convergence_config>());
 
   /* initialize temporal variance injection */
   tv_init(config()->config_get<config::tv::tv_manager_config>());
@@ -91,7 +90,7 @@ void base_loop_functions::init(ticpp::Element& node) {
 } /* init() */
 
 void base_loop_functions::convergence_init(
-    const ccconfig::convergence_config* const config) {
+    const cconvconfig::convergence_config* const config) {
   if (nullptr == config) {
     return;
   }

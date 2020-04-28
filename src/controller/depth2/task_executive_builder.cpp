@@ -33,7 +33,7 @@
 
 #include "fordyca/config/depth2/controller_repository.hpp"
 #include "fordyca/config/exploration_config.hpp"
-#include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/controller/foraging_perception_subsystem.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
 #include "fordyca/fsm/depth2/block_to_new_cache_fsm.hpp"
@@ -58,7 +58,7 @@ task_executive_builder::task_executive_builder(
     const controller::block_sel_matrix* bsel_matrix,
     const controller::cache_sel_matrix* csel_matrix,
     crfootbot::footbot_saa_subsystem2D* const saa,
-    base_perception_subsystem* const perception)
+    foraging_perception_subsystem* const perception)
     : depth1::task_executive_builder(bsel_matrix, csel_matrix, saa, perception),
       ER_CLIENT_INIT("fordyca.controller.depth2.task_executive_builder") {}
 

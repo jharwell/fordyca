@@ -1,5 +1,5 @@
 /**
- * \file base_perception_subsystem.hpp
+ * \file foraging_perception_subsystem.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,17 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_BASE_PERCEPTION_SUBSYSTEM_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_BASE_PERCEPTION_SUBSYSTEM_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_FORAGING_PERCEPTION_SUBSYSTEM_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_FORAGING_PERCEPTION_SUBSYSTEM_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <memory>
+#include "cosm/controller/perception/base_perception_subsystem.hpp"
 
-#include "cosm/foraging/repr/foraging_los.hpp"
-
-#include "fordyca/config/perception/perception_config.hpp"
+#include "fordyca/repr/forager_los.hpp"
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
@@ -47,24 +45,19 @@ class oracular_info_receptor;
  * Class Definitions
  ******************************************************************************/
 /**
- * \class base_perception_subsystem
+ * \class foraging_perception_subsystem
  * \ingroup controller
  *
- * \brief Base class for robot perception common to all controllers, which is
- * just the \ref dpo_store of objects.
+ * \brief Base class for robot perception common to all foraging controllers,
+ * which is just the \ref dpo_store of objects.
  */
-class base_perception_subsystem {
+class foraging_perception_subsystem : public ccperception::base_perception_subsystem<repr::forager_los> {
  public:
-  explicit base_perception_subsystem(
-      const config::perception::perception_config* const pconfig)
-      : mc_los_dim(pconfig->los_dim) {}
+  explicit foraging_perception_subsystem(
+      const ccontconfig::perception::perception_config* const pconfig)
+      : base_perception_subsystem(pconfig) {}
 
-  virtual ~base_perception_subsystem(void) = default;
-
-  /**
-   * \brief Reset the robot's perception of the environment to an initial state
-   */
-  virtual void reset(void) {}
+  ~foraging_perception_subsystem(void) override = default;
 
   /**
    * \brief Update the internal data structure/repr of the
@@ -74,36 +67,8 @@ class base_perception_subsystem {
 
   virtual const ds::dpo_store* dpo_store(void) const = 0;
   virtual ds::dpo_store* dpo_store(void) = 0;
-
-  /**
-   * \brief Set the robots LOS for the next timestep.
-   *
-   * This is a hack to make it easy for me to run simulations, as I can computer
-   * the line of sight for a robot within the loop functions, and just pass it
-   * in here. In real robots this routine would be MUCH messier and harder to
-   * work with.
-   *
-   * \param los The new los
-   */
-  void los(std::unique_ptr<cfrepr::foraging_los> los) {
-    m_los = std::move(los);
-  }
-
-  /**
-   * \brief Get the robot's current line-of-sight (LOS)
-   */
-  const cfrepr::foraging_los* los(void) const { return m_los.get(); }
-
-  double los_dim(void) const { return mc_los_dim; }
-
- private:
-  /* clang-format off */
-  const double mc_los_dim;
-
-  std::unique_ptr<cfrepr::foraging_los> m_los{nullptr};
-  /* clang-format on */
 };
 
 NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_BASE_PERCEPTION_SUBSYSTEM_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_FORAGING_PERCEPTION_SUBSYSTEM_HPP_ */

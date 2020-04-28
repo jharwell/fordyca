@@ -25,9 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
-#include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
-#include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
+
 #include "cosm/controller/metrics/manipulation_metrics.hpp"
 #include "cosm/fsm/metrics/movement_metrics.hpp"
 #include "cosm/fsm/metrics/collision_metrics.hpp"
@@ -35,9 +33,12 @@
 #include "cosm/ta/metrics/bi_tdgraph_metrics.hpp"
 #include "cosm/ta/polled_task.hpp"
 
-#include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
+#include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
+#include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
 #include "fordyca/controller/foraging_controller.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
+#include "fordyca/controller/foraging_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,6 +46,10 @@
 namespace cosm::ta::ds {
 class bi_tab;
 } /* namespace ds */
+
+namespace cosm::arena::repr {
+class arena_cache;
+} /* namespace cosm::arena */
 
 NS_START(fordyca);
 
@@ -73,7 +78,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
                                   public rer::client<depth1_metrics_aggregator> {
  public:
   depth1_metrics_aggregator(const cmconfig::metrics_config* mconfig,
-                            const cdconfig::grid_config* gconfig,
+                            const cdconfig::grid2D_config* gconfig,
                             const std::string& output_root);
 
   /**
@@ -121,8 +126,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
   /**
    * \brief Collect utilization metrics from a cache in the arena.
    */
-  void collect_from_cache(
-      const carepr::arena_cache* cache);
+  void collect_from_cache(const carepr::arena_cache* cache);
 
   /**
    * \brief Collect lifecycle metrics across all caches in the arena.

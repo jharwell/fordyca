@@ -31,6 +31,7 @@
 
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
+#include "cosm/controller/config/perception/pheromone_config.hpp"
 
 #include "fordyca/ds/dp_block_map.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
@@ -39,11 +40,7 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca);
-namespace config { namespace perception {
-struct pheromone_config;
-}} // namespace config::perception
-NS_START(ds);
+NS_START(fordyca, ds);
 
 /*******************************************************************************
  * Class Definitions
@@ -92,7 +89,7 @@ class dpo_store final : public rer::client<dpo_store> {
    */
   static constexpr double kNRD_MAX_PHEROMONE = 1.0;
 
-  explicit dpo_store(const config::perception::pheromone_config* config);
+  explicit dpo_store(const ccontconfig::perception::pheromone_config* config);
 
   /**
    * \brief Get all blocks the robot is currently aware of, and their

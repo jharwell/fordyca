@@ -29,7 +29,7 @@
 #include <atomic>
 #include <utility>
 
-#include "cosm/foraging/operations/robot_los_update.hpp"
+#include "cosm/controller/operations/robot_los_update.hpp"
 
 #include "fordyca/support/depth0/depth0_loop_functions.hpp"
 #include "fordyca/support/robot_task_extractor.hpp"
@@ -105,8 +105,9 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
                              carena::caching_arena_map>::type>;
   using los_updater_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth1::typelist,
-                              cfops::robot_los_update,
-                              carena::caching_arena_map>::type>;
+                              ccops::robot_los_update,
+                              rds::grid2D_overlay<cds::cell2D>,
+                              repr::forager_los>::type>;
   using task_extractor_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth1::typelist,
                                 robot_task_extractor>::type>;

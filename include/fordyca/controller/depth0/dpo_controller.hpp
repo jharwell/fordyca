@@ -31,7 +31,12 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace fordyca::controller {
+class foraging_perception_subsystem;
+} /* namespace fordyca::controller */
+
 NS_START(fordyca);
+
 namespace fsm { namespace depth0 { class dpo_fsm; }}
 
 namespace config {
@@ -39,7 +44,6 @@ namespace depth0 { class dpo_controller_repository; }
 }
 
 NS_START(controller);
-class base_perception_subsystem;
 class dpo_perception_subsystem;
 class block_sel_matrix;
 
@@ -91,18 +95,9 @@ class dpo_controller : public crw_controller,
    * way than to have each derived class have its own private version and
    * require duplicate accessors in each derived class.
    */
-    void fsm(std::unique_ptr<class fsm::depth0::dpo_fsm> fsm);
+  void fsm(std::unique_ptr<class fsm::depth0::dpo_fsm> fsm);
 
-  /**
-   * \brief Set the robot's current line of sight (LOS).
-   */
-  void los(std::unique_ptr<cfrepr::foraging_los> new_los);
   double los_dim(void) const RCSW_PURE;
-
-  /**
-   * \brief Get the current LOS for the robot.
-   */
-  const cfrepr::foraging_los* los(void) const RCSW_PURE;
 
   /**
    * \brief Set whether or not a robot is supposed to display it's LOS as a
@@ -116,10 +111,10 @@ class dpo_controller : public crw_controller,
    */
   bool display_los(void) const { return m_display_los; }
 
-  const base_perception_subsystem* perception(void) const override final {
+  const foraging_perception_subsystem* perception(void) const override final {
     return m_perception.get();
   }
-  base_perception_subsystem* perception(void) override final {
+  foraging_perception_subsystem* perception(void) override final {
     return m_perception.get();
   }
 
@@ -147,7 +142,7 @@ class dpo_controller : public crw_controller,
    * this way than to have each derived class have its own private version and
    * require duplicate accessors in each derived class.
    */
-  void perception(std::unique_ptr<base_perception_subsystem> perception);
+  void perception(std::unique_ptr<foraging_perception_subsystem> perception);
 
   /**
    * \brief Initialization that derived classes may also need to perform, if
@@ -175,10 +170,10 @@ class dpo_controller : public crw_controller,
   void private_init(const config::depth0::dpo_controller_repository& config_repo) RCSW_COLD;
 
   /* clang-format off */
-  bool                                       m_display_los{false};
-  std::unique_ptr<class block_sel_matrix>    m_block_sel_matrix;
-  std::unique_ptr<base_perception_subsystem> m_perception;
-  std::unique_ptr<fsm::depth0::dpo_fsm>      m_fsm;
+  bool                                           m_display_los{false};
+  std::unique_ptr<class block_sel_matrix>        m_block_sel_matrix;
+  std::unique_ptr<foraging_perception_subsystem> m_perception;
+  std::unique_ptr<fsm::depth0::dpo_fsm>          m_fsm;
   /* clang-format on */
 };
 

@@ -30,10 +30,10 @@
 
 #include "rcppsw/er/client.hpp"
 
-#include "cosm/foraging/repr/foraging_los.hpp"
+#include "fordyca/repr/forager_los.hpp"
 
-#include "fordyca/config/perception/perception_config.hpp"
-#include "fordyca/controller/base_perception_subsystem.hpp"
+#include "cosm/controller/config/perception/perception_config.hpp"
+#include "fordyca/controller/foraging_perception_subsystem.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
 
@@ -56,15 +56,15 @@ NS_START(controller);
  * \class mdpo_perception_subsystem
  * \ingroup controller
  *
- * \brief Translates the sensor readings of the robot (i.e. \ref foraging_los),
+ * \brief Translates the sensor readings of the robot (i.e. \ref forager_los),
  * into a useful internal repr: a \ref dpo_semantic_map.
  */
 class mdpo_perception_subsystem final
     : public rer::client<mdpo_perception_subsystem>,
-      public base_perception_subsystem,
+      public foraging_perception_subsystem,
       public metrics::perception::mdpo_perception_metrics {
  public:
-  mdpo_perception_subsystem(const config::perception::perception_config* config,
+  mdpo_perception_subsystem(const ccontconfig::perception::perception_config* config,
                             const std::string& id);
   ~mdpo_perception_subsystem(void) override = default;
 
@@ -100,10 +100,10 @@ class mdpo_perception_subsystem final
    *
    * \param c_los The LOS to process.
    */
-  void process_los(const cfrepr::foraging_los* c_los,
+  void process_los(const repr::forager_los* c_los,
                    oracular_info_receptor* receptor);
-  void process_los_blocks(const cfrepr::foraging_los* c_los);
-  void process_los_caches(const cfrepr::foraging_los* c_los);
+  void process_los_blocks(const repr::forager_los* c_los);
+  void process_los_caches(const repr::forager_los* c_los);
 
   /**
    * \brief Update the aggregate stats on inaccuracies in the robot's perceived
@@ -111,11 +111,11 @@ class mdpo_perception_subsystem final
    *
    * \param c_los The current LOS
    */
-  void update_cell_stats(const cfrepr::foraging_los* c_los);
+  void update_cell_stats(const repr::forager_los* c_los);
 
   /* clang-format off */
   std::vector<uint>                     m_cell_stats;
-  std::unique_ptr<cfrepr::foraging_los>   m_los;
+  std::unique_ptr<repr::forager_los>   m_los;
   std::unique_ptr<ds::dpo_semantic_map> m_map;
   /* clang-format on */
 };

@@ -39,7 +39,6 @@
 #include "cosm/controller/operations/applicator.hpp"
 #include "cosm/pal/argos_convergence_calculator.hpp"
 #include "cosm/foraging/block_dist/base_distributor.hpp"
-#include "cosm/foraging/operations/robot_los_update.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
 #include "cosm/operations/robot_arena_interaction_applicator.hpp"
 #include "cosm/foraging/oracle/foraging_oracle.hpp"
@@ -109,8 +108,9 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
             lf->oracle(),
             lf->m_metrics_agg.get()));
     lf->m_los_update_map->emplace(typeid(controller),
-                                  cfops::robot_los_update<T,
-                                  carena::caching_arena_map>(lf->arena_map()));
+                                  ccops::robot_los_update<T,
+                                  rds::grid2D_overlay<cds::cell2D>,
+                                  repr::forager_los>(lf->arena_map()->decoratee().template layer<cds::arena_grid::kCell>()));
   }
 
   /* clang-format off */
@@ -166,7 +166,7 @@ void depth2_loop_functions::private_init(void) {
   auto padded_size =
       rmath::vector2d(arena_map()->xrsize(), arena_map()->yrsize());
   auto arena = *config()->config_get<caconfig::arena_map_config>();
-  arena.grid.upper = padded_size;
+  arena.grid.dims = padded_size;
   m_metrics_agg = std::make_unique<depth2_metrics_aggregator>(&output->metrics,
                                                               &arena.grid,
                                                               output_root());
@@ -423,8 +423,9 @@ void depth2_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
 
   auto applicator =
       ccops::applicator<controller::foraging_controller,
-                        cfops::robot_los_update,
-                        carena::caching_arena_map>(controller);
+                        ccops::robot_los_update,
+                        rds::grid2D_overlay<cds::cell2D>,
+                        repr::forager_los>(controller);
   boost::apply_visitor(applicator,
                        m_los_update_map->at(controller->type_index()));
 } /* robot_pre_step() */

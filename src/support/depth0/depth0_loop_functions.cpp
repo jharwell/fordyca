@@ -36,7 +36,7 @@
 #include "cosm/arena/config/arena_map_config.hpp"
 #include "cosm/controller/operations/applicator.hpp"
 #include "cosm/pal/argos_convergence_calculator.hpp"
-#include "cosm/foraging/repr/foraging_los.hpp"
+#include "fordyca/repr/forager_los.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
 #include "cosm/operations/robot_arena_interaction_applicator.hpp"
 #include "cosm/foraging/oracle/foraging_oracle.hpp"
@@ -53,6 +53,7 @@
 #include "fordyca/support/depth0/robot_configurer_applicator.hpp"
 #include "fordyca/support/depth0/robot_los_update_applicator.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
+#include "fordyca/controller/foraging_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -96,7 +97,9 @@ struct functor_maps_initializer {
             lf->config()->config_get<cvconfig::visualization_config>(),
             lf->oracle()));
     lf->m_los_update_map->emplace(typeid(controller),
-                                  cfops::robot_los_update<T, carena::caching_arena_map>(lf->arena_map()));
+                                  ccops::robot_los_update<T,
+                                  rds::grid2D_overlay<cds::cell2D>,
+                                  repr::forager_los>(lf->arena_map()->decoratee().template layer<cds::arena_grid::kCell>()));
   }
 
   /* clang-format off */
@@ -150,7 +153,7 @@ void depth0_loop_functions::private_init(void) {
   auto padded_size = rmath::vector2d(arena_map()->xrsize(),
                                      arena_map()->yrsize());
   auto arena = *config()->config_get<caconfig::arena_map_config>();
-  arena.grid.upper = padded_size;
+  arena.grid.dims = padded_size;
   m_metrics_agg = std::make_unique<depth0_metrics_aggregator>(&output->metrics,
                                                               &arena.grid,
                                                               output_root());
@@ -318,7 +321,7 @@ void depth0_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
             "Controller '%s' type '%s' not in depth0 LOS update map",
             controller->GetId().c_str(),
             controller->type_index().name());
-  auto applicator = robot_los_update_applicator<carena::caching_arena_map>(controller);
+  auto applicator = robot_los_update_applicator(controller);
   boost::apply_visitor(applicator,
                        m_los_update_map->at(controller->type_index()));
 } /* robot_pre_step() */

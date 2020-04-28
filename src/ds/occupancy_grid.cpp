@@ -23,7 +23,6 @@
  ******************************************************************************/
 #include "fordyca/ds/occupancy_grid.hpp"
 
-#include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/events/cell2D_unknown.hpp"
 
 /*******************************************************************************
@@ -35,10 +34,10 @@ NS_START(fordyca, ds);
  * Constructors/Destructor
  ******************************************************************************/
 occupancy_grid::occupancy_grid(
-    const config::perception::perception_config* c_config,
+    const ccontconfig::perception::perception_config* c_config,
     const std::string& robot_id)
     : ER_CLIENT_INIT("fordyca.ds.occupancy_grid"),
-      stacked_grid2D(c_config->occupancy_grid.upper,
+      stacked_grid2D(c_config->occupancy_grid.dims,
                      c_config->occupancy_grid.resolution),
       m_pheromone_repeat_deposit(c_config->pheromone.repeat_deposit),
       m_robot_id(robot_id) {
