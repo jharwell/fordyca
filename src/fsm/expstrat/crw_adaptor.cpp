@@ -1,7 +1,7 @@
 /**
- * \file cache_factory.cpp
+ * \file crw_adaptor.cpp
  *
- * \copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2020 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,26 +21,24 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/expstrat/cache_factory.hpp"
-
 #include "fordyca/fsm/expstrat/crw_adaptor.hpp"
-#include "fordyca/fsm/expstrat/ledtaxis_cache_search.hpp"
-#include "fordyca/fsm/expstrat/likelihood_cache_search.hpp"
-#include "fordyca/fsm/expstrat/utility_cache_search.hpp"
+
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************
- * Namespaces/Decls
- ******************************************************************************/
+ * Namespaces
+******************************************************************************/
 NS_START(fordyca, fsm, expstrat);
 
 /*******************************************************************************
- * Constructors/Destructors
+ * Constructors/Destructor
  ******************************************************************************/
-cache_factory::cache_factory(void) {
-  register_type<crw_adaptor>(kCRW);
-  register_type<likelihood_cache_search>(kLikelihoodSearch);
-  register_type<utility_cache_search>(kUtilitySearch);
-  register_type<ledtaxis_cache_search>(kLEDTaxisSearch);
-}
+crw_adaptor::crw_adaptor(const fsm::expstrat::foraging_expstrat::params* c_params,
+                         rmath::rng* rng)
+    : crw_adaptor(c_params->saa, rng) {}
+
+crw_adaptor::crw_adaptor(crfootbot::footbot_saa_subsystem* saa, rmath::rng* rng) :
+    foraging_expstrat(saa, rng),
+    decorator(static_cast<crfootbot::footbot_saa_subsystem*>(saa), rng){}
 
 NS_END(expstrat, fsm, fordyca);

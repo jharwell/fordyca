@@ -34,11 +34,11 @@
 #include "cosm/metrics/config/output_config.hpp"
 #include "cosm/repr/base_block2D.hpp"
 #include "cosm/robots/footbot/config/saa_xml_names.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/steer2D/config/force_calculator_config.hpp"
 #include "cosm/subsystem/config/actuation_subsystem2D_config.hpp"
-#include "cosm/subsystem/config/sensing_subsystem2D_config.hpp"
-#include "cosm/subsystem/saa_subsystem2D.hpp"
+#include "cosm/subsystem/config/sensing_subsystemQ3D_config.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/tv/robot_dynamics_applicator.hpp"
 
 #include "fordyca/config/foraging_controller_repository.hpp"
@@ -47,7 +47,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
-namespace fs = std::filesystem;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -93,7 +92,7 @@ void foraging_controller::init(ticpp::Element& node) {
 
   /* initialize sensing and actuation (SAA) subsystem */
   saa_init(repo.config_get<csubsystem::config::actuation_subsystem2D_config>(),
-           repo.config_get<csubsystem::config::sensing_subsystem2D_config>());
+           repo.config_get<csubsystem::config::sensing_subsystemQ3D_config>());
 
   /* initialize supervisor */
   supervisor(std::make_unique<cfsm::supervisor_fsm>(saa()));
@@ -129,7 +128,7 @@ void foraging_controller::output_init(const cmconfig::output_config* outputp) {
 
 void foraging_controller::saa_init(
     const csubsystem::config::actuation_subsystem2D_config* actuation_p,
-    const csubsystem::config::sensing_subsystem2D_config* sensing_p) {
+    const csubsystem::config::sensing_subsystemQ3D_config* sensing_p) {
   using saa_names = crfootbot::config::saa_xml_names;
 
 #ifdef FORDYCA_WITH_ROBOT_RAB
@@ -165,14 +164,14 @@ void foraging_controller::saa_init(
       GetSensor<argos::CCI_DifferentialSteeringSensor>(
           saa_names::diff_steering_saa));
 
-  auto sensors = csubsystem::sensing_subsystem2D::sensor_map{
-      csubsystem::sensing_subsystem2D::map_entry_create(rabs),
-      csubsystem::sensing_subsystem2D::map_entry_create(battery),
-      csubsystem::sensing_subsystem2D::map_entry_create(proximity),
-      csubsystem::sensing_subsystem2D::map_entry_create(blobs),
-      csubsystem::sensing_subsystem2D::map_entry_create(light),
-      csubsystem::sensing_subsystem2D::map_entry_create(ground),
-      csubsystem::sensing_subsystem2D::map_entry_create(diff_drives)};
+  auto sensors = csubsystem::sensing_subsystemQ3D::sensor_map{
+      csubsystem::sensing_subsystemQ3D::map_entry_create(rabs),
+      csubsystem::sensing_subsystemQ3D::map_entry_create(battery),
+      csubsystem::sensing_subsystemQ3D::map_entry_create(proximity),
+      csubsystem::sensing_subsystemQ3D::map_entry_create(blobs),
+      csubsystem::sensing_subsystemQ3D::map_entry_create(light),
+      csubsystem::sensing_subsystemQ3D::map_entry_create(ground),
+      csubsystem::sensing_subsystemQ3D::map_entry_create(diff_drives)};
 
   auto diff_drivea = ckin2D::governed_diff_drive(
       &actuation_p->diff_drive,
@@ -207,7 +206,7 @@ void foraging_controller::saa_init(
       csubsystem::actuation_subsystem2D::map_entry_create(leds),
       csubsystem::actuation_subsystem2D::map_entry_create(raba)};
 
-  base_controller2D::saa(std::make_unique<crfootbot::footbot_saa_subsystem2D>(
+  base_controller2D::saa(std::make_unique<crfootbot::footbot_saa_subsystem>(
       position, sensors, actuators, &actuation_p->steering));
 } /* saa_init() */
 
@@ -226,13 +225,13 @@ void foraging_controller::irv_init(const ctv::robot_dynamics_applicator* rda) {
   }
 } /* irv_init() */
 
-class crfootbot::footbot_saa_subsystem2D* foraging_controller::saa(void) {
-  return static_cast<crfootbot::footbot_saa_subsystem2D*>(
+class crfootbot::footbot_saa_subsystem* foraging_controller::saa(void) {
+  return static_cast<crfootbot::footbot_saa_subsystem*>(
       base_controller2D::saa());
 }
-const class crfootbot::footbot_saa_subsystem2D* foraging_controller::saa(
+const class crfootbot::footbot_saa_subsystem* foraging_controller::saa(
     void) const {
-  return static_cast<const crfootbot::footbot_saa_subsystem2D*>(
+  return static_cast<const crfootbot::footbot_saa_subsystem*>(
       base_controller2D::saa());
 }
 NS_END(controller, fordyca);

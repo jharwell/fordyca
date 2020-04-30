@@ -35,8 +35,8 @@ NS_START(fordyca, fsm, depth2);
  ******************************************************************************/
 block_to_new_cache_fsm::block_to_new_cache_fsm(
     const fsm_ro_params* c_params,
-    crfootbot::footbot_saa_subsystem2D* saa,
-    std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
+    crfootbot::footbot_saa_subsystem* saa,
+    std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
     rmath::rng* rng)
     : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, saa, rng),
       m_cache_fsm(c_params, saa, exp_behavior->clone(), rng),

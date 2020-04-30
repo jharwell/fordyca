@@ -62,7 +62,7 @@ NS_START(fsm, depth1);
 class block_to_existing_cache_fsm final : public block_to_goal_fsm {
  public:
    block_to_existing_cache_fsm(const fsm_ro_params* c_params,
-                               crfootbot::footbot_saa_subsystem2D* saa,
+                               crfootbot::footbot_saa_subsystem* saa,
                                rmath::rng* rng);
 
   ~block_to_existing_cache_fsm(void) override = default;

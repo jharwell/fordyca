@@ -62,8 +62,8 @@ class dpo_fsm final : public cfsm::util_hfsm,
                       public cta::taskable {
  public:
   dpo_fsm(const fsm_ro_params * params,
-          crfootbot::footbot_saa_subsystem2D* saa,
-          std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
+          crfootbot::footbot_saa_subsystem* saa,
+          std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
           rmath::rng* rng);
   ~dpo_fsm(void) override = default;
   dpo_fsm(const dpo_fsm&) = delete;
@@ -85,7 +85,8 @@ class dpo_fsm final : public cfsm::util_hfsm,
   RCPPSW_WRAP_OVERRIDE_DECL(bool, entered_collision_avoidance, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, exited_collision_avoidance, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rtypes::timestep, collision_avoidance_duration, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, avoidance_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, avoidance_loc2D, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, avoidance_loc3D, const);
 
   /* goal acquisition metrics */
   RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);

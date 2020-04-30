@@ -104,12 +104,13 @@ void mdpo_perception_subsystem::process_los_blocks(
    */
   cds::entity_vector blocks = c_los->blocks();
   if (!blocks.empty()) {
-    auto accum = std::accumulate(blocks.begin(),
-                                 blocks.end(),
-                                 std::string(),
-                                 [&](const std::string& a, const auto& b) {
-                                   return a + "b" + rcppsw::to_string(b->id()) + ",";
-                                 });
+    auto accum =
+        std::accumulate(blocks.begin(),
+                        blocks.end(),
+                        std::string(),
+                        [&](const std::string& a, const auto& b) {
+                          return a + "b" + rcppsw::to_string(b->id()) + ",";
+                        });
 
     ER_DEBUG("Blocks in LOS: [%s]", accum.c_str());
     ER_DEBUG("Blocks in DPO store: [%s]",
@@ -129,7 +130,8 @@ void mdpo_perception_subsystem::process_los_blocks(
       if (!c_los->access(i, j).state_has_block() &&
           m_map->access<occupancy_grid::kCell>(d).state_has_block()) {
         auto* los_entity = c_los->access(i, j).entity();
-        ER_ASSERT(crepr::entity_dimensionality::ek2D == los_entity->dimensionality(),
+        ER_ASSERT(crepr::entity_dimensionality::ek2D ==
+                      los_entity->dimensionality(),
                   "LOS block%d is not 2D!",
                   los_entity->id().v());
         auto* map_block = m_map->access<occupancy_grid::kCell>(d).block2D();

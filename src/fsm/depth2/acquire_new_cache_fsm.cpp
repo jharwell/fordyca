@@ -24,7 +24,7 @@
 #include "fordyca/fsm/depth2/acquire_new_cache_fsm.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 #include "fordyca/controller/depth2/new_cache_selector.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
@@ -42,8 +42,8 @@ NS_START(fordyca, fsm, depth2);
  ******************************************************************************/
 acquire_new_cache_fsm::acquire_new_cache_fsm(
     const fsm_ro_params* c_params,
-    crfootbot::footbot_saa_subsystem2D* saa,
-    std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
+    crfootbot::footbot_saa_subsystem* saa,
+    std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_new_cache"),
       acquire_goal_fsm(
@@ -93,8 +93,8 @@ boost::optional<cfsm::acquire_goal_fsm::candidate_type> acquire_new_cache_fsm::
   controller::depth2::new_cache_selector selector(mc_matrix);
 
   /* A "new" cache is the same as a single block  */
-  if (auto best = selector(
-          mc_store->blocks(), mc_store->caches(), sensing()->position())) {
+  if (auto best =
+          selector(mc_store->blocks(), mc_store->caches(), sensing()->rpos2D())) {
     ER_INFO("Select new cache%d@%s/%s for acquisition",
             best->id().v(),
             best->rloc().to_str().c_str(),
@@ -112,7 +112,7 @@ boost::optional<cfsm::acquire_goal_fsm::candidate_type> acquire_new_cache_fsm::
 
 bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
   ER_ASSERT(!explore_result, "New cache acquisition via exploration?");
-  rmath::vector2d position = saa()->sensing()->position();
+  rmath::vector2d position = saa()->sensing()->rpos2D();
   for (auto& b : mc_store->blocks().const_values_range()) {
     if ((b.ent()->rloc() - position).length() <= kNEW_CACHE_ARRIVAL_TOL) {
       return true;

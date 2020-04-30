@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/fsm/expstrat/block_factory.hpp"
 
-#include "fordyca/fsm/expstrat/crw.hpp"
+#include "fordyca/fsm/expstrat/crw_adaptor.hpp"
 #include "fordyca/fsm/expstrat/likelihood_block_search.hpp"
 
 /*******************************************************************************
@@ -35,7 +35,7 @@ NS_START(fordyca, fsm, expstrat);
  * Constructors/Destructors
  ******************************************************************************/
 block_factory::block_factory(void) {
-  register_type<crw>(kCRW);
+  register_type<crw_adaptor>(kCRW);
   register_type<likelihood_block_search>(kLikelihoodSearch);
 }
 

@@ -105,16 +105,24 @@ void site_selection_metrics_collector::collect(
 
   if (m.site_select_success()) {
     ++m_stats.int_n_successes;
-    m_stats.int_nlopt_stopval += static_cast<uint>(nlopt::result::STOPVAL_REACHED == res);
-    m_stats.int_nlopt_ftol += static_cast<uint>(nlopt::result::FTOL_REACHED == res);
-    m_stats.int_nlopt_xtol += static_cast<uint>(nlopt::result::XTOL_REACHED == res);
-    m_stats.int_nlopt_maxeval += static_cast<uint>(nlopt::result::MAXEVAL_REACHED == res);
+    m_stats.int_nlopt_stopval +=
+        static_cast<uint>(nlopt::result::STOPVAL_REACHED == res);
+    m_stats.int_nlopt_ftol +=
+        static_cast<uint>(nlopt::result::FTOL_REACHED == res);
+    m_stats.int_nlopt_xtol +=
+        static_cast<uint>(nlopt::result::XTOL_REACHED == res);
+    m_stats.int_nlopt_maxeval +=
+        static_cast<uint>(nlopt::result::MAXEVAL_REACHED == res);
 
     ++m_stats.cum_n_successes;
-    m_stats.cum_nlopt_stopval += static_cast<uint>(nlopt::result::STOPVAL_REACHED == res);
-    m_stats.cum_nlopt_ftol += static_cast<uint>(nlopt::result::FTOL_REACHED == res);
-    m_stats.cum_nlopt_xtol += static_cast<uint>(nlopt::result::XTOL_REACHED == res);
-    m_stats.cum_nlopt_maxeval += static_cast<uint>(nlopt::result::MAXEVAL_REACHED == res);
+    m_stats.cum_nlopt_stopval +=
+        static_cast<uint>(nlopt::result::STOPVAL_REACHED == res);
+    m_stats.cum_nlopt_ftol +=
+        static_cast<uint>(nlopt::result::FTOL_REACHED == res);
+    m_stats.cum_nlopt_xtol +=
+        static_cast<uint>(nlopt::result::XTOL_REACHED == res);
+    m_stats.cum_nlopt_maxeval +=
+        static_cast<uint>(nlopt::result::MAXEVAL_REACHED == res);
   } else {
     ++m_stats.int_n_fails;
     ++m_stats.cum_n_fails;

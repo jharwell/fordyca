@@ -29,8 +29,8 @@
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block2D.hpp"
 #include "cosm/robots/footbot/config/saa_xml_names.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
-#include "cosm/subsystem/config/sensing_subsystem2D_config.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/subsystem/config/sensing_subsystemQ3D_config.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
 
@@ -123,7 +123,7 @@ void bitd_dpo_controller::shared_init(
    */
   using saa_names = crfootbot::config::saa_xml_names;
   auto sensing_p =
-      config_repo.config_get<csubsystem::config::sensing_subsystem2D_config>();
+      config_repo.config_get<csubsystem::config::sensing_subsystemQ3D_config>();
   auto ground = chal::sensors::ground_sensor(
       GetSensor<argos::CCI_FootBotMotorGroundSensor>(saa_names::ground_sensor),
       &sensing_p->ground);

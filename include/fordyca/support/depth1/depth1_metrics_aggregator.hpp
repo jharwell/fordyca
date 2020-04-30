@@ -156,7 +156,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
       return;
     }
     collect("fsm::collision_counts", *task->mechanism());
-    collect_if("fsm::collision_locs",
+    collect_if("fsm::collision_locs2D",
                *task->mechanism(),
                [&](const rmetrics::base_metrics& metrics) {
                  auto& m = dynamic_cast<const cfsm::metrics::collision_metrics&>(metrics);

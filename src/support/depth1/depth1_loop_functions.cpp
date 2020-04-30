@@ -35,13 +35,13 @@
 
 #include "cosm/arena/config/arena_map_config.hpp"
 #include "cosm/controller/operations/applicator.hpp"
-#include "cosm/pal/argos_convergence_calculator.hpp"
 #include "cosm/foraging/block_dist/base_distributor.hpp"
+#include "cosm/foraging/oracle/foraging_oracle.hpp"
 #include "cosm/foraging/repr/block_cluster.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
 #include "cosm/operations/robot_arena_interaction_applicator.hpp"
 #include "cosm/oracle/config/aggregate_oracle_config.hpp"
-#include "cosm/foraging/oracle/foraging_oracle.hpp"
+#include "cosm/pal/argos_convergence_calculator.hpp"
 #include "cosm/pal/argos_swarm_iterator.hpp"
 #include "cosm/robots/footbot/config/saa_xml_names.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
@@ -133,9 +133,9 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
         lf->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>(),
         lf->m_cache_manager.get(),
         lf};
-    lf->m_interactor_map->emplace(typeid(controller),
-                                  robot_arena_interactor<T,
-                                  carena::caching_arena_map>(p));
+    lf->m_interactor_map->emplace(
+        typeid(controller),
+        robot_arena_interactor<T, carena::caching_arena_map>(p));
     lf->m_metric_extractor_map->emplace(
         typeid(controller),
         ccops::metrics_extract<T, depth1_metrics_aggregator>(
@@ -146,10 +146,12 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
             lf->config()->config_get<cvconfig::visualization_config>(),
             lf->oracle(),
             lf->m_metrics_agg.get()));
-    lf->m_los_update_map->emplace(typeid(controller),
-                                  ccops::robot_los_update<T,
-                                  rds::grid2D_overlay<cds::cell2D>,
-                                  repr::forager_los>(lf->arena_map()->decoratee().template layer<cds::arena_grid::kCell>()));
+    lf->m_los_update_map->emplace(
+        typeid(controller),
+        ccops::robot_los_update<T,
+                                rds::grid2D_overlay<cds::cell2D>,
+                                repr::forager_los>(
+            lf->arena_map()->decoratee().template layer<cds::arena_grid::kCell>()));
     lf->m_subtask_status_map->emplace(typeid(controller),
                                       d1_subtask_status_extractor<T>());
   }
@@ -316,8 +318,7 @@ void depth1_loop_functions::cache_handling_init(
       .clusters = arena_map()->block_distributor()->block_clusters(),
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
-  cpal::argos_sm_adaptor::led_medium(
-      crfootbot::config::saa_xml_names::leds_saa);
+  cpal::argos_sm_adaptor::led_medium(crfootbot::config::saa_xml_names::leds_saa);
   if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
@@ -598,11 +599,10 @@ void depth1_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
             controller->GetId().c_str(),
             controller->type_index().name());
 
-  auto applicator =
-      ccops::applicator<controller::foraging_controller,
-                        ccops::robot_los_update,
-                        rds::grid2D_overlay<cds::cell2D>,
-                        repr::forager_los>(controller);
+  auto applicator = ccops::applicator<controller::foraging_controller,
+                                      ccops::robot_los_update,
+                                      rds::grid2D_overlay<cds::cell2D>,
+                                      repr::forager_los>(controller);
   boost::apply_visitor(applicator,
                        m_los_update_map->at(controller->type_index()));
 } /* robot_pre_step() */
@@ -693,8 +693,7 @@ void depth1_loop_functions::static_cache_monitor(void) {
 } /* static_cache_monitor() */
 
 bool depth1_loop_functions::caches_depleted(void) const {
-  return arena_map()->caches().size() !=
-         m_cache_manager->n_managed();
+  return arena_map()->caches().size() != m_cache_manager->n_managed();
 } /* caches_depleted() */
 
 void depth1_loop_functions::caches_recreation_task_counts_collect(

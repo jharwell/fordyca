@@ -64,8 +64,8 @@ class crw_fsm final : public cfsm::util_hfsm,
                       public block_transporter,
                       public cta::taskable {
  public:
-  crw_fsm(crfootbot::footbot_saa_subsystem2D* saa,
-          std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
+  crw_fsm(crfootbot::footbot_saa_subsystem* saa,
+          std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
           rmath::rng* rng);
 
   crw_fsm(const crw_fsm&) = delete;
@@ -76,7 +76,9 @@ class crw_fsm final : public cfsm::util_hfsm,
   bool entered_collision_avoidance(void) const override RCSW_PURE;
   bool exited_collision_avoidance(void) const override RCSW_PURE;
   rtypes::timestep collision_avoidance_duration(void) const override RCSW_PURE;
-  rmath::vector2z avoidance_loc(void) const override;
+  rmath::vector2z avoidance_loc2D(void) const override;
+  rmath::vector3z avoidance_loc3D(void) const override;
+
   /* goal acquisition metrics */
   cfsm::metrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
   exp_status is_exploring_for_goal(void) const override RCSW_PURE;

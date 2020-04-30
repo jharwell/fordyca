@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/fsm/depth0/free_block_to_nest_fsm.hpp"
 
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
 
@@ -38,8 +40,8 @@ using goal_type = cfsm::metrics::goal_acq_metrics::goal_type;
  ******************************************************************************/
 free_block_to_nest_fsm::free_block_to_nest_fsm(
     const fsm_ro_params* c_params,
-    crfootbot::footbot_saa_subsystem2D* saa,
-    std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
+    crfootbot::footbot_saa_subsystem* saa,
+    std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
     rmath::rng* rng)
     : util_hfsm(saa, rng, ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth0.free_block_to_nest"),
@@ -156,13 +158,21 @@ rtypes::timestep free_block_to_nest_fsm::collision_avoidance_duration(void) cons
   }
 } /* collision_avoidance_duration() */
 
-rmath::vector2z free_block_to_nest_fsm::avoidance_loc(void) const {
+rmath::vector2z free_block_to_nest_fsm::avoidance_loc2D(void) const {
   if (m_block_fsm.task_running()) {
-    return m_block_fsm.avoidance_loc();
+    return m_block_fsm.avoidance_loc2D();
   } else {
-    return cfsm::util_hfsm::avoidance_loc();
+    return cfsm::util_hfsm::avoidance_loc2D();
   }
-} /* collision_avoidance_duration() */
+} /* avoidance_loc2D() */
+
+rmath::vector3z free_block_to_nest_fsm::avoidance_loc3D(void) const {
+  if (m_block_fsm.task_running()) {
+    return m_block_fsm.avoidance_loc3D();
+  } else {
+    return cfsm::util_hfsm::avoidance_loc3D();
+  }
+} /* avoidance_loc3D() */
 
 /*******************************************************************************
  * Goal Acquisition Metrics

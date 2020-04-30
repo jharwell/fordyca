@@ -24,10 +24,10 @@
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 
 #include "cosm/robots/footbot/footbot_actuation_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
-#include "fordyca/fsm/expstrat/crw.hpp"
+#include "cosm/fsm/expstrat/base_expstrat.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
 
 /*******************************************************************************
@@ -38,8 +38,8 @@ NS_START(fordyca, fsm, depth0);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-crw_fsm::crw_fsm(crfootbot::footbot_saa_subsystem2D* const saa,
-                 std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
+crw_fsm::crw_fsm(crfootbot::footbot_saa_subsystem* const saa,
+                 std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
                  rmath::rng* rng)
     : util_hfsm(saa, rng, ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth0.crw"),
@@ -144,16 +144,16 @@ bool crw_fsm::goal_acquired(void) const {
 } /* goal_acquired() */
 
 rmath::vector2z crw_fsm::acquisition_loc(void) const {
-  return saa()->sensing()->discrete_position();
+  return saa()->sensing()->dpos2D();
 } /* acquisition_loc() */
 
 rmath::vector2z crw_fsm::current_explore_loc(void) const {
-  return saa()->sensing()->discrete_position();
+  return saa()->sensing()->dpos2D();
 } /* current_explore_loc() */
 
 rmath::vector2z crw_fsm::current_vector_loc(void) const {
   ER_FATAL_SENTINEL("CRW_FSM current vector location undefined");
-  return saa()->sensing()->discrete_position();
+  return saa()->sensing()->dpos2D();
 } /* current_vector_loc() */
 
 rtypes::type_uuid crw_fsm::entity_acquired_id(void) const {
@@ -190,9 +190,13 @@ rtypes::timestep crw_fsm::collision_avoidance_duration(void) const {
   }
 } /* collision_avoidance_duration() */
 
-rmath::vector2z crw_fsm::avoidance_loc(void) const {
-  return saa()->sensing()->discrete_position();
-} /* avoidance_loc() */
+rmath::vector2z crw_fsm::avoidance_loc2D(void) const {
+  return saa()->sensing()->dpos2D();
+} /* avoidance_loc2D() */
+
+rmath::vector3z crw_fsm::avoidance_loc3D(void) const {
+  return saa()->sensing()->dpos3D();
+} /* avoidance_loc3D() */
 
 /*******************************************************************************
  * General Member Functions

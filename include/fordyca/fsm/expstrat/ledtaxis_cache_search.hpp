@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <memory>
 #include "fordyca/fsm/expstrat/ledtaxis.hpp"
-#include "fordyca/fsm/expstrat/crw.hpp"
+#include "fordyca/fsm/expstrat/crw_adaptor.hpp"
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 
 /*******************************************************************************
@@ -53,7 +53,7 @@ class ledtaxis_cache_search : public foraging_expstrat,
       : ledtaxis_cache_search(c_params->saa,
                               c_params->ledtaxis_target,
                               rng) {}
-  ledtaxis_cache_search(crfootbot::footbot_saa_subsystem2D* saa,
+  ledtaxis_cache_search(crfootbot::footbot_saa_subsystem* saa,
                         const rutils::color& ledtaxis_target,
                         rmath::rng* rng)
       : foraging_expstrat(saa, rng),
@@ -96,10 +96,11 @@ class ledtaxis_cache_search : public foraging_expstrat,
   bool entered_collision_avoidance(void) const override final RCSW_PURE;
   bool exited_collision_avoidance(void) const override final RCSW_PURE;
   rtypes::timestep collision_avoidance_duration(void) const override final;
-  rmath::vector2z avoidance_loc(void) const override final RCSW_PURE;
+  rmath::vector2z avoidance_loc2D(void) const override final RCSW_PURE;
+  rmath::vector3z avoidance_loc3D(void) const override final RCSW_PURE;
 
   /* prototype overrides */
-  std::unique_ptr<foraging_expstrat> clone(void) const override {
+  std::unique_ptr<cfsm::expstrat::base_expstrat> clone(void) const override {
     return std::make_unique<ledtaxis_cache_search>(saa(),
                                                    m_taxis.target(),
                                                    rng());
@@ -107,8 +108,8 @@ class ledtaxis_cache_search : public foraging_expstrat,
 
  private:
   /* clang-format off */
-  crw      m_crw;
-  ledtaxis m_taxis;
+  crw_adaptor m_crw;
+  ledtaxis    m_taxis;
   /* clang-format on */
 };
 

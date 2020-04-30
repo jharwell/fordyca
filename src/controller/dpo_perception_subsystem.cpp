@@ -128,13 +128,13 @@ void dpo_perception_subsystem::process_los_blocks(
   if (!los_blocks.empty()) {
     ER_DEBUG("Blocks in DPO store: [%s]",
              rcppsw::to_string(m_store->blocks()).c_str());
-    auto accum = std::accumulate(los_blocks.begin(),
-                                 los_blocks.end(),
-                                 std::string(),
-                           [&](const std::string& a, const auto& b) {
-                                   return a + "b" + rcppsw::to_string(b->id()) + ",";
-                           });
-
+    auto accum =
+        std::accumulate(los_blocks.begin(),
+                        los_blocks.end(),
+                        std::string(),
+                        [&](const std::string& a, const auto& b) {
+                          return a + "b" + rcppsw::to_string(b->id()) + ",";
+                        });
   }
 
   /*
@@ -245,7 +245,7 @@ void dpo_perception_subsystem::los_tracking_sync(
     auto exists_in_los =
         los_blocks.end() !=
         std::find_if(los_blocks.begin(), los_blocks.end(), [&](const auto& b) {
-            return static_cast<crepr::base_block2D*>(b)->idcmp(*(it->ent()));
+          return static_cast<crepr::base_block2D*>(b)->idcmp(*(it->ent()));
         });
     ER_TRACE("Block%d location in LOS", it->ent()->id().v());
     if (!exists_in_los) {

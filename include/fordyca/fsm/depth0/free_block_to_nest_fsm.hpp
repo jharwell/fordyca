@@ -64,8 +64,8 @@ class free_block_to_nest_fsm final : public cfsm::util_hfsm,
  public:
   free_block_to_nest_fsm(
       const fsm_ro_params* c_params,
-      crfootbot::footbot_saa_subsystem2D* saa,
-      std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
+      crfootbot::footbot_saa_subsystem* saa,
+      std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
       rmath::rng* rng);
 
   free_block_to_nest_fsm(const free_block_to_nest_fsm&) = delete;
@@ -88,7 +88,8 @@ class free_block_to_nest_fsm final : public cfsm::util_hfsm,
   bool entered_collision_avoidance(void) const override RCSW_PURE;
   bool exited_collision_avoidance(void) const override RCSW_PURE;
   rtypes::timestep collision_avoidance_duration(void) const override RCSW_PURE;
-  rmath::vector2z avoidance_loc(void) const override RCSW_PURE;
+  rmath::vector2z avoidance_loc2D(void) const override RCSW_PURE;
+  rmath::vector3z avoidance_loc3D(void) const override RCSW_PURE;
 
   /* goal acquisition metrics */
   RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);

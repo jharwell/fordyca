@@ -97,10 +97,9 @@ void depth2_metrics_aggregator::task_finish_or_abort_cb(
 void depth2_metrics_aggregator::register_standard(
     const cmconfig::metrics_config* const mconfig) {
   using collector_typelist = rmpl::typelist<
-    rmpl::identity<ctametrics::bi_tab_metrics_collector>,
-    rmpl::identity<ctametrics::execution_metrics_collector>,
-    rmpl::identity<metrics::caches::site_selection_metrics_collector>
-    >;
+      rmpl::identity<ctametrics::bi_tab_metrics_collector>,
+      rmpl::identity<ctametrics::execution_metrics_collector>,
+      rmpl::identity<metrics::caches::site_selection_metrics_collector> >;
   cmetrics::collector_registerer<>::creatable_set creatable_set = {
       {typeid(ctametrics::bi_tab_metrics_collector),
        "task_tab_harvester",
@@ -131,9 +130,7 @@ void depth2_metrics_aggregator::register_standard(
        "caches::site_selection",
        rmetrics::output_mode::ekAPPEND}};
 
-  cmetrics::collector_registerer<> registerer(mconfig,
-                                              creatable_set,
-                                              this);
+  cmetrics::collector_registerer<> registerer(mconfig, creatable_set, this);
   boost::mpl::for_each<collector_typelist>(registerer);
 } /* register_standard() */
 

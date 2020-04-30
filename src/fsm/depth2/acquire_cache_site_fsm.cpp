@@ -24,7 +24,7 @@
 #include "fordyca/fsm/depth2/acquire_cache_site_fsm.hpp"
 
 #include "cosm/repr/base_block2D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
@@ -43,7 +43,7 @@ using cselm = controller::cache_sel_matrix;
  ******************************************************************************/
 acquire_cache_site_fsm::acquire_cache_site_fsm(
     const fsm_ro_params* c_params,
-    crfootbot::footbot_saa_subsystem2D* saa,
+    crfootbot::footbot_saa_subsystem* saa,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_cache_site"),
       acquire_goal_fsm(
@@ -98,7 +98,7 @@ boost::optional<cfsm::acquire_goal_fsm::candidate_type> acquire_cache_site_fsm::
   auto selector = cache_site_selector(mc_matrix);
   if (auto best = selector(mc_store->caches(),
                            mc_store->blocks(),
-                           saa()->sensing()->position(),
+                           saa()->sensing()->rpos2D(),
                            rng())) {
     ER_INFO("Select cache site@%s for acquisition", best->to_str().c_str());
     m_sel_success = true;

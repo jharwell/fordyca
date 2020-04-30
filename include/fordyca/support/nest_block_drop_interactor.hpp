@@ -55,8 +55,8 @@ NS_START(fordyca, support);
  */
 template <typename TControllerType, typename TArenaMapType>
 class nest_block_drop_interactor
-    : public rer::client<nest_block_drop_interactor<TControllerType,
-                                                    TArenaMapType>> {
+    : public rer::client<
+          nest_block_drop_interactor<TControllerType, TArenaMapType>> {
  public:
   nest_block_drop_interactor(TArenaMapType* const map,
                              depth0::depth0_metrics_aggregator* const metrics_agg,
@@ -146,8 +146,8 @@ class nest_block_drop_interactor
      * event, because the penalty is generic, and the event handles concrete
      * classes--no clean way to mix the two.
      */
-    controller.block_manip_recorder()->record(metrics::blocks::block_manip_events::ekFREE_DROP,
-                                              penalty.penalty());
+    controller.block_manip_recorder()->record(
+        metrics::blocks::block_manip_events::ekFREE_DROP, penalty.penalty());
     rtypes::type_uuid id = controller.block()->id();
 
     caops::nest_block_drop_visitor adrop_op(controller.block_release(), t);

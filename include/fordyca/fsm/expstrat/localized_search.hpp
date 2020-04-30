@@ -29,7 +29,7 @@
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "cosm/fsm/vector_fsm.hpp"
-#include "fordyca/fsm/expstrat/crw.hpp"
+#include "fordyca/fsm/expstrat/crw_adaptor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -54,11 +54,7 @@ class localized_search : public foraging_expstrat,
                    rmath::rng* rng)
       : localized_search(c_params->saa, rng) {}
 
-  localized_search(crfootbot::footbot_saa_subsystem2D* saa, rmath::rng* rng)
-      : foraging_expstrat(saa, rng),
-        ER_CLIENT_INIT("fordyca.fsm.expstrat.localized_search"),
-        m_vfsm(saa, rng),
-        m_crw(saa, rng) {}
+  localized_search(crfootbot::footbot_saa_subsystem* saa, rmath::rng* rng);
 
   ~localized_search(void) override = default;
   localized_search(const localized_search&) = delete;
@@ -69,7 +65,8 @@ class localized_search : public foraging_expstrat,
   bool entered_collision_avoidance(void) const override final RCSW_PURE;
   bool exited_collision_avoidance(void) const override final RCSW_PURE;
   rtypes::timestep collision_avoidance_duration(void) const override final;
-  rmath::vector2z avoidance_loc(void) const override final;
+  rmath::vector2z avoidance_loc2D(void) const override final;
+  rmath::vector3z avoidance_loc3D(void) const override final;
 
   /* taskable overrides */
 
@@ -103,14 +100,14 @@ class localized_search : public foraging_expstrat,
   void task_execute(void) override final;
 
   /* prototype overrides */
-  std::unique_ptr<foraging_expstrat> clone(void) const override {
+  std::unique_ptr<cfsm::expstrat::base_expstrat> clone(void) const override {
     return std::make_unique<localized_search>(saa(), rng());
   }
 
  private:
   /* clang-format off */
   cfsm::vector_fsm m_vfsm;
-  crw               m_crw;
+  crw_adaptor      m_crw;
   /* clang-format on */
 };
 

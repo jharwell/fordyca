@@ -103,16 +103,15 @@
           output_dir="metrics"
           output_interval="1000"
           block_transport="block-transport.csv"
-          fsm_collision_counts_fname="fsm-collision-counts.csv"
-          fsm_collision_locs_fname="fsm-collision-locs.csv"
-          fsm_movement_fname="fsm-movement.csv"
-          block_acq_counts_fname="block-acq-counts.csv"
-          block_acq_locs_fname="block-acq-locs.csv"
-          block_acq_explore_locs_fname="block-acq-explore-locs.csv"
-          block_acq_vector_locs_fname="block-acq-vector-locs.csv"
-          block_transport_fname="block-transport.csv"
-          block_manipulation_fname="block-manipulation.csv"
-          swarm_dist_pos2D_fname="swarm-dist-pos2D.csv">
+          fsm_collision_counts="fsm-collision-counts.csv"
+          fsm_collision_locs2D="fsm-collision-locs.csv"
+          fsm_movement="fsm-movement.csv"
+          block_acq_counts="block-acq-counts.csv"
+          block_acq_locs="block-acq-locs.csv"
+          block_acq_explore_fname="block-acq-explore-locs.csv"
+          block_acq_vector_locs="block-acq-vector-locs.csv"
+          block_manipulation="block-manipulation.csv"
+          swarm_dist_pos2D="swarm-dist-pos2D.csv">
       </metrics>
     </output>
 

@@ -24,13 +24,13 @@
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/controller/config/perception/perception_config.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block2D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 #include "fordyca/config/depth0/mdpo_controller_repository.hpp"
 #include "fordyca/config/exploration_config.hpp"
-#include "cosm/controller/config/perception/perception_config.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
@@ -102,8 +102,8 @@ void mdpo_controller::shared_init(
                           p.occupancy_grid.resolution.v() * 5);
   p.occupancy_grid.dims += padding;
 
-  dpo_controller::perception(std::make_unique<mdpo_perception_subsystem>(&p,
-                                                                         GetId()));
+  dpo_controller::perception(
+      std::make_unique<mdpo_perception_subsystem>(&p, GetId()));
 } /* shared_init() */
 
 void mdpo_controller::private_init(

@@ -24,11 +24,11 @@
 #include "fordyca/controller/los_proc_verify.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "fordyca/repr/forager_los.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/ds/dpo_store.hpp"
+#include "fordyca/repr/forager_los.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -138,7 +138,8 @@ bool los_proc_verify::operator()(const ds::dpo_semantic_map* const c_map) const 
                   cell1.fsm().current_state(),
                   cell2.fsm().current_state());
         if (cell1.state_has_block()) {
-          ER_ASSERT(crepr::entity_dimensionality::ek2D == cell1.entity()->dimensionality(),
+          ER_ASSERT(crepr::entity_dimensionality::ek2D ==
+                        cell1.entity()->dimensionality(),
                     "Block%d is not 2D!",
                     cell1.entity()->id().v());
 

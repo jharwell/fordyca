@@ -25,7 +25,7 @@
 
 #include "cosm/fsm/acquire_goal_fsm.hpp"
 #include "cosm/robots/footbot/footbot_actuation_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 #include "fordyca/fsm/foraging_acq_goal.hpp"
@@ -42,7 +42,7 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 block_to_goal_fsm::block_to_goal_fsm(cfsm::acquire_goal_fsm* const goal_fsm,
                                      cfsm::acquire_goal_fsm* const block_fsm,
-                                     crfootbot::footbot_saa_subsystem2D* saa,
+                                     crfootbot::footbot_saa_subsystem* saa,
                                      rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.block_to_goal"),
       util_hfsm(saa, rng, ekST_MAX_STATES),
@@ -191,15 +191,25 @@ rtypes::timestep block_to_goal_fsm::collision_avoidance_duration(void) const {
   return rtypes::timestep(0);
 } /* collision_avoidance_duration() */
 
-rmath::vector2z block_to_goal_fsm::avoidance_loc(void) const {
+rmath::vector2z block_to_goal_fsm::avoidance_loc2D(void) const {
   ER_ASSERT(m_block_fsm->task_running() || m_goal_fsm->task_running(),
             "In collision avoidance without running task?");
   if (m_block_fsm->task_running()) {
-    return m_block_fsm->avoidance_loc();
+    return m_block_fsm->avoidance_loc2D();
   } else { /* goal FSM must be running */
-    return m_goal_fsm->avoidance_loc();
+    return m_goal_fsm->avoidance_loc2D();
   }
-} /* avoidance_loc() */
+} /* avoidance_loc2D() */
+
+rmath::vector3z block_to_goal_fsm::avoidance_loc3D(void) const {
+  ER_ASSERT(m_block_fsm->task_running() || m_goal_fsm->task_running(),
+            "In collision avoidance without running task?");
+  if (m_block_fsm->task_running()) {
+    return m_block_fsm->avoidance_loc3D();
+  } else { /* goal FSM must be running */
+    return m_goal_fsm->avoidance_loc3D();
+  }
+} /* avoidance_loc3D() */
 
 /*******************************************************************************
  * Acquisition Metrics
@@ -239,11 +249,11 @@ rmath::vector2z block_to_goal_fsm::acquisition_loc(void) const {
 } /* acquisition_loc() */
 
 rmath::vector2z block_to_goal_fsm::current_explore_loc(void) const {
-  return saa()->sensing()->discrete_position();
+  return saa()->sensing()->dpos2D();
 } /* current_explore_loc() */
 
 rmath::vector2z block_to_goal_fsm::current_vector_loc(void) const {
-  return saa()->sensing()->discrete_position();
+  return saa()->sensing()->dpos2D();
 } /* current_vector_loc() */
 
 /*******************************************************************************

@@ -49,7 +49,7 @@ rtypes::type_uuid block_op_penalty_id_calculator::operator()(
   rtypes::type_uuid id = rtypes::constants::kNoUUID;
   switch (src) {
     case block_op_src::ekFREE_PICKUP:
-      id = decoratee().from_free_pickup(controller.pos2D(),
+      id = decoratee().from_free_pickup(controller.rpos2D(),
                                         controller.entity_acquired_id(),
                                         mc_map);
       break;

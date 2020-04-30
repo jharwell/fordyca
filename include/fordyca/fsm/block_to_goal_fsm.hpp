@@ -67,7 +67,7 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
  public:
   block_to_goal_fsm(cfsm::acquire_goal_fsm* goal_fsm,
                     cfsm::acquire_goal_fsm* block_fsm,
-                    crfootbot::footbot_saa_subsystem2D* saa,
+                    crfootbot::footbot_saa_subsystem* saa,
                     rmath::rng* rng);
   ~block_to_goal_fsm(void) override = default;
 
@@ -91,7 +91,8 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
   bool exited_collision_avoidance(void) const override final RCSW_PURE;
   rtypes::timestep collision_avoidance_duration(
       void) const override final RCSW_PURE;
-  rmath::vector2z avoidance_loc(void) const override final RCSW_PURE;
+  rmath::vector2z avoidance_loc2D(void) const override final RCSW_PURE;
+  rmath::vector3z avoidance_loc3D(void) const override final RCSW_PURE;
 
   /* goal acquisition metrics */
   rmath::vector2z acquisition_loc(void) const override final;

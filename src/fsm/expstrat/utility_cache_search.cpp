@@ -26,6 +26,7 @@
 #include <numeric>
 
 #include "cosm/repr/base_block2D.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
@@ -52,7 +53,7 @@ void utility_cache_search::task_start(const cta::taskable_argument*) {
                                }) /
                boost::size(range);
   } else {
-    position = saa()->sensing()->position();
+    position = saa()->sensing()->rpos2D();
   }
   depth2::cache_site_selector sel(mc_matrix);
   if (auto site = sel(mc_store->caches(), mc_store->blocks(), position, rng())) {

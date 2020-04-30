@@ -30,12 +30,12 @@
 
 #include "rcppsw/er/client.hpp"
 
-#include "fordyca/repr/forager_los.hpp"
-
 #include "cosm/controller/config/perception/perception_config.hpp"
+
 #include "fordyca/controller/foraging_perception_subsystem.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
+#include "fordyca/repr/forager_los.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -64,8 +64,9 @@ class mdpo_perception_subsystem final
       public foraging_perception_subsystem,
       public metrics::perception::mdpo_perception_metrics {
  public:
-  mdpo_perception_subsystem(const ccontconfig::perception::perception_config* config,
-                            const std::string& id);
+  mdpo_perception_subsystem(
+      const ccontconfig::perception::perception_config* config,
+      const std::string& id);
   ~mdpo_perception_subsystem(void) override = default;
 
   /* world model metrics */

@@ -40,7 +40,7 @@
  * Namespaces
  ******************************************************************************/
 namespace cosm::robots::footbot {
-class footbot_saa_subsystem2D;
+class footbot_saa_subsystem;
 } /* namespace cosm::robots::footbot */
 
 NS_START(fordyca);
@@ -80,8 +80,8 @@ class acquire_existing_cache_fsm
    */
   acquire_existing_cache_fsm(
       const fsm_ro_params* c_params,
-      crfootbot::footbot_saa_subsystem2D* saa,
-      std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
+      crfootbot::footbot_saa_subsystem* saa,
+      std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
       rmath::rng* rng,
       bool for_pickup);
 

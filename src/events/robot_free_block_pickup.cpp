@@ -84,8 +84,9 @@ void robot_free_block_pickup::dispatch_robot_free_block_interactor(
   interactor->accept(*this);
 } /* dispatch_robot_free_block_interactor() */
 
-template<typename TControllerType>
-void robot_free_block_pickup::d1d2_dpo_controller_visit(TControllerType& controller) {
+template <typename TControllerType>
+void robot_free_block_pickup::d1d2_dpo_controller_visit(
+    TControllerType& controller) {
   controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
@@ -100,7 +101,7 @@ void robot_free_block_pickup::d1d2_dpo_controller_visit(TControllerType& control
   controller.ndc_pop();
 } /* d1d2_dpo_controller_visit() */
 
-template<typename TControllerType>
+template <typename TControllerType>
 void robot_free_block_pickup::d1d2_mdpo_controller_visit(
     TControllerType& controller) {
   controller.ndc_pusht();
@@ -117,7 +118,7 @@ void robot_free_block_pickup::d1d2_mdpo_controller_visit(
   controller.ndc_pop();
 } /* d1d2_mdpo_controller_visit() */
 
-template<typename TControllerType>
+template <typename TControllerType>
 void robot_free_block_pickup::d0_dpo_controller_visit(
     TControllerType& controller) {
   controller.ndc_pusht();
@@ -134,7 +135,7 @@ void robot_free_block_pickup::d0_dpo_controller_visit(
   controller.ndc_pop();
 } /* d0_dpo_controller_visit() */
 
-template<typename TControllerType>
+template <typename TControllerType>
 void robot_free_block_pickup::d0_mdpo_controller_visit(
     TControllerType& controller) {
   controller.ndc_pusht();

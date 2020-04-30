@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/fsm/expstrat/ledtaxis_cache_search.hpp"
 
-#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 /*******************************************************************************
@@ -102,14 +102,24 @@ rtypes::timestep ledtaxis_cache_search::collision_avoidance_duration(void) const
   }
 } /* collision_avoidance_duration() */
 
-rmath::vector2z ledtaxis_cache_search::avoidance_loc(void) const {
+rmath::vector2z ledtaxis_cache_search::avoidance_loc2D(void) const {
   ER_ASSERT(m_taxis.task_running() || m_crw.task_running(),
             "In collision avoidance without running task?");
   if (m_taxis.task_running()) {
-    return m_taxis.avoidance_loc();
+    return m_taxis.avoidance_loc2D();
   } else {
-    return m_crw.avoidance_loc();
+    return m_crw.avoidance_loc2D();
   }
-} /* collision_avoidance_duration() */
+} /* avoidance_loc2D() */
+
+rmath::vector3z ledtaxis_cache_search::avoidance_loc3D(void) const {
+  ER_ASSERT(m_taxis.task_running() || m_crw.task_running(),
+            "In collision avoidance without running task?");
+  if (m_taxis.task_running()) {
+    return m_taxis.avoidance_loc3D();
+  } else {
+    return m_crw.avoidance_loc3D();
+  }
+} /* avoidance_loc3D() */
 
 NS_END(expstrat, fsm, fordyca);

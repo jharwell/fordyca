@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/config/depth1/controller_repository.hpp"
 
-#include "cosm/subsystem/config/xml/sensing_subsystem2D_parser.hpp"
+#include "cosm/subsystem/config/xml/sensing_subsystemQ3D_parser.hpp"
 #include "cosm/ta/config/xml/task_alloc_parser.hpp"
 #include "cosm/ta/config/xml/task_executive_parser.hpp"
 
@@ -58,8 +58,8 @@ controller_repository::controller_repository(void) {
   parser_find<rtcxml::task_alloc_parser>(rtcxml::task_alloc_parser::kXMLRoot)
       ->exec_est_task_add("harvester");
 
-  parser_find<cscxml::sensing_subsystem2D_parser>(
-      cscxml::sensing_subsystem2D_parser::kXMLRoot)
+  parser_find<cscxml::sensing_subsystemQ3D_parser>(
+      cscxml::sensing_subsystemQ3D_parser::kXMLRoot)
       ->ground_detection_add("cache");
 }
 

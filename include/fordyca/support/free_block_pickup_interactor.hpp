@@ -55,7 +55,8 @@ NS_START(fordyca, support);
  */
 template <typename TControllerType, typename TArenaMapType>
 class free_block_pickup_interactor
-    : public rer::client<free_block_pickup_interactor<TControllerType, TArenaMapType>> {
+    : public rer::client<
+          free_block_pickup_interactor<TControllerType, TArenaMapType>> {
  public:
   free_block_pickup_interactor(TArenaMapType* const map,
                                argos::CFloorEntity* const floor,
@@ -106,7 +107,8 @@ class free_block_pickup_interactor
    * \brief Determine if a robot is waiting to pick up a free block, and if it
    * is actually on a free block, send it the \ref free_block_pickup event.
    */
-  void finish_free_block_pickup(TControllerType& controller, const rtypes::timestep& t) {
+  void finish_free_block_pickup(TControllerType& controller,
+                                const rtypes::timestep& t) {
     ER_ASSERT(controller.goal_acquired() && fsm::foraging_acq_goal::ekBLOCK ==
                                                 controller.acquisition_goal(),
               "Controller not waiting for free block pickup");
@@ -187,8 +189,8 @@ class free_block_pickup_interactor
      * event, because the penalty is generic, and the event handles concrete
      * classes--no clean way to mix the two.
      */
-    controller.block_manip_recorder()->record(metrics::blocks::block_manip_events::ekFREE_PICKUP,
-                                              penalty.penalty());
+    controller.block_manip_recorder()->record(
+        metrics::blocks::block_manip_events::ekFREE_PICKUP, penalty.penalty());
     events::robot_free_block_pickup_visitor rpickup_op(*it,
                                                        controller.entity_id(),
                                                        t);
@@ -202,7 +204,8 @@ class free_block_pickup_interactor
      *
      * In order for the pickup event to process properly.
      */
-    apickup_op.visit(*static_cast<carena::base_arena_map<crepr::base_block2D>*>(m_map));
+    apickup_op.visit(
+        *static_cast<carena::base_arena_map<crepr::base_block2D>*>(m_map));
     rpickup_op.visit(controller);
 
     /* The floor texture must be updated */

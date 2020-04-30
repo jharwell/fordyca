@@ -64,8 +64,8 @@ class acquire_new_cache_fsm final : public rer::client<acquire_new_cache_fsm>,
                               public cfsm::acquire_goal_fsm {
  public:
   acquire_new_cache_fsm(const fsm_ro_params* c_params,
-                        crfootbot::footbot_saa_subsystem2D* saa,
-                        std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
+                        crfootbot::footbot_saa_subsystem* saa,
+                        std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
                         rmath::rng* rng);
   ~acquire_new_cache_fsm(void) override = default;
 

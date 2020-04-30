@@ -53,8 +53,9 @@ void oracular_info_receptor::dpo_store_update(ds::dpo_store* const store) {
     auto blocks = mc_oracle->blocks()->ask();
     if (!blocks.empty()) {
       ER_DEBUG("Blocks in receptor: [%s]",
-               cforacle::foraging_oracle::blocks_oracle_type::knowledge_to_string("b",
-                                                                                  blocks).c_str());
+               cforacle::foraging_oracle::blocks_oracle_type::knowledge_to_string(
+                   "b", blocks)
+                   .c_str());
       ER_DEBUG("Blocks in DPO store: [%s]",
                rcppsw::to_string(store->blocks()).c_str());
     }
@@ -71,8 +72,9 @@ void oracular_info_receptor::dpo_store_update(ds::dpo_store* const store) {
     auto caches = mc_oracle->caches()->ask();
     if (!caches.empty()) {
       ER_DEBUG("Caches in receptor: [%s]",
-               cforacle::foraging_oracle::caches_oracle_type::knowledge_to_string("c",
-                                                                               caches).c_str());
+               cforacle::foraging_oracle::caches_oracle_type::knowledge_to_string(
+                   "c", caches)
+                   .c_str());
       ER_DEBUG("Caches in DPO store: [%s]",
                rcppsw::to_string(store->caches()).c_str());
     }
@@ -142,13 +144,13 @@ void oracular_info_receptor::int_est_update(cta::polled_task* const task) {
 bool oracular_info_receptor::entities_blocks_enabled(void) const {
   auto blocks_it = mc_oracle->config()->entities.types.find("blocks");
   return mc_oracle->config()->entities.types.end() != blocks_it &&
-      blocks_it->second;
+         blocks_it->second;
 } /* entities_blocks_enabled() */
 
 bool oracular_info_receptor::entities_caches_enabled(void) const {
   auto caches_it = mc_oracle->config()->entities.types.find("caches");
   return mc_oracle->config()->entities.types.end() != caches_it &&
-      caches_it->second;
+         caches_it->second;
 } /* entities_caches_enabled() */
 
 bool oracular_info_receptor::tasking_enabled(void) const {

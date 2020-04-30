@@ -23,10 +23,22 @@
  ******************************************************************************/
 #include "fordyca/fsm/expstrat/localized_search.hpp"
 
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, fsm, expstrat);
+
+/*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+localized_search::localized_search(crfootbot::footbot_saa_subsystem* saa,
+                                   rmath::rng* rng)
+    : foraging_expstrat(saa, rng),
+      ER_CLIENT_INIT("fordyca.fsm.expstrat.localized_search"),
+      m_vfsm(saa, rng),
+      m_crw(saa, rng) {}
 
 /*******************************************************************************
  * Member Functions
@@ -70,14 +82,24 @@ rtypes::timestep localized_search::collision_avoidance_duration(void) const {
   }
 } /* collision_avoidance_duration() */
 
-rmath::vector2z localized_search::avoidance_loc(void) const {
+rmath::vector2z localized_search::avoidance_loc2D(void) const {
   ER_ASSERT(m_vfsm.task_running() || m_crw.task_running(),
             "In collision avoidance without running task?");
   if (m_vfsm.task_running()) {
-    return m_vfsm.avoidance_loc();
+    return m_vfsm.avoidance_loc2D();
   } else {
-    return m_crw.avoidance_loc();
+    return m_crw.avoidance_loc2D();
   }
-} /* collision_avoidance_duration() */
+} /* avoidance_loc2D() */
+
+rmath::vector3z localized_search::avoidance_loc3D(void) const {
+  ER_ASSERT(m_vfsm.task_running() || m_crw.task_running(),
+            "In collision avoidance without running task?");
+  if (m_vfsm.task_running()) {
+    return m_vfsm.avoidance_loc3D();
+  } else {
+    return m_crw.avoidance_loc3D();
+  }
+} /* avoidance_loc3D() */
 
 NS_END(expstrat, fsm, fordyca);

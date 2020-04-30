@@ -32,13 +32,13 @@
 #include "cosm/metrics/collector_registerer.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
-#include "fordyca/controller/foraging_perception_subsystem.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
 #include "fordyca/controller/depth0/odpo_controller.hpp"
 #include "fordyca/controller/depth0/omdpo_controller.hpp"
 #include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca/controller/foraging_perception_subsystem.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
@@ -98,7 +98,7 @@ void depth0_metrics_aggregator::collect_from_controller(
   collect("blocks::acq_counts", *controller);
   collect("blocks::manipulation", *controller->block_manip_recorder());
 
-  collect_if("fsm::collision_locs",
+  collect_if("fsm::collision_locs2D",
              *controller->fsm(),
              [&](const rmetrics::base_metrics&) {
                return controller->fsm()->ca_tracker()->in_collision_avoidance();

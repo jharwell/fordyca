@@ -60,7 +60,7 @@ class acquire_cache_site_fsm : public rer::client<acquire_cache_site_fsm>,
                                public metrics::caches::site_selection_metrics {
  public:
   acquire_cache_site_fsm(const fsm_ro_params* c_params,
-                         crfootbot::footbot_saa_subsystem2D* saa,
+                         crfootbot::footbot_saa_subsystem* saa,
                          rmath::rng* rng);
   ~acquire_cache_site_fsm(void) override = default;
 

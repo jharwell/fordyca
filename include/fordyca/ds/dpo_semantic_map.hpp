@@ -29,12 +29,12 @@
 
 #include "rcppsw/patterns/decorator/decorator.hpp"
 
+#include "cosm/controller/config/perception/perception_config.hpp"
+
 #include "fordyca/ds/dp_block_map.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/ds/occupancy_grid.hpp"
-
-#include "cosm/controller/config/perception/perception_config.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -135,10 +135,10 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
 
  public:
   /* wrapping DPO store--must be after declaration -_- */
-  RCPPSW_DECLDEF_WRAP(blocks, (*store()))
-  RCPPSW_DECLDEF_WRAP(caches, (*store()))
-  RCPPSW_DECLDEF_WRAP(blocks, (*store()), const)
-  RCPPSW_DECLDEF_WRAP(caches, (*store()), const)
+  RCPPSW_WRAP_DECLDEF(blocks, (*store()))
+  RCPPSW_WRAP_DECLDEF(caches, (*store()))
+  RCPPSW_WRAP_DECLDEF(blocks, (*store()), const)
+  RCPPSW_WRAP_DECLDEF(caches, (*store()), const)
 };
 
 NS_END(ds, fordyca);

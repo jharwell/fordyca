@@ -130,15 +130,14 @@ void depth1_metrics_aggregator::task_start_cb(const cta::polled_task* const,
 } /* task_start_cb() */
 
 void depth1_metrics_aggregator::register_standard(
-    const cmconfig::metrics_config*  mconfig) {
+    const cmconfig::metrics_config* mconfig) {
   using collector_typelist = rmpl::typelist<
-    rmpl::identity<cfsm::metrics::goal_acq_metrics_collector>,
-    rmpl::identity<ctametrics::execution_metrics_collector>,
-    rmpl::identity<ctametrics::bi_tab_metrics_collector>,
-    rmpl::identity<cametrics::caches::utilization_metrics_collector>,
-    rmpl::identity<metrics::caches::lifecycle_metrics_collector>
-     >;
-cmetrics::collector_registerer<>::creatable_set creatable_set = {
+      rmpl::identity<cfsm::metrics::goal_acq_metrics_collector>,
+      rmpl::identity<ctametrics::execution_metrics_collector>,
+      rmpl::identity<ctametrics::bi_tab_metrics_collector>,
+      rmpl::identity<cametrics::caches::utilization_metrics_collector>,
+      rmpl::identity<metrics::caches::lifecycle_metrics_collector> >;
+  cmetrics::collector_registerer<>::creatable_set creatable_set = {
       {typeid(cfsm::metrics::goal_acq_metrics_collector),
        "cache_acq_counts",
        "caches::acq_counts",
@@ -166,8 +165,7 @@ cmetrics::collector_registerer<>::creatable_set creatable_set = {
       {typeid(metrics::caches::lifecycle_metrics_collector),
        "cache_lifecycle",
        "caches::lifecycle",
-       rmetrics::output_mode::ekAPPEND}
-      };
+       rmetrics::output_mode::ekAPPEND}};
   cmetrics::collector_registerer<> registerer(mconfig, creatable_set, this);
   boost::mpl::for_each<collector_typelist>(registerer);
 } /* register_standard() */
@@ -175,21 +173,17 @@ cmetrics::collector_registerer<>::creatable_set creatable_set = {
 void depth1_metrics_aggregator::register_with_decomp_depth(
     const cmconfig::metrics_config* const mconfig,
     size_t depth) {
-  using collector_typelist = rmpl::typelist<
-    rmpl::identity<ctametrics::bi_tdgraph_metrics_collector>
-    >;
+  using collector_typelist =
+      rmpl::typelist<rmpl::identity<ctametrics::bi_tdgraph_metrics_collector> >;
   using extra_args_type = std::tuple<size_t>;
   cmetrics::collector_registerer<extra_args_type>::creatable_set creatable_set = {
-    {typeid(ctametrics::bi_tdgraph_metrics_collector),
-     "task_distribution",
-     "tasks::distribution",
-     rmetrics::output_mode::ekAPPEND}
-  };
+      {typeid(ctametrics::bi_tdgraph_metrics_collector),
+       "task_distribution",
+       "tasks::distribution",
+       rmetrics::output_mode::ekAPPEND}};
 
-  cmetrics::collector_registerer<extra_args_type> registerer(mconfig,
-                                                             creatable_set,
-                                                             this,
-                                                             std::make_tuple(depth));
+  cmetrics::collector_registerer<extra_args_type> registerer(
+      mconfig, creatable_set, this, std::make_tuple(depth));
   boost::mpl::for_each<collector_typelist>(registerer);
 } /* register_with_decomp_depth() */
 
@@ -197,14 +191,13 @@ void depth1_metrics_aggregator::register_with_arena_dims2D(
     const cmconfig::metrics_config* const mconfig,
     const rmath::vector2z& dims) {
   using collector_typelist = rmpl::typelist<
-    rmpl::identity<cfsm::metrics::goal_acq_locs_metrics_collector>,
-    rmpl::identity<cfsm::metrics::current_explore_locs_metrics_collector>,
-    rmpl::identity<cfsm::metrics::current_vector_locs_metrics_collector>,
-    rmpl::identity<cametrics::caches::location_metrics_collector>
-    >;
+      rmpl::identity<cfsm::metrics::goal_acq_locs_metrics_collector>,
+      rmpl::identity<cfsm::metrics::current_explore_locs_metrics_collector>,
+      rmpl::identity<cfsm::metrics::current_vector_locs_metrics_collector>,
+      rmpl::identity<cametrics::caches::location_metrics_collector> >;
 
   using extra_args_type = std::tuple<rmath::vector2z>;
-    cmetrics::collector_registerer<extra_args_type>::creatable_set creatable_set = {
+  cmetrics::collector_registerer<extra_args_type>::creatable_set creatable_set = {
       {typeid(cfsm::metrics::goal_acq_locs_metrics_collector),
        "cache_acq_locs",
        "caches::acq_locs",
@@ -221,10 +214,8 @@ void depth1_metrics_aggregator::register_with_arena_dims2D(
        "cache_locations",
        "caches::locations",
        rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE}};
-  cmetrics::collector_registerer<extra_args_type> registerer(mconfig,
-                                                             creatable_set,
-                                                             this,
-                                                             std::make_tuple(dims));
+  cmetrics::collector_registerer<extra_args_type> registerer(
+      mconfig, creatable_set, this, std::make_tuple(dims));
   boost::mpl::for_each<collector_typelist>(registerer);
 } /* register_with_arena_dims2D() */
 

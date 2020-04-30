@@ -41,7 +41,7 @@ NS_START(fordyca, support);
  * post-interaction hooks need to be run after processing all interactions for a
  * given robot on a given timestep.
  */
-enum class interactor_status: uint {
+enum class interactor_status : uint {
   /**
    * \brief No event occured (i.e. the robot did not meet the requirements for
    * the interaction).

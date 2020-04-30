@@ -161,7 +161,7 @@ void base_cache_creator::update_host_cells(cads::acache_vectoro& caches) {
         rmath::vector2z c = rmath::vector2z(i, j);
         auto& cell = m_grid->access<arena_grid::kCell>(i, j);
         ER_ASSERT(cache->contains_point2D(
-            rmath::zvec2dvec(c, m_grid->resolution().v())),
+                      rmath::zvec2dvec(c, m_grid->resolution().v())),
                   "Cache%d does not contain point (%u, %u) within its extent",
                   cache->id().v(),
                   i,

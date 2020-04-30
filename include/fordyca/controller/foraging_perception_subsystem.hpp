@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include "cosm/controller/perception/base_perception_subsystem.hpp"
 
-#include "fordyca/repr/forager_los.hpp"
 #include "fordyca/fordyca.hpp"
+#include "fordyca/repr/forager_los.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,7 +51,8 @@ class oracular_info_receptor;
  * \brief Base class for robot perception common to all foraging controllers,
  * which is just the \ref dpo_store of objects.
  */
-class foraging_perception_subsystem : public ccperception::base_perception_subsystem<repr::forager_los> {
+class foraging_perception_subsystem
+    : public ccperception::base_perception_subsystem<repr::forager_los> {
  public:
   explicit foraging_perception_subsystem(
       const ccontconfig::perception::perception_config* const pconfig)

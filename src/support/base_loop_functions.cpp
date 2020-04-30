@@ -27,11 +27,11 @@
 
 #include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/arena/config/arena_map_config.hpp"
-#include "cosm/pal/argos_convergence_calculator.hpp"
+#include "cosm/foraging/oracle/foraging_oracle.hpp"
 #include "cosm/metrics/config/output_config.hpp"
 #include "cosm/oracle/config/aggregate_oracle_config.hpp"
-#include "cosm/foraging/oracle/foraging_oracle.hpp"
 #include "cosm/oracle/tasking_oracle.hpp"
+#include "cosm/pal/argos_convergence_calculator.hpp"
 #include "cosm/pal/argos_swarm_iterator.hpp"
 #include "cosm/vis/config/visualization_config.hpp"
 
@@ -107,15 +107,11 @@ void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
    * they are disabled, and trying to figure out how to get things to work if
    * they are omitted is waaayyyy too much work. See #621 too.
    */
-  auto envd = std::make_unique<tv::env_dynamics>(
-      &tvp->env_dynamics, this, arena_map());
+  auto envd =
+      std::make_unique<tv::env_dynamics>(&tvp->env_dynamics, this, arena_map());
 
   auto popd = std::make_unique<tv::fordyca_pd_adaptor>(
-      &tvp->population_dynamics,
-      this,
-      envd.get(),
-      arena_map(),
-      rng());
+      &tvp->population_dynamics, this, envd.get(), arena_map(), rng());
 
   m_tv_manager =
       std::make_unique<tv::tv_manager>(std::move(envd), std::move(popd));
@@ -192,6 +188,5 @@ void base_loop_functions::post_step(void) {
 void base_loop_functions::reset(void) {
   arena_map()->distribute_all_blocks();
 } /* reset() */
-
 
 NS_END(support, fordyca);

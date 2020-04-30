@@ -57,7 +57,7 @@ class likelihood_block_search : public localized_search {
                                 c_params->dpo_store,
                                 rng) {}
 
-  likelihood_block_search(crfootbot::footbot_saa_subsystem2D* saa,
+  likelihood_block_search(crfootbot::footbot_saa_subsystem* saa,
                           const ds::dpo_store* store,
                           rmath::rng* rng)
       : localized_search(saa, rng),
@@ -71,7 +71,7 @@ class likelihood_block_search : public localized_search {
   void task_start(const cta::taskable_argument*) override final;
 
   /* prototype overrides */
-  std::unique_ptr<foraging_expstrat> clone(void) const override {
+  std::unique_ptr<cfsm::expstrat::base_expstrat> clone(void) const override {
     return std::make_unique<likelihood_block_search>(saa(),
                                                      mc_store,
                                                      rng());

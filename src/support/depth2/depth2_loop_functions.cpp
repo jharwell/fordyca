@@ -37,11 +37,11 @@
 
 #include "cosm/arena/config/arena_map_config.hpp"
 #include "cosm/controller/operations/applicator.hpp"
-#include "cosm/pal/argos_convergence_calculator.hpp"
 #include "cosm/foraging/block_dist/base_distributor.hpp"
+#include "cosm/foraging/oracle/foraging_oracle.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
 #include "cosm/operations/robot_arena_interaction_applicator.hpp"
-#include "cosm/foraging/oracle/foraging_oracle.hpp"
+#include "cosm/pal/argos_convergence_calculator.hpp"
 #include "cosm/pal/argos_swarm_iterator.hpp"
 #include "cosm/robots/footbot/config/saa_xml_names.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
@@ -94,9 +94,9 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
         lf->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>(),
         lf->m_cache_manager.get(),
         lf};
-    lf->m_interactor_map->emplace(typeid(controller),
-                                  robot_arena_interactor<T,
-                                  carena::caching_arena_map>(p));
+    lf->m_interactor_map->emplace(
+        typeid(controller),
+        robot_arena_interactor<T, carena::caching_arena_map>(p));
     lf->m_metric_extractor_map->emplace(
         typeid(controller),
         ccops::metrics_extract<T, depth2_metrics_aggregator>(
@@ -107,10 +107,12 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
             lf->config()->config_get<cvconfig::visualization_config>(),
             lf->oracle(),
             lf->m_metrics_agg.get()));
-    lf->m_los_update_map->emplace(typeid(controller),
-                                  ccops::robot_los_update<T,
-                                  rds::grid2D_overlay<cds::cell2D>,
-                                  repr::forager_los>(lf->arena_map()->decoratee().template layer<cds::arena_grid::kCell>()));
+    lf->m_los_update_map->emplace(
+        typeid(controller),
+        ccops::robot_los_update<T,
+                                rds::grid2D_overlay<cds::cell2D>,
+                                repr::forager_los>(
+            lf->arena_map()->decoratee().template layer<cds::arena_grid::kCell>()));
   }
 
   /* clang-format off */
@@ -421,11 +423,10 @@ void depth2_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
             controller->GetId().c_str(),
             controller->type_index().name());
 
-  auto applicator =
-      ccops::applicator<controller::foraging_controller,
-                        ccops::robot_los_update,
-                        rds::grid2D_overlay<cds::cell2D>,
-                        repr::forager_los>(controller);
+  auto applicator = ccops::applicator<controller::foraging_controller,
+                                      ccops::robot_los_update,
+                                      rds::grid2D_overlay<cds::cell2D>,
+                                      repr::forager_los>(controller);
   boost::apply_visitor(applicator,
                        m_los_update_map->at(controller->type_index()));
 } /* robot_pre_step() */
@@ -451,8 +452,7 @@ void depth2_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
       cops::robot_arena_interaction_applicator<controller::foraging_controller,
                                                robot_arena_interactor,
                                                carena::caching_arena_map>(
-                                                   controller,
-                                                   rtypes::timestep(GetSpace().GetSimulationClock()));
+          controller, rtypes::timestep(GetSpace().GetSimulationClock()));
   auto status =
       boost::apply_visitor(iapplicator,
                            m_interactor_map->at(controller->type_index()));

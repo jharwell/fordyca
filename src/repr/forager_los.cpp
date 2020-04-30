@@ -23,8 +23,8 @@
  *****************************************************************************/
 #include "fordyca/repr/forager_los.hpp"
 
-#include "cosm/ds/cell2D.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
+#include "cosm/ds/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -40,10 +40,11 @@ cds::entity_vector forager_los::blocks(void) const {
     for (size_t j = 0; j < ysize(); ++j) {
       const cds::cell2D& cell = access(i, j);
       if (cell.state_has_block()) {
-        ER_ASSERT(nullptr != cell.block2D() || nullptr != cell.block3D(),
-                  "Cell at(%zu,%zu) in HAS_BLOCK state, but does not have block",
-                  i,
-                  j);
+        ER_ASSERT(
+            nullptr != cell.block2D() || nullptr != cell.block3D(),
+            "Cell at(%zu,%zu) in HAS_BLOCK state, but does not have block",
+            i,
+            j);
         blocks.push_back(cell.entity());
       }
     } /* for(j..) */

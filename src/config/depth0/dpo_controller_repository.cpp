@@ -23,8 +23,9 @@
  ******************************************************************************/
 #include "fordyca/config/depth0/dpo_controller_repository.hpp"
 
-#include "fordyca/config/block_sel/block_sel_matrix_parser.hpp"
 #include "cosm/controller/config/perception/xml/perception_parser.hpp"
+
+#include "fordyca/config/block_sel/block_sel_matrix_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,7 +41,7 @@ dpo_controller_repository::dpo_controller_repository(void) {
       block_sel::block_sel_matrix_parser::kXMLRoot);
   parser_register<ccontconfig::perception::xml::perception_parser,
                   ccontconfig::perception::perception_config>(
-                      ccontconfig::perception::xml::perception_parser::kXMLRoot);
+      ccontconfig::perception::xml::perception_parser::kXMLRoot);
 }
 
 NS_END(depth0, config, fordyca);

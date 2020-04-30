@@ -24,7 +24,7 @@
 #include "fordyca/fsm/expstrat/ledtaxis.hpp"
 
 #include "cosm/arena/repr/light_type_index.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,7 +34,7 @@ NS_START(fordyca, fsm, expstrat);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-ledtaxis::ledtaxis(crfootbot::footbot_saa_subsystem2D* saa,
+ledtaxis::ledtaxis(crfootbot::footbot_saa_subsystem* saa,
                    const rutils::color& target,
                    rmath::rng* rng)
     : foraging_expstrat(saa, rng),

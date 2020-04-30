@@ -55,7 +55,7 @@ struct convergence_config;
 } /* namespace cosm::convergence */
 
 namespace cosm::pal {
-template<class TControllerType>
+template <class TControllerType>
 class argos_convergence_calculator;
 } /* namespace cosm::pal */
 
@@ -98,7 +98,8 @@ NS_START(support);
 class base_loop_functions : public cpal::argos_sm_adaptor,
                             public rer::client<base_loop_functions> {
  public:
-  using convergence_calculator_type = cpal::argos_convergence_calculator<cpal::argos_controller2D_adaptor>;
+  using convergence_calculator_type =
+      cpal::argos_convergence_calculator<cpal::argos_controller2D_adaptor>;
 
   base_loop_functions(void) RCSW_COLD;
   ~base_loop_functions(void) override RCSW_COLD;
@@ -117,9 +118,7 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
   const convergence_calculator_type* conv_calculator(void) const {
     return m_conv_calc.get();
   }
-  const cforacle::foraging_oracle* oracle(void) const {
-    return m_oracle.get();
-  }
+  const cforacle::foraging_oracle* oracle(void) const { return m_oracle.get(); }
 
  protected:
   tv::tv_manager* tv_manager(void) { return m_tv_manager.get(); }
@@ -130,15 +129,14 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
   convergence_calculator_type* conv_calculator(void) {
     return m_conv_calc.get();
   }
-  cforacle::foraging_oracle* oracle(void) {
-    return m_oracle.get();
-  }
+  cforacle::foraging_oracle* oracle(void) { return m_oracle.get(); }
   const carena::caching_arena_map* arena_map(void) const {
     return argos_sm_adaptor::arena_map<carena::caching_arena_map>();
   }
   carena::caching_arena_map* arena_map(void) {
     return argos_sm_adaptor::arena_map<carena::caching_arena_map>();
   }
+
  private:
   /**
    * \brief Initialize convergence calculations.

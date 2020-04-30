@@ -24,13 +24,13 @@
 #include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/controller/config/perception/perception_config.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block2D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 
 #include "fordyca/config/depth1/controller_repository.hpp"
-#include "cosm/controller/config/perception/perception_config.hpp"
 #include "fordyca/controller/depth1/task_executive_builder.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"

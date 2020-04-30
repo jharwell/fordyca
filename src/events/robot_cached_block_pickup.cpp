@@ -381,7 +381,6 @@ void robot_cached_block_pickup::visit(
   visit(*controller.dpo_perception()->dpo_store());
   controller.block(std::move(m_robot_block));
 
-
   if (dispatch_d2_cache_interactor(controller.current_task(),
                                    controller.cache_sel_matrix())) {
     controller.csel_exception_added(true);

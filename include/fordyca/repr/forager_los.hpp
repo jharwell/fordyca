@@ -24,9 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "cosm/repr/los2D.hpp"
-#include "cosm/ds/entity_vector.hpp"
 #include "cosm/arena/ds/cache_vector.hpp"
+#include "cosm/ds/entity_vector.hpp"
+#include "cosm/repr/los2D.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -47,12 +47,10 @@ NS_START(fordyca, repr);
  * arena, but it also exposes non-const access to the blocks and caches within
  * that part of the arena by necessity for event processing.
  */
-class forager_los final : public crepr::los2D,
-                          public rer::client<forager_los> {
+class forager_los final : public crepr::los2D, public rer::client<forager_los> {
  public:
   explicit forager_los(const const_grid_view& c_view)
-      : los2D(c_view),
-        ER_CLIENT_INIT("fordyca.repr.forager_los") {}
+      : los2D(c_view), ER_CLIENT_INIT("fordyca.repr.forager_los") {}
 
   /**
    * \brief Get the list of blocks currently in the LOS.

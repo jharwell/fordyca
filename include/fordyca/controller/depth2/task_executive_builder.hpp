@@ -54,7 +54,7 @@ class task_executive_builder : public depth1::task_executive_builder,
  public:
   task_executive_builder(const controller::block_sel_matrix* bsel_matrix,
                       const controller::cache_sel_matrix* csel_matrix,
-                      crfootbot::footbot_saa_subsystem2D* saa,
+                      crfootbot::footbot_saa_subsystem* saa,
                       foraging_perception_subsystem* perception) RCSW_COLD;
   ~task_executive_builder(void) override RCSW_COLD;
 

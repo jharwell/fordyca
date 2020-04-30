@@ -30,8 +30,8 @@
 #include "rcppsw/math/vector2.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/repr/base_block2D.hpp"
 #include "cosm/controller/config/perception/pheromone_config.hpp"
+#include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/ds/dp_block_map.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"

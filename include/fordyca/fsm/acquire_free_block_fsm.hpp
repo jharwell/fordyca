@@ -69,8 +69,8 @@ class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
  public:
   acquire_free_block_fsm(
       const fsm_ro_params* c_params,
-      crfootbot::footbot_saa_subsystem2D* saa,
-      std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
+      crfootbot::footbot_saa_subsystem* saa,
+      std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
       rmath::rng* rng);
 
   ~acquire_free_block_fsm(void) override = default;

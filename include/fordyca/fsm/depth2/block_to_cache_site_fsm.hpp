@@ -55,8 +55,8 @@ class block_to_cache_site_fsm final : public block_to_goal_fsm,
                                       public virtual metrics::caches::site_selection_metrics {
  public:
   block_to_cache_site_fsm(const fsm_ro_params* c_params,
-                          crfootbot::footbot_saa_subsystem2D* saa,
-                          std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
+                          crfootbot::footbot_saa_subsystem* saa,
+                          std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
                           rmath::rng* rng);
 
   ~block_to_cache_site_fsm(void) override = default;
@@ -80,9 +80,9 @@ class block_to_cache_site_fsm final : public block_to_goal_fsm,
 
  public:
   /* cache site selection overrides */
-  RCPPSW_DECLDEF_OVERRIDE_WRAP(site_select_exec, m_cache_fsm, const);
-  RCPPSW_DECLDEF_OVERRIDE_WRAP(site_select_success, m_cache_fsm, const);
-  RCPPSW_DECLDEF_OVERRIDE_WRAP(nlopt_result, m_cache_fsm, const);
+  RCPPSW_DECLDEF_WRAP_OVERRIDE(site_select_exec, m_cache_fsm, const);
+  RCPPSW_DECLDEF_WRAP_OVERRIDE(site_select_success, m_cache_fsm, const);
+  RCPPSW_DECLDEF_WRAP_OVERRIDE(nlopt_result, m_cache_fsm, const);
 };
 
 NS_END(depth2, fsm, fordyca);

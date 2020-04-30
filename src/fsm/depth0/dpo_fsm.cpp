@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
 
@@ -35,8 +37,8 @@ NS_START(fordyca, fsm, depth0);
  * Constructors/Destructors
  ******************************************************************************/
 dpo_fsm::dpo_fsm(const fsm_ro_params* params,
-                 crfootbot::footbot_saa_subsystem2D* saa,
-                 std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
+                 crfootbot::footbot_saa_subsystem* saa,
+                 std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
                  rmath::rng* rng)
     : util_hfsm(saa, rng, ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth0.dpo"),
@@ -93,8 +95,8 @@ RCPPSW_WRAP_DEF(dpo_fsm, in_collision_avoidance, m_block_fsm, const)
 RCPPSW_WRAP_DEF(dpo_fsm, entered_collision_avoidance, m_block_fsm, const);
 RCPPSW_WRAP_DEF(dpo_fsm, exited_collision_avoidance, m_block_fsm, const);
 RCPPSW_WRAP_DEF(dpo_fsm, collision_avoidance_duration, m_block_fsm, const);
-
-RCPPSW_WRAP_DEF(dpo_fsm, avoidance_loc, m_block_fsm, const);
+RCPPSW_WRAP_DEF(dpo_fsm, avoidance_loc2D, m_block_fsm, const);
+RCPPSW_WRAP_DEF(dpo_fsm, avoidance_loc3D, m_block_fsm, const);
 
 /*******************************************************************************
  * Goal Acquisition Metrics

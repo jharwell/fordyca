@@ -24,7 +24,7 @@
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 #include "fordyca/ds/dpo_store.hpp"
@@ -47,8 +47,8 @@ using cselm = controller::cache_sel_matrix;
  ******************************************************************************/
 acquire_existing_cache_fsm::acquire_existing_cache_fsm(
     const fsm_ro_params* c_params,
-    crfootbot::footbot_saa_subsystem2D* saa,
-    std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
+    crfootbot::footbot_saa_subsystem* saa,
+    std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
     rmath::rng* rng,
     bool for_pickup)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_existing_cache"),
@@ -113,7 +113,7 @@ boost::optional<acquire_existing_cache_fsm::acq_loc_type> acquire_existing_cache
   existing_cache_selector selector(mc_for_pickup, mc_matrix, &mc_store->caches());
 
   if (auto best = selector(mc_store->caches(),
-                           saa()->sensing()->position(),
+                           saa()->sensing()->rpos2D(),
                            saa()->sensing()->tick())) {
     ER_INFO("Selected existing cache%d@%s/%s for acquisition",
             best->id().v(),
@@ -121,7 +121,7 @@ boost::optional<acquire_existing_cache_fsm::acq_loc_type> acquire_existing_cache
             best->dloc().to_str().c_str());
 
     rmath::vector2d point = cache_acq_point_selector(
-        kFOOTBOT_CACHE_ACQ_FACTOR)(saa()->sensing()->position(), best, rng());
+        kFOOTBOT_CACHE_ACQ_FACTOR)(saa()->sensing()->rpos2D(), best, rng());
 
     return boost::make_optional(std::make_pair(best->id(), point));
   } else {

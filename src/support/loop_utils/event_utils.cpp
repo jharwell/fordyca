@@ -37,12 +37,14 @@ NS_START(fordyca, support, utils);
  ******************************************************************************/
 rtypes::type_uuid robot_on_block(const controller::foraging_controller& controller,
                                  const carena::caching_arena_map& map) {
-  return map.robot_on_block(controller.pos2D(), controller.entity_acquired_id());
+  return map.robot_on_block(controller.rpos2D(),
+                            controller.entity_acquired_id());
 } /* robot_on_block() */
 
 rtypes::type_uuid robot_on_cache(const controller::foraging_controller& controller,
                                  const carena::caching_arena_map& map) {
-  return map.robot_on_cache(controller.pos2D(), controller.entity_acquired_id());
+  return map.robot_on_cache(controller.rpos2D(),
+                            controller.entity_acquired_id());
 } /* robot_on_cache() */
 
 proximity_status_t new_cache_cache_proximity(
@@ -51,8 +53,8 @@ proximity_status_t new_cache_cache_proximity(
     rtypes::spatial_dist new_cache_prox) {
   std::scoped_lock lock(*map.cache_mtx());
   for (const auto* cache : map.caches()) {
-    if (new_cache_prox >= (cache->rloc() - c.pos2D()).length()) {
-      return {cache->id(), cache->rloc(), cache->rloc() - c.pos2D()};
+    if (new_cache_prox >= (cache->rloc() - c.rpos2D()).length()) {
+      return {cache->id(), cache->rloc(), cache->rloc() - c.rpos2D()};
     }
   } /* for(&b..) */
   return {rtypes::constants::kNoUUID, rmath::vector2d(), rmath::vector2d()};

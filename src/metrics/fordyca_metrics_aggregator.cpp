@@ -27,8 +27,8 @@
 
 #include "rcppsw/mpl/typelist.hpp"
 
-#include "cosm/pal/argos_convergence_calculator.hpp"
 #include "cosm/metrics/collector_registerer.hpp"
+#include "cosm/pal/argos_convergence_calculator.hpp"
 
 #include "fordyca/controller/foraging_controller.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
@@ -72,8 +72,7 @@ fordyca_metrics_aggregator::fordyca_metrics_aggregator(
        rmetrics::output_mode::ekAPPEND},
   };
 
-  cmetrics::collector_registerer<> registerer(
-      mconfig, creatable_set, this);
+  cmetrics::collector_registerer<> registerer(mconfig, creatable_set, this);
   boost::mpl::for_each<detail::collector_typelist>(registerer);
   reset_all();
 }
@@ -90,7 +89,8 @@ void fordyca_metrics_aggregator::collect_from_loop(
   collect("tv::environment",
           *loop->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>());
 
-  if (nullptr != loop->tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>()) {
+  if (nullptr !=
+      loop->tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>()) {
     collect("tv::population",
             *loop->tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>());
   }

@@ -26,15 +26,15 @@
 #include <fstream>
 
 #include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/controller/config/perception/perception_config.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block2D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 #include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
 #include "fordyca/config/depth0/dpo_controller_repository.hpp"
 #include "fordyca/config/exploration_config.hpp"
-#include "cosm/controller/config/perception/perception_config.hpp"
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"

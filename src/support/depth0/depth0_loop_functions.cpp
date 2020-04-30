@@ -35,11 +35,10 @@
 
 #include "cosm/arena/config/arena_map_config.hpp"
 #include "cosm/controller/operations/applicator.hpp"
-#include "cosm/pal/argos_convergence_calculator.hpp"
-#include "fordyca/repr/forager_los.hpp"
+#include "cosm/foraging/oracle/foraging_oracle.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
 #include "cosm/operations/robot_arena_interaction_applicator.hpp"
-#include "cosm/foraging/oracle/foraging_oracle.hpp"
+#include "cosm/pal/argos_convergence_calculator.hpp"
 #include "cosm/pal/argos_swarm_iterator.hpp"
 
 #include "fordyca/controller/depth0/crw_controller.hpp"
@@ -47,13 +46,14 @@
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
 #include "fordyca/controller/depth0/odpo_controller.hpp"
 #include "fordyca/controller/depth0/omdpo_controller.hpp"
+#include "fordyca/controller/foraging_perception_subsystem.hpp"
+#include "fordyca/repr/forager_los.hpp"
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
 #include "fordyca/support/depth0/robot_arena_interactor.hpp"
 #include "fordyca/support/depth0/robot_configurer.hpp"
 #include "fordyca/support/depth0/robot_configurer_applicator.hpp"
 #include "fordyca/support/depth0/robot_los_update_applicator.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
-#include "fordyca/controller/foraging_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -96,10 +96,12 @@ struct functor_maps_initializer {
         robot_configurer<T>(
             lf->config()->config_get<cvconfig::visualization_config>(),
             lf->oracle()));
-    lf->m_los_update_map->emplace(typeid(controller),
-                                  ccops::robot_los_update<T,
-                                  rds::grid2D_overlay<cds::cell2D>,
-                                  repr::forager_los>(lf->arena_map()->decoratee().template layer<cds::arena_grid::kCell>()));
+    lf->m_los_update_map->emplace(
+        typeid(controller),
+        ccops::robot_los_update<T,
+                                rds::grid2D_overlay<cds::cell2D>,
+                                repr::forager_los>(
+            lf->arena_map()->decoratee().template layer<cds::arena_grid::kCell>()));
   }
 
   /* clang-format off */
@@ -150,8 +152,8 @@ void depth0_loop_functions::private_init(void) {
    * arena map. The arena map pads the size obtained from the XML file after
    * initialization, so we just need to grab it.
    */
-  auto padded_size = rmath::vector2d(arena_map()->xrsize(),
-                                     arena_map()->yrsize());
+  auto padded_size =
+      rmath::vector2d(arena_map()->xrsize(), arena_map()->yrsize());
   auto arena = *config()->config_get<caconfig::arena_map_config>();
   arena.grid.dims = padded_size;
   m_metrics_agg = std::make_unique<depth0_metrics_aggregator>(&output->metrics,
