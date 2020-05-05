@@ -43,7 +43,7 @@ NS_START(fordyca, fsm, depth2);
 acquire_new_cache_fsm::acquire_new_cache_fsm(
     const fsm_ro_params* c_params,
     crfootbot::footbot_saa_subsystem* saa,
-    std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
+    std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_new_cache"),
       acquire_goal_fsm(
@@ -88,7 +88,7 @@ bool acquire_new_cache_fsm::candidates_exist(void) const {
   return !mc_store->blocks().empty();
 } /* candidates_exsti() */
 
-boost::optional<cfsm::acquire_goal_fsm::candidate_type> acquire_new_cache_fsm::
+boost::optional<csfsm::acquire_goal_fsm::candidate_type> acquire_new_cache_fsm::
     cache_select(void) const {
   controller::depth2::new_cache_selector selector(mc_matrix);
 
@@ -126,7 +126,7 @@ bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-cfsm::metrics::goal_acq_metrics::goal_type acquire_new_cache_fsm::
+csmetrics::goal_acq_metrics::goal_type acquire_new_cache_fsm::
     acquisition_goal_internal(void) const {
   return fsm::to_goal_type(foraging_acq_goal::ekNEW_CACHE);
 } /* acquisition_goal() */

@@ -34,9 +34,11 @@
 #include "cosm/metrics/config/output_config.hpp"
 #include "cosm/pal/argos_controller2D_adaptor.hpp"
 #include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
+#include "cosm/fsm/block_transporter.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/metrics/blocks/block_manip_events.hpp"
+#include "fordyca/fsm/foraging_transport_goal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -84,6 +86,7 @@ NS_START(fordyca, controller);
  */
 class foraging_controller : public cpal::argos_controller2D_adaptor,
                             public ccontroller::block_carrying_controller,
+                            public cfsm::block_transporter<fsm::foraging_transport_goal>,
                             public ccontroller::irv_recipient_controller,
                             public rer::client<foraging_controller> {
  public:

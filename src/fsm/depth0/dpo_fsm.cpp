@@ -38,7 +38,7 @@ NS_START(fordyca, fsm, depth0);
  ******************************************************************************/
 dpo_fsm::dpo_fsm(const fsm_ro_params* params,
                  crfootbot::footbot_saa_subsystem* saa,
-                 std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
+                 std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
                  rmath::rng* rng)
     : util_hfsm(saa, rng, ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth0.dpo"),
@@ -115,7 +115,7 @@ RCPPSW_WRAP_DEF(dpo_fsm, entity_acquired_id, m_block_fsm, const);
  * General Member Functions
  ******************************************************************************/
 void dpo_fsm::init(void) {
-  cfsm::util_hfsm::init();
+  csfsm::util_hfsm::init();
   m_block_fsm.task_reset();
 } /* init() */
 

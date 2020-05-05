@@ -41,7 +41,7 @@ NS_START(fordyca, fsm, expstrat);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void utility_cache_search::task_start(const cta::taskable_argument*) {
+void utility_cache_search::task_start(cta::taskable_argument*) {
   auto range = mc_store->blocks().const_values_range();
   rmath::vector2d position;
   if (!range.empty()) {

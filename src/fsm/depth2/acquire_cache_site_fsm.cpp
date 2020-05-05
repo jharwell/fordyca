@@ -93,7 +93,7 @@ bool acquire_cache_site_fsm::site_exploration_term_cb(void) const {
   return false;
 } /* site_exploration_term_cb() */
 
-boost::optional<cfsm::acquire_goal_fsm::candidate_type> acquire_cache_site_fsm::
+boost::optional<csfsm::acquire_goal_fsm::candidate_type> acquire_cache_site_fsm::
     site_select(void) {
   auto selector = cache_site_selector(mc_matrix);
   if (auto best = selector(mc_store->caches(),
@@ -114,7 +114,7 @@ boost::optional<cfsm::acquire_goal_fsm::candidate_type> acquire_cache_site_fsm::
   }
 } /* site_select() */
 
-cfsm::metrics::goal_acq_metrics::goal_type acquire_cache_site_fsm::
+csmetrics::goal_acq_metrics::goal_type acquire_cache_site_fsm::
     acquisition_goal_internal(void) const {
   return fsm::to_goal_type(foraging_acq_goal::ekCACHE_SITE);
 } /* acquisition_goal_internal() */

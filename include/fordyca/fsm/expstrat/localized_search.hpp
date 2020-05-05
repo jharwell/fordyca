@@ -28,7 +28,7 @@
 
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "cosm/fsm/vector_fsm.hpp"
+#include "cosm/spatial/fsm/vector_fsm.hpp"
 #include "fordyca/fsm/expstrat/crw_adaptor.hpp"
 
 /*******************************************************************************
@@ -79,7 +79,7 @@ class localized_search : public foraging_expstrat,
    * location (e.g. the location of the last known object of a specific type),
    * in which case we will just fall back to regular CRW.
    */
-  void task_start(const cta::taskable_argument* c_arg) override {
+  void task_start(cta::taskable_argument* c_arg) override {
     if (nullptr != c_arg) {
       m_vfsm.task_start(c_arg);
     }
@@ -100,13 +100,13 @@ class localized_search : public foraging_expstrat,
   void task_execute(void) override final;
 
   /* prototype overrides */
-  std::unique_ptr<cfsm::expstrat::base_expstrat> clone(void) const override {
+  std::unique_ptr<csexpstrat::base_expstrat> clone(void) const override {
     return std::make_unique<localized_search>(saa(), rng());
   }
 
  private:
   /* clang-format off */
-  cfsm::vector_fsm m_vfsm;
+  csfsm::vector_fsm m_vfsm;
   crw_adaptor      m_crw;
   /* clang-format on */
 };

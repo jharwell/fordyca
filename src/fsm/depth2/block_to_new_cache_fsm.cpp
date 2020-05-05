@@ -36,7 +36,7 @@ NS_START(fordyca, fsm, depth2);
 block_to_new_cache_fsm::block_to_new_cache_fsm(
     const fsm_ro_params* c_params,
     crfootbot::footbot_saa_subsystem* saa,
-    std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
+    std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
     rmath::rng* rng)
     : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, saa, rng),
       m_cache_fsm(c_params, saa, exp_behavior->clone(), rng),
@@ -45,7 +45,7 @@ block_to_new_cache_fsm::block_to_new_cache_fsm(
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-cfsm::metrics::goal_acq_metrics::goal_type block_to_new_cache_fsm::acquisition_goal(
+csmetrics::goal_acq_metrics::goal_type block_to_new_cache_fsm::acquisition_goal(
     void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {

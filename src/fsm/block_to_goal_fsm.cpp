@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 
-#include "cosm/fsm/acquire_goal_fsm.hpp"
+#include "cosm/spatial/fsm/acquire_goal_fsm.hpp"
 #include "cosm/robots/footbot/footbot_actuation_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
@@ -40,8 +40,8 @@ NS_START(fordyca, fsm);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-block_to_goal_fsm::block_to_goal_fsm(cfsm::acquire_goal_fsm* const goal_fsm,
-                                     cfsm::acquire_goal_fsm* const block_fsm,
+block_to_goal_fsm::block_to_goal_fsm(csfsm::acquire_goal_fsm* const goal_fsm,
+                                     csfsm::acquire_goal_fsm* const block_fsm,
                                      crfootbot::footbot_saa_subsystem* saa,
                                      rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.block_to_goal"),
@@ -234,7 +234,7 @@ bool block_to_goal_fsm::goal_acquired(void) const {
          (ekST_WAIT_FOR_BLOCK_DROP == current_state());
 } /* goal_acquired() */
 
-cfsm::metrics::goal_acq_metrics::goal_type block_to_goal_fsm::acquisition_goal(
+csmetrics::goal_acq_metrics::goal_type block_to_goal_fsm::acquisition_goal(
     void) const {
   if (m_block_fsm->task_running()) {
     return m_block_fsm->acquisition_goal();
@@ -260,12 +260,12 @@ rmath::vector2z block_to_goal_fsm::current_vector_loc(void) const {
  * General Member Functions
  ******************************************************************************/
 void block_to_goal_fsm::init(void) {
-  cfsm::util_hfsm::init();
+  csfsm::util_hfsm::init();
   m_goal_fsm->task_reset();
   m_block_fsm->task_reset();
 } /* init() */
 
-void block_to_goal_fsm::task_start(const cta::taskable_argument* const arg) {
+void block_to_goal_fsm::task_start(cta::taskable_argument* const arg) {
   auto* a = dynamic_cast<const tasks::foraging_signal_argument*>(arg);
   ER_ASSERT(nullptr != a, "Bad argument passed");
   inject_event(a->signal(), rpfsm::event_type::ekNORMAL);

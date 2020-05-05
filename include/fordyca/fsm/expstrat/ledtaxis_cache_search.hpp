@@ -71,7 +71,7 @@ class ledtaxis_cache_search : public foraging_expstrat,
    * \brief Start LED taxis cache search. Crucially, this enables the camera
    * sensor for use during exploration. See #593.
    */
-  void task_start(const cta::taskable_argument*) override;
+  void task_start(cta::taskable_argument*) override;
 
   /**
    * \brief Reset LED taxis cache search after a cache is successfully
@@ -100,7 +100,7 @@ class ledtaxis_cache_search : public foraging_expstrat,
   rmath::vector3z avoidance_loc3D(void) const override final RCSW_PURE;
 
   /* prototype overrides */
-  std::unique_ptr<cfsm::expstrat::base_expstrat> clone(void) const override {
+  std::unique_ptr<csexpstrat::base_expstrat> clone(void) const override {
     return std::make_unique<ledtaxis_cache_search>(saa(),
                                                    m_taxis.target(),
                                                    rng());

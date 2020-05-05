@@ -46,7 +46,7 @@ cache_finisher::cache_finisher(const struct cta::config::task_alloc_config* conf
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void cache_finisher::task_start(const cta::taskable_argument* const) {
+void cache_finisher::task_start(cta::taskable_argument* const) {
   foraging_signal_argument a(fsm::foraging_signal::ekACQUIRE_FREE_BLOCK);
   cta::polled_task::mechanism()->task_start(&a);
 } /* task_start() */

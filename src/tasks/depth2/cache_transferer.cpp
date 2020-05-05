@@ -27,7 +27,6 @@
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/robot_cache_block_drop.hpp"
 #include "fordyca/events/robot_cached_block_pickup.hpp"
-#include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/fsm/depth2/cache_transferer_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
 
@@ -49,7 +48,7 @@ cache_transferer::cache_transferer(
  * Member Functions
  ******************************************************************************/
 
-void cache_transferer::task_start(const cta::taskable_argument* const) {
+void cache_transferer::task_start(cta::taskable_argument* const) {
   foraging_signal_argument a(fsm::foraging_signal::ekACQUIRE_CACHED_BLOCK);
   cta::polled_task::mechanism()->task_start(&a);
 } /* task_start() */

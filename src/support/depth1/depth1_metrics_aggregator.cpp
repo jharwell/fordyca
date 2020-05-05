@@ -33,13 +33,13 @@
 #include "cosm/arena/metrics/caches/utilization_metrics.hpp"
 #include "cosm/arena/metrics/caches/utilization_metrics_collector.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
-#include "cosm/fsm/metrics/collision_metrics.hpp"
-#include "cosm/fsm/metrics/current_explore_locs_metrics_collector.hpp"
-#include "cosm/fsm/metrics/current_vector_locs_metrics_collector.hpp"
-#include "cosm/fsm/metrics/goal_acq_locs_metrics_collector.hpp"
-#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
-#include "cosm/fsm/metrics/goal_acq_metrics_collector.hpp"
-#include "cosm/fsm/metrics/movement_metrics.hpp"
+#include "cosm/spatial/metrics/collision_metrics.hpp"
+#include "cosm/spatial/metrics/current_explore_locs_metrics_collector.hpp"
+#include "cosm/spatial/metrics/current_vector_locs_metrics_collector.hpp"
+#include "cosm/spatial/metrics/goal_acq_locs_metrics_collector.hpp"
+#include "cosm/spatial/metrics/goal_acq_metrics.hpp"
+#include "cosm/spatial/metrics/goal_acq_metrics_collector.hpp"
+#include "cosm/spatial/metrics/movement_metrics.hpp"
 #include "cosm/metrics/collector_registerer.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tab.hpp"
@@ -132,13 +132,13 @@ void depth1_metrics_aggregator::task_start_cb(const cta::polled_task* const,
 void depth1_metrics_aggregator::register_standard(
     const cmconfig::metrics_config* mconfig) {
   using collector_typelist = rmpl::typelist<
-      rmpl::identity<cfsm::metrics::goal_acq_metrics_collector>,
+      rmpl::identity<csmetrics::goal_acq_metrics_collector>,
       rmpl::identity<ctametrics::execution_metrics_collector>,
       rmpl::identity<ctametrics::bi_tab_metrics_collector>,
       rmpl::identity<cametrics::caches::utilization_metrics_collector>,
       rmpl::identity<metrics::caches::lifecycle_metrics_collector> >;
   cmetrics::collector_registerer<>::creatable_set creatable_set = {
-      {typeid(cfsm::metrics::goal_acq_metrics_collector),
+      {typeid(csmetrics::goal_acq_metrics_collector),
        "cache_acq_counts",
        "caches::acq_counts",
        rmetrics::output_mode::ekAPPEND},
@@ -191,22 +191,22 @@ void depth1_metrics_aggregator::register_with_arena_dims2D(
     const cmconfig::metrics_config* const mconfig,
     const rmath::vector2z& dims) {
   using collector_typelist = rmpl::typelist<
-      rmpl::identity<cfsm::metrics::goal_acq_locs_metrics_collector>,
-      rmpl::identity<cfsm::metrics::current_explore_locs_metrics_collector>,
-      rmpl::identity<cfsm::metrics::current_vector_locs_metrics_collector>,
+      rmpl::identity<csmetrics::goal_acq_locs_metrics_collector>,
+      rmpl::identity<csmetrics::current_explore_locs_metrics_collector>,
+      rmpl::identity<csmetrics::current_vector_locs_metrics_collector>,
       rmpl::identity<cametrics::caches::location_metrics_collector> >;
 
   using extra_args_type = std::tuple<rmath::vector2z>;
   cmetrics::collector_registerer<extra_args_type>::creatable_set creatable_set = {
-      {typeid(cfsm::metrics::goal_acq_locs_metrics_collector),
+      {typeid(csmetrics::goal_acq_locs_metrics_collector),
        "cache_acq_locs",
        "caches::acq_locs",
        rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE},
-      {typeid(cfsm::metrics::current_explore_locs_metrics_collector),
+      {typeid(csmetrics::current_explore_locs_metrics_collector),
        "cache_acq_explore_locs",
        "caches::acq_explore_locs",
        rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE},
-      {typeid(cfsm::metrics::current_vector_locs_metrics_collector),
+      {typeid(csmetrics::current_vector_locs_metrics_collector),
        "cache_acq_vector_locs",
        "caches::acq_vector_locs",
        rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE},

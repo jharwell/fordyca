@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "cosm/fsm/acquire_goal_fsm.hpp"
+#include "cosm/spatial/fsm/acquire_goal_fsm.hpp"
 #include "fordyca/fordyca.hpp"
 #include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
@@ -56,7 +56,7 @@ NS_START(fsm, depth2);
  * done, it signals that it has completed its task.
  */
 class acquire_cache_site_fsm : public rer::client<acquire_cache_site_fsm>,
-                               public cfsm::acquire_goal_fsm,
+                               public csfsm::acquire_goal_fsm,
                                public metrics::caches::site_selection_metrics {
  public:
   acquire_cache_site_fsm(const fsm_ro_params* c_params,
@@ -80,7 +80,7 @@ class acquire_cache_site_fsm : public rer::client<acquire_cache_site_fsm>,
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  cfsm::metrics::goal_acq_metrics::goal_type acquisition_goal_internal(void) const RCSW_CONST;
+  csmetrics::goal_acq_metrics::goal_type acquisition_goal_internal(void) const RCSW_CONST;
   boost::optional<acquire_goal_fsm::candidate_type> site_select(void);
   bool candidates_exist(void) const { return true; }
   bool site_exploration_term_cb(void) const RCSW_CONST;

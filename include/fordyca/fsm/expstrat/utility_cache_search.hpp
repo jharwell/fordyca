@@ -71,10 +71,10 @@ class utility_cache_search : public localized_search {
   utility_cache_search& operator=(const utility_cache_search&) = delete;
 
   /* taskable overrides */
-  void task_start(const cta::taskable_argument*) override;
+  void task_start(cta::taskable_argument*) override;
 
   /* prototype overrides */
-  std::unique_ptr<cfsm::expstrat::base_expstrat> clone(void) const override {
+  std::unique_ptr<csexpstrat::base_expstrat> clone(void) const override {
     return std::make_unique<utility_cache_search>(mc_matrix,
                                                   mc_store,
                                                   saa(),

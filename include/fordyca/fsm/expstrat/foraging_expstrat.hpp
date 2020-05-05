@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "cosm/fsm/expstrat/base_expstrat.hpp"
+#include "cosm/spatial/expstrat/base_expstrat.hpp"
 #include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
 
 #include "fordyca/fordyca.hpp"
@@ -59,7 +59,7 @@ NS_START(fsm, expstrat);
  * \brief Base class for different exploration behaviors that controller can
  * exhibit when looking for stuff.
  */
-class foraging_expstrat : public cfsm::expstrat::base_expstrat {
+class foraging_expstrat : public csexpstrat::base_expstrat {
  public:
   struct params {
     params(crfootbot::footbot_saa_subsystem* const saa_in,

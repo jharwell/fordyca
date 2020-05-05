@@ -31,7 +31,7 @@
 #include "rcppsw/math/rng.hpp"
 #include "rcppsw/types/type_uuid.hpp"
 
-#include "cosm/fsm/acquire_goal_fsm.hpp"
+#include "cosm/spatial/fsm/acquire_goal_fsm.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
@@ -73,7 +73,7 @@ class foraging_expstrat;
  */
 class acquire_existing_cache_fsm
     : public rer::client<acquire_existing_cache_fsm>,
-      public cfsm::acquire_goal_fsm {
+      public csfsm::acquire_goal_fsm {
  public:
   /**
    * \param for_pickup Are we acquiring a cache for pickup or block drop?
@@ -81,7 +81,7 @@ class acquire_existing_cache_fsm
   acquire_existing_cache_fsm(
       const fsm_ro_params* c_params,
       crfootbot::footbot_saa_subsystem* saa,
-      std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
+      std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
       rmath::rng* rng,
       bool for_pickup);
 
@@ -97,7 +97,7 @@ class acquire_existing_cache_fsm
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  static cfsm::metrics::goal_acq_metrics::goal_type acq_goal_internal(void)
+  static csmetrics::goal_acq_metrics::goal_type acq_goal_internal(void)
       RCSW_CONST;
 
   boost::optional<acquire_goal_fsm::candidate_type> existing_cache_select(void);

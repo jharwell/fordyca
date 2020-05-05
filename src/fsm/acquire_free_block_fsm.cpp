@@ -46,7 +46,7 @@ NS_START(fordyca, fsm);
 acquire_free_block_fsm::acquire_free_block_fsm(
     const fsm_ro_params* c_params,
     crfootbot::footbot_saa_subsystem* saa,
-    std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
+    std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_free_block"),
       acquire_goal_fsm(
@@ -85,7 +85,7 @@ acquire_free_block_fsm::acquire_free_block_fsm(
 /*******************************************************************************
  * Non-Member Functions
  ******************************************************************************/
-cfsm::metrics::goal_acq_metrics::goal_type acquire_free_block_fsm::acq_goal_internal(
+csmetrics::goal_acq_metrics::goal_type acquire_free_block_fsm::acq_goal_internal(
     void) {
   return fsm::to_goal_type(foraging_acq_goal::ekBLOCK);
 } /* acq_goal_internal() */
@@ -113,7 +113,7 @@ bool acquire_free_block_fsm::block_acquired_cb(bool explore_result) const {
   }
 } /* block_acquired_cb() */
 
-boost::optional<cfsm::acquire_goal_fsm::candidate_type> acquire_free_block_fsm::
+boost::optional<csfsm::acquire_goal_fsm::candidate_type> acquire_free_block_fsm::
     block_select(void) const {
   controller::block_selector selector(mc_matrix);
 

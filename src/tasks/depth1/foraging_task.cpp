@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 
-#include "cosm/fsm/util_hfsm.hpp"
+#include "cosm/spatial/fsm/util_hfsm.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 #include "cosm/ta/config/task_alloc_config.hpp"
 
@@ -47,7 +47,7 @@ foraging_task::foraging_task(const std::string& name,
  * Member Functions
  ******************************************************************************/
 rtypes::timestep foraging_task::current_time(void) const {
-  return dynamic_cast<cfsm::util_hfsm*>(polled_task::mechanism())
+  return dynamic_cast<csfsm::util_hfsm*>(polled_task::mechanism())
       ->sensing()
       ->tick();
 } /* current_time() */

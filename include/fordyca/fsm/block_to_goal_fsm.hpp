@@ -26,20 +26,21 @@
  ******************************************************************************/
 #include "rcppsw/er/client.hpp"
 
-#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
-#include "cosm/fsm/util_hfsm.hpp"
+#include "cosm/spatial/metrics/goal_acq_metrics.hpp"
+#include "cosm/spatial/fsm/util_hfsm.hpp"
 #include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
 #include "cosm/ta/taskable.hpp"
+#include "cosm/fsm/block_transporter.hpp"
 
 #include "fordyca/fordyca.hpp"
-#include "fordyca/fsm/block_transporter.hpp"
+#include "fordyca/fsm/foraging_transport_goal.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::fsm {
+namespace cosm::spatial::fsm {
 class acquire_goal_fsm;
-} /* namespace cosm::fsm */
+} /* namespace cosm::spatial::fsm */
 
 NS_START(fordyca, fsm);
 
@@ -60,13 +61,13 @@ class acquire_free_block_fsm;
  * goal. Once it has done that it will signal that its task is complete.
  */
 class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
-                          public cfsm::util_hfsm,
+                          public csfsm::util_hfsm,
                           public cta::taskable,
-                          public cfsm::metrics::goal_acq_metrics,
-                          public fsm::block_transporter {
+                          public csmetrics::goal_acq_metrics,
+                          public cfsm::block_transporter<foraging_transport_goal> {
  public:
-  block_to_goal_fsm(cfsm::acquire_goal_fsm* goal_fsm,
-                    cfsm::acquire_goal_fsm* block_fsm,
+  block_to_goal_fsm(csfsm::acquire_goal_fsm* goal_fsm,
+                    csfsm::acquire_goal_fsm* block_fsm,
                     crfootbot::footbot_saa_subsystem* saa,
                     rmath::rng* rng);
   ~block_to_goal_fsm(void) override = default;
@@ -76,7 +77,7 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
 
   /* taskable overrides */
   void task_execute(void) override;
-  void task_start(const cta::taskable_argument* arg) override;
+  void task_start(cta::taskable_argument* arg) override;
   bool task_finished(void) const override {
     return ekST_FINISHED == current_state();
   }
@@ -99,7 +100,7 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
   bool is_vectoring_to_goal(void) const override final RCSW_PURE;
   exp_status is_exploring_for_goal(void) const override final RCSW_PURE;
   bool goal_acquired(void) const override RCSW_PURE;
-  cfsm::metrics::goal_acq_metrics::goal_type acquisition_goal(void) const override;
+  csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override;
   rmath::vector2z current_explore_loc(void) const override final;
   rmath::vector2z current_vector_loc(void) const override final;
 
@@ -138,12 +139,12 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
     ekST_MAX_STATES,
   };
 
-  const cfsm::acquire_goal_fsm* goal_fsm(void) const { return m_goal_fsm; }
-  const cfsm::acquire_goal_fsm* block_fsm(void) const { return m_block_fsm; }
+  const csfsm::acquire_goal_fsm* goal_fsm(void) const { return m_goal_fsm; }
+  const csfsm::acquire_goal_fsm* block_fsm(void) const { return m_block_fsm; }
 
  private:
   /* inherited states */
-  HFSM_ENTRY_INHERIT_ND(cfsm::util_hfsm, entry_wait_for_signal);
+  HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_wait_for_signal);
 
   /* block to goal states */
   HFSM_STATE_DECLARE(block_to_goal_fsm, start, rpfsm::event_data);
@@ -166,8 +167,8 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 
   /* clang-format off */
-  cfsm::acquire_goal_fsm* const  m_goal_fsm;
-  cfsm::acquire_goal_fsm * const m_block_fsm;
+  csfsm::acquire_goal_fsm* const  m_goal_fsm;
+  csfsm::acquire_goal_fsm * const m_block_fsm;
   /* clang-format on */
 };
 

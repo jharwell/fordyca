@@ -56,7 +56,7 @@ class block_to_cache_site_fsm final : public block_to_goal_fsm,
  public:
   block_to_cache_site_fsm(const fsm_ro_params* c_params,
                           crfootbot::footbot_saa_subsystem* saa,
-                          std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
+                          std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
                           rmath::rng* rng);
 
   ~block_to_cache_site_fsm(void) override = default;
@@ -64,7 +64,7 @@ class block_to_cache_site_fsm final : public block_to_goal_fsm,
   block_to_cache_site_fsm& operator=(const block_to_cache_site_fsm&) = delete;
 
   /* goal acquisition metrics */
-  cfsm::metrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
+  csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
   rtypes::type_uuid entity_acquired_id(void) const override {
     return rtypes::constants::kNoUUID;
   }

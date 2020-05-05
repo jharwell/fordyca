@@ -27,8 +27,8 @@
 
 #include "rcppsw/mpl/typelist.hpp"
 
-#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
-#include "cosm/fsm/metrics/movement_metrics.hpp"
+#include "cosm/spatial/metrics/goal_acq_metrics.hpp"
+#include "cosm/spatial/metrics/movement_metrics.hpp"
 #include "cosm/metrics/collector_registerer.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
@@ -108,7 +108,7 @@ void depth0_metrics_aggregator::collect_from_controller(
              *controller,
              [&](const rmetrics::base_metrics& metrics) {
                auto& m =
-                   dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(metrics);
+                   dynamic_cast<const csmetrics::goal_acq_metrics&>(metrics);
                return fsm::foraging_acq_goal::ekBLOCK == m.acquisition_goal() &&
                       m.goal_acquired();
              });
@@ -121,14 +121,14 @@ void depth0_metrics_aggregator::collect_from_controller(
              *controller,
              [&](const rmetrics::base_metrics& metrics) {
                auto& m =
-                   dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(metrics);
+                   dynamic_cast<const csmetrics::goal_acq_metrics&>(metrics);
                return m.is_exploring_for_goal().first;
              });
   collect_if("blocks::acq_vector_locs",
              *controller,
              [&](const rmetrics::base_metrics& metrics) {
                auto& m =
-                   dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(metrics);
+                   dynamic_cast<const csmetrics::goal_acq_metrics&>(metrics);
                return m.is_vectoring_to_goal();
              });
   /*

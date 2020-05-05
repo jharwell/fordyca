@@ -27,7 +27,7 @@
 #include <memory>
 #include "rcppsw/patterns/decorator/decorator.hpp"
 
-#include "cosm/fsm/expstrat/crw.hpp"
+#include "cosm/spatial/expstrat/crw.hpp"
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 
 /*******************************************************************************
@@ -45,10 +45,10 @@ NS_START(fordyca, fsm, expstrat);
  * \brief Adaptor for the CRW exploration strategy to enable it as an
  * exploration factory output within FORDYCA. Uses the decorator pattern on the
  * parent CRW class in order to avoid diamond inheritance with \ref
- * cfsm::expstrat::base_expstrat.
+ * csexpstrat::base_expstrat.
  */
 class crw_adaptor final : public foraging_expstrat,
-                          public rpdecorator::decorator<cfsm::expstrat::crw> {
+                          public rpdecorator::decorator<csexpstrat::crw> {
  public:
   crw_adaptor(const fsm::expstrat::foraging_expstrat::params* c_params,
               rmath::rng* rng);
@@ -70,7 +70,7 @@ class crw_adaptor final : public foraging_expstrat,
   RCPPSW_DECLDEF_WRAP_OVERRIDE(task_running, decoratee(), const);
   RCPPSW_DECLDEF_WRAP_OVERRIDE(task_finished, decoratee(), const);
   RCPPSW_DECLDEF_WRAP_OVERRIDE(task_execute, decoratee());
-  void task_start(const cta::taskable_argument* arg) override { decoratee().task_start(arg); }
+  void task_start(cta::taskable_argument* arg) override { decoratee().task_start(arg); }
 
   /* prototype overrides */
   RCPPSW_DECLDEF_WRAP_OVERRIDE(clone, decoratee(), const);

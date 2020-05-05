@@ -45,7 +45,7 @@ NS_START(fordyca, fsm, expstrat);
  * \brief Factory for creating block exploration strategies.
  */
 class block_factory :
-    public rpfactory::releasing_factory<cfsm::expstrat::base_expstrat,
+    public rpfactory::releasing_factory<csexpstrat::base_expstrat,
                                         std::string, /* key type */
                                         const expstrat::foraging_expstrat::params*,
                                         rmath::rng*> {

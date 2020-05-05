@@ -26,7 +26,6 @@
  ******************************************************************************/
 #include <string>
 
-#include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/support/tv/cache_op_filter.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "cosm/tv/temporal_penalty_handler.hpp"

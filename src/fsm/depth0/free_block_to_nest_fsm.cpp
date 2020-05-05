@@ -33,7 +33,7 @@
  ******************************************************************************/
 NS_START(fordyca, fsm, depth0);
 
-using goal_type = cfsm::metrics::goal_acq_metrics::goal_type;
+using goal_type = csmetrics::goal_acq_metrics::goal_type;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -41,7 +41,7 @@ using goal_type = cfsm::metrics::goal_acq_metrics::goal_type;
 free_block_to_nest_fsm::free_block_to_nest_fsm(
     const fsm_ro_params* c_params,
     crfootbot::footbot_saa_subsystem* saa,
-    std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
+    std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
     rmath::rng* rng)
     : util_hfsm(saa, rng, ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth0.free_block_to_nest"),
@@ -135,26 +135,26 @@ RCSW_CONST FSM_STATE_DEFINE_ND(free_block_to_nest_fsm, finished) {
  ******************************************************************************/
 bool free_block_to_nest_fsm::in_collision_avoidance(void) const {
   return (m_block_fsm.task_running() && m_block_fsm.in_collision_avoidance()) ||
-         cfsm::util_hfsm::in_collision_avoidance();
+         csfsm::util_hfsm::in_collision_avoidance();
 } /* in_collision_avoidance() */
 
 bool free_block_to_nest_fsm::entered_collision_avoidance(void) const {
   return (m_block_fsm.task_running() &&
           m_block_fsm.entered_collision_avoidance()) ||
-         cfsm::util_hfsm::entered_collision_avoidance();
+         csfsm::util_hfsm::entered_collision_avoidance();
 } /* entered_collision_avoidance() */
 
 bool free_block_to_nest_fsm::exited_collision_avoidance(void) const {
   return (m_block_fsm.task_running() &&
           m_block_fsm.exited_collision_avoidance()) ||
-         cfsm::util_hfsm::exited_collision_avoidance();
+         csfsm::util_hfsm::exited_collision_avoidance();
 } /* exited_collision_avoidance() */
 
 rtypes::timestep free_block_to_nest_fsm::collision_avoidance_duration(void) const {
   if (m_block_fsm.task_running()) {
     return m_block_fsm.collision_avoidance_duration();
   } else {
-    return cfsm::util_hfsm::collision_avoidance_duration();
+    return csfsm::util_hfsm::collision_avoidance_duration();
   }
 } /* collision_avoidance_duration() */
 
@@ -162,7 +162,7 @@ rmath::vector2z free_block_to_nest_fsm::avoidance_loc2D(void) const {
   if (m_block_fsm.task_running()) {
     return m_block_fsm.avoidance_loc2D();
   } else {
-    return cfsm::util_hfsm::avoidance_loc2D();
+    return csfsm::util_hfsm::avoidance_loc2D();
   }
 } /* avoidance_loc2D() */
 
@@ -170,7 +170,7 @@ rmath::vector3z free_block_to_nest_fsm::avoidance_loc3D(void) const {
   if (m_block_fsm.task_running()) {
     return m_block_fsm.avoidance_loc3D();
   } else {
-    return cfsm::util_hfsm::avoidance_loc3D();
+    return csfsm::util_hfsm::avoidance_loc3D();
   }
 } /* avoidance_loc3D() */
 
@@ -226,7 +226,7 @@ bool free_block_to_nest_fsm::goal_acquired(void) const {
  * General Member Functions
  ******************************************************************************/
 void free_block_to_nest_fsm::init(void) {
-  cfsm::util_hfsm::init();
+  csfsm::util_hfsm::init();
   m_block_fsm.task_reset();
 } /* init() */
 

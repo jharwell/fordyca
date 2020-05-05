@@ -26,15 +26,17 @@
  ******************************************************************************/
 #include <memory>
 
-#include "cosm/fsm/util_hfsm.hpp"
-#include "cosm/fsm/explore_for_goal_fsm.hpp"
-#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
-#include "cosm/fsm/metrics/collision_metrics.hpp"
-#include "fordyca/fsm/block_transporter.hpp"
+#include "cosm/spatial/fsm/util_hfsm.hpp"
+#include "cosm/spatial/fsm/explore_for_goal_fsm.hpp"
+#include "cosm/spatial/metrics/goal_acq_metrics.hpp"
+#include "cosm/spatial/metrics/collision_metrics.hpp"
+#include "cosm/fsm/block_transporter.hpp"
+#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
+
+#include "fordyca/fsm/foraging_transport_goal.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/fsm/foraging_transport_goal.hpp"
-#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,14 +60,14 @@ NS_START(depth0);
  * this FSM roams around randomly until it finds a block, and then brings the
  * block back to the nest, and drops it.
  */
-class crw_fsm final : public cfsm::util_hfsm,
+class crw_fsm final : public csfsm::util_hfsm,
                       public rer::client<crw_fsm>,
-                      public cfsm::metrics::goal_acq_metrics,
-                      public block_transporter,
+                      public csmetrics::goal_acq_metrics,
+                      public cfsm::block_transporter<foraging_transport_goal>,
                       public cta::taskable {
  public:
   crw_fsm(crfootbot::footbot_saa_subsystem* saa,
-          std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
+          std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
           rmath::rng* rng);
 
   crw_fsm(const crw_fsm&) = delete;
@@ -80,7 +82,7 @@ class crw_fsm final : public cfsm::util_hfsm,
   rmath::vector3z avoidance_loc3D(void) const override;
 
   /* goal acquisition metrics */
-  cfsm::metrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
+  csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
   exp_status is_exploring_for_goal(void) const override RCSW_PURE;
   bool is_vectoring_to_goal(void) const override { return false; }
   bool goal_acquired(void) const override RCSW_PURE;
@@ -94,7 +96,7 @@ class crw_fsm final : public cfsm::util_hfsm,
 
   /* taskable overrides */
   void task_execute(void) override { run(); }
-  void task_start(const cta::taskable_argument*) override {}
+  void task_start(cta::taskable_argument*) override {}
   bool task_finished(void) const override { return m_task_finished; }
   bool task_running(void) const override { return !m_task_finished; }
   void task_reset(void) override { init(); }
@@ -123,16 +125,16 @@ class crw_fsm final : public cfsm::util_hfsm,
   };
 
   /* inherited states */
-  HFSM_STATE_INHERIT(cfsm::util_hfsm, transport_to_nest,
+  HFSM_STATE_INHERIT(csfsm::util_hfsm, transport_to_nest,
                      rpfsm::event_data);
-  HFSM_STATE_INHERIT(cfsm::util_hfsm, leaving_nest,
+  HFSM_STATE_INHERIT(csfsm::util_hfsm, leaving_nest,
                      rpfsm::event_data);
 
-  HFSM_ENTRY_INHERIT_ND(cfsm::util_hfsm, entry_transport_to_nest);
-  HFSM_ENTRY_INHERIT_ND(cfsm::util_hfsm, entry_leaving_nest);
-  HFSM_ENTRY_INHERIT_ND(cfsm::util_hfsm, entry_wait_for_signal);
+  HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_transport_to_nest);
+  HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_leaving_nest);
+  HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_wait_for_signal);
 
-  HFSM_EXIT_INHERIT(cfsm::util_hfsm, exit_transport_to_nest);
+  HFSM_EXIT_INHERIT(csfsm::util_hfsm, exit_transport_to_nest);
 
   /* crw fsm states */
   HFSM_STATE_DECLARE(crw_fsm, start, rpfsm::event_data);
@@ -156,7 +158,7 @@ class crw_fsm final : public cfsm::util_hfsm,
 
   /* clang-format off */
   bool                       m_task_finished{false};
-  cfsm::explore_for_goal_fsm m_explore_fsm;
+  csfsm::explore_for_goal_fsm m_explore_fsm;
   /* clang-format on */
 };
 

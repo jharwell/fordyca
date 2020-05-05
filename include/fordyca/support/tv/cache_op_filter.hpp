@@ -26,9 +26,8 @@
  ******************************************************************************/
 #include <string>
 
-#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
+#include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 
-#include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/support/utils/event_utils.hpp"
 #include "fordyca/support/tv/op_filter_status.hpp"

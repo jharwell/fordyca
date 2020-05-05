@@ -68,10 +68,10 @@ class likelihood_block_search : public localized_search {
   likelihood_block_search& operator=(const likelihood_block_search&) = delete;
 
   /* taskable overrides */
-  void task_start(const cta::taskable_argument*) override final;
+  void task_start(cta::taskable_argument*) override final;
 
   /* prototype overrides */
-  std::unique_ptr<cfsm::expstrat::base_expstrat> clone(void) const override {
+  std::unique_ptr<csexpstrat::base_expstrat> clone(void) const override {
     return std::make_unique<likelihood_block_search>(saa(),
                                                      mc_store,
                                                      rng());

@@ -27,7 +27,7 @@
 #include <memory>
 
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
-#include "cosm/fsm/collision_tracker.hpp"
+#include "cosm/spatial/collision_tracker.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -62,7 +62,7 @@ class ledtaxis : public foraging_expstrat,
   ledtaxis& operator=(const ledtaxis&) = delete;
 
   /* taskable overrides */
-  void task_start(const cta::taskable_argument*) override final {
+  void task_start(cta::taskable_argument*) override final {
     m_task_running = true;
   }
 
@@ -78,7 +78,7 @@ class ledtaxis : public foraging_expstrat,
   void task_execute(void) override final;
 
   /* prototype overrides */
-  std::unique_ptr<cfsm::expstrat::base_expstrat> clone(void) const override {
+  std::unique_ptr<csexpstrat::base_expstrat> clone(void) const override {
     return nullptr; /* Should not be a top level explore behavior */
   }
 
@@ -93,7 +93,7 @@ class ledtaxis : public foraging_expstrat,
 
   /* clang-format off */
   mutable bool            m_task_running{false};
-  cfsm::collision_tracker m_tracker;
+  cspatial::collision_tracker m_tracker;
   rutils::color           m_target;
   /* clang-format on */
 

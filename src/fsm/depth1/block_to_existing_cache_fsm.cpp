@@ -73,7 +73,7 @@ block_to_existing_cache_fsm::block_to_existing_cache_fsm(
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-cfsm::metrics::goal_acq_metrics::goal_type block_to_existing_cache_fsm::
+csmetrics::goal_acq_metrics::goal_type block_to_existing_cache_fsm::
     acquisition_goal(void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {

@@ -72,7 +72,7 @@ class cache_finisher final : public foraging_task,
   RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
   RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(cfsm::metrics::goal_acq_metrics::goal_type,
+  RCPPSW_WRAP_OVERRIDE_DECL(csmetrics::goal_acq_metrics::goal_type,
                             acquisition_goal,
                             const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, acquisition_loc, const);
@@ -88,7 +88,7 @@ class cache_finisher final : public foraging_task,
   /* task metrics */
   bool task_completed(void) const override { return task_finished(); }
 
-  void task_start(const cta::taskable_argument*) override;
+  void task_start(cta::taskable_argument*) override;
   double abort_prob_calc(void) override RCSW_PURE;
   rtypes::timestep interface_time_calc(uint interface,
                                        const rtypes::timestep& start_time) override RCSW_PURE;

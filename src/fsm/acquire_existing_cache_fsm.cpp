@@ -48,7 +48,7 @@ using cselm = controller::cache_sel_matrix;
 acquire_existing_cache_fsm::acquire_existing_cache_fsm(
     const fsm_ro_params* c_params,
     crfootbot::footbot_saa_subsystem* saa,
-    std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
+    std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
     rmath::rng* rng,
     bool for_pickup)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_existing_cache"),
@@ -100,7 +100,7 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
 /*******************************************************************************
  * Non-Member Functions
  ******************************************************************************/
-cfsm::metrics::goal_acq_metrics::goal_type acquire_existing_cache_fsm::
+csmetrics::goal_acq_metrics::goal_type acquire_existing_cache_fsm::
     acq_goal_internal(void) {
   return fsm::to_goal_type(foraging_acq_goal::ekEXISTING_CACHE);
 } /* acq_goal() */
@@ -133,7 +133,7 @@ boost::optional<acquire_existing_cache_fsm::acq_loc_type> acquire_existing_cache
   }
 } /* calc_acq_location() */
 
-boost::optional<cfsm::acquire_goal_fsm::candidate_type> acquire_existing_cache_fsm::
+boost::optional<csfsm::acquire_goal_fsm::candidate_type> acquire_existing_cache_fsm::
     existing_cache_select(void) {
   if (auto selection = calc_acq_location()) {
     return boost::make_optional(acquire_goal_fsm::candidate_type(

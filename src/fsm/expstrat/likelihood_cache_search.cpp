@@ -35,7 +35,7 @@ NS_START(fordyca, fsm, expstrat);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void likelihood_cache_search::task_start(const cta::taskable_argument*) {
+void likelihood_cache_search::task_start(cta::taskable_argument*) {
   if (auto loc = mc_store->last_cache_loc()) {
     tasks::vector_argument v(kCACHE_ARRIVAL_TOL, *loc);
     localized_search::task_start(&v);

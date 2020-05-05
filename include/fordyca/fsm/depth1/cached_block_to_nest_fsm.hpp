@@ -25,12 +25,14 @@
  * Includes
  ******************************************************************************/
 #include <memory>
-#include "cosm/fsm/util_hfsm.hpp"
-#include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
-#include "fordyca/fsm/block_transporter.hpp"
-#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
+#include "cosm/spatial/fsm/util_hfsm.hpp"
 #include "cosm/ta/taskable.hpp"
+#include "cosm/fsm/block_transporter.hpp"
+#include "cosm/spatial/metrics/goal_acq_metrics.hpp"
+
+#include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
+#include "fordyca/fsm/foraging_transport_goal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -67,16 +69,16 @@ NS_START(depth1);
  * It can be directed to acquire a block either from a cache or to find a free
  * one.
  */
-class cached_block_to_nest_fsm final : public cfsm::util_hfsm,
+class cached_block_to_nest_fsm final : public csfsm::util_hfsm,
                                        public rer::client<cached_block_to_nest_fsm>,
-                                       public cfsm::metrics::goal_acq_metrics,
-                                       public block_transporter,
+                                       public csmetrics::goal_acq_metrics,
+                                       public cfsm::block_transporter<foraging_transport_goal>,
                                        public cta::taskable {
  public:
   cached_block_to_nest_fsm(
       const fsm_ro_params* c_params,
       crfootbot::footbot_saa_subsystem* saa,
-      std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
+      std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
       rmath::rng *rng);
   ~cached_block_to_nest_fsm(void) override = default;
 
@@ -97,7 +99,7 @@ class cached_block_to_nest_fsm final : public cfsm::util_hfsm,
    * \brief Reset the task FSM to a state where it can be started again.
    */
   void task_reset(void) override { init(); }
-  void task_start(const cta::taskable_argument*) override {}
+  void task_start(cta::taskable_argument*) override {}
 
   /* collision metrics */
   bool in_collision_avoidance(void) const override RCSW_PURE;
@@ -115,7 +117,7 @@ class cached_block_to_nest_fsm final : public cfsm::util_hfsm,
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, current_explore_loc, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, current_vector_loc, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid, entity_acquired_id, const);
-  cfsm::metrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
+  csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
 
   /* block transportation */
   foraging_transport_goal block_transport_goal(void) const override RCSW_PURE;
@@ -171,18 +173,18 @@ class cached_block_to_nest_fsm final : public cfsm::util_hfsm,
   static constexpr uint kPICKUP_TIMEOUT = 100;
 
   /* inherited states */
-  HFSM_STATE_INHERIT(cfsm::util_hfsm,
+  HFSM_STATE_INHERIT(csfsm::util_hfsm,
                      transport_to_nest,
                      rpfsm::event_data);
-  HFSM_STATE_INHERIT(cfsm::util_hfsm,
+  HFSM_STATE_INHERIT(csfsm::util_hfsm,
                      leaving_nest,
                      rpfsm::event_data);
 
-  HFSM_ENTRY_INHERIT_ND(cfsm::util_hfsm, entry_transport_to_nest);
-  HFSM_ENTRY_INHERIT_ND(cfsm::util_hfsm, entry_leaving_nest);
-  HFSM_ENTRY_INHERIT_ND(cfsm::util_hfsm, entry_wait_for_signal);
+  HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_transport_to_nest);
+  HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_leaving_nest);
+  HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_wait_for_signal);
 
-  HFSM_EXIT_INHERIT(cfsm::util_hfsm, exit_transport_to_nest);
+  HFSM_EXIT_INHERIT(csfsm::util_hfsm, exit_transport_to_nest);
 
   /* foraging states */
   HFSM_STATE_DECLARE(cached_block_to_nest_fsm, start, rpfsm::event_data);

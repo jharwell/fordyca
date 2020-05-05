@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "cosm/fsm/util_signal.hpp"
+#include "cosm/spatial/fsm/util_signal.hpp"
 
 #include "fordyca/fordyca.hpp"
 
@@ -43,13 +43,13 @@ NS_START(fordyca, fsm);
  * \brief Signals that FSMs can use to communicate between sub/super states, and
  * that can be used to direct them in some way.
  */
-class foraging_signal : public cfsm::util_signal {
+class foraging_signal : public csfsm::util_signal {
  public:
   enum type {
     /**
      * \brief A robot has picked up a block
      */
-    ekBLOCK_PICKUP = cfsm::util_signal::type::ekEXTERNAL_SIGNALS,
+    ekBLOCK_PICKUP = csfsm::util_signal::type::ekEXTERNAL_SIGNALS,
 
     /**
      * \brief A robot has dropped a block in {cache, nest, arena}

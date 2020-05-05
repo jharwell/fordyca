@@ -25,11 +25,12 @@
  * Includes
  ******************************************************************************/
 #include <memory>
-#include "fordyca/fsm/block_transporter.hpp"
+#include "cosm/spatial/fsm/util_hfsm.hpp"
+#include "cosm/fsm/block_transporter.hpp"
 
-#include "cosm/fsm/util_hfsm.hpp"
 #include "fordyca/fsm/depth0/free_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
+#include "fordyca/fsm/foraging_transport_goal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,15 +56,15 @@ NS_START(fsm, depth0);
  * way to the nest and dropped it in the nest, it will repeat the same sequence
  * (i.e. it loops indefinitely).
  */
-class dpo_fsm final : public cfsm::util_hfsm,
+class dpo_fsm final : public csfsm::util_hfsm,
                       public rer::client<dpo_fsm>,
-                      public cfsm::metrics::goal_acq_metrics,
-                      public block_transporter,
+                      public csmetrics::goal_acq_metrics,
+                      public cfsm::block_transporter<foraging_transport_goal>,
                       public cta::taskable {
  public:
   dpo_fsm(const fsm_ro_params * params,
           crfootbot::footbot_saa_subsystem* saa,
-          std::unique_ptr<cfsm::expstrat::base_expstrat> exp_behavior,
+          std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
           rmath::rng* rng);
   ~dpo_fsm(void) override = default;
   dpo_fsm(const dpo_fsm&) = delete;
@@ -75,7 +76,7 @@ class dpo_fsm final : public cfsm::util_hfsm,
    * supervisor_fsm.
    */
   void task_execute(void) override { run(); }
-  void task_start(const cta::taskable_argument*) override {}
+  void task_start(cta::taskable_argument*) override {}
   bool task_finished(void) const override { return m_task_finished; }
   bool task_running(void) const override { return !m_task_finished; }
   void task_reset(void) override { init(); }
@@ -92,7 +93,7 @@ class dpo_fsm final : public cfsm::util_hfsm,
   RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(cfsm::metrics::goal_acq_metrics::goal_type,
+  RCPPSW_WRAP_OVERRIDE_DECL(csmetrics::goal_acq_metrics::goal_type,
                             acquisition_goal,
                             const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, acquisition_loc, const);
@@ -122,9 +123,9 @@ class dpo_fsm final : public cfsm::util_hfsm,
 
  private:
   /* inherited states */
-  HFSM_STATE_INHERIT(cfsm::util_hfsm, leaving_nest,
+  HFSM_STATE_INHERIT(csfsm::util_hfsm, leaving_nest,
                      rpfsm::event_data);
-  HFSM_ENTRY_INHERIT_ND(cfsm::util_hfsm, entry_leaving_nest);
+  HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_leaving_nest);
 
   /* foraging states */
   HFSM_STATE_DECLARE(dpo_fsm, start, rpfsm::event_data);

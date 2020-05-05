@@ -32,7 +32,6 @@
 #include "cosm/arena/operations/nest_block_drop.hpp"
 
 #include "fordyca/events/robot_nest_block_drop.hpp"
-#include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
 #include "fordyca/support/interactor_status.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"

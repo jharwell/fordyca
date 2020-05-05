@@ -27,7 +27,6 @@
 #include <memory>
 
 #include "fordyca/controller/foraging_controller.hpp"
-#include "fordyca/fsm/block_transporter.hpp"
 #include "rcppsw/patterns/fsm/base_fsm.hpp"
 
 /*******************************************************************************
@@ -50,7 +49,6 @@ NS_START(controller, depth0);
  * until you find a block, and then bring it back to the nest; repeat.
  */
 class crw_controller : public foraging_controller,
-                       public fsm::block_transporter,
                        public rer::client<crw_controller> {
  public:
   crw_controller(void) RCSW_COLD;
@@ -66,7 +64,7 @@ class crw_controller : public foraging_controller,
   bool is_vectoring_to_goal(void) const override { return false; }
   RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(cfsm::metrics::goal_acq_metrics::goal_type,
+  RCPPSW_WRAP_OVERRIDE_DECL(csmetrics::goal_acq_metrics::goal_type,
                             acquisition_goal,
                             const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, acquisition_loc, const);
