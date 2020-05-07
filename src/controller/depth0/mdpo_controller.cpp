@@ -26,7 +26,7 @@
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/controller/config/perception/perception_config.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 #include "fordyca/config/depth0/mdpo_controller_repository.hpp"

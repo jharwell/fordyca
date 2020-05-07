@@ -28,6 +28,7 @@
 #include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/arena/repr/light_type_index.hpp"
 #include "cosm/foraging/repr/block_cluster.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/events/cell2D_empty.hpp"
 #include "fordyca/support/utils/loop_utils.hpp"
@@ -52,7 +53,7 @@ base_cache_creator::base_cache_creator(cds::arena_grid* const grid,
  ******************************************************************************/
 std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
     const rmath::vector2d& center,
-    cds::block2D_vectorno blocks,
+    cds::block3D_vectorno blocks,
     const rtypes::timestep& t) {
   ER_ASSERT(center.x() > 0 && center.y() > 0,
             "Center@%s is not positive definite",
@@ -64,7 +65,7 @@ std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
   rmath::vector2z d = rmath::dvec2zvec(center, grid()->resolution().v());
   cds::cell2D& cell = m_grid->access<arena_grid::kCell>(d);
   if (cell.state_has_block()) {
-    ER_ASSERT(nullptr != cell.block2D(),
+    ER_ASSERT(nullptr != cell.block3D(),
               "Cell@%s does not have block",
               cell.loc().to_str().c_str());
 
@@ -77,7 +78,7 @@ std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
      * creation). However, it may also NOT be in the list of blocks to use for
      * the new cache, in which case we need to add in (static cache creation).
      */
-    if (blocks.end() == std::find(blocks.begin(), blocks.end(), cell.block2D())) {
+    if (blocks.end() == std::find(blocks.begin(), blocks.end(), cell.block3D())) {
       /*
        * We use insert() instead of push_back() here so that if there was a
        * leftover block on the cell where a cache used to be that is also where
@@ -86,9 +87,9 @@ std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
        * helps to ensure fairness/better statistics for the simulations.
        */
       ER_DEBUG("Add block%d in from cache host cell@%s to block vector",
-               cell.block2D()->id().v(),
+               cell.block3D()->id().v(),
                cell.loc().to_str().c_str());
-      blocks.insert(blocks.begin(), cell.block2D());
+      blocks.insert(blocks.begin(), cell.block3D());
     }
   }
 
@@ -99,17 +100,19 @@ std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
    * grab them in a non-concurrent context.
    */
   for (auto& block : blocks) {
-    events::cell2D_empty_visitor op(block->dloc());
-    op.visit(m_grid->access<arena_grid::kCell>(op.coord()));
+    events::cell2D_empty_visitor op(block->dpos2D());
+    op.visit(m_grid->access<arena_grid::kCell>(block->dpos2D()));
   } /* for(block..) */
 
   for (auto& block : blocks) {
-    caops::free_block_drop_visitor<crepr::base_block2D> op(
-        block, d, m_grid->resolution(), carena::arena_map_locking::ekALL_HELD);
+    caops::free_block_drop_visitor op(block,
+                                      d,
+                                      m_grid->resolution(),
+                                      carena::arena_map_locking::ekALL_HELD);
     op.visit(m_grid->access<arena_grid::kCell>(op.coord()));
   } /* for(block..) */
 
-  cds::block2D_vectorno block_vec(blocks.begin(), blocks.end());
+  cds::block3D_vectorno block_vec(blocks.begin(), blocks.end());
   auto ret = std::make_unique<carepr::arena_cache>(
       carepr::arena_cache::params{mc_cache_dim,
                                   m_grid->resolution(),
@@ -120,8 +123,8 @@ std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
   ret->creation_ts(t);
   ER_INFO("Create cache%d@%s/%s, xspan=%s/%s,yspan=%s/%s with %zu blocks [%s]",
           ret->id().v(),
-          ret->rloc().to_str().c_str(),
-          ret->dloc().to_str().c_str(),
+          ret->rpos2D().to_str().c_str(),
+          ret->dpos2D().to_str().c_str(),
           ret->xspan().to_str().c_str(),
           rmath::drange2urange(ret->xspan(), m_grid->resolution().v())
               .to_str()
@@ -143,7 +146,7 @@ void base_cache_creator::update_host_cells(cads::acache_vectoro& caches) {
    * creation process and setting it here will trigger an assert later.
    */
   for (auto& cache : caches) {
-    m_grid->access<arena_grid::kCell>(cache->dloc()).entity(cache.get());
+    m_grid->access<arena_grid::kCell>(cache->dpos2D()).entity(cache.get());
 
     auto xspan = cache->xspan();
     auto yspan = cache->yspan();
@@ -167,7 +170,7 @@ void base_cache_creator::update_host_cells(cads::acache_vectoro& caches) {
                   i,
                   j);
 
-        if (c != cache->dloc()) {
+        if (c != cache->dpos2D()) {
           ER_ASSERT(!cell.state_in_cache_extent(),
                     "Cell@(%u, %u) already in CACHE_EXTENT",
                     i,
@@ -182,11 +185,11 @@ void base_cache_creator::update_host_cells(cads::acache_vectoro& caches) {
 
 bool base_cache_creator::creation_sanity_checks(
     const cads::acache_vectoro& caches,
-    const cds::block2D_vectorno& free_blocks,
-    const cfds::block2D_cluster_vector& clusters) const {
+    const cds::block3D_vectorno& free_blocks,
+    const cfds::block3D_cluster_vector& clusters) const {
   /* check caches against each other and internally for consistency */
   for (auto& c1 : caches) {
-    auto& cell = m_grid->access<arena_grid::kCell>(c1->dloc());
+    auto& cell = m_grid->access<arena_grid::kCell>(c1->dpos2D());
     ER_CHECK(cell.fsm().state_has_cache(),
              "Cell@%s not in HAS_CACHE state",
              cell.loc().to_str().c_str());

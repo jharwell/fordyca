@@ -61,20 +61,20 @@ const carepr::base_cache* existing_cache_selector::operator()(
   for (auto& c : existing_caches.const_values_range()) {
     fsm::cache_acq_validator validator(mc_cache_map, mc_matrix, mc_is_pickup);
 
-    if (!validator(c.ent()->rloc(), c.ent()->id(), t) ||
+    if (!validator(c.ent()->rpos2D(), c.ent()->id(), t) ||
         cache_is_excluded(position, c.ent())) {
       continue;
     }
     math::existing_cache_utility u(
-        c.ent()->rloc(),
+        c.ent()->rpos2D(),
         boost::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second));
 
     double utility = u.calc(position, c.density(), c.ent()->n_blocks());
     ER_ASSERT(utility > 0.0, "Bad utility calculation");
     ER_DEBUG("Utility for existing_cache%d@%s/%s, density=%f: %f",
              c.ent()->id().v(),
-             c.ent()->rloc().to_str().c_str(),
-             c.ent()->dloc().to_str().c_str(),
+             c.ent()->rpos2D().to_str().c_str(),
+             c.ent()->dpos2D().to_str().c_str(),
              c.density().v(),
              utility);
 
@@ -87,8 +87,8 @@ const carepr::base_cache* existing_cache_selector::operator()(
   if (nullptr != best) {
     ER_INFO("Best utility: existing_cache%d@%s/%s w/%zu blocks: %f",
             best->id().v(),
-            best->rloc().to_str().c_str(),
-            best->dloc().to_str().c_str(),
+            best->rpos2D().to_str().c_str(),
+            best->dpos2D().to_str().c_str(),
             best->n_blocks(),
             max_utility);
     return best;
@@ -113,8 +113,8 @@ bool existing_cache_selector::cache_is_excluded(
   if (cache->contains_point2D(position)) {
     ER_DEBUG("Ignoring cache%d@%s/%s: robot@%s inside it",
              cache->id().v(),
-             cache->rloc().to_str().c_str(),
-             cache->dloc().to_str().c_str(),
+             cache->rpos2D().to_str().c_str(),
+             cache->dpos2D().to_str().c_str(),
              position.to_str().c_str());
     return true;
   }
@@ -133,8 +133,8 @@ bool existing_cache_selector::cache_is_excluded(
       })) {
     ER_DEBUG("Ignoring cache%d@%s/%s: On exception list",
              cache->id().v(),
-             cache->rloc().to_str().c_str(),
-             cache->dloc().to_str().c_str());
+             cache->rpos2D().to_str().c_str(),
+             cache->dpos2D().to_str().c_str());
     return true;
   }
 

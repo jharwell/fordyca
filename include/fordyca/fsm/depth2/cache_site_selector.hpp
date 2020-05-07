@@ -69,7 +69,7 @@ class cache_site_selector: public rer::client<cache_site_selector> {
     rtypes::spatial_dist     cache_prox{0.0};
   };
   struct block_constraint_data {
-    const crepr::base_block2D* mc_block{nullptr};
+    const crepr::base_block3D* mc_block{nullptr};
     cache_site_selector*    selector{nullptr};
     rtypes::spatial_dist    block_prox{0.0};
   };

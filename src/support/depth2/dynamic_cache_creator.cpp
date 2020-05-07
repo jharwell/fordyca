@@ -24,7 +24,7 @@
 #include "fordyca/support/depth2/dynamic_cache_creator.hpp"
 
 #include "cosm/arena/repr/arena_cache.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/events/cell2D_empty.hpp"
 #include "fordyca/support/depth2/cache_center_calculator.hpp"
@@ -51,7 +51,7 @@ dynamic_cache_creator::dynamic_cache_creator(const params* const p,
  ******************************************************************************/
 cads::acache_vectoro dynamic_cache_creator::create_all(
     const cache_create_ro_params& c_params,
-    const cds::block2D_vectorno& c_alloc_blocks) {
+    const cds::block3D_vectorno& c_alloc_blocks) {
   cads::acache_vectoro created_caches;
 
   ER_DEBUG("Creating caches: min_dist=%f,min_blocks=%u,free_blocks=[%s] (%zu)",
@@ -60,9 +60,9 @@ cads::acache_vectoro dynamic_cache_creator::create_all(
            rcppsw::to_string(c_alloc_blocks).c_str(),
            c_alloc_blocks.size());
 
-  cds::block2D_vectorno used_blocks;
+  cds::block3D_vectorno used_blocks;
   for (size_t i = 0; i < c_alloc_blocks.size() - 1; ++i) {
-    cds::block2D_vectorno cache_i_blocks =
+    cds::block3D_vectorno cache_i_blocks =
         cache_i_blocks_alloc(used_blocks, c_alloc_blocks, i);
 
     /*
@@ -107,7 +107,7 @@ cads::acache_vectoro dynamic_cache_creator::create_all(
     }
   } /* for(i..) */
 
-  cds::block2D_vectorno free_blocks =
+  cds::block3D_vectorno free_blocks =
       utils::free_blocks_calc(created_caches, c_alloc_blocks);
 
   ER_ASSERT(
@@ -126,17 +126,17 @@ cads::acache_vectorno dynamic_cache_creator::avoidance_caches_calc(
   return avoid;
 } /* avoidance_caches_calc() */
 
-cds::block2D_vectorno dynamic_cache_creator::absorb_blocks_calc(
-    const cds::block2D_vectorno& c_alloc_blocks,
-    const cds::block2D_vectorno& c_cache_i_blocks,
-    const cds::block2D_vectorno& c_used_blocks,
+cds::block3D_vectorno dynamic_cache_creator::absorb_blocks_calc(
+    const cds::block3D_vectorno& c_alloc_blocks,
+    const cds::block3D_vectorno& c_cache_i_blocks,
+    const cds::block3D_vectorno& c_used_blocks,
     const rmath::vector2z& c_center,
     rtypes::spatial_dist cache_dim) const {
-  cds::block2D_vectorno absorb_blocks;
+  cds::block3D_vectorno absorb_blocks;
   std::copy_if(c_alloc_blocks.begin(),
                c_alloc_blocks.end(),
                std::back_inserter(absorb_blocks),
-               [&](crepr::base_block2D* b) RCSW_PURE {
+               [&](crepr::base_block3D* b) RCSW_PURE {
                  auto xspan = rmath::ranged(c_center.x() - cache_dim.v() / 2.0,
                                             c_center.x() + cache_dim.v() / 2.0);
                  auto yspan = rmath::ranged(c_center.y() - cache_dim.v() / 2.0,
@@ -154,11 +154,11 @@ cds::block2D_vectorno dynamic_cache_creator::absorb_blocks_calc(
   return absorb_blocks;
 } /* absorb_blocks_calc() */
 
-cds::block2D_vectorno dynamic_cache_creator::cache_i_blocks_alloc(
-    const cds::block2D_vectorno& c_used_blocks,
-    const cds::block2D_vectorno& c_alloc_blocks,
+cds::block3D_vectorno dynamic_cache_creator::cache_i_blocks_alloc(
+    const cds::block3D_vectorno& c_used_blocks,
+    const cds::block3D_vectorno& c_alloc_blocks,
     uint index) const {
-  cds::block2D_vectorno src_blocks;
+  cds::block3D_vectorno src_blocks;
 
   /*
    * Block already in a new cache, so bail out.
@@ -176,7 +176,7 @@ cds::block2D_vectorno dynamic_cache_creator::cache_i_blocks_alloc(
    */
   ER_TRACE("Add anchor block%d@%s to src list",
            c_alloc_blocks[index]->id().v(),
-           c_alloc_blocks[index]->rloc().to_str().c_str());
+           c_alloc_blocks[index]->rpos2D().to_str().c_str());
   src_blocks.push_back(c_alloc_blocks[index]);
   for (size_t i = index + 1; i < c_alloc_blocks.size(); ++i) {
     /*
@@ -184,7 +184,7 @@ cds::block2D_vectorno dynamic_cache_creator::cache_i_blocks_alloc(
      * add to the src list.
      */
     if (mc_min_dist >=
-        (c_alloc_blocks[index]->rloc() - c_alloc_blocks[i]->rloc()).length()) {
+        (c_alloc_blocks[index]->rpos2D() - c_alloc_blocks[i]->rpos2D()).length()) {
       ER_ASSERT(std::find(src_blocks.begin(),
                           src_blocks.end(),
                           c_alloc_blocks[i]) == src_blocks.end(),
@@ -195,7 +195,7 @@ cds::block2D_vectorno dynamic_cache_creator::cache_i_blocks_alloc(
                     c_alloc_blocks[i]) == c_used_blocks.end()) {
         ER_TRACE("Add block %d@%s to src list",
                  c_alloc_blocks[i]->id().v(),
-                 c_alloc_blocks[i]->rloc().to_str().c_str());
+                 c_alloc_blocks[i]->rpos2D().to_str().c_str());
         src_blocks.push_back(c_alloc_blocks[i]);
       }
     }

@@ -27,6 +27,7 @@
 #include "cosm/ds/cell2D.hpp"
 #include "cosm/foraging/repr/block_cluster.hpp"
 #include "cosm/foraging/utils/utils.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,21 +47,21 @@ cache_center_calculator::cache_center_calculator(cds::arena_grid* const grid,
  * Member Functions
  ******************************************************************************/
 boost::optional<rmath::vector2z> cache_center_calculator::operator()(
-    const cds::block2D_vectorno& c_cache_i_blocks,
+    const cds::block3D_vectorno& c_cache_i_blocks,
     const cads::acache_vectorno& c_existing_caches,
-    const cfds::block2D_cluster_vector& c_clusters,
+    const cfds::block3D_cluster_vector& c_clusters,
     rmath::rng* rng) const {
   double sumx = std::accumulate(c_cache_i_blocks.begin(),
                                 c_cache_i_blocks.end(),
                                 0.0,
                                 [](double sum, const auto& b) {
-                                  return sum + b->rloc().x();
+                                  return sum + b->rpos2D().x();
                                 });
   double sumy = std::accumulate(c_cache_i_blocks.begin(),
                                 c_cache_i_blocks.end(),
                                 0.0,
                                 [](double sum, const auto& b) {
-                                  return sum + b->rloc().y();
+                                  return sum + b->rpos2D().y();
                                 });
 
   /* center is discretized real coordinates WITHOUT converting via resolution */
@@ -111,7 +112,7 @@ boost::optional<rmath::vector2z> cache_center_calculator::operator()(
 
 boost::optional<rmath::vector2z> cache_center_calculator::deconflict_loc(
     const cads::acache_vectorno& c_existing_caches,
-    const cfds::block2D_cluster_vector& c_clusters,
+    const cfds::block3D_cluster_vector& c_clusters,
     const rmath::vector2z& c_center,
     rmath::rng* rng) const {
   bool conflict = false;

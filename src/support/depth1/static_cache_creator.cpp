@@ -47,7 +47,7 @@ static_cache_creator::static_cache_creator(
  ******************************************************************************/
 cads::acache_vectoro static_cache_creator::create_all(
     const cache_create_ro_params& c_params,
-    const cds::block2D_vectorno& c_alloc_blocks) {
+    const cds::block3D_vectorno& c_alloc_blocks) {
   ER_DEBUG("Creating caches: alloc_blocks=[%s] (%zu)",
            rcppsw::to_string(c_alloc_blocks).c_str(),
            c_alloc_blocks.size());
@@ -56,7 +56,7 @@ cads::acache_vectoro static_cache_creator::create_all(
   auto it = c_alloc_blocks.begin();
   for (auto& center : mc_centers) {
     auto filter = [&](const auto& c) {
-      return rmath::dvec2zvec(center, grid()->resolution().v()) == c->dloc();
+      return rmath::dvec2zvec(center, grid()->resolution().v()) == c->dpos2D();
     };
     /* static cache already exists */
     if (c_params.current_caches.end() !=
@@ -76,7 +76,7 @@ cads::acache_vectoro static_cache_creator::create_all(
     }
     auto it2 = it;
     std::advance(it, base_cache::kMinBlocks);
-    cds::block2D_vectorno cache_i_blocks(it2, it);
+    cds::block3D_vectorno cache_i_blocks(it2, it);
 
     ER_INFO("Creating static cache@%s: blocks=[%s] (%zu)",
             center.to_str().c_str(),

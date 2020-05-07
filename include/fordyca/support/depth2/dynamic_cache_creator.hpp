@@ -61,7 +61,7 @@ class dynamic_cache_creator : public base_cache_creator,
    * together.
    */
   cads::acache_vectoro create_all(const cache_create_ro_params& c_params,
-                                const cds::block2D_vectorno&  c_alloc_blocks) override;
+                                const cds::block3D_vectorno&  c_alloc_blocks) override;
 
  private:
   /**
@@ -74,8 +74,8 @@ class dynamic_cache_creator : public base_cache_creator,
    *                     creation when the creator was called.
    * \param index Our current index within the candidate vector.
    */
-  cds::block2D_vectorno cache_i_blocks_alloc(const cds::block2D_vectorno& c_used_blocks,
-                                           const cds::block2D_vectorno& c_alloc_blocks,
+  cds::block3D_vectorno cache_i_blocks_alloc(const cds::block3D_vectorno& c_used_blocks,
+                                           const cds::block3D_vectorno& c_alloc_blocks,
                                            uint index) const;
 
   /**
@@ -93,10 +93,10 @@ class dynamic_cache_creator : public base_cache_creator,
    * blocks getting added to created caches twice, which causes all sorts of
    * problems. See FORDYCA#578.
    */
-  cds::block2D_vectorno absorb_blocks_calc(
-      const cds::block2D_vectorno& c_alloc_blocks,
-      const cds::block2D_vectorno& c_cache_i_blocks,
-      const cds::block2D_vectorno& c_used_blocks,
+  cds::block3D_vectorno absorb_blocks_calc(
+      const cds::block3D_vectorno& c_alloc_blocks,
+      const cds::block3D_vectorno& c_cache_i_blocks,
+      const cds::block3D_vectorno& c_used_blocks,
       const rmath::vector2z& c_center,
       rtypes::spatial_dist cache_dim) const;
 

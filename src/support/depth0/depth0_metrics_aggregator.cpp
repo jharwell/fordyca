@@ -30,7 +30,7 @@
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 #include "cosm/spatial/metrics/movement_metrics.hpp"
 #include "cosm/metrics/collector_registerer.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"

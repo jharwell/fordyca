@@ -25,7 +25,7 @@
 
 #include <numeric>
 
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 #include "fordyca/ds/dpo_store.hpp"
@@ -49,7 +49,7 @@ void utility_cache_search::task_start(cta::taskable_argument*) {
                                range.end(),
                                rmath::vector2d(),
                                [&](rmath::vector2d& sum, const auto& bent) {
-                                 return sum + bent.ent()->rloc();
+                                 return sum + bent.ent()->rpos2D();
                                }) /
                boost::size(range);
   } else {

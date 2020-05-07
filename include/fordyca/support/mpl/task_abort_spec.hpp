@@ -1,5 +1,5 @@
 /**
- * \file task_abort.hpp
+ * \file task_abort_spec.hpp
  *
  * \copyright 2020 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_MPL_TASK_ABORT_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_MPL_TASK_ABORT_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_MPL_TASK_ABORT_SPEC_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_MPL_TASK_ABORT_SPEC_HPP_
 
 /*******************************************************************************
  * Includes
@@ -42,7 +42,7 @@ NS_START(fordyca, support, mpl, detail);
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-struct task_abort_spec {
+struct task_abort_spec_value {
   using arena_map_type = carena::caching_arena_map;
   using env_dynamics_type = tv::env_dynamics;
   using robot_free_block_drop_visitor_type = events::robot_free_block_drop_visitor;
@@ -54,14 +54,14 @@ struct task_abort_spec {
  */
 using task_abort_inserter = boost::mpl::insert<boost::mpl::_1,
                                               boost::mpl::pair<boost::mpl::_2,
-                                                               task_abort_spec>>;
+                                                               task_abort_spec_value>>;
 
 NS_END(detail);
 
 template<typename TTypelist>
-using task_abort_map = typename boost::mpl::fold<TTypelist,
-                                                 boost::mpl::map0<>,
-                                                 detail::task_abort_inserter>::type;
+using task_abort_spec = typename boost::mpl::fold<TTypelist,
+                                                  boost::mpl::map0<>,
+                                                  detail::task_abort_inserter>::type;
 NS_END(mpl, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_MPL_TASK_ABORT_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_MPL_TASK_ABORT_SPEC_HPP_ */

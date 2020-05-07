@@ -56,8 +56,8 @@ rmath::vector2d cache_acq_point_selector::operator()(
   ER_ASSERT(cache->contains_point2D(loc),
             "Cache%d@%s/%s with xspan=%s,yspan=%s does not contain %s",
             cache->id().v(),
-            cache->rloc().to_str().c_str(),
-            cache->dloc().to_str().c_str(),
+            cache->rpos2D().to_str().c_str(),
+            cache->dpos2D().to_str().c_str(),
             cache->xspan().to_str().c_str(),
             cache->yspan().to_str().c_str(),
             loc.to_str().c_str());

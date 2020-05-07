@@ -25,6 +25,7 @@
 
 #include "cosm/arena/base_arena_map.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,9 +35,9 @@ NS_START(fordyca, support, utils);
 /*******************************************************************************
  * Functions
  ******************************************************************************/
-cds::block2D_vectorno free_blocks_calc(const cads::acache_vectoro& all_caches,
-                                       const cds::block2D_vectorno& all_blocks) {
-  cds::block2D_vectorno free_blocks;
+cds::block3D_vectorno free_blocks_calc(const cads::acache_vectoro& all_caches,
+                                       const cds::block3D_vectorno& all_blocks) {
+  cds::block3D_vectorno free_blocks;
   std::copy_if(all_blocks.begin(),
                all_blocks.end(),
                std::back_inserter(free_blocks),

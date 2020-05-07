@@ -30,7 +30,7 @@
 #include "rcppsw/patterns/visitor/visitor.hpp"
 #include "rcppsw/types/timestep.hpp"
 
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
@@ -80,7 +80,7 @@ class robot_nest_block_drop : public rer::client<robot_nest_block_drop> {
    *              the arena.
    * \param t Current timestep.
    */
-  robot_nest_block_drop(crepr::base_block2D* block, const rtypes::timestep& t);
+  robot_nest_block_drop(crepr::base_block3D* block, const rtypes::timestep& t);
 
   ~robot_nest_block_drop(void) override = default;
 
@@ -119,7 +119,7 @@ class robot_nest_block_drop : public rer::client<robot_nest_block_drop> {
   /* clang-format off */
   const rtypes::timestep mc_timestep;
 
-  crepr::base_block2D*   m_block;
+  crepr::base_block3D*   m_block;
   /* clang-format on */
 };
 

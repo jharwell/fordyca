@@ -92,7 +92,7 @@ class robot_cached_block_pickup : public rer::client<robot_cached_block_pickup>,
   using visit_typelist = visit_typelist_impl::value;
 
   robot_cached_block_pickup(const carepr::arena_cache* cache,
-                            const crepr::base_block2D* block,
+                            const crepr::base_block3D* block,
                             const rtypes::type_uuid& robot_id,
                             const rtypes::timestep& t);
   ~robot_cached_block_pickup(void) override;
@@ -107,7 +107,7 @@ class robot_cached_block_pickup : public rer::client<robot_cached_block_pickup>,
   void visit(cfsm::cell2D_fsm& fsm);
   void visit(ds::dpo_semantic_map& map);
   void visit(ds::dpo_store& store);
-  void visit(crepr::base_block2D& block);
+  void visit(crepr::base_block3D& block);
   void visit(tasks::depth1::collector& task);
   void visit(fsm::block_to_goal_fsm& fsm);
   void visit(fsm::depth1::cached_block_to_nest_fsm& fsm);
@@ -140,9 +140,9 @@ class robot_cached_block_pickup : public rer::client<robot_cached_block_pickup>,
   const rtypes::type_uuid              mc_robot_id;
   const rtypes::timestep               mc_timestep;
   const carepr::arena_cache*           mc_cache;
-  const crepr::base_block2D*           mc_block;
+  const crepr::base_block3D*           mc_block;
 
-  std::unique_ptr<crepr::base_block2D> m_robot_block;
+  std::unique_ptr<crepr::base_block3D> m_robot_block;
   /* clang-format on */
 };
 

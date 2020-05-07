@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include "fordyca/support/free_block_pickup_interactor.hpp"
 #include "fordyca/support/nest_block_drop_interactor.hpp"
-#include "fordyca/support/mpl/free_block_pickup.hpp"
-#include "fordyca/support/mpl/nest_block_drop.hpp"
+#include "fordyca/support/mpl/free_block_pickup_spec.hpp"
+#include "fordyca/support/mpl/nest_block_drop_spec.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
 
 /*******************************************************************************
@@ -86,11 +86,12 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
   }
 
  private:
+  using pickup_spec = mpl::free_block_pickup_spec<controller::depth0::typelist>;
+  using drop_spec = mpl::nest_block_drop_spec<controller::depth0::typelist>;
+
   /* clang-format off */
-  free_block_pickup_interactor<TController,
-                               mpl::free_block_pickup_map<controller::depth0::typelist>> m_free_pickup;
-  nest_block_drop_interactor<TController,
-                             mpl::nest_block_drop_map<controller::depth0::typelist>>     m_nest_drop;
+  free_block_pickup_interactor<TController, pickup_spec> m_free_pickup;
+  nest_block_drop_interactor<TController, drop_spec>     m_nest_drop;
   /* clang-format on */
 };
 

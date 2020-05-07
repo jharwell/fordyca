@@ -24,7 +24,7 @@
 #include "fordyca/controller/depth0/odpo_controller.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 #include "fordyca/controller/dpo_perception_subsystem.hpp"

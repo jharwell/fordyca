@@ -210,7 +210,7 @@ class cached_block_pickup_interactor
               penalty.id().v());
     caops::cached_block_pickup_visitor apickup_op(
         *it, m_loop, controller.entity_id(), t);
-    const crepr::base_block2D* to_pickup = (*it)->oldest_block();
+    const crepr::base_block3D* to_pickup = (*it)->oldest_block();
     events::robot_cached_block_pickup_visitor rpickup_op(
         *it, to_pickup, controller.entity_id(), t);
     (*it)->penalty_served(penalty.penalty());

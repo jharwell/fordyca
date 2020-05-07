@@ -97,21 +97,15 @@ class cache_found : public cdops::cell2D_op, public rer::client<cache_found> {
   /* clang-format on */
 };
 
+NS_END(detail);
+
 /**
  * \brief We use the precise visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using cache_found_visitor_impl =
-    rpvisitor::precise_visitor<detail::cache_found,
-                               detail::cache_found::visit_typelist>;
-
-NS_END(detail);
-
-class cache_found_visitor : public detail::cache_found_visitor_impl {
-  using detail::cache_found_visitor_impl::cache_found_visitor_impl;
-};
+using cache_found_visitor = rpvisitor::generic_precise_visitor<detail::cache_found>;
 
 NS_END(events, fordyca);
 

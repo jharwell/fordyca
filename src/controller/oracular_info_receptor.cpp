@@ -27,7 +27,7 @@
 #include "cosm/foraging/oracle/foraging_oracle.hpp"
 #include "cosm/oracle/entities_oracle.hpp"
 #include "cosm/oracle/tasking_oracle.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/polled_task.hpp"
 #include "cosm/ta/time_estimate.hpp"

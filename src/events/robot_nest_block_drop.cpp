@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/events/robot_nest_block_drop.hpp"
 
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
@@ -54,7 +54,7 @@ NS_START(fordyca, events, detail);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-robot_nest_block_drop::robot_nest_block_drop(crepr::base_block2D* block,
+robot_nest_block_drop::robot_nest_block_drop(crepr::base_block3D* block,
                                              const rtypes::timestep& t)
     : ER_CLIENT_INIT("fordyca.events.robot_nest_block_drop"),
       mc_timestep(t),

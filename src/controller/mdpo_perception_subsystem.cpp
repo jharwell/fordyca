@@ -28,7 +28,7 @@
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/ds/cell2D.hpp"
 #include "cosm/fsm/cell2D_state.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/controller/los_proc_verify.hpp"
 #include "fordyca/controller/oracular_info_receptor.hpp"
@@ -134,11 +134,11 @@ void mdpo_perception_subsystem::process_los_blocks(
                       los_entity->dimensionality(),
                   "LOS block%d is not 2D!",
                   los_entity->id().v());
-        auto* map_block = m_map->access<occupancy_grid::kCell>(d).block2D();
+        auto* map_block = m_map->access<occupancy_grid::kCell>(d).block3D();
         ER_DEBUG("Correct block%d %s/%s discrepency",
                  map_block->id().v(),
-                 map_block->rloc().to_str().c_str(),
-                 map_block->dloc().to_str().c_str());
+                 map_block->rpos2D().to_str().c_str(),
+                 map_block->dpos2D().to_str().c_str());
         m_map->block_remove(map_block);
       } else if (c_los->access(i, j).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_is_known()) {
@@ -150,24 +150,24 @@ void mdpo_perception_subsystem::process_los_blocks(
   }   /* for(i..) */
 
   for (auto* b : c_los->blocks()) {
-    auto* block = static_cast<crepr::base_block2D*>(b);
+    auto* block = static_cast<crepr::base_block3D*>(b);
     ER_ASSERT(!block->is_out_of_sight(),
               "Block%d out of sight in LOS?",
               block->id().v());
-    auto& cell = m_map->access<occupancy_grid::kCell>(block->dloc());
+    auto& cell = m_map->access<occupancy_grid::kCell>(block->dpos2D());
     if (!cell.state_has_block()) {
       ER_INFO("Discovered block%d@%s/%s",
               block->id().v(),
-              block->rloc().to_str().c_str(),
-              block->dloc().to_str().c_str());
+              block->rpos2D().to_str().c_str(),
+              block->dpos2D().to_str().c_str());
     } else if (cell.state_has_block()) {
       ER_DEBUG("Block%d@%s/%s already known",
                block->id().v(),
-               block->rloc().to_str().c_str(),
-               block->dloc().to_str().c_str());
+               block->rpos2D().to_str().c_str(),
+               block->dpos2D().to_str().c_str());
       auto range = m_map->blocks().const_values_range();
       auto it = std::find_if(range.begin(), range.end(), [&](const auto& b1) {
-        return b1.ent()->id() == cell.block2D()->id();
+        return b1.ent()->id() == cell.block3D()->id();
       });
       ER_ASSERT(it != range.end(), "Known block%d not in PAM", block->id().v());
     }
@@ -204,8 +204,8 @@ void mdpo_perception_subsystem::process_los_caches(
         auto cache = map()->access<occupancy_grid::kCell>(d).cache();
         ER_DEBUG("Correct cache%d@%s/%s discrepency",
                  cache->id().v(),
-                 cache->rloc().to_str().c_str(),
-                 cache->dloc().to_str().c_str());
+                 cache->rpos2D().to_str().c_str(),
+                 cache->dpos2D().to_str().c_str());
         map()->cache_remove(cache);
       }
     } /* for(j..) */
@@ -219,23 +219,23 @@ void mdpo_perception_subsystem::process_los_caches(
      */
     ER_DEBUG("LOS: Cache%d@%s/%s: %zu blocks",
              cache->id().v(),
-             cache->rloc().to_str().c_str(),
-             cache->dloc().to_str().c_str(),
+             cache->rpos2D().to_str().c_str(),
+             cache->dpos2D().to_str().c_str(),
              cache->n_blocks());
-    auto& cell = map()->access<occupancy_grid::kCell>(cache->dloc());
+    auto& cell = map()->access<occupancy_grid::kCell>(cache->dpos2D());
 
     if (!cell.state_has_cache()) {
       ER_INFO("Discovered cache%d@%s/%s: %zu blocks",
               cache->id().v(),
-              cache->rloc().to_str().c_str(),
-              cache->dloc().to_str().c_str(),
+              cache->rpos2D().to_str().c_str(),
+              cache->dpos2D().to_str().c_str(),
               cache->n_blocks());
     } else if (cell.state_has_cache() &&
                cell.cache()->n_blocks() != cache->n_blocks()) {
       ER_INFO("Fixed cache%d@%s/%s block count: %zu -> %zu",
               cache->id().v(),
-              cache->rloc().to_str().c_str(),
-              cache->dloc().to_str().c_str(),
+              cache->rpos2D().to_str().c_str(),
+              cache->dpos2D().to_str().c_str(),
               cache->n_blocks(),
               cell.cache()->n_blocks());
     }

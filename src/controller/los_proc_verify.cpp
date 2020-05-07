@@ -24,7 +24,7 @@
 #include "fordyca/controller/los_proc_verify.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/ds/dpo_store.hpp"
@@ -53,13 +53,13 @@ bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
       ER_ASSERT(crepr::entity_dimensionality::ek2D == b->dimensionality(),
                 "Block%d is not 2D!",
                 b->id().v());
-      auto* block = static_cast<crepr::base_block2D*>(b);
+      auto* block = static_cast<crepr::base_block3D*>(b);
 
-      if (!cache.ent()->contains_point2D(block->rloc2D())) {
+      if (!cache.ent()->contains_point2D(block->rpos2D())) {
         ER_ASSERT(c_dpo->contains(block),
                   "Store does not contain block%d@%s",
                   block->id().v(),
-                  block->dloc2D().to_str().c_str());
+                  block->dpos2D().to_str().c_str());
       }
     } /* for(&block..) */
   }   /* for(&cache..) */
@@ -76,21 +76,21 @@ bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
     ER_ASSERT(nullptr != exists,
               "LOS Cache%d@%s does not exist in DPO store",
               c1->id().v(),
-              c1->dloc().to_str().c_str());
-    ER_ASSERT(c1->dloc() == exists->ent()->dloc(),
+              c1->dpos2D().to_str().c_str());
+    ER_ASSERT(c1->dpos2D() == exists->ent()->dpos2D(),
               "LOS/DPO store disagree on cache%d location: %s/%s",
               c1->id().v(),
-              c1->dloc().to_str().c_str(),
-              exists->ent()->dloc().to_str().c_str());
+              c1->dpos2D().to_str().c_str(),
+              exists->ent()->dpos2D().to_str().c_str());
     ER_ASSERT(c1->id() == exists->ent()->id(),
               "DPO store/LOS disagree on cache ID @%s: %d/%d",
-              c1->dloc().to_str().c_str(),
+              c1->dpos2D().to_str().c_str(),
               exists->ent()->id().v(),
               c1->id().v());
     ER_ASSERT(c1->n_blocks() == exists->ent()->n_blocks(),
               "LOS/DPO store disagree on # of blocks in cache%d@%s: %zu/%zu",
               c1->id().v(),
-              c1->dloc().to_str().c_str(),
+              c1->dpos2D().to_str().c_str(),
               c1->n_blocks(),
               exists->ent()->n_blocks());
   } /* for(c1..) */
@@ -108,17 +108,17 @@ bool los_proc_verify::operator()(const ds::dpo_semantic_map* const c_map) const 
     ER_ASSERT(crepr::entity_dimensionality::ek2D == b->dimensionality(),
               "Block%d is not 2D!",
               b->id().v());
-    auto* block = static_cast<crepr::base_block2D*>(b);
-    auto& cell = c_map->access<ds::occupancy_grid::kCell>(block->dloc());
+    auto* block = static_cast<crepr::base_block3D*>(b);
+    auto& cell = c_map->access<ds::occupancy_grid::kCell>(block->dpos2D());
 
     ER_ASSERT(cell.state_has_block(),
               "Cell@%s not in HAS_BLOCK state",
-              block->dloc().to_str().c_str());
-    ER_ASSERT(cell.block2D()->id() == block->id(),
+              block->dpos2D().to_str().c_str());
+    ER_ASSERT(cell.block3D()->id() == block->id(),
               "Cell@%s has wrong block ID (%d vs %d)",
-              block->dloc().to_str().c_str(),
+              block->dpos2D().to_str().c_str(),
               block->id().v(),
-              cell.block2D()->id().v());
+              cell.block3D()->id().v());
   } /* for(&block..) */
 
   /*
@@ -143,11 +143,11 @@ bool los_proc_verify::operator()(const ds::dpo_semantic_map* const c_map) const 
                     "Block%d is not 2D!",
                     cell1.entity()->id().v());
 
-          ER_ASSERT(cell1.block2D()->id() == cell2.block2D()->id(),
+          ER_ASSERT(cell1.block3D()->id() == cell2.block3D()->id(),
                     "LOS/DPO map disagree on block id in cell@%s: %d/%d",
                     d.to_str().c_str(),
-                    cell1.block2D()->id().v(),
-                    cell2.block2D()->id().v());
+                    cell1.block3D()->id().v(),
+                    cell2.block3D()->id().v());
         }
       }
     } /* for(j..) */

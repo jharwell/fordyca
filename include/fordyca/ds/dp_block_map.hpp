@@ -28,7 +28,7 @@
 
 #include "rcppsw/types/type_uuid.hpp"
 
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/ds/dpo_map.hpp"
 #include "fordyca/fordyca.hpp"
@@ -51,9 +51,9 @@ NS_START(fordyca, ds);
  * inserting/removing blocks from the map using location comparison will not
  * give correct results.
  */
-class dp_block_map : public dpo_map<rtypes::type_uuid, crepr::base_block2D> {
+class dp_block_map : public dpo_map<rtypes::type_uuid, crepr::base_block3D> {
  public:
-  using dpo_map<rtypes::type_uuid, crepr::base_block2D>::dpo_map;
+  using dpo_map<rtypes::type_uuid, crepr::base_block3D>::dpo_map;
 
   /**
    * \brief Build a string from the list of DP blocks that a robot is tracking

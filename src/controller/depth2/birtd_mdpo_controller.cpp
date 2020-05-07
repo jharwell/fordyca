@@ -26,7 +26,7 @@
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/controller/config/perception/perception_config.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/config/depth2/controller_repository.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"

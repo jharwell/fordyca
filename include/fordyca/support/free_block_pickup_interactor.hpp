@@ -27,7 +27,7 @@
 #include <boost/none.hpp>
 
 #include "cosm/tv/temporal_penalty.hpp"
-#include "cosm/interactors/base_free_block_pickup.hpp"
+#include "cosm/interactors/base_arena_block_pickup.hpp"
 
 #include "fordyca/metrics/blocks/block_manip_events.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
@@ -52,20 +52,21 @@ NS_START(fordyca, support);
 template <typename TController, typename TControllerSpecMap>
 class free_block_pickup_interactor final :
 
-    public cinteractors::base_free_block_pickup<TController,
+    public cinteractors::base_arena_block_pickup<TController,
                                                                                        TControllerSpecMap> {
  public:
-  using typename cinteractors::base_free_block_pickup<TController,
+  using typename cinteractors::base_arena_block_pickup<TController,
                                                       TControllerSpecMap>::arena_map_type;
-  using typename cinteractors::base_free_block_pickup<TController,
+  using typename cinteractors::base_arena_block_pickup<TController,
                                                       TControllerSpecMap>::penalty_handler_type;
 
 free_block_pickup_interactor(arena_map_type* const map,
                              argos::CFloorEntity* const floor,
                              penalty_handler_type* const handler)
-      : cinteractors::base_free_block_pickup<TController, TControllerSpecMap>(map,
-                                                                              floor,
-                                                                              handler) {}
+      : cinteractors::base_arena_block_pickup<TController,
+                                             TControllerSpecMap>(map,
+                                                                  floor,
+                                                                  handler) {}
 
   free_block_pickup_interactor(free_block_pickup_interactor&&) = default;
 

@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/events/robot_free_block_pickup.hpp"
 
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
@@ -62,14 +62,11 @@ using ds::occupancy_grid;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-robot_free_block_pickup::robot_free_block_pickup(crepr::base_block2D* block,
+robot_free_block_pickup::robot_free_block_pickup(crepr::base_block3D* block,
                                                  const rtypes::type_uuid& robot_id,
                                                  const rtypes::timestep& t)
     : ER_CLIENT_INIT("fordyca.events.robot_free_block_pickup"),
-      cell2D_op(block->dloc()),
-      mc_timestep(t),
-      mc_robot_id(robot_id),
-      m_block(block) {}
+      ccops::block_pickup(block, robot_id, t) {}
 
 /*******************************************************************************
  * Member Functions
@@ -90,13 +87,9 @@ void robot_free_block_pickup::d1d2_dpo_controller_visit(
   controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
-
-  auto robot_block = m_block->clone();
-  robot_block->md()->robot_id(mc_robot_id);
-  controller.block(std::move(robot_block));
-
+  visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   dispatch_robot_free_block_interactor(controller.current_task());
-  ER_INFO("Picked up block%d", m_block->id().v());
+  ER_INFO("Picked up block%d", block()->id().v());
 
   controller.ndc_pop();
 } /* d1d2_dpo_controller_visit() */
@@ -107,13 +100,9 @@ void robot_free_block_pickup::d1d2_mdpo_controller_visit(
   controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->dpo_store());
-
-  auto robot_block = m_block->clone();
-  robot_block->md()->robot_id(mc_robot_id);
-  controller.block(std::move(robot_block));
-
+  visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   dispatch_robot_free_block_interactor(controller.current_task());
-  ER_INFO("Picked up block%d", m_block->id().v());
+  ER_INFO("Picked up block%d", block()->id().v());
 
   controller.ndc_pop();
 } /* d1d2_mdpo_controller_visit() */
@@ -124,13 +113,10 @@ void robot_free_block_pickup::d0_dpo_controller_visit(
   controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
+  visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   visit(*controller.fsm());
 
-  auto robot_block = m_block->clone();
-  robot_block->md()->robot_id(mc_robot_id);
-  controller.block(std::move(robot_block));
-
-  ER_INFO("Picked up block%d", m_block->id().v());
+  ER_INFO("Picked up block%d", block()->id().v());
 
   controller.ndc_pop();
 } /* d0_dpo_controller_visit() */
@@ -141,13 +127,9 @@ void robot_free_block_pickup::d0_mdpo_controller_visit(
   controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
+  visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   visit(*controller.fsm());
-
-  auto robot_block = m_block->clone();
-  robot_block->md()->robot_id(mc_robot_id);
-  controller.block(std::move(robot_block));
-
-  ER_INFO("Picked up block%d", m_block->id().v());
+  ER_INFO("Picked up block%d", block()->id().v());
 
   controller.ndc_pop();
 } /* d0_mdpo_controller_visit() */
@@ -158,12 +140,11 @@ void robot_free_block_pickup::d0_mdpo_controller_visit(
 void robot_free_block_pickup::visit(
     controller::depth0::crw_controller& controller) {
   controller.ndc_pusht();
-  visit(*controller.fsm());
-  auto robot_block = m_block->clone();
-  robot_block->md()->robot_id(mc_robot_id);
-  controller.block(std::move(robot_block));
 
-  ER_INFO("Picked up block%d", m_block->id().v());
+  visit(static_cast<ccontroller::block_carrying_controller&>(controller));
+  visit(*controller.fsm());
+  ER_INFO("Picked up block%d", block()->id().v());
+
   controller.ndc_pop();
 } /* visit() */
 
@@ -176,31 +157,31 @@ void robot_free_block_pickup::visit(fsm::depth0::crw_fsm& fsm) {
  * DPO/MDPO Depth0 Foraging
  ******************************************************************************/
 void robot_free_block_pickup::visit(ds::dpo_store& store) {
-  ER_ASSERT(store.contains(m_block),
+  ER_ASSERT(store.contains(block()),
             "Block%d@%s not in DPO store",
-            m_block->id().v(),
-            m_block->dloc().to_str().c_str());
-  store.block_remove(m_block);
-  ER_ASSERT(!store.contains(m_block),
+            block()->id().v(),
+            block()->dpos2D().to_str().c_str());
+  store.block_remove(block());
+  ER_ASSERT(!store.contains(block()),
             "Block%d@%s in DPO store after removal",
-            m_block->id().v(),
-            m_block->dloc().to_str().c_str());
+            block()->id().v(),
+            block()->dpos2D().to_str().c_str());
 } /* visit() */
 
 void robot_free_block_pickup::visit(ds::dpo_semantic_map& map) {
   cds::cell2D& cell =
       map.access<occupancy_grid::kCell>(cell2D_op::x(), cell2D_op::y());
 
-  ER_ASSERT(m_block->dloc() == cell.loc(),
+  ER_ASSERT(block()->dpos2D() == cell.loc(),
             "Coordinates for block%d@%s/cell@%s do not agree",
-            m_block->id().v(),
-            m_block->dloc().to_str().c_str(),
+            block()->id().v(),
+            block()->dpos2D().to_str().c_str(),
             cell.loc().to_str().c_str());
 
-  ER_ASSERT(m_block->id() == cell.block2D()->id(),
+  ER_ASSERT(block()->id() == cell.block3D()->id(),
             "Pickup/cell block mismatch: %d vs %d",
-            m_block->id().v(),
-            cell.block2D()->id().v());
+            block()->id().v(),
+            cell.block3D()->id().v());
   /*
    * @bug: This should just be an assert. However, due to FORDYCA#242, the fact
    * that blocks can appear close to the wall, and FORDYCA#82, this may not
@@ -212,7 +193,7 @@ void robot_free_block_pickup::visit(ds::dpo_semantic_map& map) {
    */
   /* ER_ASSERT(cell.state_has_block(), "cell does not contain block"); */
   if (cell.state_has_block()) {
-    map.block_remove(cell.block2D());
+    map.block_remove(cell.block3D());
   }
 } /* visit() */
 

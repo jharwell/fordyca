@@ -69,3 +69,4 @@ tags
 # Sphinx
 docs/_build/
 docs/api
+__pycache__/

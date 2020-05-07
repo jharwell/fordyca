@@ -25,7 +25,7 @@
 
 #include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/ds/cell2D.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
@@ -54,11 +54,11 @@ using ds::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 robot_cache_block_drop::robot_cache_block_drop(
-    std::unique_ptr<crepr::base_block2D> block,
+    std::unique_ptr<crepr::base_block3D> block,
     carepr::arena_cache* cache,
     const rtypes::discretize_ratio& resolution)
     : ER_CLIENT_INIT("fordyca.events.robot_cache_block_drop"),
-      cell2D_op(cache->dloc()),
+      cell2D_op(cache->dpos2D()),
       mc_resolution(resolution),
       m_block(std::move(block)),
       m_cache(cache) {}
@@ -89,7 +89,7 @@ bool robot_cache_block_drop::dispatch_d2_cache_interactor(
   if (tasks::depth2::foraging_task::kCacheTransfererName == polled->name()) {
     ER_INFO("Added cache%d@%s to pickup exception list,task='%s'",
             m_cache->id().v(),
-            m_cache->rloc().to_str().c_str(),
+            m_cache->rpos2D().to_str().c_str(),
             polled->name().c_str());
     csel_matrix->sel_exception_add(
         {m_cache->id(), controller::cache_sel_exception::ekPICKUP});

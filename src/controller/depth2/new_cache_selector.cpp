@@ -45,11 +45,11 @@ new_cache_selector::new_cache_selector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-const crepr::base_block2D* new_cache_selector::operator()(
+const crepr::base_block3D* new_cache_selector::operator()(
     const ds::dp_block_map& new_caches,
     const ds::dp_cache_map& existing_caches,
     const rmath::vector2d& position) const {
-  const crepr::base_block2D* best = nullptr;
+  const crepr::base_block3D* best = nullptr;
   ER_ASSERT(!new_caches.empty(), "No known new caches");
 
   double max_utility = 0.0;
@@ -57,7 +57,7 @@ const crepr::base_block2D* new_cache_selector::operator()(
     if (new_cache_is_excluded(existing_caches, new_caches, c.ent())) {
       continue;
     }
-    math::new_cache_utility u(c.ent()->rloc(),
+    math::new_cache_utility u(c.ent()->rpos2D(),
                               boost::get<rmath::vector2d>(
                                   mc_matrix->find(cselm::kNestLoc)->second));
 
@@ -65,8 +65,8 @@ const crepr::base_block2D* new_cache_selector::operator()(
     ER_ASSERT(utility > 0.0, "Bad utility calculation");
     ER_DEBUG("Utility for new cache%d@%s/%s, density=%f: %f",
              c.ent()->id().v(),
-             c.ent()->rloc().to_str().c_str(),
-             c.ent()->dloc().to_str().c_str(),
+             c.ent()->rpos2D().to_str().c_str(),
+             c.ent()->dpos2D().to_str().c_str(),
              c.density().v(),
              utility);
 
@@ -79,8 +79,8 @@ const crepr::base_block2D* new_cache_selector::operator()(
   if (nullptr != best) {
     ER_INFO("Best utility: new cache%d@%s/%s: %f",
             best->id().v(),
-            best->rloc().to_str().c_str(),
-            best->dloc().to_str().c_str(),
+            best->rpos2D().to_str().c_str(),
+            best->dpos2D().to_str().c_str(),
             max_utility);
     return best;
   } else {
@@ -92,23 +92,23 @@ const crepr::base_block2D* new_cache_selector::operator()(
 bool new_cache_selector::new_cache_is_excluded(
     const ds::dp_cache_map& existing_caches,
     const ds::dp_block_map& blocks,
-    const crepr::base_block2D* const new_cache) const {
+    const crepr::base_block3D* const new_cache) const {
   auto cache_prox = boost::get<rtypes::spatial_dist>(
       mc_matrix->find(cselm::kCacheProxDist)->second);
   auto cluster_prox = boost::get<rtypes::spatial_dist>(
       mc_matrix->find(cselm::kClusterProxDist)->second);
 
   for (auto& ec : existing_caches.const_values_range()) {
-    double dist = (ec.ent()->rloc() - new_cache->rloc()).length();
+    double dist = (ec.ent()->rpos2D() - new_cache->rpos2D()).length();
     if (cache_prox >= dist) {
       ER_DEBUG(
           "Ignoring new cache%d@%s/%s: Too close to cache%d@%s/%s (%f <= %f)",
           new_cache->id().v(),
-          new_cache->rloc().to_str().c_str(),
-          new_cache->dloc().to_str().c_str(),
+          new_cache->rpos2D().to_str().c_str(),
+          new_cache->dpos2D().to_str().c_str(),
           ec.ent()->id().v(),
-          ec.ent()->rloc().to_str().c_str(),
-          ec.ent()->dloc().to_str().c_str(),
+          ec.ent()->rpos2D().to_str().c_str(),
+          ec.ent()->dpos2D().to_str().c_str(),
           dist,
           cache_prox.v());
       return true;
@@ -129,17 +129,17 @@ bool new_cache_selector::new_cache_is_excluded(
     if (b.ent() == new_cache) {
       continue;
     }
-    double dist = (b.ent()->rloc() - new_cache->rloc()).length();
+    double dist = (b.ent()->rpos2D() - new_cache->rpos2D()).length();
 
     if (cluster_prox >= dist) {
       ER_DEBUG(
           "Ignoring new cache%d@%s/%s: Too close to potential block "
           "cluster@%s/%s (%f <= %f)",
           new_cache->id().v(),
-          new_cache->rloc().to_str().c_str(),
-          new_cache->dloc().to_str().c_str(),
-          b.ent()->rloc().to_str().c_str(),
-          b.ent()->dloc().to_str().c_str(),
+          new_cache->rpos2D().to_str().c_str(),
+          new_cache->dpos2D().to_str().c_str(),
+          b.ent()->rpos2D().to_str().c_str(),
+          b.ent()->dpos2D().to_str().c_str(),
           dist,
           cluster_prox.v());
       return true;

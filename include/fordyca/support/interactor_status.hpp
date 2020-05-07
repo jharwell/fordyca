@@ -57,7 +57,7 @@ enum class interactor_status {
    * \brief The robot picked up a free block in the arena, from \ref
    * free_block_interactor.
    */
-  ekFREE_BLOCK_PICKUP = 1 << 2,
+  ekARENA_FREE_BLOCK_PICKUP = 1 << 2,
 
   /**
    * \brief The robot purposefully dropped a block in the arena, NOT as a part

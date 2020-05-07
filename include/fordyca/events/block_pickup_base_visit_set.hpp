@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/mpl/typelist.hpp"
 
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/fordyca.hpp"
 
@@ -58,7 +58,7 @@ NS_START(events, detail);
 using block_pickup_base_visit_typelist = rmpl::typelist<cfds::arena_map,
                                                         ds::dpo_semantic_map,
                                                         ds::dpo_store,
-                                                        crepr::base_block2D>;
+                                                        crepr::base_block3D>;
 NS_END(detail, events, fordyca);
 
 #endif /* INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_BASE_VISIT_SET_HPP_ */

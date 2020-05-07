@@ -53,8 +53,8 @@ proximity_status_t new_cache_cache_proximity(
     rtypes::spatial_dist new_cache_prox) {
   std::scoped_lock lock(*map.cache_mtx());
   for (const auto* cache : map.caches()) {
-    if (new_cache_prox >= (cache->rloc() - c.rpos2D()).length()) {
-      return {cache->id(), cache->rloc(), cache->rloc() - c.rpos2D()};
+    if (new_cache_prox >= (cache->rpos2D() - c.rpos2D()).length()) {
+      return {cache->id(), cache->rpos2D(), cache->rpos2D() - c.rpos2D()};
     }
   } /* for(&b..) */
   return {rtypes::constants::kNoUUID, rmath::vector2d(), rmath::vector2d()};

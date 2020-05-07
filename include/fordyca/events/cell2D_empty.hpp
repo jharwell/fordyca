@@ -80,21 +80,15 @@ class cell2D_empty : public cdops::cell2D_empty,
   void visit(ds::dpo_semantic_map& map);
 };
 
+NS_END(detail);
+
 /**
  * \brief We use the precise visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using cell2D_empty_visitor_impl =
-    rpvisitor::precise_visitor<detail::cell2D_empty,
-                               detail::cell2D_empty::visit_typelist>;
-
-NS_END(detail);
-
-class cell2D_empty_visitor : public detail::cell2D_empty_visitor_impl {
-  using detail::cell2D_empty_visitor_impl::cell2D_empty_visitor_impl;
-};
+using cell2D_empty_visitor = rpvisitor::generic_precise_visitor<detail::cell2D_empty>;
 
 NS_END(events, fordyca);
 

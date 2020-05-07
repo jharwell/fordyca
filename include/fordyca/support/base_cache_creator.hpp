@@ -36,7 +36,7 @@
 #include "rcppsw/types/timestep.hpp"
 
 #include "cosm/ds/arena_grid.hpp"
-#include "cosm/ds/block2D_vector.hpp"
+#include "cosm/ds/block3D_vector.hpp"
 
 #include "fordyca/support/cache_create_ro_params.hpp"
 
@@ -79,7 +79,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    */
   virtual cads::acache_vectoro create_all(
       const cache_create_ro_params& c_params,
-      const cds::block2D_vectorno& c_alloc_blocks) = 0;
+      const cds::block3D_vectorno& c_alloc_blocks) = 0;
 
   /**
    * \brief Update the cells for all newly created caches to reflect the fact
@@ -107,8 +107,8 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    */
   bool creation_sanity_checks(
       const cads::acache_vectoro& caches,
-      const cds::block2D_vectorno& free_blocks,
-      const cfds::block2D_cluster_vector& clusters) const RCSW_PURE;
+      const cds::block3D_vectorno& free_blocks,
+      const cfds::block3D_cluster_vector& clusters) const RCSW_PURE;
 
  protected:
   const cds::arena_grid* grid(void) const { return m_grid; }
@@ -126,7 +126,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    */
   std::unique_ptr<carepr::arena_cache> create_single_cache(
       const rmath::vector2d& center,
-      cds::block2D_vectorno blocks,
+      cds::block3D_vectorno blocks,
       const rtypes::timestep& t);
 
   rtypes::spatial_dist cache_dim(void) const { return mc_cache_dim; }

@@ -58,7 +58,7 @@ class static_cache_creator : public base_cache_creator,
    * conflict free.
    */
   cads::acache_vectoro create_all(const cache_create_ro_params& c_params,
-                                  const cds::block2D_vectorno&  c_alloc_blocks) override;
+                                  const cds::block3D_vectorno&  c_alloc_blocks) override;
 
  private:
   /* clang-format off */

@@ -25,7 +25,7 @@
 
 #include <numeric>
 
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/ds/dp_block_map.hpp"
@@ -75,7 +75,7 @@ bool block_acq_validator::operator()(const rmath::vector2d& loc,
                           range.end(),
                           rmath::vector2d(),
                           [&](rmath::vector2d& sum, const auto& bent) {
-                            return sum + bent.ent()->rloc();
+                            return sum + bent.ent()->rpos2D();
                           }) /
           boost::size(range);
 

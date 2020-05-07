@@ -24,6 +24,7 @@
 #include "fordyca/support/tv/block_op_penalty_id_calculator.hpp"
 
 #include "cosm/arena/caching_arena_map.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/controller/foraging_controller.hpp"
 

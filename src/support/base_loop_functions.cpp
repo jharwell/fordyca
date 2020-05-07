@@ -189,4 +189,14 @@ void base_loop_functions::reset(void) {
   arena_map()->distribute_all_blocks();
 } /* reset() */
 
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+const carena::caching_arena_map* base_loop_functions::arena_map(void) const {
+  return static_cast<const carena::caching_arena_map*>(argos_sm_adaptor::arena_map());
+}
+carena::caching_arena_map* base_loop_functions::arena_map(void) {
+  return static_cast<carena::caching_arena_map*>(argos_sm_adaptor::arena_map());
+}
+
 NS_END(support, fordyca);

@@ -31,7 +31,7 @@
 
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/controller/config/perception/pheromone_config.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/ds/dp_block_map.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
@@ -116,15 +116,15 @@ class dpo_store final : public rer::client<dpo_store> {
 
   void clear_all(void);
 
-  bool contains(const crepr::base_block2D* block) const RCSW_PURE;
+  bool contains(const crepr::base_block3D* block) const RCSW_PURE;
   bool contains(const carepr::base_cache* cache) const;
 
   const dp_cache_map::value_type* find(const carepr::base_cache* cache) const;
   dp_cache_map::value_type* find(const carepr::base_cache* cache);
 
   const dp_block_map::value_type* find(
-      const crepr::base_block2D* block) const RCSW_PURE;
-  dp_block_map::value_type* find(const crepr::base_block2D* block) RCSW_PURE;
+      const crepr::base_block3D* block) const RCSW_PURE;
+  dp_block_map::value_type* find(const crepr::base_block3D* block) RCSW_PURE;
 
   /**
    * \brief Update the known caches set with the new cache.
@@ -146,7 +146,7 @@ class dpo_store final : public rer::client<dpo_store> {
    *
    * \return \c TRUE if a block was added, and \c FALSE otherwise.
    */
-  update_res_t block_update(dpo_entity<crepr::base_block2D> block_in);
+  update_res_t block_update(dpo_entity<crepr::base_block3D> block_in);
 
   /**
    * \brief Remove a cache from the set of of known caches.
@@ -159,7 +159,7 @@ class dpo_store final : public rer::client<dpo_store> {
    *
    * \return \c TRUE if a block was removed, \c FALSE otherwise.
    */
-  bool block_remove(crepr::base_block2D* victim);
+  bool block_remove(crepr::base_block3D* victim);
 
   double pheromone_rho(void) const { return mc_pheromone_rho; }
 

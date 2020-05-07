@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/fsm/depth2/acquire_cache_site_fsm.hpp"
 
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 #include "fordyca/controller/cache_sel_matrix.hpp"

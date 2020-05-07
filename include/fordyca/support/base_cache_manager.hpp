@@ -31,7 +31,7 @@
 #include "rcppsw/types/timestep.hpp"
 
 #include "cosm/arena/ds/cache_vector.hpp"
-#include "cosm/ds/block2D_vector.hpp"
+#include "cosm/ds/block3D_vector.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/metrics/caches/lifecycle_metrics.hpp"

@@ -24,15 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <memory>
-
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitor.hpp"
-#include "rcppsw/types/timestep.hpp"
 #include "rcppsw/types/type_uuid.hpp"
 
-#include "cosm/ds/operations/cell2D_op.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/controller/operations/block_pickup.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
@@ -59,7 +55,7 @@ NS_START(fordyca, events, detail);
  * that is not part of a cache).
  */
 class robot_free_block_pickup : public rer::client<robot_free_block_pickup>,
-                                public cdops::cell2D_op {
+                                public ccops::block_pickup {
  private:
   struct visit_typelist_impl {
     using controllers = boost::mpl::joint_view<
@@ -83,8 +79,8 @@ class robot_free_block_pickup : public rer::client<robot_free_block_pickup>,
 
   ~robot_free_block_pickup(void) override = default;
 
-  robot_free_block_pickup(const robot_free_block_pickup& op) = delete;
-  robot_free_block_pickup& operator=(const robot_free_block_pickup& op) = delete;
+  robot_free_block_pickup(const robot_free_block_pickup&) = delete;
+  robot_free_block_pickup& operator=(const robot_free_block_pickup&) = delete;
 
   /* CRW foraging */
   void visit(controller::depth0::crw_controller& controller);
@@ -118,11 +114,13 @@ class robot_free_block_pickup : public rer::client<robot_free_block_pickup>,
   void visit(tasks::depth2::cache_finisher& task);
 
  protected:
-  robot_free_block_pickup(crepr::base_block2D* block,
+  robot_free_block_pickup(crepr::base_block3D* block,
                           const rtypes::type_uuid& robot_id,
                           const rtypes::timestep& t);
 
  private:
+  using ccops::block_pickup::visit;
+
   void dispatch_robot_free_block_interactor(tasks::base_foraging_task* task);
 
   template <typename TController>
@@ -136,14 +134,9 @@ class robot_free_block_pickup : public rer::client<robot_free_block_pickup>,
 
   template <typename TController>
   void d0_mdpo_controller_visit(TController& controller);
-
-  /* clang-format off */
-  const rtypes::timestep  mc_timestep;
-  const rtypes::type_uuid mc_robot_id;
-
-  crepr::base_block2D*    m_block;
-  /* clang-format on */
 };
+
+NS_END(detail);
 
 /**
  * \brief We use the precise visitor in order to force compile errors if a call
@@ -151,18 +144,7 @@ class robot_free_block_pickup : public rer::client<robot_free_block_pickup>,
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using robot_free_block_pickup_visitor_impl =
-    rpvisitor::precise_visitor<detail::robot_free_block_pickup,
-                               detail::robot_free_block_pickup::visit_typelist>;
-
-NS_END(detail);
-
-class robot_free_block_pickup_visitor
-    : public detail::robot_free_block_pickup_visitor_impl {
- public:
-  using detail::robot_free_block_pickup_visitor_impl::
-      robot_free_block_pickup_visitor_impl;
-};
+using robot_free_block_pickup_visitor = rpvisitor::generic_precise_visitor<detail::robot_free_block_pickup>;
 
 NS_END(events, fordyca);
 

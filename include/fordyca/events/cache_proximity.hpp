@@ -88,21 +88,15 @@ class cache_proximity : public rer::client<cache_proximity> {
   /* clang-format on */
 };
 
+NS_END(detail);
+
 /**
  * \brief We use the precise visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using cache_proximity_visitor_impl =
-    rpvisitor::precise_visitor<detail::cache_proximity,
-                               detail::cache_proximity::visit_typelist>;
-
-NS_END(detail);
-
-class cache_proximity_visitor : public detail::cache_proximity_visitor_impl {
-  using detail::cache_proximity_visitor_impl::cache_proximity_visitor_impl;
-};
+using cache_proximity_visitor = rpvisitor::generic_precise_visitor<detail::cache_proximity>;
 
 NS_END(events, fordyca);
 

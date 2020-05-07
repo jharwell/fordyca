@@ -31,7 +31,7 @@
 #include "rcppsw/types/discretize_ratio.hpp"
 
 #include "cosm/ds/operations/cell2D_op.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/fordyca.hpp"
@@ -122,7 +122,7 @@ class robot_cache_block_drop : public rer::client<robot_cache_block_drop>,
    * \param cache Cache to drop into (owned by arena).
    * \param resolution Arena resolution.
    */
-  robot_cache_block_drop(std::unique_ptr<crepr::base_block2D> block,
+  robot_cache_block_drop(std::unique_ptr<crepr::base_block3D> block,
                          carepr::arena_cache* cache,
                          const rtypes::discretize_ratio& resolution);
 
@@ -134,7 +134,7 @@ class robot_cache_block_drop : public rer::client<robot_cache_block_drop>,
 
   const rtypes::discretize_ratio       mc_resolution;
 
-  std::unique_ptr<crepr::base_block2D> m_block;
+  std::unique_ptr<crepr::base_block3D> m_block;
   carepr::arena_cache*                 m_cache;
   /* clang-format on */
 };

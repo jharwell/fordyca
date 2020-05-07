@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/controller/block_selector.hpp"
 
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/math/block_utility.hpp"
 
@@ -43,11 +43,11 @@ block_selector::block_selector(const block_sel_matrix* const sel_matrix)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-const crepr::base_block2D* block_selector::operator()(
+const crepr::base_block3D* block_selector::operator()(
     const ds::dp_block_map& blocks,
     const rmath::vector2d& position) {
   double max_utility = 0.0;
-  const crepr::base_block2D* best = nullptr;
+  const crepr::base_block3D* best = nullptr;
 
   ER_ASSERT(!blocks.empty(), "No known perceived blocks");
   for (const auto& b : blocks.const_values_range()) {
@@ -67,13 +67,13 @@ const crepr::base_block2D* block_selector::operator()(
         boost::get<rmath::vector2d>(mc_matrix->find(bselm::kNestLoc)->second);
 
     double utility =
-        math::block_utility(b.ent()->rloc(),
+        math::block_utility(b.ent()->rpos2D(),
                             nest_loc)(position, b.density(), priority);
 
     ER_DEBUG("Utility for block%d@%s/%s, density=%f: %f",
              b.ent()->id().v(),
-             b.ent()->rloc().to_str().c_str(),
-             b.ent()->dloc().to_str().c_str(),
+             b.ent()->rpos2D().to_str().c_str(),
+             b.ent()->dpos2D().to_str().c_str(),
              b.density().v(),
              utility);
     if (utility > max_utility) {
@@ -85,8 +85,8 @@ const crepr::base_block2D* block_selector::operator()(
   if (nullptr != best) {
     ER_INFO("Best utility: block%d@%s/%s: %f",
             best->id().v(),
-            best->rloc().to_str().c_str(),
-            best->dloc().to_str().c_str(),
+            best->rpos2D().to_str().c_str(),
+            best->dpos2D().to_str().c_str(),
             max_utility);
     return best;
   } else {
@@ -97,14 +97,14 @@ const crepr::base_block2D* block_selector::operator()(
 
 bool block_selector::block_is_excluded(
     const rmath::vector2d& position,
-    const crepr::base_block2D* const block) const {
+    const crepr::base_block3D* const block) const {
   double block_dim = std::min(block->xspan().span(), block->yspan().span());
-  if ((position - block->rloc()).length() <= block_dim) {
+  if ((position - block->rpos2D()).length() <= block_dim) {
     ER_DEBUG("Ignoring block%d@%s/%s: Too close (%f <= %f)",
              block->id().v(),
-             block->rloc().to_str().c_str(),
-             block->dloc().to_str().c_str(),
-             (position - block->rloc()).length(),
+             block->rpos2D().to_str().c_str(),
+             block->dpos2D().to_str().c_str(),
+             (position - block->rpos2D()).length(),
              block_dim);
     return true;
   }
@@ -115,8 +115,8 @@ bool block_selector::block_is_excluded(
       })) {
     ER_DEBUG("Ignoring block%d@%s/%s: On exception list",
              block->id().v(),
-             block->rloc().to_str().c_str(),
-             block->dloc().to_str().c_str());
+             block->rpos2D().to_str().c_str(),
+             block->dpos2D().to_str().c_str());
     return true;
   }
   return false;

@@ -26,7 +26,7 @@
 #include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/ds/arena_grid.hpp"
 #include "cosm/ds/operations/cell2D_empty.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/math/cache_respawn_probability.hpp"
 #include "fordyca/support/depth1/static_cache_creator.hpp"
@@ -57,7 +57,7 @@ static_cache_manager::static_cache_manager(
  ******************************************************************************/
 boost::optional<cads::acache_vectoro> static_cache_manager::create(
     const cache_create_ro_params& c_params,
-    const cds::block2D_vectorno& c_alloc_blocks) {
+    const cds::block3D_vectorno& c_alloc_blocks) {
   ER_DEBUG("(Re)-Creating static cache(s)");
   ER_ASSERT(mc_cache_config.static_.size >= carepr::base_cache::kMinBlocks,
             "Static cache size %u < minimum %zu",
@@ -97,7 +97,7 @@ boost::optional<cads::acache_vectoro> static_cache_manager::create(
 
 boost::optional<cads::acache_vectoro> static_cache_manager::create_conditional(
     const cache_create_ro_params& c_params,
-    const cds::block2D_vectorno& c_alloc_blocks,
+    const cds::block3D_vectorno& c_alloc_blocks,
     uint n_harvesters,
     uint n_collectors) {
   math::cache_respawn_probability p(
@@ -110,10 +110,10 @@ boost::optional<cads::acache_vectoro> static_cache_manager::create_conditional(
   }
 } /* create_conditional() */
 
-boost::optional<cds::block2D_vectorno> static_cache_manager::blocks_alloc(
+boost::optional<cds::block3D_vectorno> static_cache_manager::blocks_alloc(
     const cads::acache_vectorno& existing_caches,
-    const cds::block2D_vectorno& all_blocks) const {
-  cds::block2D_vectorno alloc_i;
+    const cds::block3D_vectorno& all_blocks) const {
+  cds::block3D_vectorno alloc_i;
   for (auto& loc : mc_cache_locs) {
     if (auto cache_i = cache_i_blocks_alloc(existing_caches,
                                             alloc_i,
@@ -128,19 +128,19 @@ boost::optional<cds::block2D_vectorno> static_cache_manager::blocks_alloc(
   } /* for(&loc..) */
 
   if (alloc_i.empty()) {
-    return boost::optional<cds::block2D_vectorno>();
+    return boost::optional<cds::block3D_vectorno>();
   } else {
     return boost::make_optional(alloc_i);
   }
 } /* blocks_alloc() */
 
-boost::optional<cds::block2D_vectorno> static_cache_manager::cache_i_blocks_alloc(
+boost::optional<cds::block3D_vectorno> static_cache_manager::cache_i_blocks_alloc(
     const cads::acache_vectorno& existing_caches,
-    const cds::block2D_vectorno& allocated_blocks,
-    const cds::block2D_vectorno& all_blocks,
+    const cds::block3D_vectorno& allocated_blocks,
+    const cds::block3D_vectorno& all_blocks,
     const rmath::vector2d& loc,
     size_t n_blocks) const {
-  cds::block2D_vectorno cache_i_blocks;
+  cds::block3D_vectorno cache_i_blocks;
   rmath::vector2z dcenter =
       rmath::dvec2zvec(loc, arena_grid()->resolution().v());
   std::copy_if(
@@ -167,7 +167,7 @@ boost::optional<cds::block2D_vectorno> static_cache_manager::cache_i_blocks_allo
                std::all_of(mc_cache_locs.begin(),
                            mc_cache_locs.end(),
                            [&](const auto& l) {
-                             return b->dloc() !=
+                             return b->dpos2D() !=
                                     rmath::dvec2zvec(
                                         l, arena_grid()->resolution().v());
                            });
@@ -183,7 +183,7 @@ boost::optional<cds::block2D_vectorno> static_cache_manager::cache_i_blocks_allo
     std::for_each(cache_i_blocks.begin(),
                   cache_i_blocks.end(),
                   [&](const auto& b) {
-                    count += (b->is_out_of_sight() || b->dloc() == dcenter);
+                    count += (b->is_out_of_sight() || b->dpos2D() == dcenter);
                   });
 
     std::string accum;
@@ -200,7 +200,7 @@ boost::optional<cds::block2D_vectorno> static_cache_manager::cache_i_blocks_allo
                   cache_i_blocks.end(),
                   [&](const auto& b) {
                     accum += "b" + rcppsw::to_string(b->id()) + "->" +
-                             b->dloc().to_str() + ",";
+                             b->dpos2D().to_str() + ",";
                   });
     ER_TRACE("Cache i alloc_blocks locs: [%s]", accum.c_str());
 
@@ -212,7 +212,7 @@ boost::optional<cds::block2D_vectorno> static_cache_manager::cache_i_blocks_allo
               cache_i_blocks.size() - count,
               cache_i_blocks.size(),
               carepr::base_cache::kMinBlocks);
-    return boost::optional<cds::block2D_vectorno>();
+    return boost::optional<cds::block3D_vectorno>();
   }
   if (cache_i_blocks.size() < mc_cache_config.static_.size) {
     ER_WARN(
@@ -222,28 +222,28 @@ boost::optional<cds::block2D_vectorno> static_cache_manager::cache_i_blocks_allo
         dcenter.to_str().c_str(),
         cache_i_blocks.size(),
         mc_cache_config.static_.size);
-    return boost::optional<cds::block2D_vectorno>();
+    return boost::optional<cds::block3D_vectorno>();
   }
   return boost::make_optional(cache_i_blocks);
 } /* cache_i_blocks_alloc() */
 
 void static_cache_manager::post_creation_blocks_absorb(
     const cads::acache_vectoro& caches,
-    const cds::block2D_vectorno& blocks) {
+    const cds::block3D_vectorno& blocks) {
   for (auto& b : blocks) {
     for (auto& c : caches) {
       if (!c->contains_block(b) && c->xspan().overlaps_with(b->xspan()) &&
           c->yspan().overlaps_with(b->yspan())) {
-        cdops::cell2D_empty_visitor empty(b->dloc());
-        empty.visit(arena_grid()->access<arena_grid::kCell>(b->dloc()));
+        cdops::cell2D_empty_visitor empty(b->dpos2D());
+        empty.visit(arena_grid()->access<arena_grid::kCell>(b->dpos2D()));
         /*
          * We are not REALLY holding all the arena map locks, but since cache
          * creation always happens AFTER all robot control steps have been run,
          * no locking is needed.
          */
-        caops::free_block_drop_visitor<crepr::base_block2D> op(
+        caops::free_block_drop_visitor op(
             b,
-            rmath::dvec2zvec(c->rloc(), arena_grid()->resolution().v()),
+            rmath::dvec2zvec(c->rpos2D(), arena_grid()->resolution().v()),
             arena_grid()->resolution(),
             carena::arena_map_locking::ekALL_HELD);
         op.visit(arena_grid()->access<arena_grid::kCell>(op.x(), op.y()));

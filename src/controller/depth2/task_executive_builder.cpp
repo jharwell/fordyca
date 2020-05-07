@@ -24,7 +24,7 @@
 #include "fordyca/controller/depth2/task_executive_builder.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 #include "cosm/ta/bi_tdgraph_allocator.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/config/task_alloc_config.hpp"

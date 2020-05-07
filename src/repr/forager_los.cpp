@@ -41,7 +41,7 @@ cds::entity_vector forager_los::blocks(void) const {
       const cds::cell2D& cell = access(i, j);
       if (cell.state_has_block()) {
         ER_ASSERT(
-            nullptr != cell.block2D() || nullptr != cell.block3D(),
+            nullptr != cell.block3D() || nullptr != cell.block3D(),
             "Cell at(%zu,%zu) in HAS_BLOCK state, but does not have block",
             i,
             j);
@@ -67,7 +67,7 @@ cads::bcache_vectorno forager_los::caches(void) const {
         ER_ASSERT(cache->n_blocks() >= carepr::base_cache::kMinBlocks,
                   "Cache%d@%s has too few blocks (%zu < %zu)",
                   cache->id().v(),
-                  cache->dloc().to_str().c_str(),
+                  cache->dpos2D().to_str().c_str(),
                   cache->n_blocks(),
                   carepr::base_cache::kMinBlocks);
         /*

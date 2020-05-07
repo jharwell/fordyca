@@ -1,5 +1,5 @@
 /**
- * \file nest_block_drop.hpp
+ * \file nest_block_drop_spec.hpp
  *
  * \copyright 2020 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_MPL_NEST_BLOCK_DROP_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_MPL_NEST_BLOCK_DROP_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_MPL_NEST_BLOCK_DROP_SPEC_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_MPL_NEST_BLOCK_DROP_SPEC_HPP_
 
 /*******************************************************************************
  * Includes
@@ -44,7 +44,7 @@ NS_START(fordyca, support, mpl, detail);
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-struct nest_drop_spec {
+struct nest_drop_spec_value {
   using arena_map_type = carena::caching_arena_map;
   using penalty_handler_type = tv::block_op_penalty_handler;
   using interactor_status_type = interactor_status;
@@ -58,14 +58,14 @@ struct nest_drop_spec {
  */
 using nest_drop_inserter = boost::mpl::insert<boost::mpl::_1,
                                               boost::mpl::pair<boost::mpl::_2,
-                                                               nest_drop_spec>>;
+                                                               nest_drop_spec_value>>;
 
 NS_END(detail);
 
 template<typename TTypelist>
-using nest_block_drop_map = typename boost::mpl::fold<TTypelist,
-                                                      boost::mpl::map0<>,
-                                                      detail::nest_drop_inserter>::type;
+using nest_block_drop_spec = typename boost::mpl::fold<TTypelist,
+                                                       boost::mpl::map0<>,
+                                                       detail::nest_drop_inserter>::type;
 NS_END(mpl, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_MPL_NEST_BLOCK_DROP_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_MPL_NEST_BLOCK_DROP_SPEC_HPP_ */

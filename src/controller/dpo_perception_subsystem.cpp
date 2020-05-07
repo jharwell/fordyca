@@ -103,12 +103,12 @@ void dpo_perception_subsystem::process_los_caches(
     if (!m_store->contains(cache)) {
       ER_INFO("Discovered Cache%d@%s/%s",
               cache->id().v(),
-              cache->rloc().to_str().c_str(),
-              cache->dloc().to_str().c_str());
+              cache->rpos2D().to_str().c_str(),
+              cache->dpos2D().to_str().c_str());
     } else if (cache->n_blocks() != m_store->find(cache)->ent()->n_blocks()) {
       ER_INFO("Update cache%d@%s blocks: %zu -> %zu",
               cache->id().v(),
-              cache->dloc().to_str().c_str(),
+              cache->dpos2D().to_str().c_str(),
               m_store->find(cache)->ent()->n_blocks(),
               cache->n_blocks());
     }
@@ -147,23 +147,23 @@ void dpo_perception_subsystem::process_los_blocks(
     ER_ASSERT(crepr::entity_dimensionality::ek2D == b->dimensionality(),
               "Block%d is not 2D!",
               b->id().v());
-    auto* block = static_cast<crepr::base_block2D*>(b);
+    auto* block = static_cast<crepr::base_block3D*>(b);
     ER_ASSERT(!block->is_out_of_sight(),
               "Block%d@%s/%s out of sight in LOS?",
               block->id().v(),
-              block->rloc().to_str().c_str(),
-              block->dloc().to_str().c_str());
+              block->rpos2D().to_str().c_str(),
+              block->dpos2D().to_str().c_str());
 
     if (!m_store->contains(block)) {
       ER_INFO("Discovered block%d@%s/%s",
               block->id().v(),
-              block->rloc().to_str().c_str(),
-              block->dloc().to_str().c_str());
+              block->rpos2D().to_str().c_str(),
+              block->dpos2D().to_str().c_str());
     } else {
       ER_DEBUG("Block%d@%s/%s already known",
                block->id().v(),
-               block->rloc().to_str().c_str(),
-               block->dloc().to_str().c_str());
+               block->rpos2D().to_str().c_str(),
+               block->dpos2D().to_str().c_str());
     }
     events::block_found_visitor op(block);
     op.visit(*m_store);
@@ -182,7 +182,7 @@ void dpo_perception_subsystem::los_tracking_sync(
   auto it = range.begin();
 
   while (it != range.end()) {
-    if (!c_los->contains_loc(it->ent()->dloc())) {
+    if (!c_los->contains_loc(it->ent()->dpos2D())) {
       ++it;
       continue;
     }
@@ -195,7 +195,7 @@ void dpo_perception_subsystem::los_tracking_sync(
     if (!exists_in_los) {
       ER_INFO("Remove tracked cache%d@%s: not in LOS caches",
               it->ent()->id().v(),
-              it->ent()->dloc().to_str().c_str());
+              it->ent()->dpos2D().to_str().c_str());
       /*
        * Copy iterator object + iterator increment MUST be before removal to
        * avoid iterator invalidation and undefined behavior (I've seen both a
@@ -231,10 +231,10 @@ void dpo_perception_subsystem::los_tracking_sync(
   while (it != range.end()) {
     ER_TRACE("Examining block%d@%s/%s",
              it->ent()->id().v(),
-             it->ent()->rloc().to_str().c_str(),
-             it->ent()->dloc().to_str().c_str());
+             it->ent()->rpos2D().to_str().c_str(),
+             it->ent()->dpos2D().to_str().c_str());
 
-    if (!c_los->contains_loc(it->ent()->dloc())) {
+    if (!c_los->contains_loc(it->ent()->dpos2D())) {
       ++it;
       continue;
     }
@@ -245,20 +245,20 @@ void dpo_perception_subsystem::los_tracking_sync(
     auto exists_in_los =
         los_blocks.end() !=
         std::find_if(los_blocks.begin(), los_blocks.end(), [&](const auto& b) {
-          return static_cast<crepr::base_block2D*>(b)->idcmp(*(it->ent()));
+          return static_cast<crepr::base_block3D*>(b)->idcmp(*(it->ent()));
         });
     ER_TRACE("Block%d location in LOS", it->ent()->id().v());
     if (!exists_in_los) {
       ER_INFO("Remove tracked block%d@%s/%s: not in LOS blocks",
               it->ent()->id().v(),
-              it->ent()->rloc().to_str().c_str(),
-              it->ent()->dloc().to_str().c_str());
+              it->ent()->rpos2D().to_str().c_str(),
+              it->ent()->dpos2D().to_str().c_str());
       /*
        * Copy iterator object + iterator increment MUST be before removal to
        * avoid iterator invalidation and undefined behavior (I've seen both a
        * segfault and infinite loop). See FORDYCA#589.
        */
-      crepr::base_block2D* tmp = (*it).ent();
+      crepr::base_block3D* tmp = (*it).ent();
       ++it;
       m_store->block_remove(tmp);
     } else {

@@ -328,7 +328,7 @@ void depth1_loop_functions::cache_handling_init(
 std::vector<rmath::vector2d> depth1_loop_functions::calc_cache_locs(
     const cfconfig::block_dist_config* distp) {
   std::vector<rmath::vector2d> cache_locs;
-  using dispatcher_type = cfbd::dispatcher<crepr::base_block2D>;
+  using dispatcher_type = cfbd::dispatcher;
   /*
    * For all block distributions that are supported, each of the static
    * caches is halfway between the center of the nest and a block cluster.
@@ -338,8 +338,8 @@ std::vector<rmath::vector2d> depth1_loop_functions::calc_cache_locs(
     auto clusters = arena_map()->block_distributor()->block_clusters();
     for (auto& c : clusters) {
       cache_locs.push_back(
-          {(c->xspan().center() + arena_map()->nest().rloc().x()) / 2.0,
-           (c->yspan().center() + arena_map()->nest().rloc().y()) / 2.0});
+          {(c->xspan().center() + arena_map()->nest().rpos2D().x()) / 2.0,
+           (c->yspan().center() + arena_map()->nest().rpos2D().y()) / 2.0});
     } /* for(i..) */
   } else if (dispatcher_type::kDistQuadSrc == distp->dist_type) {
     /*
@@ -354,27 +354,27 @@ std::vector<rmath::vector2d> depth1_loop_functions::calc_cache_locs(
     auto clusters = arena_map()->block_distributor()->block_clusters();
     for (auto& c : clusters) {
       bool on_center_y =
-          std::fabs(c->xspan().center() - arena_map()->nest().rloc().x()) < 0.5;
+          std::fabs(c->xspan().center() - arena_map()->nest().rpos2D().x()) < 0.5;
       bool on_center_x =
-          std::fabs(c->yspan().center() - arena_map()->nest().rloc().y()) < 0.5;
+          std::fabs(c->yspan().center() - arena_map()->nest().rpos2D().y()) < 0.5;
       ER_ASSERT(on_center_y || on_center_x,
                 "Cluster@%f,%f not centered in arena X or Y",
                 c->xspan().center(),
                 c->yspan().center());
       if (on_center_x &&
-          c->xspan().center() < arena_map()->nest().rloc().x()) { /* west */
+          c->xspan().center() < arena_map()->nest().rpos2D().x()) { /* west */
         cache_locs.push_back(
             {arena_map()->xrsize() * 0.30, c->yspan().center()});
       } else if (on_center_x && c->xspan().center() >
-                                    arena_map()->nest().rloc().x()) { /* east */
+                                    arena_map()->nest().rpos2D().x()) { /* east */
         cache_locs.push_back(
             {arena_map()->xrsize() * 0.675, c->yspan().center()});
       } else if (on_center_y && c->yspan().center() <
-                                    arena_map()->nest().rloc().y()) { /* south */
+                                    arena_map()->nest().rpos2D().y()) { /* south */
         cache_locs.push_back(
             {c->xspan().center(), arena_map()->yrsize() * 0.30});
       } else if (on_center_y && c->yspan().center() >
-                                    arena_map()->nest().rloc().y()) { /* north */
+                                    arena_map()->nest().rpos2D().y()) { /* north */
         cache_locs.push_back(
             {c->xspan().center(), arena_map()->yrsize() * 0.675});
       }

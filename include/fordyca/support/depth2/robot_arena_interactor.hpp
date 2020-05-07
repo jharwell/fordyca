@@ -33,9 +33,9 @@
 #include "fordyca/support/interactor_status.hpp"
 #include "fordyca/tasks/task_status.hpp"
 #include "fordyca/support/task_abort_interactor.hpp"
-#include "fordyca/support/mpl/free_block_pickup.hpp"
-#include "fordyca/support/mpl/nest_block_drop.hpp"
-#include "fordyca/support/mpl/task_abort.hpp"
+#include "fordyca/support/mpl/free_block_pickup_spec.hpp"
+#include "fordyca/support/mpl/nest_block_drop_spec.hpp"
+#include "fordyca/support/mpl/task_abort_spec.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -138,18 +138,18 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
 
 
  private:
-  using mpl_free_pickup_map = mpl::free_block_pickup_map<controller::depth2::typelist>;
-  using mpl_nest_drop_map = mpl::nest_block_drop_map<controller::depth2::typelist>;
-  using mpl_task_abort_map = mpl::task_abort_map<controller::depth2::typelist>;
+  using free_pickup_spec = mpl::free_block_pickup_spec<controller::depth2::typelist>;
+  using nest_drop_spec = mpl::nest_block_drop_spec<controller::depth2::typelist>;
+  using task_abort_spec = mpl::task_abort_spec<controller::depth2::typelist>;
 
   /* clang-format off */
-  free_block_pickup_interactor<TController, mpl_free_pickup_map> m_free_pickup;
-  nest_block_drop_interactor<TController, mpl_nest_drop_map>     m_nest_drop;
-  task_abort_interactor<TController, mpl_task_abort_map>         m_task_abort;
-  cached_block_pickup_interactor<TController>                    m_cached_pickup;
-  existing_cache_block_drop_interactor<TController>              m_existing_cache_drop;
-  cache_site_block_drop_interactor<TController>                  m_cache_site_drop;
-  new_cache_block_drop_interactor<TController>                   m_new_cache_drop;
+  free_block_pickup_interactor<TController, free_pickup_spec> m_free_pickup;
+  nest_block_drop_interactor<TController, nest_drop_spec>     m_nest_drop;
+  task_abort_interactor<TController, task_abort_spec>         m_task_abort;
+  cached_block_pickup_interactor<TController>                 m_cached_pickup;
+  existing_cache_block_drop_interactor<TController>           m_existing_cache_drop;
+  cache_site_block_drop_interactor<TController>               m_cache_site_drop;
+  new_cache_block_drop_interactor<TController>                m_new_cache_drop;
   /* clang-format on */
 };
 

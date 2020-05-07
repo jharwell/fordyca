@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/events/block_proximity.hpp"
 
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
 #include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
@@ -45,7 +45,7 @@ NS_START(fordyca, events, detail);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_proximity::block_proximity(crepr::base_block2D* block)
+block_proximity::block_proximity(crepr::base_block3D* block)
     : ER_CLIENT_INIT("fordyca.events.block_proximity"), m_block(block) {}
 
 /*******************************************************************************

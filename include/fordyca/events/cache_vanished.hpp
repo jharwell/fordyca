@@ -97,21 +97,15 @@ class cache_vanished : public rer::client<cache_vanished> {
   /* clang-format on */
 };
 
+NS_END(detail);
+
 /**
  * \brief We use the precise visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using cache_vanished_visitor_impl =
-    rpvisitor::precise_visitor<detail::cache_vanished,
-                               detail::cache_vanished::visit_typelist>;
-
-NS_END(detail);
-
-class cache_vanished_visitor : public detail::cache_vanished_visitor_impl {
-  using detail::cache_vanished_visitor_impl::cache_vanished_visitor_impl;
-};
+using cache_vanished_visitor = rpvisitor::generic_precise_visitor<detail::cache_vanished>;
 
 NS_END(events, fordyca);
 

@@ -25,6 +25,7 @@
 
 #include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/arena/operations/free_block_drop.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/controller/foraging_controller.hpp"
 
@@ -75,7 +76,7 @@ void fordyca_pd_adaptor::pre_kill_cleanup(
      * dynamics are always applied AFTER all robots have had their control steps
      * run, we are in a non-concurrent context, so no reason to grab them.
      */
-    caops::free_block_drop_visitor<crepr::base_block2D> adrop_op(
+    caops::free_block_drop_visitor adrop_op(
         *it,
         rmath::dvec2zvec(foraging->rpos2D(), m_map->grid_resolution().v()),
         m_map->grid_resolution(),

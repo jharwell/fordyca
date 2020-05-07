@@ -24,7 +24,7 @@
 #include "fordyca/events/robot_free_block_drop.hpp"
 
 #include "cosm/ds/cell2D.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
@@ -53,7 +53,7 @@ using ds::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 robot_free_block_drop::robot_free_block_drop(
-    std::unique_ptr<crepr::base_block2D> block,
+    std::unique_ptr<crepr::base_block3D> block,
     const rmath::vector2z& coord,
     const rtypes::discretize_ratio& resolution)
     : ER_CLIENT_INIT("fordyca.events.robot_free_block_drop"),
@@ -84,7 +84,7 @@ bool robot_free_block_drop::dispatch_free_block_interactor(
         !polled->task_aborted()) {
       ER_INFO("Added block%d@%s to exception list,task='%s'",
               m_block->id().v(),
-              m_block->rloc().to_str().c_str(),
+              m_block->rpos2D().to_str().c_str(),
               polled->name().c_str());
       bsel_matrix->sel_exception_add(m_block->id());
       ret = true;
@@ -173,11 +173,12 @@ void robot_free_block_drop::visit(cfsm::cell2D_fsm& fsm) {
   fsm.event_block_drop();
 } /* visit() */
 
-void robot_free_block_drop::visit(crepr::base_block2D& block) {
+void robot_free_block_drop::visit(crepr::base_block3D& block) {
   block.md()->robot_id_reset();
 
-  block.rloc(rmath::zvec2dvec(cell2D_op::coord(), mc_resolution.v()));
-  block.dloc(cell2D_op::coord());
+  block.rpos3D(rmath::zvec2dvec(rmath::vector3z(cell2D_op::coord()),
+                                mc_resolution.v()));
+  block.dpos3D(rmath::vector3z(cell2D_op::coord()));
 } /* visit() */
 
 NS_END(detail, events, fordyca);

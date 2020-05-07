@@ -65,14 +65,14 @@ class new_cache_selector: public rer::client<new_cache_selector> {
    *
    * \return The "best" new cache.
    */
-  const crepr::base_block2D* operator()(const ds::dp_block_map& new_caches,
+  const crepr::base_block3D* operator()(const ds::dp_block_map& new_caches,
                                         const ds::dp_cache_map& existing_caches,
                                         const rmath::vector2d& position) const;
 
  private:
   bool new_cache_is_excluded(const ds::dp_cache_map& existing_caches,
                              const ds::dp_block_map& blocks,
-                             const crepr::base_block2D* new_cache) const;
+                             const crepr::base_block3D* new_cache) const;
 
   /* clang-format off */
   const controller::cache_sel_matrix* const mc_matrix;

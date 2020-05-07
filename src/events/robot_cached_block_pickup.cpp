@@ -24,7 +24,7 @@
 #include "fordyca/events/robot_cached_block_pickup.hpp"
 
 #include "cosm/arena/repr/arena_cache.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
@@ -62,11 +62,11 @@ using ds::occupancy_grid;
  ******************************************************************************/
 robot_cached_block_pickup::robot_cached_block_pickup(
     const carepr::arena_cache* cache,
-    const crepr::base_block2D* block,
+    const crepr::base_block3D* block,
     const rtypes::type_uuid& robot_id,
     const rtypes::timestep& t)
     : ER_CLIENT_INIT("fordyca.events.robot_cached_block_pickup"),
-      cell2D_op(cache->dloc()),
+      cell2D_op(cache->dpos2D()),
       mc_robot_id(robot_id),
       mc_timestep(t),
       mc_cache(cache),
@@ -107,7 +107,7 @@ bool robot_cached_block_pickup::dispatch_d2_cache_interactor(
   if (tasks::depth2::foraging_task::kCacheTransfererName == polled->name()) {
     ER_INFO("Added cache%d@%s to drop exception list,task='%s'",
             mc_cache->id().v(),
-            mc_cache->rloc().to_str().c_str(),
+            mc_cache->rpos2D().to_str().c_str(),
             polled->name().c_str());
     csel_matrix->sel_exception_add(
         {mc_cache->id(), controller::cache_sel_exception::ekDROP});
@@ -136,7 +136,7 @@ void robot_cached_block_pickup::visit(ds::dpo_store& store) {
   ER_ASSERT(store.contains(mc_cache),
             "Cache%d@%s not in DPO store",
             mc_cache->id().v(),
-            mc_cache->dloc().to_str().c_str());
+            mc_cache->dpos2D().to_str().c_str());
 
   auto pcache = store.find(mc_cache);
 
@@ -152,8 +152,8 @@ void robot_cached_block_pickup::visit(ds::dpo_store& store) {
   if (!pcache->ent()->contains_block(mc_block)) {
     ER_INFO("DPO cache%d@%s/%s does not contain pickup block%d",
             pcache->ent()->id().v(),
-            pcache->ent()->rloc().to_str().c_str(),
-            pcache->ent()->dloc().to_str().c_str(),
+            pcache->ent()->rpos2D().to_str().c_str(),
+            pcache->ent()->dpos2D().to_str().c_str(),
             mc_block->id().v());
     return;
   }
@@ -192,8 +192,8 @@ void robot_cached_block_pickup::visit(ds::dpo_semantic_map& map) {
   ER_ASSERT(cell.cache()->contains_block(mc_block),
             "Perceived cache%d@%s/%s does not contain pickup block%d",
             cell.cache()->id().v(),
-            cell.cache()->rloc().to_str().c_str(),
-            cell.cache()->dloc().to_str().c_str(),
+            cell.cache()->rpos2D().to_str().c_str(),
+            cell.cache()->dpos2D().to_str().c_str(),
             mc_block->id().v());
 
   if (cell.cache()->n_blocks() > base_cache::kMinBlocks) {

@@ -274,7 +274,7 @@ XML configuration:
   - ``ledtaxis_search`` - Use the sensing information given off by a cache to
     perform LEDtaxis towards it, and then perform CRW once a robot is
 
-Additional notes to :xref:`COSM` controller docs:
+Additional notes to :xref:`COSM` controller docs
 =================================================
 
 ``perception``

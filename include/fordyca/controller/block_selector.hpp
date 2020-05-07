@@ -63,7 +63,7 @@ class block_selector : public rer::client<block_selector> {
    * \return A pointer to the "best" block, along with its utility value, if a
    * best block is found, and NULL.
    */
-  const crepr::base_block2D* operator()(const ds::dp_block_map& blocks,
+  const crepr::base_block3D* operator()(const ds::dp_block_map& blocks,
                                         const rmath::vector2d& position);
 
  private:
@@ -82,7 +82,7 @@ class block_selector : public rer::client<block_selector> {
    * \return \c TRUE if the cache should be excluded, \c FALSE otherwise.
    */
   bool block_is_excluded(const rmath::vector2d& position,
-                         const crepr::base_block2D* block) const;
+                         const crepr::base_block3D* block) const;
 
   /* clang-format off */
   const block_sel_matrix* const mc_matrix;

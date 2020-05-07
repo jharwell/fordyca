@@ -25,7 +25,7 @@
 #include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/ds/arena_grid.hpp"
 #include "cosm/foraging/repr/block_cluster.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/events/cell2D_empty.hpp"
 #include "fordyca/support/depth2/dynamic_cache_creator.hpp"
@@ -52,7 +52,7 @@ dynamic_cache_manager::dynamic_cache_manager(
  ******************************************************************************/
 boost::optional<cads::acache_vectoro> dynamic_cache_manager::create(
     const cache_create_ro_params& c_params,
-    const cds::block2D_vectorno& c_alloc_blocks) {
+    const cds::block3D_vectorno& c_alloc_blocks) {
   if (auto to_use = calc_blocks_for_creation(
           c_params.current_caches, c_params.clusters, c_alloc_blocks)) {
     support::depth2::dynamic_cache_creator::params params = {
@@ -76,11 +76,11 @@ boost::optional<cads::acache_vectoro> dynamic_cache_manager::create(
   }
 } /* create() */
 
-boost::optional<cds::block2D_vectorno> dynamic_cache_manager::
+boost::optional<cds::block3D_vectorno> dynamic_cache_manager::
     calc_blocks_for_creation(const cads::acache_vectorno& existing_caches,
-                             const cfds::block2D_cluster_vector& clusters,
-                             const cds::block2D_vectorno& blocks) {
-  cds::block2D_vectorno to_use;
+                             const cfds::block3D_cluster_vector& clusters,
+                             const cds::block3D_vectorno& blocks) {
+  cds::block3D_vectorno to_use;
   auto filter = [&](const auto& b) {
     /* Blocks cannot be in existing caches */
     return std::all_of(existing_caches.begin(),
@@ -128,7 +128,7 @@ boost::optional<cds::block2D_vectorno> dynamic_cache_manager::
     accum = "";
     std::for_each(to_use.begin(), to_use.end(), [&](const auto& b) {
       accum +=
-          "b" + rcppsw::to_string(b->id()) + "->" + b->dloc().to_str() + ",";
+          "b" + rcppsw::to_string(b->id()) + "->" + b->dpos2D().to_str() + ",";
     });
     ER_DEBUG("Block locations: [%s]", accum.c_str());
 
@@ -138,13 +138,13 @@ boost::optional<cds::block2D_vectorno> dynamic_cache_manager::
               to_use.size() - count,
               to_use.size(),
               mc_cache_config.dynamic.min_blocks);
-    return boost::optional<cds::block2D_vectorno>();
+    return boost::optional<cds::block3D_vectorno>();
   }
   if (to_use.size() < mc_cache_config.static_.size) {
     ER_WARN("Free block count < min blocks for new caches (%zu < %u)",
             to_use.size(),
             mc_cache_config.dynamic.min_blocks);
-    return boost::optional<cds::block2D_vectorno>();
+    return boost::optional<cds::block3D_vectorno>();
   }
   return boost::make_optional(to_use);
 } /* calc_blocks_for_creation() */

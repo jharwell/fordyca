@@ -45,7 +45,7 @@ using ds::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 cache_found::cache_found(carepr::base_cache* cache)
-    : cell2D_op(cache->dloc()),
+    : cell2D_op(cache->dpos2D()),
       ER_CLIENT_INIT("fordyca.events.cache_found"),
       m_cache(cache) {}
 
@@ -65,8 +65,8 @@ void cache_found::visit(ds::dpo_store& store) {
    */
   auto it = store.blocks().values_range().begin();
   while (it != store.blocks().values_range().end()) {
-    if (m_cache->contains_point2D(it->ent()->rloc())) {
-      crepr::base_block2D* tmp = (*it).ent();
+    if (m_cache->contains_point2D(it->ent()->rpos2D())) {
+      crepr::base_block3D* tmp = (*it).ent();
       ++it;
       ER_TRACE("Remove block%d hidden behind cache%d",
                tmp->id().v(),
@@ -164,9 +164,9 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
    * created. When we return to the arena and find a new cache there, we are
    * tracking blocks that no longer exist in our perception.
    */
-  std::list<crepr::base_block2D*> rms;
+  std::list<crepr::base_block3D*> rms;
   for (auto&& b : map.blocks().values_range()) {
-    if (m_cache->contains_point2D(b.ent()->rloc())) {
+    if (m_cache->contains_point2D(b.ent()->rpos2D())) {
       ER_TRACE("Remove block%d hidden behind cache%d",
                b.ent()->id().v(),
                m_cache->id().v());
@@ -175,8 +175,8 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
   } /* for(&&b..) */
 
   for (auto&& b : rms) {
-    cdops::cell2D_empty_visitor op(b->dloc());
-    op.visit(map.access<occupancy_grid::kCell>(b->dloc()));
+    cdops::cell2D_empty_visitor op(b->dpos2D());
+    op.visit(map.access<occupancy_grid::kCell>(b->dpos2D()));
     map.block_remove(b);
   } /* for(&&b..) */
 
@@ -189,7 +189,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
    * kind of cell entity.
    */
   if (cell.state_has_block()) {
-    map.block_remove(cell.block2D());
+    map.block_remove(cell.block3D());
   }
 
   /*

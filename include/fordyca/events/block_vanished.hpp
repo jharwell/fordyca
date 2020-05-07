@@ -115,6 +115,12 @@ class block_vanished : public rer::client<block_vanished> {
 
 NS_END(detail);
 
+/**
+ * \brief We use the precise visitor in order to force compile errors if a call to
+ * a visitor is made that involves a visitee that is not in our visit set
+ * (i.e. remove the possibility of implicit upcasting performed by the
+ * compiler).
+ */
 using block_vanished_visitor = rpvisitor::generic_precise_visitor<detail::block_vanished>;
 
 NS_END(events, fordyca);

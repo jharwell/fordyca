@@ -26,7 +26,7 @@
 #include <fstream>
 
 #include "cosm/fsm/supervisor_fsm.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 #include "fordyca/fsm/depth0/crw_fsm.hpp"

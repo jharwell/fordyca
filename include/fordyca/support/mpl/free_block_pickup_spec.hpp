@@ -1,5 +1,5 @@
 /**
- * \file free_block_pickup.hpp
+ * \file free_block_pickup_spec.hpp
  *
  * \copyright 2020 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_MPL_FREE_BLOCK_PICKUP_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_MPL_FREE_BLOCK_PICKUP_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_MPL_FREE_BLOCK_PICKUP_SPEC_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_MPL_FREE_BLOCK_PICKUP_SPEC_HPP_
 
 /*******************************************************************************
  * Includes
@@ -44,7 +44,7 @@ NS_START(fordyca, support, mpl, detail);
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-struct free_pickup_spec {
+struct free_pickup_spec_value {
   using arena_map_type = carena::caching_arena_map;
   using penalty_handler_type = tv::block_op_penalty_handler;
   using interactor_status_type = interactor_status;
@@ -58,14 +58,14 @@ struct free_pickup_spec {
  */
 using free_pickup_inserter = boost::mpl::insert<boost::mpl::_1,
                                                 boost::mpl::pair<boost::mpl::_2,
-                                                                 free_pickup_spec>>;
+                                                                 free_pickup_spec_value>>;
 
 NS_END(detail);
 
 template<typename TTypelist>
-using free_block_pickup_map = typename boost::mpl::fold<TTypelist,
+using free_block_pickup_spec = typename boost::mpl::fold<TTypelist,
                                                         boost::mpl::map0<>,
                                                         detail::free_pickup_inserter>::type;
 NS_END(mpl, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_MPL_FREE_BLOCK_PICKUP_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_MPL_FREE_BLOCK_PICKUP_SPEC_HPP_ */

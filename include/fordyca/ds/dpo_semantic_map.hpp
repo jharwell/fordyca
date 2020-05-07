@@ -123,7 +123,7 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
   RCPPSW_DECORATE_FUNC(resolution, const)
 
   bool cache_remove(carepr::base_cache* victim);
-  bool block_remove(crepr::base_block2D* victim);
+  bool block_remove(crepr::base_block3D* victim);
 
   const dpo_store* store(void) const { return &m_store; }
   dpo_store* store(void) { return &m_store; }
