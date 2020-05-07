@@ -69,14 +69,14 @@ class ledtaxis_cache_search : public foraging_expstrat,
 
   /**
    * \brief Start LED taxis cache search. Crucially, this enables the camera
-   * sensor for use during exploration. See #593.
+   * sensor for use during exploration. See FORDYCA#593.
    */
   void task_start(cta::taskable_argument*) override;
 
   /**
    * \brief Reset LED taxis cache search after a cache is successfully
    * discovered. Crucially, this disable the camera sensor for increased
-   * computational efficiency. See #593.
+   * computational efficiency. See FORDYCA#593.
    */
   void task_reset(void) override final;
 

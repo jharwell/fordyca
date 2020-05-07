@@ -62,8 +62,8 @@ class depth2_metrics_aggregator final : public depth1::depth1_metrics_aggregator
   /**
    * \brief Collect metrics from the depth2 controller.
    */
-  template<class ControllerType>
-  void collect_from_controller(const ControllerType* c) {
+  template<class Controller>
+  void collect_from_controller(const Controller* c) {
     depth1::depth1_metrics_aggregator::collect_from_controller(c);
 
     auto task = dynamic_cast<const cta::polled_task*>(c->current_task());

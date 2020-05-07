@@ -48,7 +48,7 @@ NS_START(support, depth1);
 class depth1_metrics_aggregator;
 class static_cache_manager;
 
-template<typename TControllerType, typename TArenaMapType>
+template<typename TController, typename TArenaMap>
 class robot_arena_interactor;
 
 namespace detail {
@@ -111,17 +111,10 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
   using task_extractor_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth1::typelist,
                                 robot_task_extractor>::type>;
-  using metric_extractor_typelist = rmpl::typelist<
-    ccops::metrics_extract<controller::depth1::bitd_dpo_controller,
-                           depth1_metrics_aggregator>,
-    ccops::metrics_extract<controller::depth1::bitd_odpo_controller,
-                           depth1_metrics_aggregator>,
-    ccops::metrics_extract<controller::depth1::bitd_mdpo_controller,
-                           depth1_metrics_aggregator>,
-    ccops::metrics_extract<controller::depth1::bitd_omdpo_controller,
-                           depth1_metrics_aggregator>
-    >;
-  using metric_extractor_map_type = rds::type_map<metric_extractor_typelist>;
+  using metric_extractor_map_type = rds::type_map<
+    rmpl::typelist_wrap_apply<controller::depth1::typelist,
+                              ccops::metrics_extract,
+                              depth1_metrics_aggregator>::type>;
 
   /**
    * \brief These are friend classes because they are basically just pieces of

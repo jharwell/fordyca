@@ -199,7 +199,7 @@ void dpo_perception_subsystem::los_tracking_sync(
       /*
        * Copy iterator object + iterator increment MUST be before removal to
        * avoid iterator invalidation and undefined behavior (I've seen both a
-       * segfault and infinite loop). See #589.
+       * segfault and infinite loop). See FORDYCA#589.
        */
       carepr::base_cache* tmp = (*it).ent();
       ++it;
@@ -256,7 +256,7 @@ void dpo_perception_subsystem::los_tracking_sync(
       /*
        * Copy iterator object + iterator increment MUST be before removal to
        * avoid iterator invalidation and undefined behavior (I've seen both a
-       * segfault and infinite loop). See #589.
+       * segfault and infinite loop). See FORDYCA#589.
        */
       crepr::base_block2D* tmp = (*it).ent();
       ++it;

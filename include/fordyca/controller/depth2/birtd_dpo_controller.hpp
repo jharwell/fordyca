@@ -69,7 +69,7 @@ class birtd_dpo_controller : public depth1::bitd_dpo_controller,
    * that the previous task was aborted. Not reseting this results in erroneous
    * handling of the newly allocated task as if it was aborted by the loop
    * functions, resulting in inconsistent state with the robot's executive. See
-   * #532,#587.
+   * FORDYCA#532,FORDYCA#587.
    */
   void task_start_cb(cta::polled_task* task,
                      const cta::ds::bi_tab*);

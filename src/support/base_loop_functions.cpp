@@ -105,7 +105,7 @@ void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
    * We unconditionally create environmental dynamics because they are used to
    * generate the 1 timestep penalties for robot-arena interactions even when
    * they are disabled, and trying to figure out how to get things to work if
-   * they are omitted is waaayyyy too much work. See #621 too.
+   * they are omitted is waaayyyy too much work. See FORDYCA#621 too.
    */
   auto envd =
       std::make_unique<tv::env_dynamics>(&tvp->env_dynamics, this, arena_map());

@@ -49,7 +49,7 @@ struct functor_maps_initializer;
 } /* namespace detail */
 class depth0_metrics_aggregator;
 
-template<typename ControllerType, typename TArenaMapType>
+template<typename Controller, typename TArenaMap>
 class robot_arena_interactor;
 
 /*******************************************************************************
@@ -86,7 +86,7 @@ class depth0_loop_functions : public base_loop_functions,
    */
   void shared_init(ticpp::Element& node) RCSW_COLD;
 
- private:
+private:
   using interactor_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth0::typelist,
                               robot_arena_interactor,
@@ -98,21 +98,10 @@ class depth0_loop_functions : public base_loop_functions,
                               rds::grid2D_overlay<cds::cell2D>,
                               repr::forager_los>::type>;
 
-  using metric_extraction_typelist = rmpl::typelist<
-    ccops::metrics_extract<controller::depth0::crw_controller,
-                           depth0_metrics_aggregator>,
-    ccops::metrics_extract<controller::depth0::dpo_controller,
-                           depth0_metrics_aggregator>,
-    ccops::metrics_extract<controller::depth0::odpo_controller,
-                           depth0_metrics_aggregator>,
-    ccops::metrics_extract<controller::depth0::mdpo_controller,
-                           depth0_metrics_aggregator>,
-    ccops::metrics_extract<controller::depth0::omdpo_controller,
-                           depth0_metrics_aggregator>
-    >;
-
-  using metric_extraction_map_type = rds::type_map<metric_extraction_typelist>;
-
+  using metric_extraction_map_type = rds::type_map<
+    rmpl::typelist_wrap_apply<controller::depth0::typelist,
+                              ccops::metrics_extract,
+                              depth0_metrics_aggregator>::type>;
   /**
    * \brief These are friend classes because they are basically just pieces of
    * the loop functions pulled out for increased clarity/modularity, and are not

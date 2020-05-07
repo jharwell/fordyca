@@ -31,7 +31,7 @@
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
-template<class ControllerType, class AggregatorType>
+template<class Controller, class Aggregator>
 class robot_configurer;
 class depth1_metrics_aggregator;
 

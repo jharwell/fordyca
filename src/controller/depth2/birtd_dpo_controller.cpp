@@ -140,7 +140,7 @@ void birtd_dpo_controller::task_start_cb(cta::polled_task* const task,
 
   /*
    * This is set in the BITD DPO controller's task start cb, but we don't use
-   * that here, so it needs to also be here. See #622.
+   * that here, so it needs to also be here. See FORDYCA#622.
    */
   current_task(dynamic_cast<tasks::base_foraging_task*>(task));
 } /* task_start_cb() */

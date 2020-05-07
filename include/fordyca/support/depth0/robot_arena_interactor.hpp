@@ -26,7 +26,9 @@
  ******************************************************************************/
 #include "fordyca/support/free_block_pickup_interactor.hpp"
 #include "fordyca/support/nest_block_drop_interactor.hpp"
-#include "fordyca/support/interactor_status.hpp"
+#include "fordyca/support/mpl/free_block_pickup.hpp"
+#include "fordyca/support/mpl/nest_block_drop.hpp"
+#include "fordyca/support/tv/env_dynamics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,28 +50,24 @@ NS_START(fordyca, support, depth0);
  * - Picking up a free block.
  * - Dropping a carried block in the nest.
  */
-template <typename TControllerType, typename TArenaMapType>
-class robot_arena_interactor final : public rer::client<robot_arena_interactor<TControllerType,
-                                                                               TArenaMapType>> {
+template <typename TController, typename TArenaMap>
+class robot_arena_interactor final : public rer::client<robot_arena_interactor<TController,
+                                                                               TArenaMap>> {
  public:
-  robot_arena_interactor(TArenaMapType* const map,
+  robot_arena_interactor(TArenaMap* const map,
                          depth0_metrics_aggregator *const metrics_agg,
                          argos::CFloorEntity* const floor,
                          tv::env_dynamics* const envd)
       : ER_CLIENT_INIT("fordyca.support.depth0.robot_arena_interactor"),
-        m_free_pickup_interactor(map, floor, envd),
-        m_nest_drop_interactor(map, metrics_agg, floor, envd) {}
+        m_free_pickup(map,
+                      floor,
+                      envd->penalty_handler(tv::block_op_src::ekFREE_PICKUP)),
+        m_nest_drop(map, metrics_agg, floor, envd) {}
 
-  /**
-   * \brief Interactors should generally NOT be copy constructable/assignable,
-   * but is needed to use these classes with boost::variant.
-   *
-   * \todo Supposedly in recent versions of boost you can use variants with
-   * move-constructible-only types (which is what this class SHOULD be), but I
-   * cannot get this to work (the default move constructor needs to be noexcept
-   * I think, and is not being interpreted as such).
-   */
-  robot_arena_interactor(const robot_arena_interactor&) = default;
+  robot_arena_interactor(robot_arena_interactor&&) = default;
+
+  /* Not copy-constructible/assignable by default. */
+  robot_arena_interactor(const robot_arena_interactor&) = delete;
   robot_arena_interactor& operator=(const robot_arena_interactor&) = delete;
 
   /**
@@ -78,21 +76,21 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
    * \param controller The controller to handle interactions for.
    * \param t The current timestep.
    */
-  interactor_status operator()(TControllerType& controller,
+  interactor_status operator()(TController& controller,
                                const rtypes::timestep& t) {
     if (controller.is_carrying_block()) {
-      return m_nest_drop_interactor(controller, t);
+      return m_nest_drop(controller, t);
     } else { /* The foot-bot has no block item */
-      return m_free_pickup_interactor(controller, t);
+      return m_free_pickup(controller, t);
     }
   }
 
  private:
   /* clang-format off */
-  free_block_pickup_interactor<TControllerType,
-                               TArenaMapType> m_free_pickup_interactor;
-  nest_block_drop_interactor<TControllerType,
-                             TArenaMapType>   m_nest_drop_interactor;
+  free_block_pickup_interactor<TController,
+                               mpl::free_block_pickup_map<controller::depth0::typelist>> m_free_pickup;
+  nest_block_drop_interactor<TController,
+                             mpl::nest_block_drop_map<controller::depth0::typelist>>     m_nest_drop;
   /* clang-format on */
 };
 

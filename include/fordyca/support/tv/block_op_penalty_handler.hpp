@@ -84,8 +84,8 @@ class block_op_penalty_handler final : public ctv::temporal_penalty_handler,
    * \param prox_dist The minimum distance that the cache site needs to be from
    *                  all caches in the arena.
    */
-  template<typename TControllerType>
-  op_filter_status penalty_init(const TControllerType& controller,
+  template<typename TController>
+  op_filter_status penalty_init(const TController& controller,
                                 const rtypes::timestep& t,
                                 block_op_src src,
                                 boost::optional<rtypes::spatial_dist> cache_prox) {
@@ -99,10 +99,10 @@ class block_op_penalty_handler final : public ctv::temporal_penalty_handler,
 
     rtypes::type_uuid id = m_id_calc(controller, src);
     rtypes::timestep orig_duration = penalty_calc(t);
-    auto duration RCSW_UNUSED = penalty_add(&controller,
-                                            id,
-                                            orig_duration,
-                                            t);
+    rtypes::timestep RCSW_UNUSED duration = penalty_add(&controller,
+                                                        id,
+                                                        orig_duration,
+                                                        t);
 
     ER_INFO("%s: block%d start=%u, penalty=%u, adjusted penalty=%u src=%d",
             controller.GetId().c_str(),

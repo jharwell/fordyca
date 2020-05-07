@@ -52,8 +52,8 @@ class block_vanished : public rer::client<block_vanished> {
  private:
   struct visit_typelist_impl {
     using controllers = boost::mpl::joint_view<
-        boost::mpl::joint_view<controller::depth0::typelist,
-                               controller::depth1::typelist>,
+      boost::mpl::joint_view<controller::depth0::typelist,
+                             controller::depth1::typelist>,
         controller::depth2::typelist>;
     using tasks = rmpl::typelist<tasks::depth0::generalist,
                                  tasks::depth1::harvester,
@@ -75,8 +75,8 @@ class block_vanished : public rer::client<block_vanished> {
   explicit block_vanished(const rtypes::type_uuid& block_id);
   ~block_vanished(void) override = default;
 
-  block_vanished(const block_vanished& op) = delete;
-  block_vanished& operator=(const block_vanished& op) = delete;
+  block_vanished(const block_vanished&) = delete;
+  block_vanished& operator=(const block_vanished&) = delete;
 
   /* depth0 foraging */
   void visit(controller::depth0::crw_controller& controller);
@@ -113,21 +113,9 @@ class block_vanished : public rer::client<block_vanished> {
   /* clang-format on */
 };
 
-/**
- * \brief We use the precise visitor in order to force compile errors if a call to
- * a visitor is made that involves a visitee that is not in our visit set
- * (i.e. remove the possibility of implicit upcasting performed by the
- * compiler).
- */
-using block_vanished_visitor_impl =
-    rpvisitor::precise_visitor<detail::block_vanished,
-                               detail::block_vanished::visit_typelist>;
-
 NS_END(detail);
 
-class block_vanished_visitor : public detail::block_vanished_visitor_impl {
-  using detail::block_vanished_visitor_impl::block_vanished_visitor_impl;
-};
+using block_vanished_visitor = rpvisitor::generic_precise_visitor<detail::block_vanished>;
 
 NS_END(events, fordyca);
 

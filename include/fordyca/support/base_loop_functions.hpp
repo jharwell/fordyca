@@ -55,7 +55,7 @@ struct convergence_config;
 } /* namespace cosm::convergence */
 
 namespace cosm::pal {
-template <class TControllerType>
+template <class TController>
 class argos_convergence_calculator;
 } /* namespace cosm::pal */
 

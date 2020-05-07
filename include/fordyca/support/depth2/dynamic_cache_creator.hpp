@@ -91,7 +91,7 @@ class dynamic_cache_creator : public base_cache_creator,
    *
    * You *need* cache_i blocks, because if you omit them then you can have
    * blocks getting added to created caches twice, which causes all sorts of
-   * problems. See #578.
+   * problems. See FORDYCA#578.
    */
   cds::block2D_vectorno absorb_blocks_calc(
       const cds::block2D_vectorno& c_alloc_blocks,

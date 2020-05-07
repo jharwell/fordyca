@@ -101,8 +101,8 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
     /**
    * \brief Collect metrics from the depth1 controller.
    */
-    template<class ControllerType>
-    void collect_from_controller(const ControllerType* const controller) {
+    template<class Controller>
+    void collect_from_controller(const Controller* const controller) {
       base_metrics_aggregator::collect_from_controller(controller);
       collect_controller_common(controller);
       /*
@@ -146,8 +146,8 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
   void register_with_decomp_depth(const cmconfig::metrics_config* mconfig,
                                   size_t depth);
  private:
-  template<typename ControllerType>
-  void collect_controller_common(const ControllerType* const controller) {
+  template<typename Controller>
+  void collect_controller_common(const Controller* const controller) {
     collect("fsm::movement", *controller);
     collect("blocks::manipulation", *controller->block_manip_recorder());
 

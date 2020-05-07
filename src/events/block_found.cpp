@@ -197,7 +197,7 @@ void block_found::pheromone_update(ds::dpo_semantic_map& map) {
    * ONLY if the underlying DPO store actually changed do we update what block
    * the cell points to. If we do it unconditionally, we are left
    * with dangling references as a result of mixing unique_ptr and raw ptr. See
-   * #229.
+   * FORDYCA#229.
    */
   auto res = map.store()->block_update(
       repr::dpo_entity<crepr::base_block2D>(m_block->clone(), density));

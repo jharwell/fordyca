@@ -211,7 +211,7 @@ class bitd_dpo_controller : public depth0::dpo_controller,
    * done to avoid having to dynamically cast from \ref cta::polled_task to \ref
    * tasks::base_foraging_task multiple times EVERY timestep for EVERY robot,
    * which was enough to make it show up in VTune as a minor bottleneck. See
-   * #547.
+   * FORDYCA#547.
    */
   tasks::base_foraging_task*                 m_current_task{nullptr};
   tasks::task_status                         m_task_status{tasks::task_status::ekNULL};

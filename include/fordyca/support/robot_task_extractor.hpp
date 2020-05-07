@@ -42,11 +42,11 @@ NS_START(fordyca, support);
  * task. This is used in computing task distribution entropy in depth1, depth2
  * in conjunction with boost::variant.
  */
-template <class ControllerType>
+template <class Controller>
 struct robot_task_extractor {
   robot_task_extractor(void) = default;
 
-  int operator()(const ControllerType* const c) const {
+  int operator()(const Controller* const c) const {
     return c->current_task_id();
   }
 };

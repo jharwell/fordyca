@@ -126,7 +126,7 @@ void cache_found::visit(cfsm::cell2D_fsm& fsm) {
    * after the cell that refers to it is update (this class does said update)).
    *
    * As such, we need to make sure that we ALWAYS put the cell in the correct
-   * state by sending it enough block drops. (see #323).
+   * state by sending it enough block drops. (see FORDYCA#323).
    */
   for (size_t i = fsm.block_count();
        i < std::max(base_cache::kMinBlocks, m_cache->n_blocks());

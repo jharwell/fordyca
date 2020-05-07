@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <list>
 #include "fordyca/support/task_abort_interactor.hpp"
 #include "fordyca/support/cached_block_pickup_interactor.hpp"
 #include "fordyca/support/existing_cache_block_drop_interactor.hpp"
@@ -32,6 +31,9 @@
 #include "fordyca/support/nest_block_drop_interactor.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/support/interactor_status.hpp"
+#include "fordyca/support/mpl/free_block_pickup.hpp"
+#include "fordyca/support/mpl/nest_block_drop.hpp"
+#include "fordyca/support/mpl/task_abort.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,11 +60,11 @@ NS_START(depth1);
  * - Free block drop due to task abort.
  * - Task abort.
  */
-template <typename TControllerType, typename TArenaMapType>
-class robot_arena_interactor final : public rer::client<robot_arena_interactor<TControllerType,
-                                                                               TArenaMapType>> {
+template <typename TController, typename TArenaMap>
+class robot_arena_interactor final : public rer::client<robot_arena_interactor<TController,
+                                                                               TArenaMap>> {
  public:
-  using controller_type = TControllerType;
+  using controller_type = TController;
   struct params {
     carena::caching_arena_map* const map;
     depth0::depth0_metrics_aggregator *const metrics_agg;
@@ -73,28 +75,24 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
   };
   explicit robot_arena_interactor(const params& p)
       : ER_CLIENT_INIT("fordyca.support.depth1.robot_arena_interactor"),
-        m_free_pickup_interactor(p.map, p.floor, p.envd),
-        m_nest_drop_interactor(p.map, p.metrics_agg, p.floor, p.envd),
-        m_task_abort_interactor(p.map,
+        m_free_pickup(p.map,
+                                 p.floor,
+                                 p.envd->penalty_handler(tv::block_op_src::ekFREE_PICKUP)),
+        m_nest_drop(p.map, p.metrics_agg, p.floor, p.envd),
+        m_task_abort(p.map,
                                 p.envd,
                                 p.floor),
-        m_cached_pickup_interactor(p.map,
+        m_cached_pickup(p.map,
                                    p.floor,
                                    p.envd,
                                    p.cache_manager, p.
                                    loop),
-        m_existing_cache_drop_interactor(p.map, p.envd) {}
+        m_existing_cache_drop(p.map, p.envd) {}
 
-  /**
-   * \brief Interactors should generally NOT be copy constructable/assignable,
-   * but is needed to use these classes with boost::variant.
-   *
-   * \todo Supposedly in recent versions of boost you can use variants with
-   * move-constructible-only types (which is what this class SHOULD be), but I
-   * cannot get this to work (the default move constructor needs to be noexcept
-   * I think, and is not being interpreted as such).
-   */
-  robot_arena_interactor(const robot_arena_interactor&) = default;
+  robot_arena_interactor(robot_arena_interactor&&) = default;
+
+  /* Not copy-constructible/assignable by default. */
+  robot_arena_interactor(const robot_arena_interactor&) = delete;
   robot_arena_interactor& operator=(const robot_arena_interactor&) = delete;
 
   /**
@@ -103,13 +101,13 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
    * \param controller The controller to handle interactions for.
    * \param t The current timestep.
    */
-  interactor_status operator()(TControllerType& controller, const rtypes::timestep& t) {
-    if (m_task_abort_interactor(controller)) {
+  interactor_status operator()(TController& controller, const rtypes::timestep& t) {
+    if (m_task_abort(controller)) {
       /*
        * This needs to be here, rather than in each robot's control step
        * function, in order to avoid triggering erroneous handling of an aborted
        * task in the loop functions when the executive has not aborted the newly
-       * allocated task *after* the previous task was aborted. See #532,#587.
+       * allocated task *after* the previous task was aborted. See FORDYCA#532,FORDYCA#587.
        */
       controller.task_status_update(tasks::task_status::ekRUNNING);
       return interactor_status::ekTASK_ABORT;
@@ -117,29 +115,31 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
 
     auto status = interactor_status::ekNO_EVENT;
     if (controller.is_carrying_block()) {
-      status |= m_nest_drop_interactor(controller, t);
+      status |= m_nest_drop(controller, t);
 
       /*
        * Dropped a block in a cache does not require oracular updates, so no
        * need to track its status.
        */
-      m_existing_cache_drop_interactor(controller, t);
+      m_existing_cache_drop(controller, t);
     } else { /* The foot-bot has no block item */
-      status |= m_free_pickup_interactor(controller, t);
-      status |= m_cached_pickup_interactor(controller, t);
+      status |= m_free_pickup(controller, t);
+      status |= m_cached_pickup(controller, t);
     }
     return status;
   }
 
  private:
+  using mpl_free_pickup_map = mpl::free_block_pickup_map<controller::depth1::typelist>;
+  using mpl_nest_drop_map = mpl::nest_block_drop_map<controller::depth1::typelist>;
+  using mpl_task_abort_map = mpl::task_abort_map<controller::depth1::typelist>;
+
   /* clang-format off */
-  free_block_pickup_interactor<TControllerType,
-                               TArenaMapType>           m_free_pickup_interactor;
-  nest_block_drop_interactor<TControllerType,
-                             TArenaMapType>             m_nest_drop_interactor;
-  task_abort_interactor<TControllerType>                m_task_abort_interactor;
-  cached_block_pickup_interactor<TControllerType>       m_cached_pickup_interactor;
-  existing_cache_block_drop_interactor<TControllerType> m_existing_cache_drop_interactor;
+  free_block_pickup_interactor<TController, mpl_free_pickup_map> m_free_pickup;
+  nest_block_drop_interactor<TController, mpl_nest_drop_map>     m_nest_drop;
+  task_abort_interactor<TController, mpl_task_abort_map>         m_task_abort;
+  cached_block_pickup_interactor<TController>                    m_cached_pickup;
+  existing_cache_block_drop_interactor<TController>              m_existing_cache_drop;
   /* clang-format on */
 };
 

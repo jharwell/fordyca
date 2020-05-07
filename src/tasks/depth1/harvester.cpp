@@ -62,7 +62,7 @@ double harvester::abort_prob_calc(void) {
    * Harvesters always have a small chance of aborting their task when not at a
    * task interface. Having the harvester task un-abortable until AFTER it
    * acquires a block can cause it to get stuck and not switch to another task
-   * if it cannot find a block anywhere. See #232.
+   * if it cannot find a block anywhere. See FORDYCA#232.
    */
   if (-1 == active_interface()) {
     return cta::abort_probability::kMIN_ABORT_PROB;

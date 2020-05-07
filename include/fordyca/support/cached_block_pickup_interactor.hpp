@@ -72,17 +72,10 @@ class cached_block_pickup_interactor
         m_cache_manager(cache_manager),
         m_loop(loop) {}
 
-  /**
-   * \brief Interactors should generally NOT be copy constructable/assignable,
-   * but is needed to use these classes with boost::variant.
-   *
-   * \todo Supposedly in recent versions of boost you can use variants with
-   * move-constructible-only types (which is what this class SHOULD be), but I
-   * cannot get this to work (the default move constructor needs to be noexcept
-   * I think, and is not being interpreted as such).
-   */
-  cached_block_pickup_interactor(const cached_block_pickup_interactor& other) =
-      default;
+  cached_block_pickup_interactor(cached_block_pickup_interactor&&) = default;
+
+  /* Not copy-constructible/assignable by default. */
+  cached_block_pickup_interactor(const cached_block_pickup_interactor&) = delete;
   cached_block_pickup_interactor& operator=(
       const cached_block_pickup_interactor&) = delete;
 
@@ -132,7 +125,7 @@ class cached_block_pickup_interactor
      * serving their penalty this timestep manage to pass the check to actually
      * perform the block pickup before one of them actually finishes picking up
      * a block, then the second one will not get the necessary \ref
-     * cache_vanished event. See #594.
+     * cache_vanished event. See FORDYCA#594.
      *
      * Grid and block mutexes are also required, but only within the actual \ref
      * cached_block_pickup event visit to the arena map.
@@ -147,7 +140,7 @@ class cached_block_pickup_interactor
      * yet (for depth 1 simulations).
      *
      * This results in a \ref cached_block_pickup with a pointer to a cache that
-     * has already been destructed, and a segfault. See #247.
+     * has already been destructed, and a segfault. See FORDYCA#247.
      *
      * Furthermore, it is also possible that while a robot is serving its pickup
      * penalty that the destination cache disappears AND then is re-created by

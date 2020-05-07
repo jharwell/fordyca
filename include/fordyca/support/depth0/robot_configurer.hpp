@@ -43,16 +43,16 @@ NS_START(fordyca, support, depth0);
  *
  * \brief Functor to perform controller configuration during initialization.
  */
-template<typename TControllerType>
+template<typename TController>
 class robot_configurer : public boost::static_visitor<void> {
  public:
-  using controller_type = TControllerType;
+  using controller_type = TController;
   robot_configurer(const cvconfig::visualization_config* const config,
                    cforacle::foraging_oracle* const oracle)
       : mc_config(config),
         mc_oracle(oracle) {}
 
-  template<typename U = TControllerType,
+  template<typename U = TController,
            RCPPSW_SFINAE_TYPELIST_REJECT(controller::depth0::oracular_typelist,
                                          U)>
   void operator()(U* const c) const {
@@ -61,7 +61,7 @@ class robot_configurer : public boost::static_visitor<void> {
       c->display_id(mc_config->robot_id);
     }
   }
-  template<typename U = TControllerType,
+  template<typename U = TController,
            RCPPSW_SFINAE_TYPELIST_REQUIRE(controller::depth0::oracular_typelist,
                                           U)>
   void operator()(U* const c) const {

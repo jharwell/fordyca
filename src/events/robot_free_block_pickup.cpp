@@ -84,9 +84,9 @@ void robot_free_block_pickup::dispatch_robot_free_block_interactor(
   interactor->accept(*this);
 } /* dispatch_robot_free_block_interactor() */
 
-template <typename TControllerType>
+template <typename TController>
 void robot_free_block_pickup::d1d2_dpo_controller_visit(
-    TControllerType& controller) {
+    TController& controller) {
   controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
@@ -101,9 +101,9 @@ void robot_free_block_pickup::d1d2_dpo_controller_visit(
   controller.ndc_pop();
 } /* d1d2_dpo_controller_visit() */
 
-template <typename TControllerType>
+template <typename TController>
 void robot_free_block_pickup::d1d2_mdpo_controller_visit(
-    TControllerType& controller) {
+    TController& controller) {
   controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->dpo_store());
@@ -118,9 +118,9 @@ void robot_free_block_pickup::d1d2_mdpo_controller_visit(
   controller.ndc_pop();
 } /* d1d2_mdpo_controller_visit() */
 
-template <typename TControllerType>
+template <typename TController>
 void robot_free_block_pickup::d0_dpo_controller_visit(
-    TControllerType& controller) {
+    TController& controller) {
   controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
@@ -135,9 +135,9 @@ void robot_free_block_pickup::d0_dpo_controller_visit(
   controller.ndc_pop();
 } /* d0_dpo_controller_visit() */
 
-template <typename TControllerType>
+template <typename TController>
 void robot_free_block_pickup::d0_mdpo_controller_visit(
-    TControllerType& controller) {
+    TController& controller) {
   controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
@@ -202,13 +202,13 @@ void robot_free_block_pickup::visit(ds::dpo_semantic_map& map) {
             m_block->id().v(),
             cell.block2D()->id().v());
   /*
-   * @bug: This should just be an assert. However, due to #242, the fact that
-   * blocks can appear close to the wall, and RCPPSW#82, this may not always be
-   * true (and the fact that it isn't is not an indication of inconsistent
-   * simulation state :-( ). This can happen if, for example, a robot is
-   * exploring for a block very near the edge of the arena, and happens to drive
-   * over a block. In that case the block is not in its LOS (BUG!), or in its
-   * occupancy grid, and hence the assertion failure here.
+   * @bug: This should just be an assert. However, due to FORDYCA#242, the fact
+   * that blocks can appear close to the wall, and FORDYCA#82, this may not
+   * always be true (and the fact that it isn't is not an indication of
+   * inconsistent simulation state :-( ). This can happen if, for example, a
+   * robot is exploring for a block very near the edge of the arena, and happens
+   * to drive over a block. In that case the block is not in its LOS (BUG!), or
+   * in its occupancy grid, and hence the assertion failure here.
    */
   /* ER_ASSERT(cell.state_has_block(), "cell does not contain block"); */
   if (cell.state_has_block()) {

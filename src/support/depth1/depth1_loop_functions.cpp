@@ -39,7 +39,7 @@
 #include "cosm/foraging/oracle/foraging_oracle.hpp"
 #include "cosm/foraging/repr/block_cluster.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
-#include "cosm/operations/robot_arena_interaction_applicator.hpp"
+#include "cosm/interactors/applicator.hpp"
 #include "cosm/oracle/config/aggregate_oracle_config.hpp"
 #include "cosm/pal/argos_convergence_calculator.hpp"
 #include "cosm/pal/argos_swarm_iterator.hpp"
@@ -74,12 +74,12 @@ using configurer_map_type =
                                             robot_configurer,
                                             depth1_metrics_aggregator>::type>;
 
-template <class ControllerType>
+template <class Controller>
 struct d1_subtask_status_extractor
     : public boost::static_visitor<std::pair<bool, bool>> {
-  using controller_type = ControllerType;
+  using controller_type = Controller;
 
-  std::pair<bool, bool> operator()(const ControllerType* const c) const {
+  std::pair<bool, bool> operator()(const Controller* const c) const {
     auto task = dynamic_cast<const cta::polled_task*>(c->current_task());
     return std::make_pair(
         task->name() == tasks::depth1::foraging_task::kHarvesterName,
@@ -101,11 +101,11 @@ struct d1_subtask_status_extractor_adaptor
       const controller::foraging_controller* const c)
       : mc_controller(c) {}
 
-  template <typename ControllerType>
+  template <typename Controller>
   std::pair<bool, bool> operator()(
-      const d1_subtask_status_extractor<ControllerType>& extractor) const {
+      const d1_subtask_status_extractor<Controller>& extractor) const {
     auto cast = dynamic_cast<const typename d1_subtask_status_extractor<
-        ControllerType>::controller_type*>(mc_controller);
+        Controller>::controller_type*>(mc_controller);
     return extractor(cast);
   }
   const controller::foraging_controller* const mc_controller;
@@ -346,7 +346,7 @@ std::vector<rmath::vector2d> depth1_loop_functions::calc_cache_locs(
      * Quad source is a tricky distribution to use with static caches, so we
      * have to tweak the static cache locations in tandem with the block cluster
      * locations to ensure that no segfaults results from cache/cache or
-     * cache/cluster overlap. See #581.
+     * cache/cluster overlap. See FORDYCA#581.
      *
      * Basically we want the cache centers to be halfway between the nest center
      * and each of the block cluster centers (we assume a square arena).
@@ -621,9 +621,9 @@ void depth1_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
             controller->GetId().c_str(),
             controller->type_index().name());
   auto iapplicator =
-      cops::robot_arena_interaction_applicator<controller::foraging_controller,
-                                               robot_arena_interactor,
-                                               carena::caching_arena_map>(
+      cinteractors::applicator<controller::foraging_controller,
+                               robot_arena_interactor,
+                               carena::caching_arena_map>(
           controller, rtypes::timestep(GetSpace().GetSimulationClock()));
 
   auto status =
@@ -643,7 +643,7 @@ void depth1_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
    * This is not a problem for caches, because caches are created (if needed)
    * after *all* robots have been processed for the given timestep.
    *
-   * See #577.
+   * See FORDYCA#577.
    */
   if (interactor_status::ekNO_EVENT != status && nullptr != oracle()) {
     oracle()->update(arena_map());

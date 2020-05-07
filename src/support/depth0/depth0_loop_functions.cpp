@@ -37,7 +37,7 @@
 #include "cosm/controller/operations/applicator.hpp"
 #include "cosm/foraging/oracle/foraging_oracle.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
-#include "cosm/operations/robot_arena_interaction_applicator.hpp"
+#include "cosm/interactors/applicator.hpp"
 #include "cosm/pal/argos_convergence_calculator.hpp"
 #include "cosm/pal/argos_swarm_iterator.hpp"
 
@@ -306,7 +306,7 @@ argos::CColor depth0_loop_functions::GetFloorColor(
  * General Member Functions
  ******************************************************************************/
 void depth0_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
-  auto controller = static_cast<controller::foraging_controller*>(
+  auto* controller = static_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
 
   /*
@@ -342,9 +342,9 @@ void depth0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
             controller->type_index().name());
 
   auto iapplicator =
-      cops::robot_arena_interaction_applicator<controller::foraging_controller,
-                                               depth0::robot_arena_interactor,
-                                               carena::caching_arena_map>(
+      cinteractors::applicator<controller::foraging_controller,
+                               depth0::robot_arena_interactor,
+                               carena::caching_arena_map>(
           controller, rtypes::timestep(GetSpace().GetSimulationClock()));
   auto status =
       boost::apply_visitor(iapplicator,
@@ -359,7 +359,7 @@ void depth0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
    * avoid asserts during on debug builds. On optimized builds the asserts are
    * ignored/compiled out, which is not a problem, because the LOS processing
    * errors that can result are transient and are corrected the next
-   * timestep. See #577.
+   * timestep. See FORDYCA#577.
    */
   if (interactor_status::ekNO_EVENT != status && nullptr != oracle()) {
     oracle()->update(arena_map());

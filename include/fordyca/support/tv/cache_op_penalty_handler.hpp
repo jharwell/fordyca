@@ -76,15 +76,15 @@ class cache_op_penalty_handler final
    *            applied).
    * \param t The current timestep.
   */
-  template<typename TControllerType>
-  op_filter_status penalty_init(const TControllerType& controller,
+  template<typename TController>
+  op_filter_status penalty_init(const TController& controller,
                                 cache_op_src src,
                                 const rtypes::timestep& t) {
     /*
      * If the robot has not acquired a cache, or thinks it has but actually has
      * not, nothing to do.
      */
-    auto filter = cache_op_filter<TControllerType>(m_map)(controller, src);
+    auto filter = cache_op_filter<TController>(m_map)(controller, src);
     if (filter != op_filter_status::ekSATISFIED) {
       return filter;
     }

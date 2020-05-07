@@ -68,7 +68,7 @@ class foraging_signal : public csfsm::util_signal {
 
     /**
      * \brief The block a robot was waiting to pickup from has vanished (see
-     * #411).
+     * FORDYCA#411).
      */
     ekBLOCK_VANISHED,
 
@@ -80,7 +80,7 @@ class foraging_signal : public csfsm::util_signal {
 
     /**
      * \brief The cache the robot was waiting to pickup from has vanished (see
-     * #247).
+     * FORDYCA#247).
      */
     ekCACHE_VANISHED,
     /**

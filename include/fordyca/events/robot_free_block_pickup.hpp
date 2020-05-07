@@ -125,17 +125,17 @@ class robot_free_block_pickup : public rer::client<robot_free_block_pickup>,
  private:
   void dispatch_robot_free_block_interactor(tasks::base_foraging_task* task);
 
-  template <typename TControllerType>
-  void d1d2_dpo_controller_visit(TControllerType& controller);
+  template <typename TController>
+  void d1d2_dpo_controller_visit(TController& controller);
 
-  template <typename TControllerType>
-  void d1d2_mdpo_controller_visit(TControllerType& controller);
+  template <typename TController>
+  void d1d2_mdpo_controller_visit(TController& controller);
 
-  template <typename TControllerType>
-  void d0_dpo_controller_visit(TControllerType& controller);
+  template <typename TController>
+  void d0_dpo_controller_visit(TController& controller);
 
-  template <typename TControllerType>
-  void d0_mdpo_controller_visit(TControllerType& controller);
+  template <typename TController>
+  void d0_mdpo_controller_visit(TController& controller);
 
   /* clang-format off */
   const rtypes::timestep  mc_timestep;

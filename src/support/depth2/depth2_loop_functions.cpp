@@ -40,7 +40,7 @@
 #include "cosm/foraging/block_dist/base_distributor.hpp"
 #include "cosm/foraging/oracle/foraging_oracle.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
-#include "cosm/operations/robot_arena_interaction_applicator.hpp"
+#include "cosm/interactors/applicator.hpp"
 #include "cosm/pal/argos_convergence_calculator.hpp"
 #include "cosm/pal/argos_swarm_iterator.hpp"
 #include "cosm/robots/footbot/config/saa_xml_names.hpp"
@@ -449,9 +449,9 @@ void depth2_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
             controller->type_index().name());
 
   auto iapplicator =
-      cops::robot_arena_interaction_applicator<controller::foraging_controller,
-                                               robot_arena_interactor,
-                                               carena::caching_arena_map>(
+      cinteractors::applicator<controller::foraging_controller,
+                              robot_arena_interactor,
+                              carena::caching_arena_map>(
           controller, rtypes::timestep(GetSpace().GetSimulationClock()));
   auto status =
       boost::apply_visitor(iapplicator,

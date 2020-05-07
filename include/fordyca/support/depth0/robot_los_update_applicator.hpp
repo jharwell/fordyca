@@ -54,8 +54,8 @@ NS_START(fordyca, support, depth0);
  */
 class robot_los_update_applicator {
  public:
-  template<typename TControllerType>
-  using los_update_op_type = ccops::robot_los_update<TControllerType,
+  template<typename TController>
+  using los_update_op_type = ccops::robot_los_update<TController,
                                                      rds::grid2D_overlay<cds::cell2D>,
                                                      repr::forager_los>;
 
@@ -64,11 +64,11 @@ class robot_los_update_applicator {
 
   void operator()(los_update_op_type<controller::depth0::crw_controller>& ) const {}
 
-  template<typename TControllerType,
-           RCPPSW_SFINAE_FUNC(!std::is_same<TControllerType,
+  template<typename TController,
+           RCPPSW_SFINAE_FUNC(!std::is_same<TController,
                               controller::depth0::crw_controller>::value)>
-  void operator()(los_update_op_type<TControllerType>& impl) const {
-    impl(dynamic_cast<TControllerType*>(controller));
+  void operator()(los_update_op_type<TController>& impl) const {
+    impl(dynamic_cast<TController*>(controller));
   }
 
  private:

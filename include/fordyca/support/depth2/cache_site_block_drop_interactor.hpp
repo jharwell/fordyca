@@ -67,17 +67,12 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
         m_penalty_handler(envd->penalty_handler(
             tv::block_op_src::ekCACHE_SITE_DROP)) {}
 
-  /**
-   * \brief Interactors should generally NOT be copy constructable/assignable,
-   * but is needed to use these classes with boost::variant.
-   *
-   * \todo Supposedly in recent versions of boost you can use variants with
-   * move-constructible-only types (which is what this class SHOULD be), but I
-   * cannot get this to work (the default move constructor needs to be noexcept
-   * I think, and is not being interpreted as such).
-   */
   cache_site_block_drop_interactor(
-      const cache_site_block_drop_interactor& other) = default;
+      cache_site_block_drop_interactor&&) = default;
+
+  /* Not copy-constructible/assignable by default. */
+  cache_site_block_drop_interactor(
+      const cache_site_block_drop_interactor&) = delete;
   cache_site_block_drop_interactor& operator=(
       const cache_site_block_drop_interactor&) = delete;
 

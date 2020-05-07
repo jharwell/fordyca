@@ -62,17 +62,12 @@ class existing_cache_block_drop_interactor
         m_penalty_handler(
             envd->penalty_handler(tv::cache_op_src::ekEXISTING_CACHE_DROP)) {}
 
-  /**
-   * \brief Interactors should generally NOT be copy constructable/assignable,
-   * but is needed to use these classes with boost::variant.
-   *
-   * \todo Supposedly in recent versions of boost you can use variants with
-   * move-constructible-only types (which is what this class SHOULD be), but I
-   * cannot get this to work (the default move constructor needs to be noexcept
-   * I think, and is not being interpreted as such).
-   */
   existing_cache_block_drop_interactor(
-      const existing_cache_block_drop_interactor& other) = default;
+      existing_cache_block_drop_interactor&&) = default;
+
+  /* Not copy-constructible/assignable by default. */
+  existing_cache_block_drop_interactor(
+      const existing_cache_block_drop_interactor&) = delete;
   existing_cache_block_drop_interactor& operator=(
       const existing_cache_block_drop_interactor&) = delete;
 
@@ -117,7 +112,7 @@ class existing_cache_block_drop_interactor
      * serving their penalty this timestep manage to pass the check to actually
      * perform the cache pickup before one of them actually finishes picking up
      * a block, then the second one will not get the necessary \ref
-     * cache_vanished event. See #594.
+     * cache_vanished event. See FORDYCA#594.
      *
      * Grid and block mutexes are also required, but only within the actual \ref
      * cached_block_pickup event visit to the arena map.
@@ -132,7 +127,7 @@ class existing_cache_block_drop_interactor
      * yet.
      *
      * This results in a \ref cached_block_drop with a pointer to a cache that
-     * has already been destructed, and a segfault. See #247.
+     * has already been destructed, and a segfault. See FORDYCA#247.
      *
      * Furthermore, it is also possible that while a robot is serving its pickup
      * penalty that the destination cache disappears AND then is re-created by
