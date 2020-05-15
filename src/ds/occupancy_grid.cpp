@@ -34,7 +34,7 @@ NS_START(fordyca, ds);
  * Constructors/Destructor
  ******************************************************************************/
 occupancy_grid::occupancy_grid(
-    const ccontconfig::perception::perception_config* c_config,
+    const cspconfig::perception_config* c_config,
     const std::string& robot_id)
     : ER_CLIENT_INIT("fordyca.ds.occupancy_grid"),
       stacked_grid2D(c_config->occupancy_grid.dims,

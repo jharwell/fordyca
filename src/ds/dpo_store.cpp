@@ -37,7 +37,7 @@ NS_START(fordyca, ds);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-dpo_store::dpo_store(const ccontconfig::perception::pheromone_config* const config)
+dpo_store::dpo_store(const cspconfig::pheromone_config* const config)
     : ER_CLIENT_INIT("fordyca.ds.dpo_store"),
       mc_repeat_deposit(config->repeat_deposit),
       mc_pheromone_rho(config->rho) {}

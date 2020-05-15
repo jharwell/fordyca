@@ -59,8 +59,7 @@ class dpo_perception_subsystem final
       public foraging_perception_subsystem,
       public metrics::perception::dpo_perception_metrics {
  public:
-  explicit dpo_perception_subsystem(
-      const ccontconfig::perception::perception_config* config);
+  explicit dpo_perception_subsystem(const cspconfig::perception_config* config);
   ~dpo_perception_subsystem(void) override;
 
   /* DPO perception metrics */

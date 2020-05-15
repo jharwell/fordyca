@@ -71,7 +71,6 @@ one ``bootstrap.sh`` uses for you. Something like the following, run from the
   -DWITH_FOOTBOT_LEDS=NO \
   -DCMAKE_BUILD_TYPE=OPT \
   -DLIBRA_ER=NONE \
-  -DCOSM_BUILD_FOR=ARGOS \
   \..
 
 To get an idea of what some of the non-project specific options mean, head over

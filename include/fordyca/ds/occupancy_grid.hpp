@@ -30,7 +30,7 @@
 #include "rcppsw/ds/stacked_grid2D.hpp"
 #include "rcppsw/math/vector2.hpp"
 
-#include "cosm/controller/config/perception/perception_config.hpp"
+#include "cosm/subsystem/perception/config/perception_config.hpp"
 #include "cosm/ds/cell2D.hpp"
 #include "cosm/repr/pheromone_density.hpp"
 
@@ -69,7 +69,7 @@ class occupancy_grid : public rer::client<occupancy_grid>,
    */
   static constexpr uint kCell = 1;
 
-  occupancy_grid(const ccontconfig::perception::perception_config* c_config,
+  occupancy_grid(const cspconfig::perception_config* c_config,
                  const std::string& robot_id);
 
   /**

@@ -273,11 +273,15 @@ void depth0_loop_functions::reset(void) {
 argos::CColor depth0_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
   rmath::vector2d tmp(plane_pos.GetX(), plane_pos.GetY());
-  if (arena_map()->nest().contains_point(tmp)) {
-    return argos::CColor(arena_map()->nest().color().red(),
-                         arena_map()->nest().color().green(),
-                         arena_map()->nest().color().blue());
-  }
+
+  /* check if the point is inside any of the nests */
+  for (auto *nest : arena_map()->nests()) {
+    if (nest->contains_point(tmp)) {
+      return argos::CColor(nest->color().red(),
+                           nest->color().green(),
+                           nest->color().blue());
+    }
+  } /* for(*nest..) */
 
   for (auto* block : arena_map()->blocks()) {
     /*

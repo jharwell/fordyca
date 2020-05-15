@@ -47,7 +47,7 @@ using ds::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 mdpo_perception_subsystem::mdpo_perception_subsystem(
-    const ccontconfig::perception::perception_config* const config,
+    const cspconfig::perception_config* const config,
     const std::string& id)
     : ER_CLIENT_INIT("fordyca.controller.mdpo_perception"),
       foraging_perception_subsystem(config),

@@ -34,6 +34,7 @@
 #include <boost/mpl/for_each.hpp>
 
 #include "rcppsw/ds/type_map.hpp"
+#include "rcppsw/utils/maskable_enum.hpp"
 
 #include "cosm/arena/config/arena_map_config.hpp"
 #include "cosm/controller/operations/applicator.hpp"
@@ -360,11 +361,16 @@ void depth2_loop_functions::destroy(void) {
 argos::CColor depth2_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
   rmath::vector2d tmp(plane_pos.GetX(), plane_pos.GetY());
-  if (arena_map()->nest().contains_point(tmp)) {
-    return argos::CColor(arena_map()->nest().color().red(),
-                         arena_map()->nest().color().green(),
-                         arena_map()->nest().color().blue());
-  }
+
+  /* check if the point is inside any of the nests */
+  for (auto *nest : arena_map()->nests()) {
+    if (nest->contains_point(tmp)) {
+      return argos::CColor(nest->color().red(),
+                           nest->color().green(),
+                           nest->color().blue());
+    }
+  } /* for(*nest..) */
+
   /*
    * Blocks are inside caches, so display the cache the point is inside FIRST,
    * so that you don't have blocks rendering inside of caches.

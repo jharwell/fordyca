@@ -30,7 +30,7 @@
 
 #include "rcppsw/er/client.hpp"
 
-#include "cosm/controller/config/perception/perception_config.hpp"
+#include "cosm/subsystem/perception/config/perception_config.hpp"
 
 #include "fordyca/controller/foraging_perception_subsystem.hpp"
 #include "fordyca/fordyca.hpp"
@@ -65,7 +65,7 @@ class mdpo_perception_subsystem final
       public metrics::perception::mdpo_perception_metrics {
  public:
   mdpo_perception_subsystem(
-      const ccontconfig::perception::perception_config* config,
+      const cspconfig::perception_config* config,
       const std::string& id);
   ~mdpo_perception_subsystem(void) override = default;
 

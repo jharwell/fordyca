@@ -321,7 +321,9 @@
               />
         </distribution>
       </blocks>
-      <nest size="1.0, 4.0" center="6, 3" />
+      <nests>
+        <nest dims="1.0, 4.0" center="6, 3" />
+      </nests>
     </arena_map>
     <caches dimension="0.8">
       <static enable="true"

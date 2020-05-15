@@ -26,7 +26,7 @@
 #include <fstream>
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/controller/config/perception/perception_config.hpp"
+#include "cosm/subsystem/perception/config/perception_config.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
@@ -120,7 +120,7 @@ void dpo_controller::init(ticpp::Element& node) {
 void dpo_controller::shared_init(
     const config::depth0::dpo_controller_repository& config_repo) {
   auto* perception =
-      config_repo.config_get<ccontconfig::perception::perception_config>();
+      config_repo.config_get<cspconfig::perception_config>();
   auto* block_matrix =
       config_repo.config_get<config::block_sel::block_sel_matrix_config>();
 

@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "cosm/controller/perception/base_perception_subsystem.hpp"
+#include "cosm/subsystem/perception/base_perception_subsystem.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/repr/forager_los.hpp"
@@ -52,10 +52,10 @@ class oracular_info_receptor;
  * which is just the \ref dpo_store of objects.
  */
 class foraging_perception_subsystem
-    : public ccperception::base_perception_subsystem<repr::forager_los> {
+    : public csperception::base_perception_subsystem<repr::forager_los> {
  public:
   explicit foraging_perception_subsystem(
-      const ccontconfig::perception::perception_config* const pconfig)
+      const cspconfig::perception_config* const pconfig)
       : base_perception_subsystem(pconfig) {}
 
   ~foraging_perception_subsystem(void) override = default;

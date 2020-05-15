@@ -109,7 +109,8 @@ exhale_args = {
 xref_links = {
     "COSM": ("COSM", "https://swarm-robotics-cosm.readthedocs.io"),
     "SILICON": ("SILICON", "https://swarm-robotics-silicon.readthedocs.io"),
-    "SIERRA": ("SIERRA", "https://swarm-robotics-sierra.readthedocs.io")
+    "SIERRA": ("SIERRA", "https://swarm-robotics-sierra.readthedocs.io"),
+    "LIBRA": ("LIBRA", "https://swarm-robotics-libra.readthedocs.io")
 
 }
 

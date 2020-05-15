@@ -29,7 +29,7 @@
 
 #include "rcppsw/patterns/decorator/decorator.hpp"
 
-#include "cosm/controller/config/perception/perception_config.hpp"
+#include "cosm/subsystem/perception/config/perception_config.hpp"
 
 #include "fordyca/ds/dp_block_map.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
@@ -64,7 +64,7 @@ NS_START(fordyca, ds);
 class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
                                public rpdecorator::decorator<occupancy_grid> {
  public:
-  dpo_semantic_map(const ccontconfig::perception::perception_config* c_config,
+  dpo_semantic_map(const cspconfig::perception_config* c_config,
                    const std::string& robot_id);
 
   RCPPSW_DECORATE_FUNC(pheromone_repeat_deposit, const);

@@ -30,7 +30,7 @@
 #include "rcppsw/math/vector2.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/controller/config/perception/pheromone_config.hpp"
+#include "cosm/subsystem/perception/config/pheromone_config.hpp"
 #include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/ds/dp_block_map.hpp"
@@ -89,7 +89,7 @@ class dpo_store final : public rer::client<dpo_store> {
    */
   static constexpr double kNRD_MAX_PHEROMONE = 1.0;
 
-  explicit dpo_store(const ccontconfig::perception::pheromone_config* config);
+  explicit dpo_store(const cspconfig::pheromone_config* config);
 
   /**
    * \brief Get all blocks the robot is currently aware of, and their

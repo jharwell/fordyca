@@ -99,7 +99,10 @@ class cache_op_penalty_handler final
               "%s not in cache?",
               controller.GetId().c_str());
 
-    RCSW_UNUSED auto duration = penalty_add(&controller, id, orig_duration, t);
+    rtypes::timestep RCSW_UNUSED duration = penalty_add(&controller,
+                                                        id,
+                                                        orig_duration,
+                                                        t);
     ER_INFO("%s: cache%d start=%u, penalty=%u, adjusted penalty=%u src=%d",
             controller.GetId().c_str(),
             id.v(),

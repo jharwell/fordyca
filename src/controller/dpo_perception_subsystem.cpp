@@ -41,7 +41,7 @@ NS_START(fordyca, controller);
  * Constructors/Destructor
  ******************************************************************************/
 dpo_perception_subsystem::dpo_perception_subsystem(
-    const ccontconfig::perception::perception_config* const config)
+    const cspconfig::perception_config* const config)
     : ER_CLIENT_INIT("fordyca.controller.dpo_perception"),
       foraging_perception_subsystem(config),
       m_store(std::make_unique<ds::dpo_store>(&config->pheromone)) {}

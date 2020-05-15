@@ -24,7 +24,7 @@
 #include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/controller/config/perception/perception_config.hpp"
+#include "cosm/subsystem/perception/config/perception_config.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
@@ -95,7 +95,7 @@ void bitd_mdpo_controller::shared_init(
   bitd_dpo_controller::shared_init(config_repo);
 
   /* MDPO perception subsystem */
-  auto p = *config_repo.config_get<ccontconfig::perception::perception_config>();
+  auto p = *config_repo.config_get<cspconfig::perception_config>();
   rmath::vector2d padding(p.occupancy_grid.resolution.v() * 5,
                           p.occupancy_grid.resolution.v() * 5);
   p.occupancy_grid.dims += padding;
