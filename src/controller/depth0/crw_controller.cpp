@@ -96,9 +96,9 @@ RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, entity_acquired_id, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, is_exploring_for_goal, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, acquisition_goal, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, block_transport_goal, *m_fsm, const);
-RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, acquisition_loc, *m_fsm, const);
-RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, current_vector_loc, *m_fsm, const);
-RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, current_explore_loc, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, acquisition_loc3D, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, vector_loc3D, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, explore_loc3D, *m_fsm, const);
 
 using namespace argos; // NOLINT
 

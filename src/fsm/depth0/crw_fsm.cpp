@@ -131,7 +131,7 @@ HFSM_STATE_DEFINE(crw_fsm, wait_for_block_drop, rpfsm::event_data* data) {
  * Metrics
  ******************************************************************************/
 crw_fsm::exp_status crw_fsm::is_exploring_for_goal(void) const {
-  return std::make_pair(current_state() == ekST_ACQUIRE_BLOCK, true);
+  return exp_status{current_state() == ekST_ACQUIRE_BLOCK, true};
 } /* is_exploring_for_goal() */
 
 bool crw_fsm::goal_acquired(void) const {
@@ -143,18 +143,18 @@ bool crw_fsm::goal_acquired(void) const {
   return false;
 } /* goal_acquired() */
 
-rmath::vector2z crw_fsm::acquisition_loc(void) const {
-  return saa()->sensing()->dpos2D();
-} /* acquisition_loc() */
+rmath::vector3z crw_fsm::acquisition_loc3D(void) const {
+  return saa()->sensing()->dpos3D();
+} /* acquisition_loc3D() */
 
-rmath::vector2z crw_fsm::current_explore_loc(void) const {
-  return saa()->sensing()->dpos2D();
-} /* current_explore_loc() */
+rmath::vector3z crw_fsm::explore_loc3D(void) const {
+  return saa()->sensing()->dpos3D();
+} /* explore_loc3D() */
 
-rmath::vector2z crw_fsm::current_vector_loc(void) const {
+rmath::vector3z crw_fsm::vector_loc3D(void) const {
   ER_FATAL_SENTINEL("CRW_FSM current vector location undefined");
-  return saa()->sensing()->dpos2D();
-} /* current_vector_loc() */
+  return saa()->sensing()->dpos3D();
+} /* vector_loc3D() */
 
 rtypes::type_uuid crw_fsm::entity_acquired_id(void) const {
   /* CRW FSM has no concept of state, so it doesn't know what it has acquired */
@@ -164,39 +164,34 @@ rtypes::type_uuid crw_fsm::entity_acquired_id(void) const {
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
-bool crw_fsm::in_collision_avoidance(void) const {
-  return (m_explore_fsm.task_running() &&
-          m_explore_fsm.in_collision_avoidance()) ||
-         csfsm::util_hfsm::in_collision_avoidance();
-} /* in_collision_avoidance() */
+bool crw_fsm::exp_interference(void) const {
+  return (m_explore_fsm.task_running() && m_explore_fsm.exp_interference()) ||
+         csfsm::util_hfsm::exp_interference();
+} /* exp_interference() */
 
-bool crw_fsm::entered_collision_avoidance(void) const {
+bool crw_fsm::entered_interference(void) const {
   return (m_explore_fsm.task_running() &&
-          m_explore_fsm.entered_collision_avoidance()) ||
-         csfsm::util_hfsm::entered_collision_avoidance();
-} /* entered_collision_avoidance() */
+          m_explore_fsm.entered_interference()) ||
+         csfsm::util_hfsm::entered_interference();
+} /* entered_interference() */
 
-bool crw_fsm::exited_collision_avoidance(void) const {
+bool crw_fsm::exited_interference(void) const {
   return (m_explore_fsm.task_running() &&
-          m_explore_fsm.exited_collision_avoidance()) ||
-         csfsm::util_hfsm::exited_collision_avoidance();
-} /* exited_collision_avoidance() */
+          m_explore_fsm.exited_interference()) ||
+         csfsm::util_hfsm::exited_interference();
+} /* exited_interference() */
 
-rtypes::timestep crw_fsm::collision_avoidance_duration(void) const {
+rtypes::timestep crw_fsm::interference_duration(void) const {
   if (m_explore_fsm.task_running()) {
-    return m_explore_fsm.collision_avoidance_duration();
+    return m_explore_fsm.interference_duration();
   } else {
-    return csfsm::util_hfsm::collision_avoidance_duration();
+    return csfsm::util_hfsm::interference_duration();
   }
-} /* collision_avoidance_duration() */
+} /* interference_duration() */
 
-rmath::vector2z crw_fsm::avoidance_loc2D(void) const {
-  return saa()->sensing()->dpos2D();
-} /* avoidance_loc2D() */
-
-rmath::vector3z crw_fsm::avoidance_loc3D(void) const {
+rmath::vector3z crw_fsm::interference_loc3D(void) const {
   return saa()->sensing()->dpos3D();
-} /* avoidance_loc3D() */
+} /* interference_loc3D() */
 
 /*******************************************************************************
  * General Member Functions

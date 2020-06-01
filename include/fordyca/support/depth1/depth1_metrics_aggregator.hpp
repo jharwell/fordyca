@@ -28,7 +28,7 @@
 
 #include "cosm/controller/metrics/manipulation_metrics.hpp"
 #include "cosm/spatial/metrics/movement_metrics.hpp"
-#include "cosm/spatial/metrics/collision_metrics.hpp"
+#include "cosm/spatial/metrics/interference_metrics.hpp"
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 #include "cosm/ta/metrics/bi_tdgraph_metrics.hpp"
 #include "cosm/ta/polled_task.hpp"
@@ -155,12 +155,12 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
     if (nullptr == task) {
       return;
     }
-    collect("fsm::collision_counts", *task->mechanism());
-    collect_if("fsm::collision_locs2D",
+    collect("fsm::interference_counts", *task->mechanism());
+    collect_if("fsm::interference_locs2D",
                *task->mechanism(),
                [&](const rmetrics::base_metrics& metrics) {
-                 auto& m = dynamic_cast<const csmetrics::collision_metrics&>(metrics);
-                 return m.in_collision_avoidance();
+                 auto& m = dynamic_cast<const csmetrics::interference_metrics&>(metrics);
+                 return m.exp_interference();
                });
     collect_if(
         "blocks::acq_counts",
@@ -171,7 +171,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
           return fsm::foraging_acq_goal::ekBLOCK == m.acquisition_goal();
         });
     collect_if(
-        "blocks::acq_locs",
+        "blocks::acq_locs2D",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
@@ -185,16 +185,16 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
      * robots explore.
      */
     collect_if(
-        "blocks::acq_explore_locs",
+        "blocks::acq_explore_locs2D",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
               metrics);
           return fsm::foraging_acq_goal::ekBLOCK == m.acquisition_goal() &&
-              m.is_exploring_for_goal().first;
+              m.is_exploring_for_goal().is_exploring;
         });
     collect_if(
-        "blocks::acq_vector_locs",
+        "blocks::acq_vector_locs2D",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
@@ -212,7 +212,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
           return fsm::foraging_acq_goal::ekEXISTING_CACHE == m.acquisition_goal();
         });
     collect_if(
-        "caches::acq_locs",
+        "caches::acq_locs2D",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
@@ -226,16 +226,16 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
      * robots explore.
      */
     collect_if(
-        "caches::acq_explore_locs",
+        "caches::acq_explore_locs2D",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
               metrics);
           return fsm::foraging_acq_goal::ekEXISTING_CACHE == m.acquisition_goal() &&
-              m.is_exploring_for_goal().first;
+              m.is_exploring_for_goal().is_exploring;
         });
     collect_if(
-        "caches::acq_vector_locs",
+        "caches::acq_vector_locs2D",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const csmetrics::goal_acq_metrics&>(

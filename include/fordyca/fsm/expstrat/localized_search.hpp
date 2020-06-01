@@ -60,13 +60,12 @@ class localized_search : public foraging_expstrat,
   localized_search(const localized_search&) = delete;
   localized_search& operator=(const localized_search&) = delete;
 
-  /* collision metrics */
-  bool in_collision_avoidance(void) const override final RCSW_PURE;
-  bool entered_collision_avoidance(void) const override final RCSW_PURE;
-  bool exited_collision_avoidance(void) const override final RCSW_PURE;
-  rtypes::timestep collision_avoidance_duration(void) const override final;
-  rmath::vector2z avoidance_loc2D(void) const override final;
-  rmath::vector3z avoidance_loc3D(void) const override final;
+  /* interference metrics */
+  bool exp_interference(void) const override final RCSW_PURE;
+  bool entered_interference(void) const override final RCSW_PURE;
+  bool exited_interference(void) const override final RCSW_PURE;
+  rtypes::timestep interference_duration(void) const override final;
+  rmath::vector3z interference_loc3D(void) const override final;
 
   /* taskable overrides */
 

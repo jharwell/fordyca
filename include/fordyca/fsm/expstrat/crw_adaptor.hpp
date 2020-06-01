@@ -58,13 +58,12 @@ class crw_adaptor final : public foraging_expstrat,
   crw_adaptor(const crw_adaptor&) = delete;
   crw_adaptor& operator=(const crw_adaptor&) = delete;
 
-  /* collision metrics */
-  RCPPSW_DECLDEF_WRAP_OVERRIDE(in_collision_avoidance, decoratee(), const);
-  RCPPSW_DECLDEF_WRAP_OVERRIDE(entered_collision_avoidance, decoratee(), const);
-  RCPPSW_DECLDEF_WRAP_OVERRIDE(exited_collision_avoidance, decoratee(), const);
-  RCPPSW_DECLDEF_WRAP_OVERRIDE(collision_avoidance_duration, decoratee(), const);
-  RCPPSW_DECLDEF_WRAP_OVERRIDE(avoidance_loc2D, decoratee(), const);
-  RCPPSW_DECLDEF_WRAP_OVERRIDE(avoidance_loc3D, decoratee(), const);
+  /* interference metrics */
+  RCPPSW_DECLDEF_WRAP_OVERRIDE(exp_interference, decoratee(), const);
+  RCPPSW_DECLDEF_WRAP_OVERRIDE(entered_interference, decoratee(), const);
+  RCPPSW_DECLDEF_WRAP_OVERRIDE(exited_interference, decoratee(), const);
+  RCPPSW_DECLDEF_WRAP_OVERRIDE(interference_duration, decoratee(), const);
+  RCPPSW_DECLDEF_WRAP_OVERRIDE(interference_loc3D, decoratee(), const);
 
   RCPPSW_DECLDEF_WRAP_OVERRIDE(task_reset, decoratee());
   RCPPSW_DECLDEF_WRAP_OVERRIDE(task_running, decoratee(), const);

@@ -89,14 +89,13 @@ HFSM_STATE_DEFINE(dpo_fsm, block_to_nest, rpfsm::event_data* data) {
 }
 
 /*******************************************************************************
- * Collision Metrics
+ * Interference Metrics
  ******************************************************************************/
-RCPPSW_WRAP_DEF(dpo_fsm, in_collision_avoidance, m_block_fsm, const)
-RCPPSW_WRAP_DEF(dpo_fsm, entered_collision_avoidance, m_block_fsm, const);
-RCPPSW_WRAP_DEF(dpo_fsm, exited_collision_avoidance, m_block_fsm, const);
-RCPPSW_WRAP_DEF(dpo_fsm, collision_avoidance_duration, m_block_fsm, const);
-RCPPSW_WRAP_DEF(dpo_fsm, avoidance_loc2D, m_block_fsm, const);
-RCPPSW_WRAP_DEF(dpo_fsm, avoidance_loc3D, m_block_fsm, const);
+RCPPSW_WRAP_DEF(dpo_fsm, exp_interference, m_block_fsm, const)
+RCPPSW_WRAP_DEF(dpo_fsm, entered_interference, m_block_fsm, const);
+RCPPSW_WRAP_DEF(dpo_fsm, exited_interference, m_block_fsm, const);
+RCPPSW_WRAP_DEF(dpo_fsm, interference_duration, m_block_fsm, const);
+RCPPSW_WRAP_DEF(dpo_fsm, interference_loc3D, m_block_fsm, const);
 
 /*******************************************************************************
  * Goal Acquisition Metrics
@@ -106,9 +105,9 @@ RCPPSW_WRAP_DEF(dpo_fsm, is_vectoring_to_goal, m_block_fsm, const);
 RCPPSW_WRAP_DEF(dpo_fsm, acquisition_goal, m_block_fsm, const);
 RCPPSW_WRAP_DEF(dpo_fsm, block_transport_goal, m_block_fsm, const);
 RCPPSW_WRAP_DEF(dpo_fsm, goal_acquired, m_block_fsm, const);
-RCPPSW_WRAP_DEF(dpo_fsm, acquisition_loc, m_block_fsm, const);
-RCPPSW_WRAP_DEF(dpo_fsm, current_explore_loc, m_block_fsm, const);
-RCPPSW_WRAP_DEF(dpo_fsm, current_vector_loc, m_block_fsm, const);
+RCPPSW_WRAP_DEF(dpo_fsm, acquisition_loc3D, m_block_fsm, const);
+RCPPSW_WRAP_DEF(dpo_fsm, explore_loc3D, m_block_fsm, const);
+RCPPSW_WRAP_DEF(dpo_fsm, vector_loc3D, m_block_fsm, const);
 RCPPSW_WRAP_DEF(dpo_fsm, entity_acquired_id, m_block_fsm, const);
 
 /*******************************************************************************

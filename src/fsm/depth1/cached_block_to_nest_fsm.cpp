@@ -129,47 +129,39 @@ RCSW_CONST HFSM_STATE_DEFINE_ND(cached_block_to_nest_fsm, finished) {
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
-bool cached_block_to_nest_fsm::in_collision_avoidance(void) const {
-  return (m_cache_fsm.task_running() && m_cache_fsm.in_collision_avoidance()) ||
-         csfsm::util_hfsm::in_collision_avoidance();
-} /* in_collision_avoidance() */
+bool cached_block_to_nest_fsm::exp_interference(void) const {
+  return (m_cache_fsm.task_running() && m_cache_fsm.exp_interference()) ||
+         csfsm::util_hfsm::exp_interference();
+} /* in_interference() */
 
-bool cached_block_to_nest_fsm::entered_collision_avoidance(void) const {
+bool cached_block_to_nest_fsm::entered_interference(void) const {
   return (m_cache_fsm.task_running() &&
-          m_cache_fsm.entered_collision_avoidance()) ||
-         csfsm::util_hfsm::entered_collision_avoidance();
-} /* entered_collision_avoidance() */
+          m_cache_fsm.entered_interference()) ||
+         csfsm::util_hfsm::entered_interference();
+} /* entered_interference() */
 
-bool cached_block_to_nest_fsm::exited_collision_avoidance(void) const {
+bool cached_block_to_nest_fsm::exited_interference(void) const {
   return (m_cache_fsm.task_running() &&
-          m_cache_fsm.exited_collision_avoidance()) ||
-         csfsm::util_hfsm::exited_collision_avoidance();
-} /* exited_collision_avoidance() */
+          m_cache_fsm.exited_interference()) ||
+         csfsm::util_hfsm::exited_interference();
+} /* exited_interference() */
 
-rtypes::timestep cached_block_to_nest_fsm::collision_avoidance_duration(
+rtypes::timestep cached_block_to_nest_fsm::interference_duration(
     void) const {
   if (m_cache_fsm.task_running()) {
-    return m_cache_fsm.collision_avoidance_duration();
+    return m_cache_fsm.interference_duration();
   } else {
-    return csfsm::util_hfsm::collision_avoidance_duration();
+    return csfsm::util_hfsm::interference_duration();
   }
-} /* collision_avoidance_duration() */
+} /* interference_duration() */
 
-rmath::vector2z cached_block_to_nest_fsm::avoidance_loc2D(void) const {
+rmath::vector3z cached_block_to_nest_fsm::interference_loc3D(void) const {
   if (m_cache_fsm.task_running()) {
-    return m_cache_fsm.avoidance_loc2D();
+    return m_cache_fsm.interference_loc3D();
   } else {
-    return csfsm::util_hfsm::avoidance_loc2D();
+    return csfsm::util_hfsm::interference_loc3D();
   }
-} /* avoidance_loc2D() */
-
-rmath::vector3z cached_block_to_nest_fsm::avoidance_loc3D(void) const {
-  if (m_cache_fsm.task_running()) {
-    return m_cache_fsm.avoidance_loc3D();
-  } else {
-    return csfsm::util_hfsm::avoidance_loc3D();
-  }
-} /* avoidance_loc3D() */
+} /* interference_loc3D() */
 
 /*******************************************************************************
  * FSM Metrics
@@ -185,16 +177,16 @@ RCPPSW_WRAP_OVERRIDE_DEF(cached_block_to_nest_fsm,
                          const);
 
 RCPPSW_WRAP_OVERRIDE_DEF(cached_block_to_nest_fsm,
-                         acquisition_loc,
+                         acquisition_loc3D,
                          m_cache_fsm,
                          const);
 
 RCPPSW_WRAP_OVERRIDE_DEF(cached_block_to_nest_fsm,
-                         current_explore_loc,
+                         explore_loc3D,
                          m_cache_fsm,
                          const);
 RCPPSW_WRAP_OVERRIDE_DEF(cached_block_to_nest_fsm,
-                         current_vector_loc,
+                         vector_loc3D,
                          m_cache_fsm,
                          const);
 

@@ -85,20 +85,19 @@ class free_block_to_nest_fsm final : public csfsm::util_hfsm,
     return !(ekST_FINISHED == current_state() || ekST_START == current_state());
   }
 
-  /* collision metrics */
-  bool in_collision_avoidance(void) const override RCSW_PURE;
-  bool entered_collision_avoidance(void) const override RCSW_PURE;
-  bool exited_collision_avoidance(void) const override RCSW_PURE;
-  rtypes::timestep collision_avoidance_duration(void) const override RCSW_PURE;
-  rmath::vector2z avoidance_loc2D(void) const override RCSW_PURE;
-  rmath::vector3z avoidance_loc3D(void) const override RCSW_PURE;
+  /* interference metrics */
+  bool exp_interference(void) const override RCSW_PURE;
+  bool entered_interference(void) const override RCSW_PURE;
+  bool exited_interference(void) const override RCSW_PURE;
+  rtypes::timestep interference_duration(void) const override RCSW_PURE;
+  rmath::vector3z interference_loc3D(void) const override RCSW_PURE;
 
   /* goal acquisition metrics */
   RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, acquisition_loc, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, current_explore_loc, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, current_vector_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, acquisition_loc3D, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, explore_loc3D, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, vector_loc3D, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid, entity_acquired_id, const);
 
   bool goal_acquired(void) const override RCSW_PURE;

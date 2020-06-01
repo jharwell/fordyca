@@ -87,22 +87,21 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
   void task_reset(void) override { init(); }
 
   /* collision metrics */
-  bool in_collision_avoidance(void) const override final RCSW_PURE;
-  bool entered_collision_avoidance(void) const override final RCSW_PURE;
-  bool exited_collision_avoidance(void) const override final RCSW_PURE;
-  rtypes::timestep collision_avoidance_duration(
+  bool exp_interference(void) const override final RCSW_PURE;
+  bool entered_interference(void) const override final RCSW_PURE;
+  bool exited_interference(void) const override final RCSW_PURE;
+  rtypes::timestep interference_duration(
       void) const override final RCSW_PURE;
-  rmath::vector2z avoidance_loc2D(void) const override final RCSW_PURE;
-  rmath::vector3z avoidance_loc3D(void) const override final RCSW_PURE;
+  rmath::vector3z interference_loc3D(void) const override final RCSW_PURE;
 
   /* goal acquisition metrics */
-  rmath::vector2z acquisition_loc(void) const override final;
   bool is_vectoring_to_goal(void) const override final RCSW_PURE;
   exp_status is_exploring_for_goal(void) const override final RCSW_PURE;
   bool goal_acquired(void) const override RCSW_PURE;
   csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override;
-  rmath::vector2z current_explore_loc(void) const override final;
-  rmath::vector2z current_vector_loc(void) const override final;
+  rmath::vector3z acquisition_loc3D(void) const override final;
+  rmath::vector3z explore_loc3D(void) const override final;
+  rmath::vector3z vector_loc3D(void) const override final;
 
   /**
    * \brief Reset the FSM

@@ -102,19 +102,19 @@ RCPPSW_WRAP_OVERRIDE_DEF(generalist,
                          const);
 
 RCPPSW_WRAP_OVERRIDE_DEF(generalist,
-                         acquisition_loc,
+                         acquisition_loc3D,
                          *static_cast<fsm::depth0::free_block_to_nest_fsm*>(
                              polled_task::mechanism()),
                          const);
 
 RCPPSW_WRAP_OVERRIDE_DEF(generalist,
-                         current_explore_loc,
+                         explore_loc3D,
                          *static_cast<fsm::depth0::free_block_to_nest_fsm*>(
                              polled_task::mechanism()),
                          const);
 
 RCPPSW_WRAP_OVERRIDE_DEF(generalist,
-                         current_vector_loc,
+                         vector_loc3D,
                          *static_cast<fsm::depth0::free_block_to_nest_fsm*>(
                              polled_task::mechanism()),
                          const);

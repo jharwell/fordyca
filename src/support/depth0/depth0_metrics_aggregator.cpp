@@ -94,17 +94,17 @@ void depth0_metrics_aggregator::collect_from_controller(
    * All depth0 controllers provide these.
    */
   collect("fsm::movement", *controller);
-  collect("fsm::collision_counts", *controller->fsm());
+  collect("fsm::interference_counts", *controller->fsm());
   collect("blocks::acq_counts", *controller);
   collect("blocks::manipulation", *controller->block_manip_recorder());
 
-  collect_if("fsm::collision_locs2D",
+  collect_if("fsm::interference_locs2D",
              *controller->fsm(),
              [&](const rmetrics::base_metrics&) {
-               return controller->fsm()->ca_tracker()->in_collision_avoidance();
+               return controller->fsm()->inta_tracker()->exp_interference();
              });
 
-  collect_if("blocks::acq_locs",
+  collect_if("blocks::acq_locs2Dx",
              *controller,
              [&](const rmetrics::base_metrics& metrics) {
                auto& m =
@@ -117,14 +117,14 @@ void depth0_metrics_aggregator::collect_from_controller(
    * We count "false" explorations as part of gathering metrics on where robots
    * explore.
    */
-  collect_if("blocks::acq_explore_locs",
+  collect_if("blocks::acq_explore_locs2D",
              *controller,
              [&](const rmetrics::base_metrics& metrics) {
                auto& m =
                    dynamic_cast<const csmetrics::goal_acq_metrics&>(metrics);
-               return m.is_exploring_for_goal().first;
+               return m.is_exploring_for_goal().is_exploring;
              });
-  collect_if("blocks::acq_vector_locs",
+  collect_if("blocks::acq_vector_locs2D",
              *controller,
              [&](const rmetrics::base_metrics& metrics) {
                auto& m =

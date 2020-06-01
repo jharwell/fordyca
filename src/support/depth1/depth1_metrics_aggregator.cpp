@@ -33,10 +33,9 @@
 #include "cosm/arena/metrics/caches/utilization_metrics.hpp"
 #include "cosm/arena/metrics/caches/utilization_metrics_collector.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
-#include "cosm/spatial/metrics/collision_metrics.hpp"
-#include "cosm/spatial/metrics/current_explore_locs_metrics_collector.hpp"
-#include "cosm/spatial/metrics/current_vector_locs_metrics_collector.hpp"
-#include "cosm/spatial/metrics/goal_acq_locs_metrics_collector.hpp"
+#include "cosm/spatial/metrics/explore_locs2D_metrics_collector.hpp"
+#include "cosm/spatial/metrics/vector_locs2D_metrics_collector.hpp"
+#include "cosm/spatial/metrics/goal_acq_locs2D_metrics_collector.hpp"
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 #include "cosm/spatial/metrics/goal_acq_metrics_collector.hpp"
 #include "cosm/spatial/metrics/movement_metrics.hpp"
@@ -191,24 +190,24 @@ void depth1_metrics_aggregator::register_with_arena_dims2D(
     const cmconfig::metrics_config* const mconfig,
     const rmath::vector2z& dims) {
   using collector_typelist = rmpl::typelist<
-      rmpl::identity<csmetrics::goal_acq_locs_metrics_collector>,
-      rmpl::identity<csmetrics::current_explore_locs_metrics_collector>,
-      rmpl::identity<csmetrics::current_vector_locs_metrics_collector>,
+      rmpl::identity<csmetrics::goal_acq_locs2D_metrics_collector>,
+      rmpl::identity<csmetrics::explore_locs2D_metrics_collector>,
+      rmpl::identity<csmetrics::vector_locs2D_metrics_collector>,
       rmpl::identity<cametrics::caches::location_metrics_collector> >;
 
   using extra_args_type = std::tuple<rmath::vector2z>;
   cmetrics::collector_registerer<extra_args_type>::creatable_set creatable_set = {
-      {typeid(csmetrics::goal_acq_locs_metrics_collector),
-       "cache_acq_locs",
-       "caches::acq_locs",
+      {typeid(csmetrics::goal_acq_locs2D_metrics_collector),
+       "cache_acq_locs2D",
+       "caches::acq_locs2D",
        rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE},
-      {typeid(csmetrics::current_explore_locs_metrics_collector),
-       "cache_acq_explore_locs",
-       "caches::acq_explore_locs",
+      {typeid(csmetrics::explore_locs2D_metrics_collector),
+       "cache_acq_explore_locs2D",
+       "caches::acq_explore_locs2D",
        rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE},
-      {typeid(csmetrics::current_vector_locs_metrics_collector),
-       "cache_acq_vector_locs",
-       "caches::acq_vector_locs",
+      {typeid(csmetrics::vector_locs2D_metrics_collector),
+       "cache_acq_vector_locs2D",
+       "caches::acq_vector_locs2D",
        rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE},
       {typeid(cametrics::caches::location_metrics_collector),
        "cache_locations",

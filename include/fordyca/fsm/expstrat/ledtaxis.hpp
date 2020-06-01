@@ -27,7 +27,6 @@
 #include <memory>
 
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
-#include "cosm/spatial/collision_tracker.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -93,18 +92,8 @@ class ledtaxis : public foraging_expstrat,
 
   /* clang-format off */
   mutable bool            m_task_running{false};
-  cspatial::collision_tracker m_tracker;
   rutils::color           m_target;
   /* clang-format on */
-
- public:
-  /* collision metrics */
-  RCPPSW_DECLDEF_WRAP_OVERRIDE(in_collision_avoidance, m_tracker, const)
-  RCPPSW_DECLDEF_WRAP_OVERRIDE(entered_collision_avoidance, m_tracker, const)
-  RCPPSW_DECLDEF_WRAP_OVERRIDE(exited_collision_avoidance, m_tracker, const)
-  RCPPSW_DECLDEF_WRAP_OVERRIDE(collision_avoidance_duration, m_tracker, const)
-  RCPPSW_DECLDEF_WRAP_OVERRIDE(avoidance_loc2D, m_tracker, const)
-  RCPPSW_DECLDEF_WRAP_OVERRIDE(avoidance_loc3D, m_tracker, const)
 };
 
 NS_END(expstrat, fsm, fordyca);

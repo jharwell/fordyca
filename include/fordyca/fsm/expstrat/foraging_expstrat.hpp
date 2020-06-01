@@ -56,7 +56,7 @@ NS_START(fsm, expstrat);
  * \class foraging_expstrat
  * \ingroup fsm expstrat
  *
- * \brief Base class for different exploration behaviors that controller can
+ * \brief Base class for different exploration behaviors that controllers can
  * exhibit when looking for stuff.
  */
 class foraging_expstrat : public csexpstrat::base_expstrat {

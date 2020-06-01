@@ -150,19 +150,19 @@ RCPPSW_WRAP_OVERRIDE_DEF(harvester,
                          const);
 
 RCPPSW_WRAP_OVERRIDE_DEF(harvester,
-                         acquisition_loc,
+                         acquisition_loc3D,
                          *static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
                              polled_task::mechanism()),
                          const);
 
 RCPPSW_WRAP_OVERRIDE_DEF(harvester,
-                         current_explore_loc,
+                         explore_loc3D,
                          *static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
                              polled_task::mechanism()),
                          const);
 
 RCPPSW_WRAP_OVERRIDE_DEF(harvester,
-                         current_vector_loc,
+                         vector_loc3D,
                          *static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
                              polled_task::mechanism()),
                          const);

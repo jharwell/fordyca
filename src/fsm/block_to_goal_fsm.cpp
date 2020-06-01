@@ -161,55 +161,45 @@ RCSW_CONST HFSM_STATE_DEFINE_ND(block_to_goal_fsm, finished) {
 }
 
 /*******************************************************************************
- * Collision Metrics
+ * Interference Metrics
  ******************************************************************************/
-bool block_to_goal_fsm::in_collision_avoidance(void) const {
-  return (m_block_fsm->task_running() && m_block_fsm->in_collision_avoidance()) ||
-         (m_goal_fsm->task_running() && m_goal_fsm->in_collision_avoidance());
-} /* in_collision_avoidance() */
+bool block_to_goal_fsm::exp_interference(void) const {
+  return (m_block_fsm->task_running() && m_block_fsm->exp_interference()) ||
+         (m_goal_fsm->task_running() && m_goal_fsm->exp_interference());
+} /* exp_interference() */
 
-bool block_to_goal_fsm::entered_collision_avoidance(void) const {
+bool block_to_goal_fsm::entered_interference(void) const {
   return (m_block_fsm->task_running() &&
-          m_block_fsm->entered_collision_avoidance()) ||
+          m_block_fsm->entered_interference()) ||
          (m_goal_fsm->task_running() &&
-          m_goal_fsm->entered_collision_avoidance());
-} /* entered_collision_avoidance() */
+          m_goal_fsm->entered_interference());
+} /* entered_interference() */
 
-bool block_to_goal_fsm::exited_collision_avoidance(void) const {
+bool block_to_goal_fsm::exited_interference(void) const {
   return (m_block_fsm->task_running() &&
-          m_block_fsm->exited_collision_avoidance()) ||
+          m_block_fsm->exited_interference()) ||
          (m_goal_fsm->task_running() &&
-          m_goal_fsm->exited_collision_avoidance());
-} /* exited_collision_avoidance() */
+          m_goal_fsm->exited_interference());
+} /* exited_interference() */
 
-rtypes::timestep block_to_goal_fsm::collision_avoidance_duration(void) const {
+rtypes::timestep block_to_goal_fsm::interference_duration(void) const {
   if (m_block_fsm->task_running()) {
-    return m_block_fsm->collision_avoidance_duration();
+    return m_block_fsm->interference_duration();
   } else if (m_goal_fsm->task_running()) {
-    return m_goal_fsm->collision_avoidance_duration();
+    return m_goal_fsm->interference_duration();
   }
   return rtypes::timestep(0);
-} /* collision_avoidance_duration() */
+} /* interference_duration() */
 
-rmath::vector2z block_to_goal_fsm::avoidance_loc2D(void) const {
+rmath::vector3z block_to_goal_fsm::interference_loc3D(void) const {
   ER_ASSERT(m_block_fsm->task_running() || m_goal_fsm->task_running(),
-            "In collision avoidance without running task?");
+            "In collision interference without running task?");
   if (m_block_fsm->task_running()) {
-    return m_block_fsm->avoidance_loc2D();
+    return m_block_fsm->interference_loc3D();
   } else { /* goal FSM must be running */
-    return m_goal_fsm->avoidance_loc2D();
+    return m_goal_fsm->interference_loc3D();
   }
-} /* avoidance_loc2D() */
-
-rmath::vector3z block_to_goal_fsm::avoidance_loc3D(void) const {
-  ER_ASSERT(m_block_fsm->task_running() || m_goal_fsm->task_running(),
-            "In collision avoidance without running task?");
-  if (m_block_fsm->task_running()) {
-    return m_block_fsm->avoidance_loc3D();
-  } else { /* goal FSM must be running */
-    return m_goal_fsm->avoidance_loc3D();
-  }
-} /* avoidance_loc3D() */
+} /* interference_loc3D() */
 
 /*******************************************************************************
  * Acquisition Metrics
@@ -221,7 +211,7 @@ block_to_goal_fsm::exp_status block_to_goal_fsm::is_exploring_for_goal(
   } else if (m_goal_fsm->task_running()) {
     return m_goal_fsm->is_exploring_for_goal();
   }
-  return std::make_pair(false, false);
+  return exp_status{false, false};
 } /* is_exploring_for_goal() */
 
 bool block_to_goal_fsm::is_vectoring_to_goal(void) const {
@@ -244,17 +234,17 @@ csmetrics::goal_acq_metrics::goal_type block_to_goal_fsm::acquisition_goal(
   return fsm::to_goal_type(foraging_acq_goal::ekNONE);
 } /* acquisition_goal() */
 
-rmath::vector2z block_to_goal_fsm::acquisition_loc(void) const {
-  return m_goal_fsm->acquisition_loc();
-} /* acquisition_loc() */
+rmath::vector3z block_to_goal_fsm::acquisition_loc3D(void) const {
+  return m_goal_fsm->acquisition_loc3D();
+} /* acquisition_loc3D() */
 
-rmath::vector2z block_to_goal_fsm::current_explore_loc(void) const {
-  return saa()->sensing()->dpos2D();
-} /* current_explore_loc() */
+rmath::vector3z block_to_goal_fsm::explore_loc3D(void) const {
+  return saa()->sensing()->dpos3D();
+} /* explore_loc3D() */
 
-rmath::vector2z block_to_goal_fsm::current_vector_loc(void) const {
-  return saa()->sensing()->dpos2D();
-} /* current_vector_loc() */
+rmath::vector3z block_to_goal_fsm::vector_loc3D(void) const {
+  return saa()->sensing()->dpos3D();
+} /* vector_loc3D() */
 
 /*******************************************************************************
  * General Member Functions

@@ -82,12 +82,11 @@ class dpo_fsm final : public csfsm::util_hfsm,
   void task_reset(void) override { init(); }
 
   /* collision metrics */
-  RCPPSW_WRAP_OVERRIDE_DECL(bool, in_collision_avoidance, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(bool, entered_collision_avoidance, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(bool, exited_collision_avoidance, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rtypes::timestep, collision_avoidance_duration, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, avoidance_loc2D, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, avoidance_loc3D, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, exp_interference, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, entered_interference, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, exited_interference, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rtypes::timestep, interference_duration, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, interference_loc3D, const);
 
   /* goal acquisition metrics */
   RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
@@ -96,9 +95,9 @@ class dpo_fsm final : public csfsm::util_hfsm,
   RCPPSW_WRAP_OVERRIDE_DECL(csmetrics::goal_acq_metrics::goal_type,
                             acquisition_goal,
                             const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, acquisition_loc, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, current_explore_loc, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2z, current_vector_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, acquisition_loc3D, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, explore_loc3D, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, vector_loc3D, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid, entity_acquired_id, const);
 
   /* block transportation */

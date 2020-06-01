@@ -120,19 +120,19 @@ RCPPSW_WRAP_OVERRIDE_DEF(cache_finisher,
                          const);
 
 RCPPSW_WRAP_OVERRIDE_DEF(cache_finisher,
-                         acquisition_loc,
+                         acquisition_loc3D,
                          *static_cast<fsm::depth2::block_to_new_cache_fsm*>(
                              polled_task::mechanism()),
                          const);
 
 RCPPSW_WRAP_OVERRIDE_DEF(cache_finisher,
-                         current_explore_loc,
+                         explore_loc3D,
                          *static_cast<fsm::depth2::block_to_new_cache_fsm*>(
                              polled_task::mechanism()),
                          const);
 
 RCPPSW_WRAP_OVERRIDE_DEF(cache_finisher,
-                         current_vector_loc,
+                         vector_loc3D,
                          *static_cast<fsm::depth2::block_to_new_cache_fsm*>(
                              polled_task::mechanism()),
                          const);
