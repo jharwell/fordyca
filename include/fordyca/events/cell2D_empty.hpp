@@ -88,7 +88,7 @@ NS_END(detail);
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using cell2D_empty_visitor = rpvisitor::generic_precise_visitor<detail::cell2D_empty>;
+using cell2D_empty_visitor = rpvisitor::filtered_visitor<detail::cell2D_empty>;
 
 NS_END(events, fordyca);
 

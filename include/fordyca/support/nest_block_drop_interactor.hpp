@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <boost/none.hpp>
 
-#include "cosm/interactors/base_nest_block_drop.hpp"
+#include "cosm/interactors/base_nest_block_process.hpp"
 
 #include "fordyca/metrics/blocks/block_manip_events.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
@@ -52,21 +52,21 @@ NS_START(fordyca, support);
  */
 template <typename TController, typename TControllerSpecMap>
 class nest_block_drop_interactor final :
-    public cinteractors::base_nest_block_drop<TController,
+    public cinteractors::base_nest_block_process<TController,
                                               TControllerSpecMap> {
  public:
-  using typename cinteractors::base_nest_block_drop<TController,
+  using typename cinteractors::base_nest_block_process<TController,
                                                       TControllerSpecMap>::arena_map_type;
-  using typename cinteractors::base_nest_block_drop<TController,
+  using typename cinteractors::base_nest_block_process<TController,
                                                 TControllerSpecMap>::penalty_handler_type;
-  using typename cinteractors::base_nest_block_drop<TController,
+  using typename cinteractors::base_nest_block_process<TController,
                                                     TControllerSpecMap>::metrics_agg_type;
 
 nest_block_drop_interactor(arena_map_type* const map,
                            metrics_agg_type* const metrics_agg,
                            argos::CFloorEntity* const floor,
                            tv::env_dynamics* const envd)
-      : cinteractors::base_nest_block_drop<TController, TControllerSpecMap>(map,
+      : cinteractors::base_nest_block_process<TController, TControllerSpecMap>(map,
                                                                             metrics_agg,
                                                                             floor,
                                                                             envd->penalty_handler(tv::block_op_src::ekNEST_DROP)) {}

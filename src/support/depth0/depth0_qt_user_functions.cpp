@@ -34,7 +34,7 @@ RCPPSW_WARNING_DISABLE_POP()
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
-#include "cosm/vis/los_visualizer.hpp"
+#include "cosm/vis/polygon2D_visualizer.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -75,7 +75,8 @@ void depth0_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
       rmath::zvec2dvec(los->abs_ur(), res.v()) - mdpo->rpos2D(),
       rmath::zvec2dvec(los->abs_lr(), res.v()) - mdpo->rpos2D()
     };
-    cvis::los_visualizer(this)(points);
+    cvis::polygon2D_visualizer(this).relative_draw(rmath::vector3d(base->rpos2D()),
+                                                   points);
   }
 }
 

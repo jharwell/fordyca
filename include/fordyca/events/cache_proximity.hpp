@@ -96,7 +96,7 @@ NS_END(detail);
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using cache_proximity_visitor = rpvisitor::generic_precise_visitor<detail::cache_proximity>;
+using cache_proximity_visitor = rpvisitor::filtered_visitor<detail::cache_proximity>;
 
 NS_END(events, fordyca);
 

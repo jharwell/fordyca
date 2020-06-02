@@ -144,7 +144,7 @@ NS_END(detail);
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using robot_free_block_pickup_visitor = rpvisitor::generic_precise_visitor<detail::robot_free_block_pickup>;
+using robot_free_block_pickup_visitor = rpvisitor::filtered_visitor<detail::robot_free_block_pickup>;
 
 NS_END(events, fordyca);
 

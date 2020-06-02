@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <dpo_controller id="ffc"
+    <crw_controller id="ffc"
                                library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -30,6 +30,7 @@
         <footbot_motor_ground implementation="rot_z_only" />
         <range_and_bearing implementation="medium" medium="rab" />
         <battery implementation="default" />
+        <positioning implementation="default"/>
         <colored_blob_omnidirectional_camera implementation="rot_z_only"
                                              medium="leds" />
       </sensors>
@@ -40,8 +41,8 @@
           />
         <perception
             los_dim="0.4">
-          <grid resolution="0.2"
-                size="12, 6, 2"/>
+          <grid2D resolution="0.2"
+                dims="12, 6, 2"/>
           <pheromone rho="0.00001"
                      repeat_deposit="false"/>
         </perception>
@@ -51,7 +52,7 @@
         <exploration
             block_strategy="CRW"
             cache_strategy="ledtaxis_search"/>
-        <sensing_subsystem2D>
+        <sensing_subsystemQ3D>
                      <!-- -5pi/6 : 5pi/6 -->
           <proximity_sensor fov="-2.61:2.61"
                             delta="0.1" />
@@ -67,7 +68,7 @@
             <cache range="0.3:0.5"
                    consensus="3"/>
           </ground_sensor>
-          </sensing_subsystem2D>
+          </sensing_subsystemQ3D>
           <actuation_subsystem2D>
           <force_calculator>
             <avoidance_force lookahead="0.5"
@@ -88,7 +89,7 @@
                               max_speed="10.0" />
         </actuation_subsystem2D>
       </params>
-    </dpo_controller>
+    </crw_controller>
 
   </controllers>
 
@@ -100,24 +101,28 @@
     <output output_root="output"
             output_dir="__current_date__">
       <metrics
-          output_dir="metrics"
-          output_interval="1000"
-          block_transport="block-transport.csv"
-          fsm_collision_counts="fsm-collision-counts.csv"
-          fsm_collision_locs2D="fsm-collision-locs.csv"
-          fsm_movement="fsm-movement.csv"
-          block_acq_counts="block-acq-counts.csv"
-          block_acq_locs="block-acq-locs.csv"
-          block_acq_explore_fname="block-acq-explore-locs.csv"
-          block_acq_vector_locs="block-acq-vector-locs.csv"
-          block_manipulation="block-manipulation.csv"
-          swarm_dist_pos2D="swarm-dist-pos2D.csv">
+          output_dir="metrics">
+          <append
+              output_interval="1000"
+              block_transport="block-transport.csv"
+              fsm_collision_counts="fsm-collision-counts.csv"
+              fsm_movement="fsm-movement.csv"
+              block_acq_counts="block-acq-counts.csv"
+              block_manipulation="block-manipulation.csv"
+              />
+          <create
+              output_interval="10"
+              fsm_collision_locs2D="fsm-collision-locs.csv"
+              block_acq_locs2D="block-acq-locs.csv"
+              block_acq_explore_locs2D="block-acq-explore-locs.csv"
+              block_acq_vector_locs2D="block-acq-vector-locs.csv"
+              swarm_dist_pos2D="swarm-dist-pos2D.csv"/>
       </metrics>
     </output>
 
     <arena_map>
-      <grid resolution="0.2"
-            size="12, 6, 2"/>
+      <grid2D resolution="0.2"
+            dims="12, 6, 2"/>
       <blocks>
         <distribution
             arena_resolution="0.2"
@@ -129,7 +134,9 @@
               />
         </distribution>
       </blocks>
-      <nest size="1.0, 4.0" center="2, 3" />
+      <nests>
+        <nest dims="1.0, 4.0" center="2, 3" />
+      </nests>
     </arena_map>
     <visualization robot_id="true"
                    robot_los="true"

@@ -51,7 +51,7 @@ enum class interactor_status {
   /**
    * \brief The robot dropped a block in the nest, from \ref nest_interactor.
    */
-  ekNEST_BLOCK_DROP = 1 << 1,
+  ekNEST_BLOCK_PROCESS = 1 << 1,
 
   /**
    * \brief The robot picked up a free block in the arena, from \ref

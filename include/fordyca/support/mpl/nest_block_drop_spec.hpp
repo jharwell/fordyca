@@ -49,7 +49,7 @@ struct nest_drop_spec_value {
   using penalty_handler_type = tv::block_op_penalty_handler;
   using interactor_status_type = interactor_status;
   using metrics_agg_type = depth0::depth0_metrics_aggregator;
-  using robot_nest_block_drop_visitor_type = events::robot_nest_block_drop_visitor;
+  using robot_nest_block_process_visitor_type = events::robot_nest_block_drop_visitor;
 };
 
 /*

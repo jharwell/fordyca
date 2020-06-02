@@ -44,8 +44,8 @@
             />
         <perception
             los_dim="0.4">
-          <grid resolution="0.2"
-                size="12, 6, 2"/>
+          <grid2D resolution="0.2"
+                dims="12, 6, 2"/>
           <pheromone rho="0.00001"
                      repeat_deposit="false"/>
         </perception>
@@ -299,8 +299,8 @@
     </temporal_variance>
 
     <arena_map>
-      <grid resolution="0.2"
-            size="12, 6, 2"/>
+      <grid2D resolution="0.2"
+            dims="12, 6, 2"/>
       <blocks>
         <distribution
             dist_type="single_source">

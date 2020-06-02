@@ -39,6 +39,7 @@ occupancy_grid::occupancy_grid(
     : ER_CLIENT_INIT("fordyca.ds.occupancy_grid"),
       stacked_grid2D(rmath::vector2d(0.0, 0.0),
                      c_config->occupancy_grid.dims,
+                     c_config->occupancy_grid.resolution,
                      c_config->occupancy_grid.resolution),
       m_pheromone_repeat_deposit(c_config->pheromone.repeat_deposit),
       m_robot_id(robot_id) {

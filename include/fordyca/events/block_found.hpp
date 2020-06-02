@@ -108,7 +108,7 @@ NS_END(detail);
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using block_found_visitor = rpvisitor::generic_precise_visitor<detail::block_found>;
+using block_found_visitor = rpvisitor::filtered_visitor<detail::block_found>;
 
 NS_END(events, fordyca);
 

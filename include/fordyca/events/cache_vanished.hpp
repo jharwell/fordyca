@@ -105,7 +105,7 @@ NS_END(detail);
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using cache_vanished_visitor = rpvisitor::generic_precise_visitor<detail::cache_vanished>;
+using cache_vanished_visitor = rpvisitor::filtered_visitor<detail::cache_vanished>;
 
 NS_END(events, fordyca);
 
