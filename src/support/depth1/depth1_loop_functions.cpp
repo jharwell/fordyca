@@ -489,7 +489,7 @@ void depth1_loop_functions::post_step(void) {
    * arena_map::cacheso() array.
    */
   for (auto& c : arena_map()->zombie_caches()) {
-    m_metrics_agg->collect_from_cache(c.get());
+    m_metrics_agg->collect_from_cache(c);
     c->reset_metrics();
   } /* for(&c..) */
   arena_map()->zombie_caches_clear();

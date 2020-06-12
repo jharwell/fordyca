@@ -76,7 +76,8 @@ void depth0_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
       rmath::zvec2dvec(los->abs_lr(), res.v()) - mdpo->rpos2D()
     };
     cvis::polygon2D_visualizer(this).relative_draw(rmath::vector3d(base->rpos2D()),
-                                                   points);
+                                                   points,
+                                                   rutils::color::kBLUE);
   }
 }
 

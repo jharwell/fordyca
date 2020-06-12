@@ -50,8 +50,8 @@ bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
    */
   for (auto& cache : c_dpo->caches().const_values_range()) {
     for (auto* b : mc_los->blocks()) {
-      ER_ASSERT(crepr::entity_dimensionality::ek2D == b->dimensionality(),
-                "Block%d is not 2D!",
+      ER_ASSERT(crepr::entity_dimensionality::ek3D == b->dimensionality(),
+                "Block%d is not 3D!",
                 b->id().v());
       auto* block = static_cast<crepr::base_block3D*>(b);
 
@@ -105,8 +105,8 @@ bool los_proc_verify::operator()(const ds::dpo_semantic_map* const c_map) const 
    * corresponding cell in the map also contains the same block.
    */
   for (auto* b : mc_los->blocks()) {
-    ER_ASSERT(crepr::entity_dimensionality::ek2D == b->dimensionality(),
-              "Block%d is not 2D!",
+    ER_ASSERT(crepr::entity_dimensionality::ek3D == b->dimensionality(),
+              "Block%d is not 3D!",
               b->id().v());
     auto* block = static_cast<crepr::base_block3D*>(b);
     auto& cell = c_map->access<ds::occupancy_grid::kCell>(block->dpos2D());
@@ -138,9 +138,9 @@ bool los_proc_verify::operator()(const ds::dpo_semantic_map* const c_map) const 
                   cell1.fsm().current_state(),
                   cell2.fsm().current_state());
         if (cell1.state_has_block()) {
-          ER_ASSERT(crepr::entity_dimensionality::ek2D ==
+          ER_ASSERT(crepr::entity_dimensionality::ek3D ==
                         cell1.entity()->dimensionality(),
-                    "Block%d is not 2D!",
+                    "Block%d is not 3D!",
                     cell1.entity()->id().v());
 
           ER_ASSERT(cell1.block3D()->id() == cell2.block3D()->id(),

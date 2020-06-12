@@ -66,7 +66,7 @@ class exploration_parser final : public rconfig::xml::xml_config_parser {
   }
 
   /* clang-format off */
-  std::shared_ptr<config_type> m_config{nullptr};
+  std::unique_ptr<config_type> m_config{nullptr};
   /* clang-format on */
 };
 

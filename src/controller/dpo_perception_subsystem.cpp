@@ -144,8 +144,8 @@ void dpo_perception_subsystem::process_los_blocks(
   los_tracking_sync(c_los, los_blocks);
 
   for (auto* b : c_los->blocks()) {
-    ER_ASSERT(crepr::entity_dimensionality::ek2D == b->dimensionality(),
-              "Block%d is not 2D!",
+    ER_ASSERT(crepr::entity_dimensionality::ek3D == b->dimensionality(),
+              "Block%d is not 3D!",
               b->id().v());
     auto* block = static_cast<crepr::base_block3D*>(b);
     ER_ASSERT(!block->is_out_of_sight(),
@@ -182,7 +182,7 @@ void dpo_perception_subsystem::los_tracking_sync(
   auto it = range.begin();
 
   while (it != range.end()) {
-    if (!c_los->contains_loc(it->ent()->dpos2D())) {
+    if (!c_los->contains_abs(it->ent()->dpos2D())) {
       ++it;
       continue;
     }
@@ -234,7 +234,7 @@ void dpo_perception_subsystem::los_tracking_sync(
              it->ent()->rpos2D().to_str().c_str(),
              it->ent()->dpos2D().to_str().c_str());
 
-    if (!c_los->contains_loc(it->ent()->dpos2D())) {
+    if (!c_los->contains_abs(it->ent()->dpos2D())) {
       ++it;
       continue;
     }

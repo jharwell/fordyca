@@ -112,11 +112,6 @@ class robot_free_block_drop : public rer::client<robot_free_block_drop>,
   void visit(tasks::depth2::cache_starter&);
   void visit(tasks::depth2::cache_finisher&);
 
-  /**
-   * \brief Get the handle on the block that has been dropped.
-   */
-  std::shared_ptr<crepr::base_block3D> block(void) const { return m_block; }
-
  protected:
   /**
    * \param block The block to drop, which was owned by the robot.
@@ -140,7 +135,7 @@ class robot_free_block_drop : public rer::client<robot_free_block_drop>,
   /* clang-format off */
   const rtypes::discretize_ratio       mc_resolution;
 
-  std::shared_ptr<crepr::base_block3D> m_block;
+  std::unique_ptr<crepr::base_block3D> m_block;
   /* clang-format on */
 };
 

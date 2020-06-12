@@ -130,9 +130,9 @@ void mdpo_perception_subsystem::process_los_blocks(
       if (!c_los->access(i, j).state_has_block() &&
           m_map->access<occupancy_grid::kCell>(d).state_has_block()) {
         auto* los_entity = c_los->access(i, j).entity();
-        ER_ASSERT(crepr::entity_dimensionality::ek2D ==
+        ER_ASSERT(crepr::entity_dimensionality::ek3D ==
                       los_entity->dimensionality(),
-                  "LOS block%d is not 2D!",
+                  "LOS block%d is not 3D!",
                   los_entity->id().v());
         auto* map_block = m_map->access<occupancy_grid::kCell>(d).block3D();
         ER_DEBUG("Correct block%d %s/%s discrepency",

@@ -46,10 +46,6 @@ NS_START(fordyca, controller);
  ******************************************************************************/
 void oracular_info_receptor::dpo_store_update(ds::dpo_store* const store) {
   if (entities_blocks_enabled()) {
-    /*
-     * Segfault if this is in the loop rather than a dedicated variable due to
-     * shared_ptr usage.
-     */
     auto blocks = mc_oracle->blocks()->ask();
     if (!blocks.empty()) {
       ER_DEBUG("Blocks in receptor: [%s]",
@@ -65,10 +61,6 @@ void oracular_info_receptor::dpo_store_update(ds::dpo_store* const store) {
     } /* for(&e..) */
   }
   if (entities_caches_enabled()) {
-    /*
-     * Segfault if this is in the loop rather than a dedicated variable due to
-     * shared_ptr usage.
-     */
     auto caches = mc_oracle->caches()->ask();
     if (!caches.empty()) {
       ER_DEBUG("Caches in receptor: [%s]",
