@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "rcppsw/mpl/typelist.hpp"
+#include "rcppsw/utils/maskable_enum.hpp"
 
 #include "cosm/arena/metrics/caches/location_metrics.hpp"
 #include "cosm/arena/metrics/caches/location_metrics_collector.hpp"

@@ -145,19 +145,9 @@ void depth0_loop_functions::shared_init(ticpp::Element& node) {
 void depth0_loop_functions::private_init(void) {
   /* initialize output and metrics collection */
   auto* output = config()->config_get<cmconfig::output_config>();
-
-  /*
-   * Need to give spatial metrics collectors the padded arena size in order to
-   * avoid boost::assert failures when robots are near the upper edge of the
-   * arena map. The arena map pads the size obtained from the XML file after
-   * initialization, so we just need to grab it.
-   */
-  auto padded_size =
-      rmath::vector2d(arena_map()->xrsize(), arena_map()->yrsize());
-  auto arena = *config()->config_get<caconfig::arena_map_config>();
-  arena.grid.dims = padded_size;
+  auto* arena = config()->config_get<caconfig::arena_map_config>();
   m_metrics_agg = std::make_unique<depth0_metrics_aggregator>(&output->metrics,
-                                                              &arena.grid,
+                                                              &arena->grid,
                                                               output_root());
   /* this starts at 0, and ARGoS starts at 1, so sync up */
   m_metrics_agg->timestep_inc_all();

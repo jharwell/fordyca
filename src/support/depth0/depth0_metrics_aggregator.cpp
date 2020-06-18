@@ -26,6 +26,7 @@
 #include <boost/mpl/for_each.hpp>
 
 #include "rcppsw/mpl/typelist.hpp"
+#include "rcppsw/utils/maskable_enum.hpp"
 
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 #include "cosm/spatial/metrics/movement_metrics.hpp"
@@ -104,7 +105,7 @@ void depth0_metrics_aggregator::collect_from_controller(
                return controller->fsm()->inta_tracker()->exp_interference();
              });
 
-  collect_if("blocks::acq_locs2Dx",
+  collect_if("blocks::acq_locs2D",
              *controller,
              [&](const rmetrics::base_metrics& metrics) {
                auto& m =

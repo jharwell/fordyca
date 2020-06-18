@@ -68,12 +68,24 @@ fi;
 
 cd ../../
 
+# Bootstrap RCPPSW
+if [ -d rcppsw ]; then rm -rf rcppsw; fi
+git clone https://github.com/swarm-robotics/rcppsw.git
+cd rcppsw
+git checkout devel
+git submodule update --init --recursive --remote
+
+cd ..
+
 # Bootstrap cosm
 if [ -d cosm ]; then rm -rf cosm; fi
 git clone https://github.com/swarm-robotics/cosm.git
 cd cosm
 git checkout devel
 git submodule update --init --recursive --remote
+
+rm -rf ext/rcppsw
+ln -s $1/rcppsw ext/rcppsw
 
 cd ..
 
@@ -92,7 +104,7 @@ ln -s $1/cosm ext/cosm
 mkdir -p build && cd build
 cmake \
     -DCMAKE_C_COMPILER=gcc-9\
-    -DCMAKE_CXX_COMPILER=g++-9
+    -DCMAKE_CXX_COMPILER=g++-9\
     ..
 make -j $4
 make documentation

@@ -25,6 +25,8 @@
 
 #include <boost/mpl/for_each.hpp>
 
+#include "rcppsw/utils/maskable_enum.hpp"
+
 #include "cosm/metrics/collector_registerer.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tab.hpp"
