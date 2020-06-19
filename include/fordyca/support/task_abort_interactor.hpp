@@ -69,7 +69,7 @@ class task_abort_interactor :
   task_abort_interactor& operator=(const task_abort_interactor&) = delete;
 
   bool robot_task_aborted(const TController& controller) const override {
-    return (nullptr != controller.current_task() ||
+    return (nullptr != controller.current_task() &&
             tasks::task_status::ekABORT_PENDING == controller.task_status());
     }
 };

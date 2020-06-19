@@ -68,6 +68,9 @@ std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
     ER_ASSERT(nullptr != cell.block3D(),
               "Cell@%s does not have block",
               cell.loc().to_str().c_str());
+    ER_ASSERT(!cell.block3D()->is_out_of_sight(),
+              "Allocated block%d is out of sight",
+              cell.block3D()->id().v());
 
     /*
      * If the host cell for the cache already contains a block, we don't want to
@@ -86,9 +89,9 @@ std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
        * will be the first block picked up by a robot from the new cache. This
        * helps to ensure fairness/better statistics for the simulations.
        */
-      ER_DEBUG("Add block%d in from cache host cell@%s to block vector",
+      ER_DEBUG("Add block%d from cache host cell@%s to block vector",
                cell.block3D()->id().v(),
-               cell.loc().to_str().c_str());
+               rcppsw::to_string(cell.loc()).c_str());
       blocks.insert(blocks.begin(), cell.block3D());
     }
   }
@@ -111,7 +114,9 @@ std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
                                       carena::arena_map_locking::ekALL_HELD);
     op.visit(m_grid->access<arena_grid::kCell>(op.coord()));
   } /* for(block..) */
-
+  ER_DEBUG("All %zu blocks now in host cell%s",
+           blocks.size(),
+           rcppsw::to_string(d).c_str());
   cds::block3D_vectorno block_vec(blocks.begin(), blocks.end());
   auto ret = std::make_unique<carepr::arena_cache>(
       carepr::arena_cache::params{mc_cache_dim,

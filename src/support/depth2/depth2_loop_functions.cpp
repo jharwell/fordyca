@@ -102,6 +102,8 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
         typeid(controller),
         ccops::metrics_extract<T, depth2_metrics_aggregator>(
             lf->m_metrics_agg.get()));
+    lf->m_task_extractor_map->emplace(typeid(controller),
+                                      ccops::task_id_extract<T>());
     config_map->emplace(
         typeid(controller),
         robot_configurer<T, depth2_metrics_aggregator>(
@@ -243,7 +245,7 @@ std::vector<int> depth2_loop_functions::robot_tasks_extract(uint) const {
               controller->GetId().c_str(),
               controller->type_index().name());
     auto applicator =
-        ccops::applicator<controller::foraging_controller, robot_task_extractor>(
+    ccops::applicator<controller::foraging_controller, ccops::task_id_extract>(
             controller);
     v.push_back(boost::apply_visitor(
         applicator, m_task_extractor_map->at(controller->type_index())));
@@ -307,11 +309,23 @@ void depth2_loop_functions::post_step(void) {
       collector->cum_transported(),
       nullptr != conv_calculator() ? conv_calculator()->converged() : false);
 
-  /* Collect metrics from/about caches */
+  /* Collect metrics from/about existing caches */
   for (auto* c : arena_map()->caches()) {
     m_metrics_agg->collect_from_cache(c);
     c->reset_metrics();
   } /* for(&c..) */
+
+  /*
+   * Collect metrics from/about zombie caches (caches that have been depleted
+   * this timestep). These are not captured by the usual metric collection
+   * process as they have been depleted and do not exist anymore in the \ref
+   * arena_map::cacheso() array.
+   */
+  for (auto& c : arena_map()->zombie_caches()) {
+    m_metrics_agg->collect_from_cache(c.get());
+    c->reset_metrics();
+  } /* for(&c..) */
+  arena_map()->zombie_caches_clear();
 
   m_metrics_agg->collect_from_cache_manager(m_cache_manager.get());
   m_cache_manager->reset_metrics();

@@ -50,10 +50,6 @@ namespace controller {
 class cache_sel_matrix;
 }
 
-namespace support {
-class base_cache_manager;
-} /* namespace support */
-
 NS_START(events, detail);
 
 /*******************************************************************************
@@ -80,7 +76,6 @@ class robot_cached_block_pickup : public rer::client<robot_cached_block_pickup>,
         fsm::block_to_goal_fsm,
         fsm::depth1::cached_block_to_nest_fsm,
         tasks::depth1::collector,
-        support::base_cache_manager,
         /* depth2 */
         tasks::depth2::cache_transferer,
         tasks::depth2::cache_collector>;
@@ -115,13 +110,6 @@ class robot_cached_block_pickup : public rer::client<robot_cached_block_pickup>,
   void visit(controller::depth1::bitd_mdpo_controller& controller);
   void visit(controller::depth1::bitd_odpo_controller& controller);
   void visit(controller::depth1::bitd_omdpo_controller& controller);
-
-  /**
-   * \brief Update the cache manager upon cache pickup. Protected by mutex in
-   * order to ensure consistency between concurrent robot updates if multiple
-   * caches are present in the arena.
-   */
-  void visit(support::base_cache_manager& manager);
 
   /* depth2 foraging */
   void visit(controller::depth2::birtd_dpo_controller& controller);

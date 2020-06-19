@@ -196,47 +196,87 @@ class cached_block_pickup_interactor
   /**
    * \brief Perform the actual pickup of a block from a cache, once all
    * preconditions have been satisfied.
+   *
+   * Visitation order must be:
+   *
+   * 1. Arena map (actually remove the cache/ensure proper block decrement)
+   * 2. Controller
+   * 3. Cache manager (update metrics)
+   *
+   * No need to lock arena map cache mutex--already holding it from parent
+   * function.
    */
   interactor_status perform_cached_block_pickup(
       T& controller,
       const ctv::temporal_penalty& penalty,
       const rtypes::timestep& t) {
-    auto it =
+    auto real_it =
         std::find_if(m_map->caches().begin(),
                      m_map->caches().end(),
                      [&](const auto& c) { return c->id() == penalty.id(); });
-    ER_ASSERT(it != m_map->caches().end(),
+    ER_ASSERT(real_it != m_map->caches().end(),
               "Cache%d from penalty does not exist?",
               penalty.id().v());
-    caops::cached_block_pickup_visitor apickup_op(
-        *it, m_loop, controller.entity_id(), t);
-    const crepr::base_block3D* to_pickup = (*it)->oldest_block();
-    events::robot_cached_block_pickup_visitor rpickup_op(
-        *it, to_pickup, controller.entity_id(), t);
-    (*it)->penalty_served(penalty.penalty());
+    caops::cached_block_pickup_visitor arena_pickup(*real_it,
+                                                    m_loop,
+                                                    controller.entity_id(),
+                                                    t);
+    /*
+     * Caches have non-owning references to blocks, so even if the current
+     * cached block pickup depletes the cache and it is destroyed by the arena
+     * map, the reference to the block the robot picked up is still valid,
+     * because it points to somewhere within the the block vector owned by the
+     * arena map.
+     */
+    const crepr::base_block3D* to_pickup = (*real_it)->oldest_block();
+    (*real_it)->penalty_served(penalty.penalty());
     controller.block_manip_recorder()->record(
         metrics::blocks::block_manip_events::ekCACHE_PICKUP, penalty.penalty());
 
     uint old_n_caches = m_map->caches().size();
 
-    /*
-     * Visitation order must be:
-     *
-     * 1. Cache manager (update metrics)
-     * 2. Arena map (actually remove the cache/ensure proper block decrement)
-     * 3. Controller
-     *
-     * No need to lock arena map cache mutex--already holding it from parent
-     * function.
-     */
-    rpickup_op.visit(*m_cache_manager);
-    apickup_op.visit(*m_map);
-    rpickup_op.visit(controller);
+    /* 1st, visit the arena map */
+    arena_pickup.visit(*m_map);
 
+    /*
+     * The cache has been depleted! The iterator reference we are currently
+     * holding to the cache in the arena map caches is now invalid. BUT all is
+     * not lost, because the arena map maintains a zombie caches list for
+     * exactly this purpose.
+     */
     if (m_map->caches().size() < old_n_caches) {
+      auto zombie_it =
+          std::find_if(m_map->zombie_caches().begin(),
+                       m_map->zombie_caches().end(),
+                       [&](const auto& c) { return c->id() == penalty.id(); });
+      ER_ASSERT(zombie_it != m_map->zombie_caches().end(),
+                "Depleted cache%d is not a zombie?",
+                penalty.id().v());
+      events::robot_cached_block_pickup_visitor robot_zombie_pickup(zombie_it->get(),
+                                                                    to_pickup,
+                                                                    controller.entity_id(),
+                                                                    t);
+
+      /* 2nd, visit the controller (depletion case) */
+      robot_zombie_pickup.visit(controller);
+
+      /*
+       * 3rd, visit the cache manager. This shouldn't be part of the robot event
+       * visitor, and can't be part of the arena map visitor, so we do it as its
+       * own thing. This may need to be changed in the future...
+       */
+      std::scoped_lock lock(m_cache_manager->mtx());
+      m_cache_manager->cache_depleted(t - (*zombie_it)->creation_ts());
       return interactor_status::ekCACHE_DEPLETION;
+    } else {
+      /* 2nd, visit the controller (normal case) */
+      events::robot_cached_block_pickup_visitor robot_real_pickup(*real_it,
+                                                                  to_pickup,
+                                                                  controller.entity_id(),
+                                                                  t);
+
+      return interactor_status::ekNO_EVENT;
     }
-    return interactor_status::ekNO_EVENT;
   }
 
  private:

@@ -56,7 +56,6 @@
 #include "fordyca/support/depth1/robot_arena_interactor.hpp"
 #include "fordyca/support/depth1/robot_configurer.hpp"
 #include "fordyca/support/depth1/static_cache_manager.hpp"
-#include "fordyca/support/robot_task_extractor.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 
 /*******************************************************************************
@@ -140,6 +139,8 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
         typeid(controller),
         ccops::metrics_extract<T, depth1_metrics_aggregator>(
             lf->m_metrics_agg.get()));
+    lf->m_task_extractor_map->emplace(typeid(controller),
+                                      ccops::task_id_extract<T>());
     config_map->emplace(
         typeid(controller),
         robot_configurer<T, depth1_metrics_aggregator>(
@@ -397,7 +398,7 @@ std::vector<int> depth1_loop_functions::robot_tasks_extract(uint) const {
               controller->GetId().c_str(),
               controller->type_index().name());
     auto applicator =
-        ccops::applicator<controller::foraging_controller, robot_task_extractor>(
+    ccops::applicator<controller::foraging_controller, ccops::task_id_extract>(
             controller);
 
     v.push_back(boost::apply_visitor(
@@ -458,6 +459,8 @@ void depth1_loop_functions::post_step(void) {
    * robot interactions with arena.
    */
   static_cache_monitor();
+  m_cache_counts.n_harvesters = 0;
+  m_cache_counts.n_collectors = 0;
 
   /* Update block distribution status */
   auto* collector =
@@ -481,7 +484,7 @@ void depth1_loop_functions::post_step(void) {
    * arena_map::cacheso() array.
    */
   for (auto& c : arena_map()->zombie_caches()) {
-    m_metrics_agg->collect_from_cache(c);
+    m_metrics_agg->collect_from_cache(c.get());
     c->reset_metrics();
   } /* for(&c..) */
   arena_map()->zombie_caches_clear();
@@ -683,15 +686,15 @@ void depth1_loop_functions::static_cache_monitor(void) {
   if (auto created =
           m_cache_manager->create_conditional(ccp,
                                               arena_map()->blocks(),
-                                              m_cache_counts.first,
-                                              m_cache_counts.second)) {
+                                              m_cache_counts.n_harvesters,
+                                              m_cache_counts.n_collectors)) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
     return;
   }
   ER_INFO("Could not create static caches: n_harvesters=%u,n_collectors=%u",
-          m_cache_counts.first.load(),
-          m_cache_counts.second.load());
+          m_cache_counts.n_harvesters.load(),
+          m_cache_counts.n_collectors.load());
 } /* static_cache_monitor() */
 
 bool depth1_loop_functions::caches_depleted(void) const {
@@ -719,8 +722,8 @@ void depth1_loop_functions::caches_recreation_task_counts_collect(
     auto [is_harvester, is_collector] = boost::apply_visitor(
         detail::d1_subtask_status_extractor_adaptor(controller),
         m_subtask_status_map->at(controller->type_index()));
-    m_cache_counts.first += is_harvester;
-    m_cache_counts.second += is_collector;
+    m_cache_counts.n_harvesters += is_harvester;
+    m_cache_counts.n_collectors += is_collector;
   }
 } /* caches_recreation_task_counts_collect() */
 

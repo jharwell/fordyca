@@ -30,9 +30,9 @@
 #include <utility>
 
 #include "cosm/controller/operations/robot_los_update.hpp"
+#include "cosm/controller/operations/task_id_extract.hpp"
 
 #include "fordyca/support/depth0/depth0_loop_functions.hpp"
-#include "fordyca/support/robot_task_extractor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -99,6 +99,11 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
   void shared_init(ticpp::Element& node) RCSW_COLD;
 
  private:
+  struct cache_counts {
+    std::atomic_uint n_harvesters{0};
+    std::atomic_uint n_collectors{0};
+  };
+
   using interactor_map_type = rds::type_map<
    rmpl::typelist_wrap_apply<controller::depth1::typelist,
                              robot_arena_interactor,
@@ -110,7 +115,7 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
                               repr::forager_los>::type>;
   using task_extractor_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth1::typelist,
-                                robot_task_extractor>::type>;
+                              ccops::task_id_extract>::type>;
   using metric_extractor_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth1::typelist,
                               ccops::metrics_extract,
@@ -215,7 +220,7 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
 
   std::unique_ptr<depth1_metrics_aggregator>          m_metrics_agg;
   std::unique_ptr<static_cache_manager>               m_cache_manager;
-  std::pair<std::atomic_uint, std::atomic_uint>       m_cache_counts{0, 0};
+  cache_counts                                        m_cache_counts{};
   /* clang-format on */
 };
 

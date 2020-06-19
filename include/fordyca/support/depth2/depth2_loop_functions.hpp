@@ -27,8 +27,9 @@
 #include <vector>
 #include <memory>
 
+#include "cosm/controller/operations/task_id_extract.hpp"
+
 #include "fordyca/support/depth1/depth1_loop_functions.hpp"
-#include "fordyca/support/robot_task_extractor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -88,7 +89,7 @@ class depth2_loop_functions final : public depth1::depth1_loop_functions,
                               repr::forager_los>::type>;
   using task_extractor_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth2::typelist,
-                                robot_task_extractor>::type>;
+                              ccops::task_id_extract>::type>;
 
   using metric_extractor_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth2::typelist,

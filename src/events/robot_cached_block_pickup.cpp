@@ -224,13 +224,6 @@ void robot_cached_block_pickup::visit(ds::dpo_semantic_map& map) {
   }
 } /* visit() */
 
-void robot_cached_block_pickup::visit(support::base_cache_manager& manager) {
-  if (mc_cache->n_blocks() == base_cache::kMinBlocks) {
-    std::scoped_lock lock(manager.mtx());
-    manager.cache_depleted(mc_timestep - mc_cache->creation_ts());
-  }
-} /* visit() */
-
 void robot_cached_block_pickup::visit(
     controller::depth1::bitd_dpo_controller& controller) {
   controller.ndc_pusht();
