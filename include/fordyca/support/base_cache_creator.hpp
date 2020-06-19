@@ -52,7 +52,7 @@ NS_START(fordyca, support);
  * \class base_cache_creator
  * \ingroup support
  *
- * \brief Base class for creating static/dynamic caches in the arena.
+ * \brief Base class for creating caches in the arena.
  */
 class base_cache_creator : public rer::client<base_cache_creator> {
  public:

@@ -25,6 +25,7 @@
 
 #include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/repr/base_block3D.hpp"
+#include "cosm/arena/caching_arena_map.hpp"
 
 #include "fordyca/events/cell2D_empty.hpp"
 #include "fordyca/support/depth2/cache_center_calculator.hpp"
@@ -40,11 +41,13 @@ NS_START(fordyca, support, depth2);
  ******************************************************************************/
 dynamic_cache_creator::dynamic_cache_creator(const params* const p,
                                              rmath::rng* rng)
-    : base_cache_creator(p->grid, p->cache_dim),
+    : base_cache_creator(&p->map->decoratee(), p->cache_dim),
       ER_CLIENT_INIT("fordyca.support.depth2.dynamic_cache_creator"),
-      mc_min_dist(p->min_dist),
+      mc_strict_constraints(p->strict_constraints),
       mc_min_blocks(p->min_blocks),
-      m_rng(rng) {}
+      mc_min_dist(p->min_dist),
+      m_rng(rng),
+      m_map(p->map) {}
 
 /*******************************************************************************
  * Member Functions
@@ -69,50 +72,27 @@ cads::acache_vectoro dynamic_cache_creator::create_all(
      * We now have all the blocks that are close enough to block i to be
      * included in a new cache, so attempt cache creation.
      */
-    if (cache_i_blocks.size() >= mc_min_blocks) {
-      cads::acache_vectorno c_avoid =
-          avoidance_caches_calc(c_params.current_caches, created_caches);
-
-      if (auto center = cache_center_calculator(grid(), cache_dim())(
-              cache_i_blocks, c_avoid, c_params.clusters, m_rng)) {
-        /*
-         * If we found a conflict free cache center, we need to check if there
-         * are free blocks that are now within the extent of the cache to be due
-         * to the center moving. If so, we absorb them into the block list for
-         * the new cache.
-         */
-        auto absorb_blocks = absorb_blocks_calc(
-            c_alloc_blocks, cache_i_blocks, used_blocks, *center, cache_dim());
-        ER_DEBUG("Absorb blocks=[%s]", rcppsw::to_string(absorb_blocks).c_str());
-
-        cache_i_blocks.insert(cache_i_blocks.end(),
-                              absorb_blocks.begin(),
-                              absorb_blocks.end());
-        /*
-         * We convert to discrete and then back to real coordinates so that our
-         * cache's real location is always on an even multiple of the grid size,
-         * which keeps asserts about cache extent from triggering right after
-         * creation, which can happen otherwise.
-         */
-        auto cache_p = std::shared_ptr<carepr::arena_cache>(create_single_cache(
-            rmath::zvec2dvec(*center), cache_i_blocks, c_params.t));
-        created_caches.push_back(cache_p);
-      }
-
-      /* Need to make sure we don't use these blocks in any other caches */
-      used_blocks.insert(used_blocks.end(),
-                         cache_i_blocks.begin(),
-                         cache_i_blocks.end());
-      ER_DEBUG("Used blocks=[%s]", rcppsw::to_string(used_blocks).c_str());
+    if (cache_i_blocks.size() < mc_min_blocks) {
+      continue;
     }
+    cache_i_create(c_params,
+                   c_alloc_blocks,
+                   std::move(cache_i_blocks),
+                   &created_caches,
+                   &used_blocks);
+
+    /*
+     * Need to make sure we don't use these blocks in any other caches, even if
+     * we aborted created cache i and they still are available, for simplicity's
+     * sake.
+    */
+    used_blocks.insert(used_blocks.end(),
+                       cache_i_blocks.begin(),
+                       cache_i_blocks.end());
+    ER_DEBUG("Used blocks after creating cache%zu: [%s]",
+             i,
+             rcppsw::to_string(used_blocks).c_str());
   } /* for(i..) */
-
-  cds::block3D_vectorno free_blocks =
-      utils::free_blocks_calc(created_caches, c_alloc_blocks);
-
-  ER_ASSERT(
-      creation_sanity_checks(created_caches, free_blocks, c_params.clusters),
-      "One or more bad caches on creation");
   return created_caches;
 } /* create_all() */
 
@@ -202,5 +182,86 @@ cds::block3D_vectorno dynamic_cache_creator::cache_i_blocks_alloc(
   } /* for(i..) */
   return src_blocks;
 } /* cache_i_blocks_alloc() */
+
+bool dynamic_cache_creator::cache_i_create(
+    const cache_create_ro_params& c_params,
+    const cds::block3D_vectorno& c_alloc_blocks,
+    cds::block3D_vectorno&& cache_i_blocks,
+    cads::acache_vectoro* created_caches,
+    cds::block3D_vectorno* used_blocks) {
+
+  cads::acache_vectorno c_avoid =
+      avoidance_caches_calc(c_params.current_caches, *created_caches);
+
+  /* First, try find a conflict free cache center (host cell) */
+  auto center = cache_center_calculator(grid(), cache_dim())(
+      cache_i_blocks, c_avoid, c_params.clusters, m_rng);
+  if (!center) {
+    return false;
+  }
+
+  /*
+   * If we found a conflict free cache center, we need to check if there
+   * are free blocks that are now within the extent of the cache to be due
+   * to the center moving. If so, we absorb them into the block list for
+   * the new cache.
+   */
+  auto absorb_blocks = absorb_blocks_calc(
+      c_alloc_blocks, cache_i_blocks, *used_blocks, *center, cache_dim());
+  ER_DEBUG("Absorb blocks=[%s]", rcppsw::to_string(absorb_blocks).c_str());
+
+  cache_i_blocks.insert(cache_i_blocks.end(),
+                        absorb_blocks.begin(),
+                        absorb_blocks.end());
+  /*
+   * We convert to discrete and then back to real coordinates so that our
+   * cache's real location is always on an even multiple of the grid size,
+   * which keeps asserts about cache extent from triggering right after
+   * creation, which can happen otherwise.
+   */
+  auto cache_p = std::shared_ptr<carepr::arena_cache>(create_single_cache(
+      rmath::zvec2dvec(*center), cache_i_blocks, c_params.t));
+  created_caches->push_back(cache_p);
+
+  auto free_blocks = utils::free_blocks_calc(*created_caches,
+                                             c_alloc_blocks);
+
+  if (!creation_sanity_checks(*created_caches,
+                              free_blocks,
+                              c_params.clusters)) {
+    if (mc_strict_constraints) {
+      ER_WARN("Bad cache creation--discard (strict constraints)");
+      cache_delete(cache_i_blocks, created_caches);
+      return false;
+    } else {
+      ER_WARN("Bad cache creation--keep (loose constraints)");
+      return true;
+    }
+  } else {
+    ER_INFO("Cache creation sanity checks OK");
+    return true;
+  }
+} /* cache_i_create() */
+
+void dynamic_cache_creator::cache_delete(
+    const cds::block3D_vectorno& cache_i_blocks,
+    cads::acache_vectoro* created_caches) {
+  auto loc = created_caches->back()->dpos2D();
+
+  events::cell2D_empty_visitor op(loc);
+  op.visit(m_map->access<cds::arena_grid::kCell>(loc));
+
+  for (auto *b : cache_i_blocks) {
+    /*
+     * We are actually holding zero locks, but we don't need to take any
+     * since dynamic cache creation always happens in a non-concurrent
+     * context.
+     */
+    m_map->distribute_single_block(b,
+                                   carena::arena_map_locking::ekALL_HELD);
+  } /* for(*b..) */
+
+  created_caches->pop_back();
+} /* cache_delete() */
 
 NS_END(depth2, support, fordyca);

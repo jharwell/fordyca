@@ -53,19 +53,22 @@
     <priority value ="debug" />
   </category>
   <category name="fordyca.support.depth1.static_cache_manager" >
-    <priority value ="trace" />
+    <priority value ="info" />
   </category>
     <category name="fordyca.tasks.depth2.cache_starter" >
     <priority value ="info" />
   </category>
   <category name="fordyca.support.depth2.cache_center_calculator" >
-    <priority value ="trace" />
+    <priority value ="info" />
   </category>
   <category name="fordyca.support.base_cache_creator" >
-    <priority value ="trace" />
+    <priority value ="info" />
   </category>
   <category name="fordyca.fsm.depth0.free_block_to_nest" >
-    <priority value ="trace" />
+    <priority value ="info" />
+  </category>
+  <category name="fordyca.fsm.existing_cache_selector" >
+    <priority value ="info" />
   </category>
 
   <category name="fordyca.controller.dpo_perception" >
@@ -78,7 +81,7 @@
     <priority value ="info" />
   </category>
   <category name="fordyca.support.tasking_oracle" >
-    <priority value ="trace" />
+    <priority value ="info" />
   </category>
 
   <category name="fordyca.ds.arena_map" >

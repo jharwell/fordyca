@@ -31,6 +31,10 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::arena {
+class caching_arena_map;
+} /* namespace cosm::arena */
+
 NS_START(fordyca, support, depth2);
 
 /*******************************************************************************
@@ -42,15 +46,25 @@ NS_START(fordyca, support, depth2);
  *
  * \brief Handles creation of dynamic caches during simulation, given a set of
  * candidate blocks, and constraints on proximity, minimum # for a cache, etc.
+ *
+ * Cache creation is "best-effort", meaning that it attempts to create a
+ * conflict free cache from the allocated blocks, but that is not always
+ * possible, especially given the imprecise and stochastic nature of swarm
+ * simulations. Verification of validity is only possible AFTER creation, so if
+ * a newly created cache is found to be invalid, it is discarded and the process
+ * of its creation reversed.
  */
 class dynamic_cache_creator : public base_cache_creator,
                               public rer::client<dynamic_cache_creator> {
  public:
   struct params {
-    cds::arena_grid*     grid;
-    rtypes::spatial_dist cache_dim;
-    rtypes::spatial_dist min_dist;
-    uint                 min_blocks;
+    /* clang-format off */
+    carena::caching_arena_map* map;
+    rtypes::spatial_dist       cache_dim;
+    rtypes::spatial_dist       min_dist;
+    uint                       min_blocks;
+    bool                       strict_constraints;
+    /* clang-format on */
   };
   dynamic_cache_creator(const params* p, rmath::rng* rng);
   dynamic_cache_creator(const dynamic_cache_creator&) = delete;
@@ -60,10 +74,34 @@ class dynamic_cache_creator : public base_cache_creator,
    * \brief Create new caches in the arena from blocks that are close enough
    * together.
    */
-  cads::acache_vectoro create_all(const cache_create_ro_params& c_params,
-                                const cds::block3D_vectorno&  c_alloc_blocks) override;
+  cads::acache_vectoro create_all(
+      const cache_create_ro_params& c_params,
+      const cds::block3D_vectorno& c_alloc_blocks) override;
 
  private:
+  /**
+   * \brief Do the actual creation of a cache, once blocks have been allocated
+   * for it.
+   *
+   * \return \c TRUE if creation was successful, and \c FALSE otherwise.
+   */
+  bool cache_i_create(const cache_create_ro_params& c_params,
+                      const cds::block3D_vectorno& c_alloc_blocks,
+                      cds::block3D_vectorno&& cache_i_blocks,
+                      cads::acache_vectoro* created_caches,
+                      cds::block3D_vectorno* used_blocks);
+
+  /**
+   * \brief If a newly created cache failed verification checks, delete it.
+   *
+   *
+   * 1. Clear host cell.
+   * 2. Redistribute the blocks that have been deposited in the host cell.
+   *
+   * Then the actual cache can safely be deleted.
+   */
+  void cache_delete(const cds::block3D_vectorno& cache_i_blocks,
+                    cads::acache_vectoro* created_caches);
   /**
    * \brief Calculate the blocks to be used in the creation of a single new
    * cache.
@@ -74,9 +112,10 @@ class dynamic_cache_creator : public base_cache_creator,
    *                     creation when the creator was called.
    * \param index Our current index within the candidate vector.
    */
-  cds::block3D_vectorno cache_i_blocks_alloc(const cds::block3D_vectorno& c_used_blocks,
-                                           const cds::block3D_vectorno& c_alloc_blocks,
-                                           uint index) const;
+  cds::block3D_vectorno cache_i_blocks_alloc(
+      const cds::block3D_vectorno& c_used_blocks,
+      const cds::block3D_vectorno& c_alloc_blocks,
+      uint index) const;
 
   /**
    * \brief Calculate the blocks a cache will absorb as a result of its center
@@ -110,9 +149,12 @@ class dynamic_cache_creator : public base_cache_creator,
       const cads::acache_vectoro& c_created_caches) const;
 
   /* clang-format off */
-  const rtypes::spatial_dist mc_min_dist;
+  const bool                 mc_strict_constraints;
   const uint                 mc_min_blocks;
+  const rtypes::spatial_dist mc_min_dist;
+
   rmath::rng*                m_rng;
+  carena::caching_arena_map* m_map;
   /* clang-format on */
 };
 

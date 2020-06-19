@@ -31,6 +31,7 @@
 #include "rcppsw/types/type_uuid.hpp"
 
 #include "cosm/ds/operations/cell2D_op.hpp"
+#include "cosm/controller/operations/base_block_pickup.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/block_pickup_base_visit_set.hpp"
@@ -65,7 +66,7 @@ NS_START(events, detail);
  * being created, at a higher level.
  */
 class robot_cached_block_pickup : public rer::client<robot_cached_block_pickup>,
-                                  public cdops::cell2D_op {
+                                  public ccops::base_block_pickup {
  private:
   struct visit_typelist_impl {
     using controllers =
@@ -87,7 +88,7 @@ class robot_cached_block_pickup : public rer::client<robot_cached_block_pickup>,
   using visit_typelist = visit_typelist_impl::value;
 
   robot_cached_block_pickup(const carepr::arena_cache* cache,
-                            const crepr::base_block3D* block,
+                            crepr::base_block3D* block,
                             const rtypes::type_uuid& robot_id,
                             const rtypes::timestep& t);
   ~robot_cached_block_pickup(void) override;
@@ -120,23 +121,21 @@ class robot_cached_block_pickup : public rer::client<robot_cached_block_pickup>,
   void visit(tasks::depth2::cache_collector& task);
 
  private:
+  using ccops::base_block_pickup::visit;
+
   void dispatch_d1_cache_interactor(tasks::base_foraging_task* task);
   bool dispatch_d2_cache_interactor(tasks::base_foraging_task* task,
                                     controller::cache_sel_matrix* csel_matrix);
 
   /* clang-format off */
-  const rtypes::type_uuid              mc_robot_id;
   const rtypes::timestep               mc_timestep;
   const carepr::arena_cache*           mc_cache;
-  const crepr::base_block3D*           mc_block;
-
-  std::unique_ptr<crepr::base_block3D> m_robot_block;
   /* clang-format on */
 };
 
 /**
- * \brief We use the precise visitor in order to force compile errors if a call to
- * a visitor is made that involves a visitee that is not in our visit set
+ * \brief We use the precise visitor in order to force compile errors if a call
+ * to a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */

@@ -66,7 +66,7 @@ robot_free_block_pickup::robot_free_block_pickup(crepr::base_block3D* block,
                                                  const rtypes::type_uuid& robot_id,
                                                  const rtypes::timestep& t)
     : ER_CLIENT_INIT("fordyca.events.robot_free_block_pickup"),
-      ccops::block_pickup(block, robot_id, t) {}
+      ccops::base_block_pickup(block, robot_id, t) {}
 
 /*******************************************************************************
  * Member Functions
@@ -89,7 +89,6 @@ void robot_free_block_pickup::d1d2_dpo_controller_visit(
   visit(*controller.dpo_perception()->dpo_store());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   dispatch_robot_free_block_interactor(controller.current_task());
-  ER_INFO("Picked up block%d", block()->id().v());
 
   controller.ndc_pop();
 } /* d1d2_dpo_controller_visit() */
@@ -102,7 +101,6 @@ void robot_free_block_pickup::d1d2_mdpo_controller_visit(
   visit(*controller.mdpo_perception()->dpo_store());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   dispatch_robot_free_block_interactor(controller.current_task());
-  ER_INFO("Picked up block%d", block()->id().v());
 
   controller.ndc_pop();
 } /* d1d2_mdpo_controller_visit() */
@@ -116,8 +114,6 @@ void robot_free_block_pickup::d0_dpo_controller_visit(
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   visit(*controller.fsm());
 
-  ER_INFO("Picked up block%d", block()->id().v());
-
   controller.ndc_pop();
 } /* d0_dpo_controller_visit() */
 
@@ -129,7 +125,6 @@ void robot_free_block_pickup::d0_mdpo_controller_visit(
   visit(*controller.mdpo_perception()->map());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   visit(*controller.fsm());
-  ER_INFO("Picked up block%d", block()->id().v());
 
   controller.ndc_pop();
 } /* d0_mdpo_controller_visit() */
@@ -143,7 +138,6 @@ void robot_free_block_pickup::visit(
 
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   visit(*controller.fsm());
-  ER_INFO("Picked up block%d", block()->id().v());
 
   controller.ndc_pop();
 } /* visit() */

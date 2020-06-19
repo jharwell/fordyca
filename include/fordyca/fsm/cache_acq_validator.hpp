@@ -62,7 +62,7 @@ NS_START(fsm);
  */
 class cache_acq_validator : public rer::client<cache_acq_validator> {
  public:
-  cache_acq_validator(const ds::dp_cache_map* map,
+  cache_acq_validator(const ds::dp_cache_map* dpo_map,
                       const controller::cache_sel_matrix* csel_matrix,
                       bool for_pickup);
 
@@ -84,7 +84,7 @@ class cache_acq_validator : public rer::client<cache_acq_validator> {
   /* clang-format off */
   const bool                                mc_for_pickup;
   const controller::cache_sel_matrix* const mc_csel_matrix;
-  const ds::dp_cache_map*             const mc_map;
+  const ds::dp_cache_map*             const mc_dpo_map;
   /* clang-format on */
 };
 

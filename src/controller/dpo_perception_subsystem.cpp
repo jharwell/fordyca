@@ -182,20 +182,38 @@ void dpo_perception_subsystem::los_tracking_sync(
   auto it = range.begin();
 
   while (it != range.end()) {
-    if (!c_los->contains_abs(it->ent()->dpos2D())) {
-      ++it;
-      continue;
-    }
-    auto exists_in_los =
+    ER_TRACE("Check tracked DPO cache%d@%s/%s xspan=%s,yspan=%s w/LOS xspan=%s,yspan=%s",
+             it->ent()->id().v(),
+             rcppsw::to_string(it->ent()->rpos2D()).c_str(),
+             rcppsw::to_string(it->ent()->dpos2D()).c_str(),
+             rcppsw::to_string(it->ent()->xspan()).c_str(),
+             rcppsw::to_string(it->ent()->yspan()).c_str(),
+             rcppsw::to_string(c_los->xspan()).c_str(),
+             rcppsw::to_string(c_los->yspan()).c_str());
+
+    /*
+     * We can't just check if the cache host cell is in our LOS, because for
+     * bigger arenas, it almost never is.
+     */
+    bool should_be_in_los = it->ent()->yspan().overlaps_with(c_los->yspan()) ||
+                            it->ent()->xspan().overlaps_with(c_los->xspan());
+
+    bool in_los =
         los_caches.end() !=
         std::find_if(los_caches.begin(), los_caches.end(), [&](const auto& c) {
           return c->dloccmp(*it->ent());
         });
 
-    if (!exists_in_los) {
-      ER_INFO("Remove tracked cache%d@%s: not in LOS caches",
+    if (should_be_in_los && !in_los) {
+      ER_INFO("Remove tracked DPO cache%d@%s/%s xspan=%s,yspan=%s: not in LOS xspan=%s,yspan=%s",
               it->ent()->id().v(),
-              it->ent()->dpos2D().to_str().c_str());
+              rcppsw::to_string(it->ent()->rpos2D()).c_str(),
+              rcppsw::to_string(it->ent()->dpos2D()).c_str(),
+              rcppsw::to_string(it->ent()->xspan()).c_str(),
+              rcppsw::to_string(it->ent()->yspan()).c_str(),
+              rcppsw::to_string(c_los->xspan()).c_str(),
+              rcppsw::to_string(c_los->yspan()).c_str());
+
       /*
        * Copy iterator object + iterator increment MUST be before removal to
        * avoid iterator invalidation and undefined behavior (I've seen both a

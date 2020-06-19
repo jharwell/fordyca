@@ -75,44 +75,60 @@ boost::optional<rmath::vector2d> cache_site_selector::operator()(
     return boost::optional<rmath::vector2d>();
   }
   site.set(point[0], point[1]);
-  ER_ASSERT(verify_site(site, known_caches, known_blocks),
-            "Selected cache violates constraints");
 
-  ER_INFO("Selected cache site @(%f, %f)", point[0], point[1]);
+  ER_INFO("Computed cache site@%s", rcppsw::to_string(site).c_str());
 
-  return boost::make_optional(site);
+  bool site_ok = verify_site(site, known_caches, known_blocks);
+  bool strict = boost::get<bool>(mc_matrix->find(cselm::kStrictConstraints)->second);
+
+  if (site_ok || (!site_ok && !strict)) {
+    return boost::make_optional(site);
+  } else {
+    ER_WARN("Discard cache site@%s: violates constraints",
+            rcppsw::to_string(site).c_str());
+    return boost::optional<rmath::vector2d>();
+  }
 } /* operator()() */
 
 bool cache_site_selector::verify_site(const rmath::vector2d& site,
                                       const ds::dp_cache_map& known_caches,
                                       const ds::dp_block_map& known_blocks) const {
+  const nest_constraint_data* ndata = &std::get<2>(m_constraints)[0];
+
+  /* check distances to known caches */
   for (auto& c : known_caches.const_values_range()) {
-    ER_ASSERT(rtypes::spatial_dist((c.ent()->rpos2D() - site).length()) >=
+    ER_CHECK(rtypes::spatial_dist((c.ent()->rpos2D() - site).length()) >=
                   std::get<0>(m_constraints)[0].cache_prox,
               "Cache site@%s too close to cache%d (%f <= %f)",
-              site.to_str().c_str(),
+             rcppsw::to_string(site).c_str(),
               c.ent()->id().v(),
               (c.ent()->rpos2D() - site).length(),
               std::get<0>(m_constraints)[0].cache_prox.v());
   } /* for(&c..) */
 
+  /* check distances to known blocks */
   for (auto& b : known_blocks.const_values_range()) {
-    ER_ASSERT(rtypes::spatial_dist((b.ent()->rpos2D() - site).length()) >=
+    ER_CHECK(rtypes::spatial_dist((b.ent()->rpos2D() - site).length()) >=
                   std::get<1>(m_constraints)[0].block_prox,
               "Cache site@%s too close to block%d (%f <= %f)",
-              site.to_str().c_str(),
+             rcppsw::to_string(site).c_str(),
               b.ent()->id().v(),
               (b.ent()->rpos2D() - site).length(),
               std::get<1>(m_constraints)[0].block_prox.v());
   } /* for(&b..) */
-  const nest_constraint_data* ndata = &std::get<2>(m_constraints)[0];
-  ER_ASSERT(rtypes::spatial_dist((ndata->nest_loc - site).length()) >=
+
+  /* check distance to nest center */
+  ER_CHECK(rtypes::spatial_dist((ndata->nest_loc - site).length()) >=
                 ndata->nest_prox,
             "Cache site@%s too close to nest (%f <= %f)",
-            site.to_str().c_str(),
+           rcppsw::to_string(site).c_str(),
             (ndata->nest_loc - site).length(),
             ndata->nest_prox.v());
+
   return true;
+
+error:
+  return false;
 } /* verify_site() */
 
 void cache_site_selector::opt_initialize(const opt_init_conditions* cond,
@@ -258,9 +274,7 @@ double __nest_constraint_func(const std::vector<double>& x,
     return std::numeric_limits<double>::max();
   }
   auto* c = reinterpret_cast<cache_site_selector::nest_constraint_data*>(data);
-  double val =
-      c->nest_prox.v() - (rmath::vector2d(x[0], x[1]) - c->nest_loc).length();
-  return val;
+  return c->nest_prox.v() - (rmath::vector2d(x[0], x[1]) - c->nest_loc).length();
 } /* __nest_constraint_func() */
 
 double __block_constraint_func(const std::vector<double>& x,

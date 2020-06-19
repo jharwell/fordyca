@@ -107,7 +107,7 @@ boost::optional<csfsm::acquire_goal_fsm::candidate_type> acquire_cache_site_fsm:
     return boost::make_optional(
         acquire_goal_fsm::candidate_type(*best, kCACHE_SITE_ARRIVAL_TOL, -1));
   } else {
-    ER_WARN("No cache site selected for acquisition--internal error?");
+    ER_WARN("No cache site selected for acquisition--possible internal error");
     m_sel_success = false;
     m_sel_exec = true;
     return boost::optional<acquire_goal_fsm::candidate_type>();

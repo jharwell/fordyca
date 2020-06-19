@@ -164,22 +164,20 @@ void base_cache_creator::update_host_cells(cads::acache_vectoro& caches) {
     auto ymax =
         static_cast<uint>(std::ceil(yspan.ub() / m_grid->resolution().v()));
 
-    for (uint i = xmin; i < xmax; ++i) {
-      for (uint j = ymin; j < ymax; ++j) {
+    for (size_t i = xmin; i < xmax; ++i) {
+      for (size_t j = ymin; j < ymax; ++j) {
         rmath::vector2z c = rmath::vector2z(i, j);
         auto& cell = m_grid->access<arena_grid::kCell>(i, j);
         ER_ASSERT(cache->contains_point2D(
                       rmath::zvec2dvec(c, m_grid->resolution().v())),
-                  "Cache%d does not contain point (%u, %u) within its extent",
+                  "Cache%d does not contain point %s within its extent",
                   cache->id().v(),
-                  i,
-                  j);
+                  rcppsw::to_string(c).c_str());
 
         if (c != cache->dpos2D()) {
           ER_ASSERT(!cell.state_in_cache_extent(),
-                    "Cell@(%u, %u) already in CACHE_EXTENT",
-                    i,
-                    j);
+                    "Cell@%s already in CACHE_EXTENT",
+                    rcppsw::to_string(c).c_str());
           caops::cell2D_cache_extent_visitor e(c, cache.get());
           e.visit(cell);
         }
@@ -218,11 +216,11 @@ bool base_cache_creator::creation_sanity_checks(
                "Cache%d xspan=%s, yspan=%s overlaps cache%d "
                "xspan=%s,yspan=%s",
                c1->id().v(),
-               c1_xspan.to_str().c_str(),
-               c1_yspan.to_str().c_str(),
+               rcppsw::to_string(c1_xspan).c_str(),
+               rcppsw::to_string(c1_yspan).c_str(),
                c2->id().v(),
-               c2_xspan.to_str().c_str(),
-               c2_yspan.to_str().c_str());
+               rcppsw::to_string(c2_xspan).c_str(),
+               rcppsw::to_string(c2_yspan).c_str());
     } /* for(&c2..) */
 
     /* check caches contain different blocks and no duplicates */
@@ -251,11 +249,11 @@ bool base_cache_creator::creation_sanity_checks(
                "Cache%d xspan=%s, yspan=%s overlaps block%d "
                "xspan=%s,yspan=%s",
                c1->id().v(),
-               c1_xspan.to_str().c_str(),
-               c1_yspan.to_str().c_str(),
+               rcppsw::to_string(c1_xspan).c_str(),
+               rcppsw::to_string(c1_yspan).c_str(),
                b->id().v(),
-               b->xspan().to_str().c_str(),
-               b->yspan().to_str().c_str());
+               rcppsw::to_string(b->xspan()).c_str(),
+               rcppsw::to_string(b->yspan()).c_str());
     } /* for(&b..) */
   }   /* for(&c1..) */
 
@@ -267,10 +265,10 @@ bool base_cache_creator::creation_sanity_checks(
             cache->yspan().overlaps_with(cluster->yspan())),
           "Cache%d xspan=%s, yspan=%s overlaps cluster w/xspan=%s,yspan=%s",
           cache->id().v(),
-          cache->xspan().to_str().c_str(),
-          cache->yspan().to_str().c_str(),
-          cluster->xspan().to_str().c_str(),
-          cluster->yspan().to_str().c_str());
+          rcppsw::to_string(cache->xspan()).c_str(),
+          rcppsw::to_string(cache->yspan()).c_str(),
+          rcppsw::to_string(cluster->xspan()).c_str(),
+          rcppsw::to_string(cluster->yspan()).c_str());
     } /* for(&cluster..) */
   }   /* for(&cache..) */
   return true;

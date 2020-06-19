@@ -28,7 +28,7 @@
 #include "rcppsw/patterns/visitor/visitor.hpp"
 #include "rcppsw/types/type_uuid.hpp"
 
-#include "cosm/controller/operations/block_pickup.hpp"
+#include "cosm/controller/operations/base_block_pickup.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
@@ -55,7 +55,7 @@ NS_START(fordyca, events, detail);
  * that is not part of a cache).
  */
 class robot_free_block_pickup : public rer::client<robot_free_block_pickup>,
-                                public ccops::block_pickup {
+                                public ccops::base_block_pickup {
  private:
   struct visit_typelist_impl {
     using controllers = boost::mpl::joint_view<
@@ -119,7 +119,7 @@ class robot_free_block_pickup : public rer::client<robot_free_block_pickup>,
                           const rtypes::timestep& t);
 
  private:
-  using ccops::block_pickup::visit;
+  using ccops::base_block_pickup::visit;
 
   void dispatch_robot_free_block_interactor(tasks::base_foraging_task* task);
 

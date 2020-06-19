@@ -42,7 +42,7 @@ existing_cache_selector::existing_cache_selector(
     bool is_pickup,
     const controller::cache_sel_matrix* const matrix,
     const ds::dp_cache_map* cache_map)
-    : ER_CLIENT_INIT("fordyca.fsm.depth1.existing_cache_selector"),
+    : ER_CLIENT_INIT("fordyca.fsm.existing_cache_selector"),
       mc_is_pickup(is_pickup),
       mc_matrix(matrix),
       mc_cache_map(cache_map) {}

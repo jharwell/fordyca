@@ -26,6 +26,7 @@
 #include "cosm/ds/arena_grid.hpp"
 #include "cosm/foraging/repr/block_cluster.hpp"
 #include "cosm/repr/base_block3D.hpp"
+#include "cosm/arena/caching_arena_map.hpp"
 
 #include "fordyca/events/cell2D_empty.hpp"
 #include "fordyca/support/depth2/dynamic_cache_creator.hpp"
@@ -40,12 +41,13 @@ NS_START(fordyca, support, depth2);
  ******************************************************************************/
 dynamic_cache_manager::dynamic_cache_manager(
     const config::caches::caches_config* config,
-    cds::arena_grid* const arena_grid,
+    carena::caching_arena_map* arena_map,
     rmath::rng* rng)
-    : base_cache_manager(arena_grid),
+    : base_cache_manager(&arena_map->decoratee()),
       ER_CLIENT_INIT("fordyca.support.depth2.dynamic_cache_manager"),
       mc_cache_config(*config),
-      m_rng(rng) {}
+      m_rng(rng),
+      m_map(arena_map) {}
 
 /*******************************************************************************
  * Member Functions
@@ -56,10 +58,11 @@ boost::optional<cads::acache_vectoro> dynamic_cache_manager::create(
   if (auto to_use = calc_blocks_for_creation(
           c_params.current_caches, c_params.clusters, c_alloc_blocks)) {
     support::depth2::dynamic_cache_creator::params params = {
-        .grid = arena_grid(),
+        .map = m_map,
         .cache_dim = mc_cache_config.dimension,
         .min_dist = mc_cache_config.dynamic.min_dist,
-        .min_blocks = mc_cache_config.dynamic.min_blocks};
+        .min_blocks = mc_cache_config.dynamic.min_blocks,
+        .strict_constraints = mc_cache_config.dynamic.strict_constraints};
     support::depth2::dynamic_cache_creator creator(&params, m_rng);
 
     cads::acache_vectoro created = creator.create_all(c_params, *to_use);

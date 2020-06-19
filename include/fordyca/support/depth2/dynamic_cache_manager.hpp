@@ -24,23 +24,26 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <algorithm>
 #include <boost/optional.hpp>
 
-#include "fordyca/config/caches/caches_config.hpp"
-#include "fordyca/support/base_cache_manager.hpp"
+#include "rcppsw/math/rng.hpp"
+#include "rcppsw/er/client.hpp"
+
 #include "cosm/ds/block3D_vector.hpp"
 #include "cosm/arena/ds/cache_vector.hpp"
 #include "cosm/foraging/ds/block_cluster_vector.hpp"
+
 #include "fordyca/support/cache_create_ro_params.hpp"
-
-#include "rcppsw/math/rng.hpp"
-
-#include "rcppsw/er/client.hpp"
+#include "fordyca/config/caches/caches_config.hpp"
+#include "fordyca/support/base_cache_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::arena {
+class caching_arena_map;
+} /* namespace cosm::arena */
+
 NS_START(fordyca, support, depth2);
 
 /*******************************************************************************
@@ -57,7 +60,7 @@ class dynamic_cache_manager final : public base_cache_manager,
                                     public rer::client<dynamic_cache_manager> {
  public:
   dynamic_cache_manager(const config::caches::caches_config* config,
-                        cds::arena_grid* arena_grid,
+                        carena::caching_arena_map* arena_map,
                         rmath::rng* rng);
   dynamic_cache_manager(const dynamic_cache_manager&) = delete;
   dynamic_cache_manager& operator=(const dynamic_cache_manager&) = delete;
@@ -99,7 +102,9 @@ class dynamic_cache_manager final : public base_cache_manager,
 
   /* clang-format off */
   const config::caches::caches_config mc_cache_config;
+
   rmath::rng*                         m_rng;
+  carena::caching_arena_map*          m_map;
   /* clang-format on */
 };
 

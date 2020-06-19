@@ -57,7 +57,8 @@ using cache_sel_variant =
                    rmath::vector2d,
                    rmath::rangeu,
                    std::vector<rtypes::type_uuid>,
-                   config::cache_sel::cache_pickup_policy_config>;
+                   config::cache_sel::cache_pickup_policy_config,
+                   bool>;
 
 /*******************************************************************************
  * Class Definitions
@@ -89,7 +90,7 @@ class cache_sel_matrix final
   static constexpr char kSiteYRange[] = "site_yrange";
   static constexpr char kPickupExceptions[] = "pickup_exceptions";
   static constexpr char kDropExceptions[] = "drop_exceptions";
-
+  static constexpr char kStrictConstraints[] = "strict_constraints";
   /**
    * \brief The conditions that must be satisfied before a robot will be
    * able to pickup from *ANY* cache.

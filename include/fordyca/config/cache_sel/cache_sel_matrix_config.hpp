@@ -53,6 +53,16 @@ struct cache_sel_matrix_config final : public rconfig::base_config {
   rmath::rangeu                site_xrange{0, 0};
   rmath::rangeu                site_yrange{0, 0};
   cache_pickup_policy_config   pickup_policy{};
+
+  /**
+   *  \brief If \c TRUE the site returned by the cache site selector violates
+   * any constraints, it is discarded, which will lead to the robot trying again
+   * the following timestep; this is more expensive computationally. If \c
+   * FALSE, then if site returned by the cache site selector violates any
+   * constraints, it is still returned as the "best-effort" site found; this is
+   * cheaper computationally.
+   */
+  bool                         strict_constraints{true};
 };
 
 NS_END(cache_sel, config, fordyca);

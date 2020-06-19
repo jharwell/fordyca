@@ -228,7 +228,7 @@ void depth2_loop_functions::cache_handling_init(
   ER_ASSERT(nullptr != cachep && cachep->dynamic.enable,
             "FATAL: Caches not enabled in depth2 loop functions");
   m_cache_manager = std::make_unique<dynamic_cache_manager>(
-      cachep, &arena_map()->decoratee(), rng());
+      cachep, arena_map(), rng());
   argos_sm_adaptor::led_medium(crfootbot::config::saa_xml_names().leds_saa);
   cache_creation_handle(false);
 } /* cache_handlng_init() */

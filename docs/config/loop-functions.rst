@@ -54,7 +54,7 @@ given type.
 | ``tv_population``                              | See :xref:`COSM` docs.                                                        |
 +------------------------------------------------+-------------------------------------------------------------------------------+
 | ``oracle_manager``                             | See :xref:`COSM` docs.                                                        |
-+------------------------------------------------+-------------------------------------------------------------------------------+                                                    
++------------------------------------------------+-------------------------------------------------------------------------------+
 | ``block_manipulation``                         | Free block pickup/drop counts/penalties.                                      |
 +------------------------------------------------+-------------------------------------------------------------------------------+
 | ``cache_acq_counts``                           || Counts of robots exploring for, vectoring to, and acquiring caches.          |
@@ -230,7 +230,8 @@ the ``enable`` attribute is required; all other attributes are parsed iff
 - Required by: [depth2 controllers].
 - Required child attributes if present: ``enable``.
 - Required child tags if present: none.
-- Optional child attributes: [ ``min_dist``, ``min_blocks``, ``robot_drop_only`` ].
+- Optional child attributes: [ ``min_dist``, ``min_blocks``,
+  ``robot_drop_only``, ``strict_constraints`` ].
 - Optional child tags: none.
 
 XML configuration:
@@ -243,7 +244,8 @@ XML configuration:
            enable="false"
            min_dist="FLOAT"
            min_blocks="INTEGER"
-           robot_drop_only="false"/>
+           robot_drop_only="false"
+           strict_constraints="true"/>
        ...
    </caches>
 
@@ -258,3 +260,13 @@ XML configuration:
 - ``robot_drop_only`` - If `true`, then caches will only be created by intential
   robot block drops rather than drops due to abort/block distribution after
   collection. Default if omitted: `false`.
+
+- ``strict_constraints`` - If `true`, then dynamic cache creation will be
+  strict, meaning that any caches that fail validation after creation will be
+  discarded.
+
+  If `false`, then dynamically created caches will be kept regardless if they
+  violate constraints or not, which MIGHT be OK, or MIGHT cause
+  issues/segfaults. Provided as an option so that it will be possible to more
+  precisely duplicate the results of papers run with earlier versions of FORDYCA
+  which had more bugs. Default if omitted: `true`.

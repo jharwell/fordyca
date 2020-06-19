@@ -68,6 +68,7 @@ class cell2D_empty : public cdops::cell2D_empty,
 
  public:
   using visit_typelist = visit_typelist_impl::value;
+  using cdops::cell2D_empty::coord;
 
   /* parent class visit functions */
   using cdops::cell2D_empty::visit;
@@ -83,8 +84,8 @@ class cell2D_empty : public cdops::cell2D_empty,
 NS_END(detail);
 
 /**
- * \brief We use the precise visitor in order to force compile errors if a call to
- * a visitor is made that involves a visitee that is not in our visit set
+ * \brief We use the precise visitor in order to force compile errors if a call
+ * to a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */

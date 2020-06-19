@@ -43,8 +43,7 @@ rtypes::type_uuid robot_on_block(const controller::foraging_controller& controll
 
 rtypes::type_uuid robot_on_cache(const controller::foraging_controller& controller,
                                  const carena::caching_arena_map& map) {
-  return map.robot_on_cache(controller.rpos2D(),
-                            controller.entity_acquired_id());
+  return map.robot_on_cache(controller.rpos2D());
 } /* robot_on_cache() */
 
 proximity_status_t new_cache_cache_proximity(

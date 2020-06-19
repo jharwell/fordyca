@@ -217,10 +217,7 @@ class cached_block_pickup_interactor
     ER_ASSERT(real_it != m_map->caches().end(),
               "Cache%d from penalty does not exist?",
               penalty.id().v());
-    caops::cached_block_pickup_visitor arena_pickup(*real_it,
-                                                    m_loop,
-                                                    controller.entity_id(),
-                                                    t);
+
     /*
      * Caches have non-owning references to blocks, so even if the current
      * cached block pickup depletes the cache and it is destroyed by the arena
@@ -228,7 +225,13 @@ class cached_block_pickup_interactor
      * because it points to somewhere within the the block vector owned by the
      * arena map.
      */
-    const crepr::base_block3D* to_pickup = (*real_it)->oldest_block();
+    crepr::base_block3D* to_pickup = (*real_it)->oldest_block();
+
+    caops::cached_block_pickup_visitor arena_pickup(*real_it,
+                                                    to_pickup,
+                                                    m_loop,
+                                                    controller.entity_id(),
+                                                    t);
     (*real_it)->penalty_served(penalty.penalty());
     controller.block_manip_recorder()->record(
         metrics::blocks::block_manip_events::ekCACHE_PICKUP, penalty.penalty());

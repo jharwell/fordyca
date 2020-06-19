@@ -62,16 +62,13 @@ using ds::occupancy_grid;
  ******************************************************************************/
 robot_cached_block_pickup::robot_cached_block_pickup(
     const carepr::arena_cache* cache,
-    const crepr::base_block3D* block,
+    crepr::base_block3D* block,
     const rtypes::type_uuid& robot_id,
     const rtypes::timestep& t)
     : ER_CLIENT_INIT("fordyca.events.robot_cached_block_pickup"),
-      cell2D_op(cache->dpos2D()),
-      mc_robot_id(robot_id),
+      base_block_pickup(block, robot_id, t),
       mc_timestep(t),
-      mc_cache(cache),
-      mc_block(block),
-      m_robot_block(nullptr) {}
+      mc_cache(cache) {}
 
 robot_cached_block_pickup::~robot_cached_block_pickup(void) = default;
 
@@ -88,7 +85,7 @@ void robot_cached_block_pickup::dispatch_d1_cache_interactor(
       task_name.c_str());
   interactor->accept(*this);
   ER_INFO("Picked up block%d from cache%d,task='%s'",
-          mc_block->id().v(),
+          block()->id().v(),
           mc_cache->id().v(),
           task_name.c_str());
 } /* dispatch_d1_cache_interactor() */
@@ -115,7 +112,7 @@ bool robot_cached_block_pickup::dispatch_d2_cache_interactor(
   }
   interactor->accept(*this);
   ER_INFO("Picked up block%d from cache%d,task='%s'",
-          mc_block->id().v(),
+          block()->id().v(),
           mc_cache->id().v(),
           polled->name().c_str());
   return ret;
@@ -149,20 +146,20 @@ void robot_cached_block_pickup::visit(ds::dpo_store& store) {
    * This is not an issue for blocks, because a block that has moved/disappeared
    * via oracular information injection vanishes from the robot's perception.
    */
-  if (!pcache->ent()->contains_block(mc_block)) {
+  if (!pcache->ent()->contains_block(block())) {
     ER_INFO("DPO cache%d@%s/%s does not contain pickup block%d",
             pcache->ent()->id().v(),
             pcache->ent()->rpos2D().to_str().c_str(),
             pcache->ent()->dpos2D().to_str().c_str(),
-            mc_block->id().v());
+            block()->id().v());
     return;
   }
 
   if (pcache->ent()->n_blocks() > base_cache::kMinBlocks) {
-    pcache->ent()->block_remove(m_robot_block.get());
+    pcache->ent()->block_remove(block());
     ER_INFO("DPO Store: fb%u: block%d from cache%d@%s,remaining=[%s] (%zu)",
-            mc_robot_id.v(),
-            mc_block->id().v(),
+            robot_id().v(),
+            block()->id().v(),
             pcache->ent()->id().v(),
             cell2D_op::coord().to_str().c_str(),
             rcppsw::to_string(pcache->ent()->blocks()).c_str(),
@@ -170,11 +167,11 @@ void robot_cached_block_pickup::visit(ds::dpo_store& store) {
 
   } else {
     RCSW_UNUSED rtypes::type_uuid id = pcache->ent()->id();
-    pcache->ent()->block_remove(m_robot_block.get());
+    pcache->ent()->block_remove(block());
     store.cache_remove(pcache->ent());
     ER_INFO("DPO Store: fb%u: block%d from cache%d@%s [depleted]",
-            mc_robot_id.v(),
-            mc_block->id().v(),
+            robot_id().v(),
+            block()->id().v(),
             id.v(),
             cell2D_op::coord().to_str().c_str());
   }
@@ -189,23 +186,23 @@ void robot_cached_block_pickup::visit(ds::dpo_semantic_map& map) {
             cell.cache()->n_blocks(),
             cell.block_count());
 
-  ER_ASSERT(cell.cache()->contains_block(mc_block),
+  ER_ASSERT(cell.cache()->contains_block(block()),
             "Perceived cache%d@%s/%s does not contain pickup block%d",
             cell.cache()->id().v(),
             cell.cache()->rpos2D().to_str().c_str(),
             cell.cache()->dpos2D().to_str().c_str(),
-            mc_block->id().v());
+            block()->id().v());
 
   if (cell.cache()->n_blocks() > base_cache::kMinBlocks) {
-    cell.cache()->block_remove(m_robot_block.get());
+    cell.cache()->block_remove(block());
     visit(cell);
     ER_ASSERT(cell.state_has_cache(),
               "cell@%s with >= 2 blocks does not have cache",
               cell2D_op::coord().to_str().c_str());
 
     ER_INFO("DPO Map: fb%u: block%d from cache%d@%s,remaining=[%s] (%zu)",
-            mc_robot_id.v(),
-            mc_block->id().v(),
+            robot_id().v(),
+            block()->id().v(),
             cell.cache()->id().v(),
             cell2D_op::coord().to_str().c_str(),
             rcppsw::to_string(cell.cache()->blocks()).c_str(),
@@ -213,12 +210,12 @@ void robot_cached_block_pickup::visit(ds::dpo_semantic_map& map) {
 
   } else {
     RCSW_UNUSED rtypes::type_uuid id = cell.cache()->id();
-    cell.cache()->block_remove(m_robot_block.get());
+    cell.cache()->block_remove(block());
 
     map.cache_remove(cell.cache());
     ER_INFO("DPO Map: fb%u: block%d from cache%d@%s [depleted]",
-            mc_robot_id.v(),
-            mc_block->id().v(),
+            robot_id().v(),
+            block()->id().v(),
             id.v(),
             cell2D_op::coord().to_str().c_str());
   }
@@ -228,16 +225,8 @@ void robot_cached_block_pickup::visit(
     controller::depth1::bitd_dpo_controller& controller) {
   controller.ndc_pusht();
 
-  /*
-   * Cloning must be before visiting the store so the C++ semantics of
-   * block/cache removal work out.
-   */
-  m_robot_block = mc_block->clone();
-  m_robot_block->md()->robot_id(mc_robot_id);
-
   visit(*controller.dpo_perception()->dpo_store());
-  controller.block(std::move(m_robot_block));
-
+  visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   dispatch_d1_cache_interactor(controller.current_task());
 
   controller.ndc_pop();
@@ -247,16 +236,8 @@ void robot_cached_block_pickup::visit(
     controller::depth1::bitd_mdpo_controller& controller) {
   controller.ndc_pusht();
 
-  /*
-   * Cloning must be before visiting the map so the C++ semantics of
-   * block/cache removal work out.
-   */
-  m_robot_block = mc_block->clone();
-  m_robot_block->md()->robot_id(mc_robot_id);
-
-  visit(*controller.mdpo_perception()->map());
-  controller.block(std::move(m_robot_block));
-
+  visit(*controller.dpo_perception()->dpo_store());
+  visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   dispatch_d1_cache_interactor(controller.current_task());
 
   controller.ndc_pop();
@@ -266,16 +247,8 @@ void robot_cached_block_pickup::visit(
     controller::depth1::bitd_odpo_controller& controller) {
   controller.ndc_pusht();
 
-  /*
-   * Cloning must be before visiting the store so the C++ semantics of
-   * block/cache removal work out.
-   */
-  m_robot_block = mc_block->clone();
-  m_robot_block->md()->robot_id(mc_robot_id);
-
   visit(*controller.dpo_perception()->dpo_store());
-  controller.block(std::move(m_robot_block));
-
+  visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   dispatch_d1_cache_interactor(controller.current_task());
 
   controller.ndc_pop();
@@ -285,16 +258,8 @@ void robot_cached_block_pickup::visit(
     controller::depth1::bitd_omdpo_controller& controller) {
   controller.ndc_pusht();
 
-  /*
-   * Cloning must be before visiting the map so the C++ semantics of
-   * block/cache removal work out.
-   */
-  m_robot_block = mc_block->clone();
-  m_robot_block->md()->robot_id(mc_robot_id);
-
-  visit(*controller.mdpo_perception()->map());
-  controller.block(std::move(m_robot_block));
-
+  visit(*controller.dpo_perception()->dpo_store());
+  visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   dispatch_d1_cache_interactor(controller.current_task());
 
   controller.ndc_pop();
@@ -321,15 +286,8 @@ void robot_cached_block_pickup::visit(
     controller::depth2::birtd_dpo_controller& controller) {
   controller.ndc_pusht();
 
-  /*
-   * Cloning must be before visiting the store so the C++ semantics of
-   * block/cache removal work out.
-   */
-  m_robot_block = mc_block->clone();
-  m_robot_block->md()->robot_id(mc_robot_id);
-
   visit(*controller.dpo_perception()->dpo_store());
-  controller.block(std::move(m_robot_block));
+  visit(static_cast<ccontroller::block_carrying_controller&>(controller));
 
   if (dispatch_d2_cache_interactor(controller.current_task(),
                                    controller.cache_sel_matrix())) {
@@ -343,15 +301,8 @@ void robot_cached_block_pickup::visit(
     controller::depth2::birtd_mdpo_controller& controller) {
   controller.ndc_pusht();
 
-  /*
-   * Cloning must be before visiting the map so the C++ semantics of
-   * block/cache removal work out.
-   */
-  m_robot_block = mc_block->clone();
-  m_robot_block->md()->robot_id(mc_robot_id);
-
-  visit(*controller.mdpo_perception()->map());
-  controller.block(std::move(m_robot_block));
+  visit(*controller.dpo_perception()->dpo_store());
+  visit(static_cast<ccontroller::block_carrying_controller&>(controller));
 
   if (dispatch_d2_cache_interactor(controller.current_task(),
                                    controller.cache_sel_matrix())) {
@@ -364,15 +315,8 @@ void robot_cached_block_pickup::visit(
     controller::depth2::birtd_odpo_controller& controller) {
   controller.ndc_pusht();
 
-  /*
-   * Cloning must be before visiting the store so the C++ semantics of
-   * block/cache removal work out.
-   */
-  m_robot_block = mc_block->clone();
-  m_robot_block->md()->robot_id(mc_robot_id);
-
   visit(*controller.dpo_perception()->dpo_store());
-  controller.block(std::move(m_robot_block));
+  visit(static_cast<ccontroller::block_carrying_controller&>(controller));
 
   if (dispatch_d2_cache_interactor(controller.current_task(),
                                    controller.cache_sel_matrix())) {
@@ -386,15 +330,8 @@ void robot_cached_block_pickup::visit(
     controller::depth2::birtd_omdpo_controller& controller) {
   controller.ndc_pusht();
 
-  /*
-   * Cloning must be before visiting the map so the C++ semantics of
-   * block/cache removal work out.
-   */
-  m_robot_block = mc_block->clone();
-  m_robot_block->md()->robot_id(mc_robot_id);
-
-  visit(*controller.mdpo_perception()->map());
-  controller.block(std::move(m_robot_block));
+  visit(*controller.dpo_perception()->dpo_store());
+  visit(static_cast<ccontroller::block_carrying_controller&>(controller));
 
   if (dispatch_d2_cache_interactor(controller.current_task(),
                                    controller.cache_sel_matrix())) {

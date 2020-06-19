@@ -39,13 +39,13 @@ using cselm = controller::cache_sel_matrix;
  * Constructors/Destructors
  ******************************************************************************/
 cache_acq_validator::cache_acq_validator(
-    const ds::dp_cache_map* map,
+    const ds::dp_cache_map* dpo_map,
     const controller::cache_sel_matrix* csel_matrix,
     bool for_pickup)
     : ER_CLIENT_INIT("fordyca.fsm.cache_acq_validator"),
       mc_for_pickup(for_pickup),
       mc_csel_matrix(csel_matrix),
-      mc_map(map) {}
+      mc_dpo_map(dpo_map) {}
 
 /*******************************************************************************
  * Member Functions
@@ -59,7 +59,7 @@ bool cache_acq_validator::operator()(const rmath::vector2d& loc,
    * the cache's host cell location. Instead we look up the cache by ID, and
    * verify that the cache exists contains the point we are acquiring.
    */
-  auto range = mc_map->const_values_range();
+  auto range = mc_dpo_map->const_values_range();
   auto it = std::find_if(range.begin(), range.end(), [&](const auto& c) {
     return c.ent()->id() == id;
   });

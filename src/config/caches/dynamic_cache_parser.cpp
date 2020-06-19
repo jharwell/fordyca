@@ -46,6 +46,7 @@ void dynamic_cache_parser::parse(const ticpp::Element& node) {
     XML_PARSE_ATTR(cnode, m_config, min_dist);
     XML_PARSE_ATTR(cnode, m_config, min_blocks);
     XML_PARSE_ATTR(cnode, m_config, robot_drop_only);
+    XML_PARSE_ATTR(cnode, m_config, strict_constraints);
   }
 } /* parse() */
 
