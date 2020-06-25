@@ -74,6 +74,11 @@ class task_executive_builder : public depth1::task_executive_builder,
                             const tasking_map& map,
                             cta::ds::bi_tdgraph* graph,
                             rmath::rng* rng) RCSW_COLD;
+
+  RCSW_COLD void depth2_subtasks_init(
+      const tasking_map& map,
+      cta::ds::bi_tdgraph* graph,
+      rmath::rng* rng);
 };
 
 NS_END(depth2, controller, fordyca);

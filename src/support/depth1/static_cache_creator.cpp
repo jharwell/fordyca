@@ -36,7 +36,7 @@ using carepr::base_cache;
  ******************************************************************************/
 static_cache_creator::static_cache_creator(
     cds::arena_grid* const grid,
-    const std::vector<rmath::vector2d>& centers,
+    const std::vector<rmath::vector2z>& centers,
     rtypes::spatial_dist cache_dim)
     : base_cache_creator(grid, cache_dim),
       ER_CLIENT_INIT("fordyca.support.depth1.static_cache_creator"),
@@ -55,14 +55,17 @@ cads::acache_vectoro static_cache_creator::create_all(
   cads::acache_vectoro created;
   auto it = c_alloc_blocks.begin();
   for (auto& center : mc_centers) {
-    auto filter = [&](const auto& c) {
-      return rmath::dvec2zvec(center, grid()->resolution().v()) == c->dpos2D();
-    };
+    auto exists = std::find_if(c_params.current_caches.begin(),
+                               c_params.current_caches.end(),
+                               [&](const auto& c) {
+                                 return center == c->dcenter2D();
+                               });
     /* static cache already exists */
-    if (c_params.current_caches.end() !=
-        std::find_if(c_params.current_caches.begin(),
-                     c_params.current_caches.end(),
-                     filter)) {
+    if (c_params.current_caches.end() != exists) {
+      ER_DEBUG("Cache%d@%s/%s already exists",
+               (*exists)->id().v(),
+               rcppsw::to_string((*exists)->rcenter2D()).c_str(),
+               rcppsw::to_string((*exists)->dcenter2D()).c_str());
       continue;
     }
 

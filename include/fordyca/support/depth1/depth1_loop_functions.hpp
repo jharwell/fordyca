@@ -153,7 +153,7 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
    * static caches that will be maintained by the simulation during
    * initialization.
    */
-  std::vector<rmath::vector2d> calc_cache_locs(
+  std::vector<rmath::vector2z> calc_cache_locs(
       const cfconfig::block_dist_config* distp) RCSW_COLD;
 
   /**

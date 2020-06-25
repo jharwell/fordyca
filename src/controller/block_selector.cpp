@@ -67,13 +67,13 @@ const crepr::base_block3D* block_selector::operator()(
         boost::get<rmath::vector2d>(mc_matrix->find(bselm::kNestLoc)->second);
 
     double utility =
-        math::block_utility(b.ent()->rpos2D(),
+        math::block_utility(b.ent()->ranchor2D(),
                             nest_loc)(position, b.density(), priority);
 
     ER_DEBUG("Utility for block%d@%s/%s, density=%f: %f",
              b.ent()->id().v(),
-             b.ent()->rpos2D().to_str().c_str(),
-             b.ent()->dpos2D().to_str().c_str(),
+             rcppsw::to_string(b.ent()->ranchor2D()).c_str(),
+             rcppsw::to_string(b.ent()->danchor2D()).c_str(),
              b.density().v(),
              utility);
     if (utility > max_utility) {
@@ -85,8 +85,8 @@ const crepr::base_block3D* block_selector::operator()(
   if (nullptr != best) {
     ER_INFO("Best utility: block%d@%s/%s: %f",
             best->id().v(),
-            best->rpos2D().to_str().c_str(),
-            best->dpos2D().to_str().c_str(),
+            rcppsw::to_string(best->ranchor2D()).c_str(),
+            rcppsw::to_string(best->danchor2D()).c_str(),
             max_utility);
     return best;
   } else {
@@ -98,13 +98,17 @@ const crepr::base_block3D* block_selector::operator()(
 bool block_selector::block_is_excluded(
     const rmath::vector2d& position,
     const crepr::base_block3D* const block) const {
-  double block_dim = std::min(block->xspan().span(), block->yspan().span());
-  if ((position - block->rpos2D()).length() <= block_dim) {
+  double block_dim = std::min(block->xrspan().span(), block->yrspan().span());
+  /*
+   * Use the center rather than the anchor to get a utility unaffected by the
+   * relative position of the block and the robot.
+   */
+  if ((position - block->rcenter2D()).length() <= block_dim) {
     ER_DEBUG("Ignoring block%d@%s/%s: Too close (%f <= %f)",
              block->id().v(),
-             block->rpos2D().to_str().c_str(),
-             block->dpos2D().to_str().c_str(),
-             (position - block->rpos2D()).length(),
+             rcppsw::to_string(block->ranchor2D()).c_str(),
+             rcppsw::to_string(block->danchor2D()).c_str(),
+             (position - block->rcenter2D()).length(),
              block_dim);
     return true;
   }
@@ -115,8 +119,8 @@ bool block_selector::block_is_excluded(
       })) {
     ER_DEBUG("Ignoring block%d@%s/%s: On exception list",
              block->id().v(),
-             block->rpos2D().to_str().c_str(),
-             block->dpos2D().to_str().c_str());
+             block->ranchor2D().to_str().c_str(),
+             block->danchor2D().to_str().c_str());
     return true;
   }
   return false;

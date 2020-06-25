@@ -180,6 +180,24 @@ void task_executive_builder::depth1_exec_est_init(
   collector->exec_estimate_init(c_bounds, rng);
 } /* depth1_exec_est_init() */
 
+void task_executive_builder::depth1_subtasks_init(
+    const tasking_map& map,
+    cta::ds::bi_tdgraph* const graph,
+    rmath::rng* rng) {
+  /*
+   * Generalist is not partitionable in depth 0 initialization, so this has
+   * not been done.
+   */
+  auto harvester = map.find("harvester")->second;
+  auto collector = map.find("collector")->second;
+
+  if (0 == rng->uniform(0, 1)) {
+    graph->root_tab()->last_subtask(harvester);
+  } else {
+    graph->root_tab()->last_subtask(collector);
+  }
+} /* depth1_subtasks_init() */
+
 std::unique_ptr<cta::bi_tdgraph_executive> task_executive_builder::operator()(
     const config::depth1::controller_repository& config_repo,
     rmath::rng* rng) {
@@ -205,6 +223,7 @@ std::unique_ptr<cta::bi_tdgraph_executive> task_executive_builder::operator()(
     graph->active_tab_init(allocp->stoch_nbhd1.tab_init_policy, rng);
   }
   depth1_exec_est_init(config_repo, map, graph, rng);
+  depth1_subtasks_init(map, graph, rng);
 
   return std::make_unique<cta::bi_tdgraph_executive>(
       execp, allocp, std::move(variant), rng);

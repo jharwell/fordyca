@@ -114,6 +114,11 @@ class task_executive_builder : public rer::client<task_executive_builder> {
       cta::ds::bi_tdgraph* graph,
       rmath::rng* rng);
 
+  RCSW_COLD void depth1_subtasks_init(
+      const tasking_map& map,
+      cta::ds::bi_tdgraph* graph,
+      rmath::rng* rng);
+
  private:
   /* clang-format off */
   const controller::cache_sel_matrix* const mc_csel_matrix;

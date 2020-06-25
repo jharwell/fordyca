@@ -208,6 +208,34 @@ void task_executive_builder::depth2_exec_est_init(
   cache_collector->exec_estimate_init(cc_bounds, rng);
 } /* depth2_exec_est_init() */
 
+void task_executive_builder::depth2_subtasks_init(
+    const tasking_map& map,
+    cta::ds::bi_tdgraph* graph,
+    rmath::rng* rng) {
+
+  auto cache_starter = map.find("cache_starter")->second;
+  auto cache_finisher = map.find("cache_finisher")->second;
+  auto cache_transferer = map.find("cache_transferer")->second;
+  auto cache_collector = map.find("cache_collector")->second;
+
+  /*
+   * As part of seeding exec estimates, we set the last executed subtask for a
+   * TAB. Collector, harvester not partitionable in depth 1 initialization, so
+   * they have only been initialized as atomic tasks.
+   */
+  if (0 == rng->uniform(0, 1)) {
+    graph->tab_child(graph->root_tab(), graph->root_tab()->child1())
+        ->last_subtask(cache_starter);
+    graph->tab_child(graph->root_tab(), graph->root_tab()->child2())
+        ->last_subtask(cache_transferer);
+  } else {
+    graph->tab_child(graph->root_tab(), graph->root_tab()->child1())
+        ->last_subtask(cache_finisher);
+    graph->tab_child(graph->root_tab(), graph->root_tab()->child2())
+        ->last_subtask(cache_collector);
+  }
+} /* depth2_subtasks_init() */
+
 std::unique_ptr<cta::bi_tdgraph_executive> task_executive_builder::operator()(
     const config::depth2::controller_repository& config_repo,
     rmath::rng* rng) {
@@ -226,9 +254,11 @@ std::unique_ptr<cta::bi_tdgraph_executive> task_executive_builder::operator()(
 
   auto map1 = depth1_tasks_create(config_repo, graph, rng);
   depth1_exec_est_init(config_repo, map1, graph, rng);
+  depth1_subtasks_init(map1, graph, rng);
 
   auto map2 = depth2_tasks_create(config_repo, graph, rng);
   depth2_exec_est_init(config_repo, map2, graph, rng);
+  depth2_subtasks_init(map2, graph, rng);
 
   /*
    * Only necessary if we are using the stochastic neighborhood policy; causes

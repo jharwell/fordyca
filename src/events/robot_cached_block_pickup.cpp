@@ -102,9 +102,10 @@ bool robot_cached_block_pickup::dispatch_d2_cache_interactor(
             polled->name().c_str());
 
   if (tasks::depth2::foraging_task::kCacheTransfererName == polled->name()) {
-    ER_INFO("Added cache%d@%s to drop exception list,task='%s'",
+    ER_INFO("Added cache%d@%s/%s to drop exception list,task='%s'",
             mc_cache->id().v(),
-            mc_cache->rpos2D().to_str().c_str(),
+            rcppsw::to_string(mc_cache->rcenter2D()).c_str(),
+            rcppsw::to_string(mc_cache->dcenter2D()).c_str(),
             polled->name().c_str());
     csel_matrix->sel_exception_add(
         {mc_cache->id(), controller::cache_sel_exception::ekDROP});
@@ -131,9 +132,10 @@ void robot_cached_block_pickup::visit(cds::cell2D& cell) {
 
 void robot_cached_block_pickup::visit(ds::dpo_store& store) {
   ER_ASSERT(store.contains(mc_cache),
-            "Cache%d@%s not in DPO store",
+            "Cache%d@%s/%s not in DPO store",
             mc_cache->id().v(),
-            mc_cache->dpos2D().to_str().c_str());
+            rcppsw::to_string(mc_cache->rcenter2D()).c_str(),
+            rcppsw::to_string(mc_cache->dcenter2D()).c_str());
 
   auto pcache = store.find(mc_cache);
 
@@ -149,8 +151,8 @@ void robot_cached_block_pickup::visit(ds::dpo_store& store) {
   if (!pcache->ent()->contains_block(block())) {
     ER_INFO("DPO cache%d@%s/%s does not contain pickup block%d",
             pcache->ent()->id().v(),
-            pcache->ent()->rpos2D().to_str().c_str(),
-            pcache->ent()->dpos2D().to_str().c_str(),
+            rcppsw::to_string(pcache->ent()->rcenter2D()).c_str(),
+            rcppsw::to_string(pcache->ent()->dcenter2D()).c_str(),
             block()->id().v());
     return;
   }
@@ -161,7 +163,7 @@ void robot_cached_block_pickup::visit(ds::dpo_store& store) {
             robot_id().v(),
             block()->id().v(),
             pcache->ent()->id().v(),
-            cell2D_op::coord().to_str().c_str(),
+            rcppsw::to_string(coord()).c_str(),
             rcppsw::to_string(pcache->ent()->blocks()).c_str(),
             pcache->ent()->n_blocks());
 
@@ -173,7 +175,7 @@ void robot_cached_block_pickup::visit(ds::dpo_store& store) {
             robot_id().v(),
             block()->id().v(),
             id.v(),
-            cell2D_op::coord().to_str().c_str());
+            rcppsw::to_string(coord()).c_str());
   }
 } /* visit() */
 
@@ -189,8 +191,8 @@ void robot_cached_block_pickup::visit(ds::dpo_semantic_map& map) {
   ER_ASSERT(cell.cache()->contains_block(block()),
             "Perceived cache%d@%s/%s does not contain pickup block%d",
             cell.cache()->id().v(),
-            cell.cache()->rpos2D().to_str().c_str(),
-            cell.cache()->dpos2D().to_str().c_str(),
+            rcppsw::to_string(cell.cache()->rcenter2D()).c_str(),
+            rcppsw::to_string(cell.cache()->dcenter2D()).c_str(),
             block()->id().v());
 
   if (cell.cache()->n_blocks() > base_cache::kMinBlocks) {
@@ -198,13 +200,13 @@ void robot_cached_block_pickup::visit(ds::dpo_semantic_map& map) {
     visit(cell);
     ER_ASSERT(cell.state_has_cache(),
               "cell@%s with >= 2 blocks does not have cache",
-              cell2D_op::coord().to_str().c_str());
+              rcppsw::to_string(coord()).c_str());
 
     ER_INFO("DPO Map: fb%u: block%d from cache%d@%s,remaining=[%s] (%zu)",
             robot_id().v(),
             block()->id().v(),
             cell.cache()->id().v(),
-            cell2D_op::coord().to_str().c_str(),
+            rcppsw::to_string(coord()).c_str(),
             rcppsw::to_string(cell.cache()->blocks()).c_str(),
             cell.cache()->n_blocks());
 
@@ -217,7 +219,7 @@ void robot_cached_block_pickup::visit(ds::dpo_semantic_map& map) {
             robot_id().v(),
             block()->id().v(),
             id.v(),
-            cell2D_op::coord().to_str().c_str());
+            rcppsw::to_string(coord()).c_str());
   }
 } /* visit() */
 

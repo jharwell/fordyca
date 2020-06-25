@@ -29,6 +29,7 @@
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/types/timestep.hpp"
+#include "rcppsw/types/spatial_dist.hpp"
 
 #include "cosm/arena/ds/cache_vector.hpp"
 #include "cosm/ds/block3D_vector.hpp"
@@ -84,6 +85,18 @@ class base_cache_manager : public metrics::caches::lifecycle_metrics,
   std::mutex& mtx(void) { return m_mutex; }
 
  protected:
+  /**
+   * \brief Check the dimension that a derived class wants to use to create
+   * caches with, and modify it if necessary.
+   *
+   * Invariant: Caches are an odd # of cells in X,Y so that they have a uniquely
+   * defined discrete center.
+   *
+   * If the cache dimension is not an odd multiple of the arena resolution, then
+   * a modified dimension is returned (smaller than the argument, never larger).
+   */
+  rtypes::spatial_dist dimension_check(rtypes::spatial_dist dim) const;
+
   void caches_created(uint c) { m_caches_created += c; }
   const cds::arena_grid* arena_grid(void) const { return m_grid; }
   cds::arena_grid* arena_grid(void) { return m_grid; }

@@ -103,12 +103,12 @@ void dpo_perception_subsystem::process_los_caches(
     if (!m_store->contains(cache)) {
       ER_INFO("Discovered Cache%d@%s/%s",
               cache->id().v(),
-              cache->rpos2D().to_str().c_str(),
-              cache->dpos2D().to_str().c_str());
+              rcppsw::to_string(cache->rcenter2D()).c_str(),
+              rcppsw::to_string(cache->dcenter2D()).c_str());
     } else if (cache->n_blocks() != m_store->find(cache)->ent()->n_blocks()) {
       ER_INFO("Update cache%d@%s blocks: %zu -> %zu",
               cache->id().v(),
-              cache->dpos2D().to_str().c_str(),
+              rcppsw::to_string(cache->dcenter2D()).c_str(),
               m_store->find(cache)->ent()->n_blocks(),
               cache->n_blocks());
     }
@@ -124,7 +124,7 @@ void dpo_perception_subsystem::process_los_blocks(
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  cds::entity_vector los_blocks = c_los->blocks();
+  auto los_blocks = c_los->blocks();
   if (!los_blocks.empty()) {
     ER_DEBUG("Blocks in DPO store: [%s]",
              rcppsw::to_string(m_store->blocks()).c_str());
@@ -143,27 +143,23 @@ void dpo_perception_subsystem::process_los_blocks(
    */
   los_tracking_sync(c_los, los_blocks);
 
-  for (auto* b : c_los->blocks()) {
-    ER_ASSERT(crepr::entity_dimensionality::ek3D == b->dimensionality(),
-              "Block%d is not 3D!",
-              b->id().v());
-    auto* block = static_cast<crepr::base_block3D*>(b);
+  for (auto* block : c_los->blocks()) {
     ER_ASSERT(!block->is_out_of_sight(),
               "Block%d@%s/%s out of sight in LOS?",
               block->id().v(),
-              block->rpos2D().to_str().c_str(),
-              block->dpos2D().to_str().c_str());
+              rcppsw::to_string(block->ranchor2D()).c_str(),
+              rcppsw::to_string(block->danchor2D()).c_str());
 
     if (!m_store->contains(block)) {
       ER_INFO("Discovered block%d@%s/%s",
               block->id().v(),
-              block->rpos2D().to_str().c_str(),
-              block->dpos2D().to_str().c_str());
+              rcppsw::to_string(block->ranchor2D()).c_str(),
+              rcppsw::to_string(block->danchor2D()).c_str());
     } else {
       ER_DEBUG("Block%d@%s/%s already known",
                block->id().v(),
-               block->rpos2D().to_str().c_str(),
-               block->dpos2D().to_str().c_str());
+               rcppsw::to_string(block->ranchor2D()).c_str(),
+               rcppsw::to_string(block->danchor2D()).c_str());
     }
     events::block_found_visitor op(block);
     op.visit(*m_store);
@@ -184,10 +180,10 @@ void dpo_perception_subsystem::los_tracking_sync(
   while (it != range.end()) {
     ER_TRACE("Check tracked DPO cache%d@%s/%s xspan=%s,yspan=%s w/LOS xspan=%s,yspan=%s",
              it->ent()->id().v(),
-             rcppsw::to_string(it->ent()->rpos2D()).c_str(),
-             rcppsw::to_string(it->ent()->dpos2D()).c_str(),
-             rcppsw::to_string(it->ent()->xspan()).c_str(),
-             rcppsw::to_string(it->ent()->yspan()).c_str(),
+             rcppsw::to_string(it->ent()->rcenter2D()).c_str(),
+             rcppsw::to_string(it->ent()->dcenter2D()).c_str(),
+             rcppsw::to_string(it->ent()->xrspan()).c_str(),
+             rcppsw::to_string(it->ent()->yrspan()).c_str(),
              rcppsw::to_string(c_los->xspan()).c_str(),
              rcppsw::to_string(c_los->yspan()).c_str());
 
@@ -195,8 +191,8 @@ void dpo_perception_subsystem::los_tracking_sync(
      * We can't just check if the cache host cell is in our LOS, because for
      * bigger arenas, it almost never is.
      */
-    bool should_be_in_los = it->ent()->yspan().overlaps_with(c_los->yspan()) ||
-                            it->ent()->xspan().overlaps_with(c_los->xspan());
+    bool should_be_in_los = it->ent()->yrspan().overlaps_with(c_los->yspan()) ||
+                            it->ent()->xrspan().overlaps_with(c_los->xspan());
 
     bool in_los =
         los_caches.end() !=
@@ -207,10 +203,10 @@ void dpo_perception_subsystem::los_tracking_sync(
     if (should_be_in_los && !in_los) {
       ER_INFO("Remove tracked DPO cache%d@%s/%s xspan=%s,yspan=%s: not in LOS xspan=%s,yspan=%s",
               it->ent()->id().v(),
-              rcppsw::to_string(it->ent()->rpos2D()).c_str(),
-              rcppsw::to_string(it->ent()->dpos2D()).c_str(),
-              rcppsw::to_string(it->ent()->xspan()).c_str(),
-              rcppsw::to_string(it->ent()->yspan()).c_str(),
+              rcppsw::to_string(it->ent()->rcenter2D()).c_str(),
+              rcppsw::to_string(it->ent()->dcenter2D()).c_str(),
+              rcppsw::to_string(it->ent()->xrspan()).c_str(),
+              rcppsw::to_string(it->ent()->yrspan()).c_str(),
               rcppsw::to_string(c_los->xspan()).c_str(),
               rcppsw::to_string(c_los->yspan()).c_str());
 
@@ -233,7 +229,7 @@ void dpo_perception_subsystem::los_tracking_sync(
 
 void dpo_perception_subsystem::los_tracking_sync(
     const repr::forager_los* const c_los,
-    const cds::entity_vector& los_blocks) {
+    const cds::block3D_vectorno& los_blocks) {
   /*
    * If the location of one of the blocks we are tracking is in our LOS, then
    * the corresponding block should also be in our LOS. If it is not, then our
@@ -249,10 +245,10 @@ void dpo_perception_subsystem::los_tracking_sync(
   while (it != range.end()) {
     ER_TRACE("Examining block%d@%s/%s",
              it->ent()->id().v(),
-             it->ent()->rpos2D().to_str().c_str(),
-             it->ent()->dpos2D().to_str().c_str());
+             rcppsw::to_string(it->ent()->ranchor2D()).c_str(),
+             rcppsw::to_string(it->ent()->danchor2D()).c_str());
 
-    if (!c_los->contains_abs(it->ent()->dpos2D())) {
+    if (!c_los->contains_abs(it->ent()->danchor2D())) {
       ++it;
       continue;
     }
@@ -269,8 +265,8 @@ void dpo_perception_subsystem::los_tracking_sync(
     if (!exists_in_los) {
       ER_INFO("Remove tracked block%d@%s/%s: not in LOS blocks",
               it->ent()->id().v(),
-              it->ent()->rpos2D().to_str().c_str(),
-              it->ent()->dpos2D().to_str().c_str());
+              rcppsw::to_string(it->ent()->ranchor2D()).c_str(),
+              rcppsw::to_string(it->ent()->danchor2D()).c_str());
       /*
        * Copy iterator object + iterator increment MUST be before removal to
        * avoid iterator invalidation and undefined behavior (I've seen both a

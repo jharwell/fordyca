@@ -97,10 +97,10 @@ boost::optional<csfsm::acquire_goal_fsm::candidate_type> acquire_new_cache_fsm::
           selector(mc_store->blocks(), mc_store->caches(), sensing()->rpos2D())) {
     ER_INFO("Select new cache%d@%s/%s for acquisition",
             best->id().v(),
-            best->rpos2D().to_str().c_str(),
-            best->dpos2D().to_str().c_str());
+            rcppsw::to_string(best->ranchor2D()).c_str(),
+            rcppsw::to_string(best->danchor2D()).c_str());
     return boost::make_optional(acquire_goal_fsm::candidate_type(
-        best->rpos2D(), kNEW_CACHE_ARRIVAL_TOL, best->id()));
+        best->rcenter2D(), kNEW_CACHE_ARRIVAL_TOL, best->id()));
   } else {
     /*
      * If this happens, all the blocks we know of are ineligible for us to
@@ -114,7 +114,7 @@ bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
   ER_ASSERT(!explore_result, "New cache acquisition via exploration?");
   rmath::vector2d position = saa()->sensing()->rpos2D();
   for (auto& b : mc_store->blocks().const_values_range()) {
-    if ((b.ent()->rpos2D() - position).length() <= kNEW_CACHE_ARRIVAL_TOL) {
+    if ((b.ent()->rcenter2D() - position).length() <= kNEW_CACHE_ARRIVAL_TOL) {
       return true;
     }
   } /* for(&b..) */

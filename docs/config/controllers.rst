@@ -47,7 +47,7 @@ The following root XML tags are defined under ``<params>``:
 | ``cache_sel_matrix``      | Depth1, depth2 controllers | Parameters used by robots when selecting which cache to acquire|
 |                           |                            | as part of the task they are currently executing.              |
 +---------------------------+----------------------------+----------------------------------------------------------------+
-| ``sensing_subsystem2D``   | All controllers            | See :xref:`COSM` docs.                                         |
+| ``sensing_subsystemQ3D``  | All controllers            | See :xref:`COSM` docs.                                         |
 +---------------------------+----------------------------+----------------------------------------------------------------+
 | ``actuation_subsystem2D`` | All controllers            | See :xref:`COSM` docs.                                         |
 +---------------------------+----------------------------+----------------------------------------------------------------+

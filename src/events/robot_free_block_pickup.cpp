@@ -154,23 +154,23 @@ void robot_free_block_pickup::visit(ds::dpo_store& store) {
   ER_ASSERT(store.contains(block()),
             "Block%d@%s not in DPO store",
             block()->id().v(),
-            block()->dpos2D().to_str().c_str());
+            rcppsw::to_string(block()->danchor2D()).c_str());
   store.block_remove(block());
   ER_ASSERT(!store.contains(block()),
             "Block%d@%s in DPO store after removal",
             block()->id().v(),
-            block()->dpos2D().to_str().c_str());
+            rcppsw::to_string(block()->danchor2D()).c_str());
 } /* visit() */
 
 void robot_free_block_pickup::visit(ds::dpo_semantic_map& map) {
   cds::cell2D& cell =
       map.access<occupancy_grid::kCell>(cell2D_op::x(), cell2D_op::y());
 
-  ER_ASSERT(block()->dpos2D() == cell.loc(),
+  ER_ASSERT(block()->danchor2D() == cell.loc(),
             "Coordinates for block%d@%s/cell@%s do not agree",
             block()->id().v(),
-            block()->dpos2D().to_str().c_str(),
-            cell.loc().to_str().c_str());
+            rcppsw::to_string(block()->danchor2D()).c_str(),
+            rcppsw::to_string(cell.loc()).c_str());
 
   ER_ASSERT(block()->id() == cell.block3D()->id(),
             "Pickup/cell block mismatch: %d vs %d",

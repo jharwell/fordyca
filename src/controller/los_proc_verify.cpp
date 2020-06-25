@@ -55,11 +55,11 @@ bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
                 b->id().v());
       auto* block = static_cast<crepr::base_block3D*>(b);
 
-      if (!cache.ent()->contains_point2D(block->rpos2D())) {
+      if (!cache.ent()->contains_point2D(block->ranchor2D())) {
         ER_ASSERT(c_dpo->contains(block),
                   "Store does not contain block%d@%s",
                   block->id().v(),
-                  block->dpos2D().to_str().c_str());
+                  block->danchor2D().to_str().c_str());
       }
     } /* for(&block..) */
   }   /* for(&cache..) */
@@ -76,21 +76,21 @@ bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
     ER_ASSERT(nullptr != exists,
               "LOS Cache%d@%s does not exist in DPO store",
               c1->id().v(),
-              c1->dpos2D().to_str().c_str());
-    ER_ASSERT(c1->dpos2D() == exists->ent()->dpos2D(),
+              c1->dcenter2D().to_str().c_str());
+    ER_ASSERT(c1->dcenter2D() == exists->ent()->dcenter2D(),
               "LOS/DPO store disagree on cache%d location: %s/%s",
               c1->id().v(),
-              c1->dpos2D().to_str().c_str(),
-              exists->ent()->dpos2D().to_str().c_str());
+              c1->dcenter2D().to_str().c_str(),
+              exists->ent()->dcenter2D().to_str().c_str());
     ER_ASSERT(c1->id() == exists->ent()->id(),
               "DPO store/LOS disagree on cache ID @%s: %d/%d",
-              c1->dpos2D().to_str().c_str(),
+              c1->dcenter2D().to_str().c_str(),
               exists->ent()->id().v(),
               c1->id().v());
     ER_ASSERT(c1->n_blocks() == exists->ent()->n_blocks(),
               "LOS/DPO store disagree on # of blocks in cache%d@%s: %zu/%zu",
               c1->id().v(),
-              c1->dpos2D().to_str().c_str(),
+              c1->dcenter2D().to_str().c_str(),
               c1->n_blocks(),
               exists->ent()->n_blocks());
   } /* for(c1..) */
@@ -104,19 +104,15 @@ bool los_proc_verify::operator()(const ds::dpo_semantic_map* const c_map) const 
    * Verify that for each cell that contained a block in the LOS, the
    * corresponding cell in the map also contains the same block.
    */
-  for (auto* b : mc_los->blocks()) {
-    ER_ASSERT(crepr::entity_dimensionality::ek3D == b->dimensionality(),
-              "Block%d is not 3D!",
-              b->id().v());
-    auto* block = static_cast<crepr::base_block3D*>(b);
-    auto& cell = c_map->access<ds::occupancy_grid::kCell>(block->dpos2D());
+  for (auto* block : mc_los->blocks()) {
+    auto& cell = c_map->access<ds::occupancy_grid::kCell>(block->danchor2D());
 
     ER_ASSERT(cell.state_has_block(),
               "Cell@%s not in HAS_BLOCK state",
-              block->dpos2D().to_str().c_str());
+              block->danchor2D().to_str().c_str());
     ER_ASSERT(cell.block3D()->id() == block->id(),
               "Cell@%s has wrong block ID (%d vs %d)",
-              block->dpos2D().to_str().c_str(),
+              block->danchor2D().to_str().c_str(),
               block->id().v(),
               cell.block3D()->id().v());
   } /* for(&block..) */
@@ -138,11 +134,6 @@ bool los_proc_verify::operator()(const ds::dpo_semantic_map* const c_map) const 
                   cell1.fsm().current_state(),
                   cell2.fsm().current_state());
         if (cell1.state_has_block()) {
-          ER_ASSERT(crepr::entity_dimensionality::ek3D ==
-                        cell1.entity()->dimensionality(),
-                    "Block%d is not 3D!",
-                    cell1.entity()->id().v());
-
           ER_ASSERT(cell1.block3D()->id() == cell2.block3D()->id(),
                     "LOS/DPO map disagree on block id in cell@%s: %d/%d",
                     d.to_str().c_str(),

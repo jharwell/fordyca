@@ -97,23 +97,23 @@ bool cache_site_selector::verify_site(const rmath::vector2d& site,
 
   /* check distances to known caches */
   for (auto& c : known_caches.const_values_range()) {
-    ER_CHECK(rtypes::spatial_dist((c.ent()->rpos2D() - site).length()) >=
+    ER_CHECK(rtypes::spatial_dist((c.ent()->rcenter2D() - site).length()) >=
                   std::get<0>(m_constraints)[0].cache_prox,
               "Cache site@%s too close to cache%d (%f <= %f)",
              rcppsw::to_string(site).c_str(),
               c.ent()->id().v(),
-              (c.ent()->rpos2D() - site).length(),
+              (c.ent()->rcenter2D() - site).length(),
               std::get<0>(m_constraints)[0].cache_prox.v());
   } /* for(&c..) */
 
   /* check distances to known blocks */
   for (auto& b : known_blocks.const_values_range()) {
-    ER_CHECK(rtypes::spatial_dist((b.ent()->rpos2D() - site).length()) >=
+    ER_CHECK(rtypes::spatial_dist((b.ent()->rcenter2D() - site).length()) >=
                   std::get<1>(m_constraints)[0].block_prox,
               "Cache site@%s too close to block%d (%f <= %f)",
              rcppsw::to_string(site).c_str(),
               b.ent()->id().v(),
-              (b.ent()->rpos2D() - site).length(),
+              (b.ent()->rcenter2D() - site).length(),
               std::get<1>(m_constraints)[0].block_prox.v());
   } /* for(&b..) */
 
@@ -263,7 +263,7 @@ double __cache_constraint_func(const std::vector<double>& x,
   }
   auto* c = reinterpret_cast<cache_site_selector::cache_constraint_data*>(data);
   double val = c->cache_prox.v() -
-               (rmath::vector2d(x[0], x[1]) - c->mc_cache->rpos2D()).length();
+               (rmath::vector2d(x[0], x[1]) - c->mc_cache->rcenter2D()).length();
   return val;
 } /* __cache_constraint_func() */
 
@@ -285,7 +285,7 @@ double __block_constraint_func(const std::vector<double>& x,
   }
   auto* b = reinterpret_cast<cache_site_selector::block_constraint_data*>(data);
   double val = b->block_prox.v() -
-               (rmath::vector2d(x[0], x[1]) - b->mc_block->rpos2D()).length();
+               (rmath::vector2d(x[0], x[1]) - b->mc_block->rcenter2D()).length();
   return val;
 } /* __block_constraint_func() */
 

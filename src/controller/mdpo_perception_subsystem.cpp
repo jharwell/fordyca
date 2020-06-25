@@ -102,7 +102,7 @@ void mdpo_perception_subsystem::process_los_blocks(
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  cds::entity_vector blocks = c_los->blocks();
+  auto blocks = c_los->blocks();
   if (!blocks.empty()) {
     auto accum =
         std::accumulate(blocks.begin(),
@@ -137,8 +137,8 @@ void mdpo_perception_subsystem::process_los_blocks(
         auto* map_block = m_map->access<occupancy_grid::kCell>(d).block3D();
         ER_DEBUG("Correct block%d %s/%s discrepency",
                  map_block->id().v(),
-                 map_block->rpos2D().to_str().c_str(),
-                 map_block->dpos2D().to_str().c_str());
+                 map_block->ranchor2D().to_str().c_str(),
+                 map_block->danchor2D().to_str().c_str());
         m_map->block_remove(map_block);
       } else if (c_los->access(i, j).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_is_known()) {
@@ -154,17 +154,17 @@ void mdpo_perception_subsystem::process_los_blocks(
     ER_ASSERT(!block->is_out_of_sight(),
               "Block%d out of sight in LOS?",
               block->id().v());
-    auto& cell = m_map->access<occupancy_grid::kCell>(block->dpos2D());
+    auto& cell = m_map->access<occupancy_grid::kCell>(block->danchor2D());
     if (!cell.state_has_block()) {
       ER_INFO("Discovered block%d@%s/%s",
               block->id().v(),
-              block->rpos2D().to_str().c_str(),
-              block->dpos2D().to_str().c_str());
+              block->ranchor2D().to_str().c_str(),
+              block->danchor2D().to_str().c_str());
     } else if (cell.state_has_block()) {
       ER_DEBUG("Block%d@%s/%s already known",
                block->id().v(),
-               block->rpos2D().to_str().c_str(),
-               block->dpos2D().to_str().c_str());
+               block->ranchor2D().to_str().c_str(),
+               block->danchor2D().to_str().c_str());
       auto range = m_map->blocks().const_values_range();
       auto it = std::find_if(range.begin(), range.end(), [&](const auto& b1) {
         return b1.ent()->id() == cell.block3D()->id();
@@ -183,7 +183,7 @@ void mdpo_perception_subsystem::process_los_caches(
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  cads::bcache_vectorno los_caches = c_los->caches();
+  auto los_caches = c_los->caches();
   if (!los_caches.empty()) {
     ER_DEBUG("Caches in LOS: [%s]", rcppsw::to_string(los_caches).c_str());
     ER_DEBUG("Caches in DPO store: [%s]",
@@ -204,8 +204,8 @@ void mdpo_perception_subsystem::process_los_caches(
         auto cache = map()->access<occupancy_grid::kCell>(d).cache();
         ER_DEBUG("Correct cache%d@%s/%s discrepency",
                  cache->id().v(),
-                 cache->rpos2D().to_str().c_str(),
-                 cache->dpos2D().to_str().c_str());
+                 cache->rcenter2D().to_str().c_str(),
+                 cache->dcenter2D().to_str().c_str());
         map()->cache_remove(cache);
       }
     } /* for(j..) */
@@ -219,23 +219,23 @@ void mdpo_perception_subsystem::process_los_caches(
      */
     ER_DEBUG("LOS: Cache%d@%s/%s: %zu blocks",
              cache->id().v(),
-             cache->rpos2D().to_str().c_str(),
-             cache->dpos2D().to_str().c_str(),
+             cache->rcenter2D().to_str().c_str(),
+             cache->dcenter2D().to_str().c_str(),
              cache->n_blocks());
-    auto& cell = map()->access<occupancy_grid::kCell>(cache->dpos2D());
+    auto& cell = map()->access<occupancy_grid::kCell>(cache->dcenter2D());
 
     if (!cell.state_has_cache()) {
       ER_INFO("Discovered cache%d@%s/%s: %zu blocks",
               cache->id().v(),
-              cache->rpos2D().to_str().c_str(),
-              cache->dpos2D().to_str().c_str(),
+              cache->rcenter2D().to_str().c_str(),
+              cache->dcenter2D().to_str().c_str(),
               cache->n_blocks());
     } else if (cell.state_has_cache() &&
                cell.cache()->n_blocks() != cache->n_blocks()) {
       ER_INFO("Fixed cache%d@%s/%s block count: %zu -> %zu",
               cache->id().v(),
-              cache->rpos2D().to_str().c_str(),
-              cache->dpos2D().to_str().c_str(),
+              cache->rcenter2D().to_str().c_str(),
+              cache->dcenter2D().to_str().c_str(),
               cache->n_blocks(),
               cell.cache()->n_blocks());
     }

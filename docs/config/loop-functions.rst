@@ -263,7 +263,12 @@ XML configuration:
 
 - ``strict_constraints`` - If `true`, then dynamic cache creation will be
   strict, meaning that any caches that fail validation after creation will be
-  discarded.
+  discarded. This can happen because when robots select cache sites they only
+  consider the distance between the `center` of existing
+  caches/blocks/nests/etc, and do not take the extent into
+  consideration. Depending on what the values of the various proximity
+  constraints robots use when searching for a cache site, validation can fail
+  after cache creation.
 
   If `false`, then dynamically created caches will be kept regardless if they
   violate constraints or not, which MIGHT be OK, or MIGHT cause

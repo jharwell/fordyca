@@ -57,9 +57,11 @@ boost::optional<cads::acache_vectoro> dynamic_cache_manager::create(
     const cds::block3D_vectorno& c_alloc_blocks) {
   if (auto to_use = calc_blocks_for_creation(
           c_params.current_caches, c_params.clusters, c_alloc_blocks)) {
+    auto dimension = dimension_check(mc_cache_config.dimension);
+
     support::depth2::dynamic_cache_creator::params params = {
         .map = m_map,
-        .cache_dim = mc_cache_config.dimension,
+        .cache_dim = dimension,
         .min_dist = mc_cache_config.dynamic.min_dist,
         .min_blocks = mc_cache_config.dynamic.min_blocks,
         .strict_constraints = mc_cache_config.dynamic.strict_constraints};
@@ -68,11 +70,8 @@ boost::optional<cads::acache_vectoro> dynamic_cache_manager::create(
     cads::acache_vectoro created = creator.create_all(c_params, *to_use);
     caches_created(created.size());
 
-    /*
-     * Must be after fixing hidden blocks, otherwise the cache host cell will
-     * have a block as its entity!
-     */
-    creator.update_host_cells(created);
+    /* Configure cache extents */
+    creator.configure_cache_extents(created);
     return boost::make_optional(created);
   } else {
     return boost::optional<cads::acache_vectoro>();
@@ -130,8 +129,11 @@ boost::optional<cds::block3D_vectorno> dynamic_cache_manager::
 
     accum = "";
     std::for_each(to_use.begin(), to_use.end(), [&](const auto& b) {
-      accum +=
-          "b" + rcppsw::to_string(b->id()) + "->" + b->dpos2D().to_str() + ",";
+      accum += "b" +
+               rcppsw::to_string(b->id()) + "->" +
+               b->ranchor2D().to_str() + "/" +
+               b->danchor2D().to_str() +
+               ",";
     });
     ER_DEBUG("Block locations: [%s]", accum.c_str());
 

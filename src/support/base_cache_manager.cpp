@@ -1,7 +1,7 @@
 /**
- * \file forager_los.hpp
+ * \file base_cache_manager.cpp
  *
- * \copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2020 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,47 +18,33 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPR_FORAGER_LOS_HPP_
-#define INCLUDE_FORDYCA_REPR_FORAGER_LOS_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "cosm/arena/ds/cache_vector.hpp"
-#include "cosm/ds/block3D_vector.hpp"
-#include "cosm/repr/los2D.hpp"
+#include "fordyca/support/base_cache_manager.hpp"
+
+#include <cmath>
+
+#include "cosm/ds/arena_grid.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, repr);
+NS_START(fordyca, support);
 
 /*******************************************************************************
- * Class Definitions
+ * Member Functions
  ******************************************************************************/
-/**
- * \class forager_los
- * \ingroup repr
- *
- * \brief A line of sight for foraging applications, which computes the lists of
- * blocks and/or caches present in the LOS on request.
- *
- * The line of sight itself is meant to be a read-only view of part of the
- * arena, but it also exposes non-const access to the blocks and caches within
- * that part of the arena by necessity for event processing.
- */
-class forager_los final : public crepr::los2D, public rer::client<forager_los> {
- public:
-  explicit forager_los(const const_grid_view& c_view)
-      : los2D(c_view), ER_CLIENT_INIT("fordyca.repr.forager_los") {}
+rtypes::spatial_dist base_cache_manager::dimension_check(
+    rtypes::spatial_dist dim) const {
+  if (std::remainder(dim.v(), arena_grid()->resolution().v()) >=
+      std::numeric_limits<double>::epsilon()) {
+    ER_WARN("Reducing cache dimension %f -> %f during creation",
+            dim.v(),
+            dim.v() - arena_grid()->resolution().v());
+    return dim -= arena_grid()->resolution().v();
+  }
+  return dim;
+}
 
-  /**
-   * \brief Get the list of blocks currently in the LOS.
-   */
-  cds::block3D_vectorno blocks(void) const;
-  cads::bcache_vectorno caches(void) const;
-};
-
-NS_END(repr, fordyca);
-
-#endif /* INCLUDE_FORDYCA_REPR_FORAGER_LOS_HPP_ */
+NS_END(support, fordyca);

@@ -57,7 +57,7 @@ class static_cache_manager final : public base_cache_manager,
  public:
   static_cache_manager(const config::caches::caches_config* config,
                        cds::arena_grid* arena_grid,
-                       const std::vector<rmath::vector2d>& cache_locs,
+                       const std::vector<rmath::vector2z>& cache_locs,
                        rmath::rng* rng);
   static_cache_manager(const static_cache_manager&) = delete;
   static_cache_manager& operator=(const static_cache_manager&) = delete;
@@ -110,7 +110,7 @@ class static_cache_manager final : public base_cache_manager,
    * - Currently placed on the cell where cache i is to be created
    * - Placed on the cell where any other cache besides cache i *might* be
    *   recreated. We have to allocate blocks so that ALL static caches can be
-   *   recreated on the same timestep if needed.
+   *   recreated on the same timestep if needed
    * - Already allocated for the re-creation of a different static cache
    *
    * are eligible.
@@ -121,14 +121,14 @@ class static_cache_manager final : public base_cache_manager,
    *                         timestep.
    * \param all_blocks All blocks available for cache creation (already
    *                   allocated blocks are not filtered out).
-   * \param loc The location the new cache is to be created at.
+   * \param center The location the new cache is to be created at.
    * \param n_blocks How many blocks to try to allocate for cache i.
    */
   boost::optional<cds::block3D_vectorno> cache_i_blocks_alloc(
       const cads::acache_vectorno& existing_caches,
       const cds::block3D_vectorno& allocated_blocks,
       const cds::block3D_vectorno& all_blocks,
-      const rmath::vector2d& loc,
+      const rmath::vector2z& center,
       size_t n_blocks) const;
 
   /**
@@ -150,7 +150,7 @@ class static_cache_manager final : public base_cache_manager,
 
   /* clang-format off */
   const config::caches::caches_config mc_cache_config;
-  const std::vector<rmath::vector2d>  mc_cache_locs;
+  const std::vector<rmath::vector2z>  mc_cache_locs;
   rmath::rng*                         m_rng;
   /* clang-format on */
 };

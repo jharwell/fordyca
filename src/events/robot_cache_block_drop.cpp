@@ -58,7 +58,7 @@ robot_cache_block_drop::robot_cache_block_drop(
     carepr::arena_cache* cache,
     const rtypes::discretize_ratio& resolution)
     : ER_CLIENT_INIT("fordyca.events.robot_cache_block_drop"),
-      cell2D_op(cache->dpos2D()),
+      cell2D_op(cache->dcenter2D()),
       mc_resolution(resolution),
       m_block(std::move(block)),
       m_cache(cache) {}
@@ -87,9 +87,10 @@ bool robot_cache_block_drop::dispatch_d2_cache_interactor(
             polled->name().c_str());
 
   if (tasks::depth2::foraging_task::kCacheTransfererName == polled->name()) {
-    ER_INFO("Added cache%d@%s to pickup exception list,task='%s'",
+    ER_INFO("Added cache%d@%s/%s to pickup exception list,task='%s'",
             m_cache->id().v(),
-            m_cache->rpos2D().to_str().c_str(),
+            rcppsw::to_string(m_cache->rcenter2D()).c_str(),
+            rcppsw::to_string(m_cache->dcenter2D()).c_str(),
             polled->name().c_str());
     csel_matrix->sel_exception_add(
         {m_cache->id(), controller::cache_sel_exception::ekPICKUP});

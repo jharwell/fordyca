@@ -128,8 +128,8 @@ cds::block3D_vectorno dynamic_cache_creator::absorb_blocks_calc(
                             std::find(c_cache_i_blocks.begin(),
                                       c_cache_i_blocks.end(),
                                       b) &&
-                        xspan.overlaps_with(b->xspan()) &&
-                        yspan.overlaps_with(b->yspan());
+                        xspan.overlaps_with(b->xrspan()) &&
+                        yspan.overlaps_with(b->yrspan());
                });
   return absorb_blocks;
 } /* absorb_blocks_calc() */
@@ -154,17 +154,18 @@ cds::block3D_vectorno dynamic_cache_creator::cache_i_blocks_alloc(
    * cache, because we have a minimum # blocks threshold that has to be met
    * anyway.
    */
-  ER_TRACE("Add anchor block%d@%s to src list",
+  ER_TRACE("Add anchor block%d@%s/%s to src list",
            c_alloc_blocks[index]->id().v(),
-           c_alloc_blocks[index]->rpos2D().to_str().c_str());
+           rcppsw::to_string(c_alloc_blocks[index]->ranchor2D()).c_str(),
+           rcppsw::to_string(c_alloc_blocks[index]->danchor2D()).c_str());
   src_blocks.push_back(c_alloc_blocks[index]);
   for (size_t i = index + 1; i < c_alloc_blocks.size(); ++i) {
     /*
      * If we find a block that is close enough to our anchor/target block, then
      * add to the src list.
      */
-    if (mc_min_dist >=
-        (c_alloc_blocks[index]->rpos2D() - c_alloc_blocks[i]->rpos2D()).length()) {
+    if (mc_min_dist >= (c_alloc_blocks[index]->rcenter2D() -
+                        c_alloc_blocks[i]->rcenter2D()).length()) {
       ER_ASSERT(std::find(src_blocks.begin(),
                           src_blocks.end(),
                           c_alloc_blocks[i]) == src_blocks.end(),
@@ -173,9 +174,10 @@ cds::block3D_vectorno dynamic_cache_creator::cache_i_blocks_alloc(
       if (std::find(c_used_blocks.begin(),
                     c_used_blocks.end(),
                     c_alloc_blocks[i]) == c_used_blocks.end()) {
-        ER_TRACE("Add block %d@%s to src list",
+        ER_TRACE("Add block%d@%s/%s to src list",
                  c_alloc_blocks[i]->id().v(),
-                 c_alloc_blocks[i]->rpos2D().to_str().c_str());
+                 rcppsw::to_string(c_alloc_blocks[i]->ranchor2D()).c_str(),
+                 rcppsw::to_string(c_alloc_blocks[i]->danchor2D()).c_str());
         src_blocks.push_back(c_alloc_blocks[i]);
       }
     }
@@ -220,7 +222,7 @@ bool dynamic_cache_creator::cache_i_create(
    * creation, which can happen otherwise.
    */
   auto cache_p = std::shared_ptr<carepr::arena_cache>(create_single_cache(
-      rmath::zvec2dvec(*center), cache_i_blocks, c_params.t));
+      *center, cache_i_blocks, c_params.t));
   created_caches->push_back(cache_p);
 
   auto free_blocks = utils::free_blocks_calc(*created_caches,
@@ -246,7 +248,7 @@ bool dynamic_cache_creator::cache_i_create(
 void dynamic_cache_creator::cache_delete(
     const cds::block3D_vectorno& cache_i_blocks,
     cads::acache_vectoro* created_caches) {
-  auto loc = created_caches->back()->dpos2D();
+  auto loc = created_caches->back()->dcenter2D();
 
   events::cell2D_empty_visitor op(loc);
   op.visit(m_map->access<cds::arena_grid::kCell>(loc));

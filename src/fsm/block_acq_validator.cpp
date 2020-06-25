@@ -75,7 +75,7 @@ bool block_acq_validator::operator()(const rmath::vector2d& loc,
                           range.end(),
                           rmath::vector2d(),
                           [&](rmath::vector2d& sum, const auto& bent) {
-                            return sum + bent.ent()->rpos2D();
+                            return sum + bent.ent()->ranchor2D();
                           }) /
           boost::size(range);
 

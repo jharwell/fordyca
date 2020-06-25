@@ -266,7 +266,7 @@ argos::CColor depth0_loop_functions::GetFloorColor(
 
   /* check if the point is inside any of the nests */
   for (auto *nest : arena_map()->nests()) {
-    if (nest->contains_point(tmp)) {
+    if (nest->contains_point2D(tmp)) {
       return argos::CColor(nest->color().red(),
                            nest->color().green(),
                            nest->color().blue());

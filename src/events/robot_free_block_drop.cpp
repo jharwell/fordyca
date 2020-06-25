@@ -82,9 +82,10 @@ bool robot_free_block_drop::dispatch_free_block_interactor(
      */
     if (tasks::depth2::foraging_task::task_in_depth2(polled) &&
         !polled->task_aborted()) {
-      ER_INFO("Added block%d@%s to exception list,task='%s'",
+      ER_INFO("Added block%d@%s/%s to exception list,task='%s'",
               m_block->id().v(),
-              m_block->rpos2D().to_str().c_str(),
+              rcppsw::to_string(m_block->ranchor2D()).c_str(),
+              rcppsw::to_string(m_block->danchor2D()).c_str(),
               polled->name().c_str());
       bsel_matrix->sel_exception_add(m_block->id());
       ret = true;
@@ -176,9 +177,9 @@ void robot_free_block_drop::visit(cfsm::cell2D_fsm& fsm) {
 void robot_free_block_drop::visit(crepr::base_block3D& block) {
   block.md()->robot_id_reset();
 
-  block.rpos3D(rmath::zvec2dvec(rmath::vector3z(cell2D_op::coord()),
+  block.ranchor3D(rmath::zvec2dvec(rmath::vector3z(cell2D_op::coord()),
                                 mc_resolution.v()));
-  block.dpos3D(rmath::vector3z(cell2D_op::coord()));
+  block.danchor3D(rmath::vector3z(cell2D_op::coord()));
 } /* visit() */
 
 NS_END(detail, events, fordyca);

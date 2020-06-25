@@ -82,12 +82,11 @@ class base_cache_creator : public rer::client<base_cache_creator> {
       const cds::block3D_vectorno& c_alloc_blocks) = 0;
 
   /**
-   * \brief Update the cells for all newly created caches to reflect the fact
-   * they now contain caches.
+   * \brief Configure the the cache extent cells for all newly created caches.
    *
    * \param caches Vector of newly created caches.
    */
-  void update_host_cells(cads::acache_vectoro& caches);
+  void configure_cache_extents(cads::acache_vectoro& caches);
 
   /**
    * \brief Basic sanity checks on newly created caches:
@@ -125,13 +124,22 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    * \param t The current timestep.
    */
   std::unique_ptr<carepr::arena_cache> create_single_cache(
-      const rmath::vector2d& center,
+      const rmath::vector2z& center,
       cds::block3D_vectorno blocks,
       const rtypes::timestep& t);
 
   rtypes::spatial_dist cache_dim(void) const { return mc_cache_dim; }
 
  private:
+  bool sanity_check_internal_consistency(const cads::acache_vectoro& caches) const;
+  bool sanity_check_cross_consistency(const cads::acache_vectoro& caches) const;
+  bool sanity_check_cache_overlap(const cads::acache_vectoro& caches) const;
+  bool sanity_check_free_block_overlap(const cads::acache_vectoro& caches,
+                                       const cds::block3D_vectorno& free_blocks) const;
+  bool sanity_check_block_cluster_overlap(
+      const cads::acache_vectoro& caches,
+      const cfds::block3D_cluster_vector& clusters) const;
+
   /* clang-format off */
   const rtypes::spatial_dist mc_cache_dim;
 

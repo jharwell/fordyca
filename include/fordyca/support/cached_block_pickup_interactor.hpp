@@ -272,12 +272,13 @@ class cached_block_pickup_interactor
       m_cache_manager->cache_depleted(t - (*zombie_it)->creation_ts());
       return interactor_status::ekCACHE_DEPLETION;
     } else {
-      /* 2nd, visit the controller (normal case) */
       events::robot_cached_block_pickup_visitor robot_real_pickup(*real_it,
                                                                   to_pickup,
                                                                   controller.entity_id(),
                                                                   t);
 
+      /* 2nd, visit the controller (normal case) */
+      robot_real_pickup.visit(controller);
       return interactor_status::ekNO_EVENT;
     }
   }

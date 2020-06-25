@@ -25,6 +25,7 @@
 
 #include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/ds/cell2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -34,18 +35,16 @@ NS_START(fordyca, repr);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-cds::entity_vector forager_los::blocks(void) const {
-  cds::entity_vector blocks{};
+cds::block3D_vectorno forager_los::blocks(void) const {
+  cds::block3D_vectorno blocks{};
   for (size_t i = 0; i < xsize(); ++i) {
     for (size_t j = 0; j < ysize(); ++j) {
       const cds::cell2D& cell = access(i, j);
       if (cell.state_has_block()) {
-        ER_ASSERT(
-            nullptr != cell.block3D() || nullptr != cell.block3D(),
-            "Cell at(%zu,%zu) in HAS_BLOCK state, but does not have block",
-            i,
-            j);
-        blocks.push_back(cell.entity());
+        ER_ASSERT(nullptr != cell.block3D() || nullptr != cell.block3D(),
+                  "Cell@%s in HAS_BLOCK state, but does not have block",
+                  rcppsw::to_string(cell.loc()).c_str());
+        blocks.push_back(static_cast<crepr::base_block3D*>(cell.entity()));
       }
     } /* for(j..) */
   }   /* for(i..) */
@@ -65,9 +64,10 @@ cads::bcache_vectorno forager_los::caches(void) const {
             "Cell@%s in HAS_CACHE/CACHE_EXTENT state, but does not have cache",
             cell.loc().to_str().c_str());
         ER_ASSERT(cache->n_blocks() >= carepr::base_cache::kMinBlocks,
-                  "Cache%d@%s has too few blocks (%zu < %zu)",
+                  "Cache%d@%s/%s has too few blocks (%zu < %zu)",
                   cache->id().v(),
-                  cache->dpos2D().to_str().c_str(),
+                  rcppsw::to_string(cache->rcenter2D()).c_str(),
+                  rcppsw::to_string(cache->dcenter2D()).c_str(),
                   cache->n_blocks(),
                   carepr::base_cache::kMinBlocks);
         /*

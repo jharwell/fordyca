@@ -44,7 +44,7 @@ using cds::arena_grid;
 static_cache_manager::static_cache_manager(
     const config::caches::caches_config* config,
     cds::arena_grid* const arena_grid,
-    const std::vector<rmath::vector2d>& cache_locs,
+    const std::vector<rmath::vector2z>& cache_locs,
     rmath::rng* rng)
     : base_cache_manager(arena_grid),
       ER_CLIENT_INIT("fordyca.support.depth1.static_cache_manager"),
@@ -73,23 +73,24 @@ boost::optional<cads::acache_vectoro> static_cache_manager::create(
         c_alloc_blocks.size());
     return boost::optional<cads::acache_vectoro>();
   }
+
+  auto dimension = dimension_check(mc_cache_config.dimension);
+
   static_cache_creator creator(arena_grid(),
                                mc_cache_locs,
-                               mc_cache_config.dimension);
+                               dimension);
 
   auto created = creator.create_all(c_params, *to_use);
 
-  /*
-   * Fix hidden blocks and update host cells. Host cell updating must be second,
-   * otherwise the cache host cell will have a block as its entity!
-   */
+  /* Fix hidden blocks and configure cache extents */
   post_creation_blocks_absorb(created, c_alloc_blocks);
-  creator.update_host_cells(created);
+  creator.configure_cache_extents(created);
 
   auto free_blocks = utils::free_blocks_calc(created, c_alloc_blocks);
-  ER_ASSERT(
-      creator.creation_sanity_checks(created, free_blocks, c_params.clusters),
-      "One or more bad caches on creation");
+  ER_ASSERT(creator.creation_sanity_checks(created,
+                                           free_blocks,
+                                           c_params.clusters),
+            "One or more bad caches on creation");
 
   caches_created(created.size());
   return boost::make_optional(created);
@@ -138,16 +139,14 @@ boost::optional<cds::block3D_vectorno> static_cache_manager::cache_i_blocks_allo
     const cads::acache_vectorno& existing_caches,
     const cds::block3D_vectorno& allocated_blocks,
     const cds::block3D_vectorno& all_blocks,
-    const rmath::vector2d& loc,
+    const rmath::vector2z& center,
     size_t n_blocks) const {
   cds::block3D_vectorno cache_i_blocks;
-  rmath::vector2z dcenter =
-      rmath::dvec2zvec(loc, arena_grid()->resolution().v());
   std::copy_if(
       all_blocks.begin(),
       all_blocks.end(),
       std::back_inserter(cache_i_blocks),
-      [&](const auto& b) {
+      [&](const auto* b) {
         /* don't have enough blocks yet */
         return (cache_i_blocks.size() < n_blocks) &&
                /* not carried by robot */
@@ -162,14 +161,14 @@ boost::optional<cds::block3D_vectorno> static_cache_manager::cache_i_blocks_allo
                            [&](const auto& c) {
                              return !c->contains_block(b);
                            }) &&
-               /* not already on a cell where cache will be re-created, or
-                * on the cell where ANOTHER cache *might* be recreated */
+               /*
+                * Not already on a cell where cache will be re-created, or on
+                * the cell where ANOTHER cache *might* be recreated.
+                */
                std::all_of(mc_cache_locs.begin(),
                            mc_cache_locs.end(),
-                           [&](const auto& l) {
-                             return b->dpos2D() !=
-                                    rmath::dvec2zvec(
-                                        l, arena_grid()->resolution().v());
+                           [&](const auto& loc) {
+                             return b->danchor2D() != loc;
                            });
       });
 
@@ -183,7 +182,7 @@ boost::optional<cds::block3D_vectorno> static_cache_manager::cache_i_blocks_allo
     std::for_each(cache_i_blocks.begin(),
                   cache_i_blocks.end(),
                   [&](const auto& b) {
-                    count += (b->is_out_of_sight() || b->dpos2D() == dcenter);
+                    count += (b->is_out_of_sight() || b->danchor2D() == center);
                   });
 
     std::string accum;
@@ -200,15 +199,14 @@ boost::optional<cds::block3D_vectorno> static_cache_manager::cache_i_blocks_allo
                   cache_i_blocks.end(),
                   [&](const auto& b) {
                     accum += "b" + rcppsw::to_string(b->id()) + "->" +
-                             b->dpos2D().to_str() + ",";
+                             b->danchor2D().to_str() + ",";
                   });
     ER_TRACE("Cache i alloc_blocks locs: [%s]", accum.c_str());
 
     ER_ASSERT(cache_i_blocks.size() - count < carepr::base_cache::kMinBlocks,
-              "For new cache @%s/%s: %zu blocks SHOULD be "
+              "For new cache @%s: %zu blocks SHOULD be "
               "available, but only %zu are (min=%zu)",
-              loc.to_str().c_str(),
-              dcenter.to_str().c_str(),
+              rcppsw::to_string(center).c_str(),
               cache_i_blocks.size() - count,
               cache_i_blocks.size(),
               carepr::base_cache::kMinBlocks);
@@ -216,10 +214,9 @@ boost::optional<cds::block3D_vectorno> static_cache_manager::cache_i_blocks_allo
   }
   if (cache_i_blocks.size() < mc_cache_config.static_.size) {
     ER_WARN(
-        "Not enough free blocks to meet min size for new cache@%s/%s (%zu < "
+        "Not enough free blocks to meet min size for new cache@/%s (%zu < "
         "%u)",
-        loc.to_str().c_str(),
-        dcenter.to_str().c_str(),
+        rcppsw::to_string(center).c_str(),
         cache_i_blocks.size(),
         mc_cache_config.static_.size);
     return boost::optional<cds::block3D_vectorno>();
@@ -232,10 +229,10 @@ void static_cache_manager::post_creation_blocks_absorb(
     const cds::block3D_vectorno& blocks) {
   for (auto& b : blocks) {
     for (auto& c : caches) {
-      if (!c->contains_block(b) && c->xspan().overlaps_with(b->xspan()) &&
-          c->yspan().overlaps_with(b->yspan())) {
-        cdops::cell2D_empty_visitor empty(b->dpos2D());
-        empty.visit(arena_grid()->access<arena_grid::kCell>(b->dpos2D()));
+      if (!c->contains_block(b) && c->xrspan().overlaps_with(b->xrspan()) &&
+          c->yrspan().overlaps_with(b->yrspan())) {
+        cdops::cell2D_empty_visitor empty(b->danchor2D());
+        empty.visit(arena_grid()->access<arena_grid::kCell>(b->danchor2D()));
         /*
          * We are not REALLY holding all the arena map locks, but since cache
          * creation always happens AFTER all robot control steps have been run,
@@ -243,7 +240,7 @@ void static_cache_manager::post_creation_blocks_absorb(
          */
         caops::free_block_drop_visitor op(
             b,
-            rmath::dvec2zvec(c->rpos2D(), arena_grid()->resolution().v()),
+            c->dcenter2D(),
             arena_grid()->resolution(),
             carena::arena_map_locking::ekALL_HELD);
         op.visit(arena_grid()->access<arena_grid::kCell>(op.x(), op.y()));
