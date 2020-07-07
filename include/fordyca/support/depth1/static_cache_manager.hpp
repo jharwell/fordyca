@@ -40,6 +40,10 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::arena {
+class caching_arena_map;
+} /* namespace cosm::arena */
+
 NS_START(fordyca, support, depth1);
 
 /*******************************************************************************
@@ -56,8 +60,8 @@ class static_cache_manager final : public base_cache_manager,
                                    public rer::client<static_cache_manager> {
  public:
   static_cache_manager(const config::caches::caches_config* config,
-                       cds::arena_grid* arena_grid,
-                       const std::vector<rmath::vector2z>& cache_locs,
+                       carena::caching_arena_map* map,
+                       const std::vector<rmath::vector2d>& cache_locs,
                        rmath::rng* rng);
   static_cache_manager(const static_cache_manager&) = delete;
   static_cache_manager& operator=(const static_cache_manager&) = delete;
@@ -76,8 +80,8 @@ class static_cache_manager final : public base_cache_manager,
   boost::optional<cads::acache_vectoro> create_conditional(
       const cache_create_ro_params& c_params,
       const cds::block3D_vectorno&  c_alloc_blocks,
-      uint n_harvesters,
-      uint n_collectors);
+      size_t n_harvesters,
+      size_t n_collectors);
 
   /**
    * \brief Get the # of caches that are being managed.
@@ -150,7 +154,7 @@ class static_cache_manager final : public base_cache_manager,
 
   /* clang-format off */
   const config::caches::caches_config mc_cache_config;
-  const std::vector<rmath::vector2z>  mc_cache_locs;
+  const std::vector<rmath::vector2d>  mc_cache_locs;
   rmath::rng*                         m_rng;
   /* clang-format on */
 };

@@ -43,7 +43,7 @@ dynamic_cache_manager::dynamic_cache_manager(
     const config::caches::caches_config* config,
     carena::caching_arena_map* arena_map,
     rmath::rng* rng)
-    : base_cache_manager(&arena_map->decoratee()),
+    : base_cache_manager(arena_map),
       ER_CLIENT_INIT("fordyca.support.depth2.dynamic_cache_manager"),
       mc_cache_config(*config),
       m_rng(rng),
@@ -67,12 +67,14 @@ boost::optional<cads::acache_vectoro> dynamic_cache_manager::create(
         .strict_constraints = mc_cache_config.dynamic.strict_constraints};
     support::depth2::dynamic_cache_creator creator(&params, m_rng);
 
-    cads::acache_vectoro created = creator.create_all(c_params, *to_use);
-    caches_created(created.size());
+    dynamic_cache_creator::creation_result res = creator.create_all(c_params,
+                                                                    *to_use);
+    caches_created(res.created.size());
+    caches_discarded(res.n_discarded);
 
     /* Configure cache extents */
-    creator.configure_cache_extents(created);
-    return boost::make_optional(created);
+    creator.configure_cache_extents(res.created);
+    return boost::make_optional(res.created);
   } else {
     return boost::optional<cads::acache_vectoro>();
   }
@@ -95,7 +97,7 @@ boost::optional<cds::block3D_vectorno> dynamic_cache_manager::
                        [&](const auto& clust) {
                          /* constructed, so must assign before search */
                          auto cblocks = clust->blocks();
-                         ER_INFO("cluster blocks: [%s]",
+                         ER_DEBUG("cluster blocks: [%s]",
                                  rcppsw::to_string(cblocks).c_str());
                          return cblocks.end() ==
                                 std::find(cblocks.begin(), cblocks.end(), b);

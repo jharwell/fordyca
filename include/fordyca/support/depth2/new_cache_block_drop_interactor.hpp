@@ -119,8 +119,8 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
  private:
   void cache_proximity_notify(T& controller,
                               const utils::proximity_status_t& status) {
-    ER_WARN("%s@%s cannot drop block in new cache: Cache%d@%s too close (%f <= %f)",
-            controller.GetId().c_str(),
+    ER_WARN("Robot%d@%s cannot drop block in new cache: Cache%d@%s too close (%f <= %f)",
+            controller.entity_id().v(),
             controller.rpos2D().to_str().c_str(),
             status.entity_id.v(),
             status.entity_loc.to_str().c_str(),
@@ -164,12 +164,15 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
               "Out of order cache penalty handling");
     ER_ASSERT(nullptr != dynamic_cast<events::dynamic_cache_interactor*>(
         controller.current_task()), "Non-cache interface task!");
+    auto acq_goal = controller.current_task()->acquisition_goal();
     ER_ASSERT(controller.current_task()->goal_acquired() &&
-              fsm::foraging_acq_goal::ekNEW_CACHE == controller.current_task()->acquisition_goal(),
-              "Controller not waiting for new cache block drop");
+              fsm::foraging_acq_goal::ekNEW_CACHE == acq_goal,
+              "Robot%d not waiting for new cache block drop: acq_goal=%d",
+              controller.entity_id().v(),
+              acq_goal.v());
     auto status = utils::new_cache_cache_proximity(controller,
-                                                       *m_map,
-                                                       m_cache_manager->cache_proximity_dist());
+                                                   *m_map,
+                                                   m_cache_manager->cache_proximity_dist());
 
     if (rtypes::constants::kNoUUID != status.entity_id) {
       /*
@@ -179,8 +182,8 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
      * said cache, then abort the drop and tell the robot about the undiscovered
      * cache so that it will update its state and pick a different new cache.
      */
-      ER_WARN("%s cannot drop block in new cache %s: Cache%d too close (%f <= %f)",
-              controller.GetId().c_str(),
+      ER_WARN("Robot%d cannot drop block in new cache %s: Cache%d too close (%f <= %f)",
+              controller.entity_id().v(),
               controller.rpos2D().to_str().c_str(),
               status.entity_id.v(),
               status.distance.length(),

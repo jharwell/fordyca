@@ -260,42 +260,6 @@ void depth0_loop_functions::reset(void) {
   ndc_pop();
 } /* reset() */
 
-argos::CColor depth0_loop_functions::GetFloorColor(
-    const argos::CVector2& plane_pos) {
-  rmath::vector2d tmp(plane_pos.GetX(), plane_pos.GetY());
-
-  /* check if the point is inside any of the nests */
-  for (auto *nest : arena_map()->nests()) {
-    if (nest->contains_point2D(tmp)) {
-      return argos::CColor(nest->color().red(),
-                           nest->color().green(),
-                           nest->color().blue());
-    }
-  } /* for(*nest..) */
-
-  for (auto* block : arena_map()->blocks()) {
-    /*
-     * Short circuiting tests for out of sight blocks can help in large
-     * swarms with large #s of blocks.
-     */
-    if (block->is_out_of_sight()) {
-      continue;
-    }
-    /*
-     * Even though each block type has a unique color, the only distinction
-     * that robots can make to determine if they are on a block or not is
-     * between shades of black/white. So, all blocks must appear as black, even
-     * when they are not actually (when blocks are picked up their correct color
-     * is shown through visualization).
-     */
-    if (block->contains_point2D(tmp)) {
-      return argos::CColor::BLACK;
-    }
-  } /* for(block..) */
-
-  return argos::CColor::WHITE;
-} /* GetFloorColor() */
-
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/

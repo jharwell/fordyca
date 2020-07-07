@@ -51,7 +51,7 @@ using configurer_map_type = rds::type_map<
 class robot_configurer_applicator {
  public:
   explicit robot_configurer_applicator(controller::foraging_controller* const c)
-      : controller(c) {}
+      : m_controller(c) {}
 
   void operator()(robot_configurer<controller::depth0::crw_controller>& ) const {}
 
@@ -59,13 +59,13 @@ class robot_configurer_applicator {
            RCPPSW_SFINAE_FUNC(!std::is_same<T,
                                  controller::depth0::crw_controller>::value)>
   void operator()(robot_configurer<T>& configurer) const {
-    auto cast = dynamic_cast<typename support::depth0::robot_configurer<T>::controller_type*>(controller);
+    auto cast = dynamic_cast<typename support::depth0::robot_configurer<T>::controller_type*>(m_controller);
     configurer(cast);
   }
 
  private:
   /* clang-format off */
-  controller::foraging_controller* const controller;
+  controller::foraging_controller* const m_controller;
   /* clang-format on */
 };
 

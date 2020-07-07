@@ -49,12 +49,7 @@ bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
    * block's location, and it is therefore not occluded.
    */
   for (auto& cache : c_dpo->caches().const_values_range()) {
-    for (auto* b : mc_los->blocks()) {
-      ER_ASSERT(crepr::entity_dimensionality::ek3D == b->dimensionality(),
-                "Block%d is not 3D!",
-                b->id().v());
-      auto* block = static_cast<crepr::base_block3D*>(b);
-
+    for (auto* block : mc_los->blocks()) {
       if (!cache.ent()->contains_point2D(block->ranchor2D())) {
         ER_ASSERT(c_dpo->contains(block),
                   "Store does not contain block%d@%s",

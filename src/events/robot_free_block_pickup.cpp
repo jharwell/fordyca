@@ -152,14 +152,12 @@ void robot_free_block_pickup::visit(fsm::depth0::crw_fsm& fsm) {
  ******************************************************************************/
 void robot_free_block_pickup::visit(ds::dpo_store& store) {
   ER_ASSERT(store.contains(block()),
-            "Block%d@%s not in DPO store",
-            block()->id().v(),
-            rcppsw::to_string(block()->danchor2D()).c_str());
+            "Block%d not in DPO store",
+            block()->id().v());
   store.block_remove(block());
   ER_ASSERT(!store.contains(block()),
-            "Block%d@%s in DPO store after removal",
-            block()->id().v(),
-            rcppsw::to_string(block()->danchor2D()).c_str());
+            "Block%d in DPO store after removal",
+            block()->id().v());
 } /* visit() */
 
 void robot_free_block_pickup::visit(ds::dpo_semantic_map& map) {

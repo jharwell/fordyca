@@ -78,12 +78,9 @@ class robot_free_block_drop : public rer::client<robot_free_block_drop>,
     using others = rmpl::typelist<
         /* depth0 */
         fsm::block_to_goal_fsm,
-        ds::dpo_semantic_map,
         /* depth2 */
         tasks::depth2::cache_starter,
-        tasks::depth2::cache_finisher,
-        fsm::block_to_goal_fsm,
-        ds::dpo_semantic_map>;
+        tasks::depth2::cache_finisher>;
 
     using value = boost::mpl::joint_view<
         boost::mpl::joint_view<controllers::type, others::type>,
@@ -123,11 +120,7 @@ class robot_free_block_drop : public rer::client<robot_free_block_drop>,
                         const rtypes::discretize_ratio& resolution);
 
  private:
-  void visit(fsm::block_to_goal_fsm&);
-  void visit(ds::dpo_semantic_map& map);
-  void visit(class cds::cell2D& cell);
-  void visit(cfsm::cell2D_fsm& fsm);
-  void visit(crepr::base_block3D& block);
+  void visit(fsm::block_to_goal_fsm& fsm);
 
   bool dispatch_free_block_interactor(tasks::base_foraging_task* task,
                                       controller::block_sel_matrix* bsel_matrix);

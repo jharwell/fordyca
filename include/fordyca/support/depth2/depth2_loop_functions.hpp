@@ -149,8 +149,6 @@ class depth2_loop_functions final : public depth1::depth1_loop_functions,
    */
   void robot_post_step(argos::CFootBotEntity& robot);
 
-  argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
-
   /* clang-format off */
   std::mutex                                 m_dynamic_cache_mtx{};
   bool                                       m_dynamic_cache_create{false};

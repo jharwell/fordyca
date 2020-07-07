@@ -24,7 +24,7 @@
 
 #include "cosm/arena/operations/free_block_drop.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
-#include "cosm/ds/arena_grid.hpp"
+#include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/ds/operations/cell2D_empty.hpp"
 #include "cosm/repr/base_block3D.hpp"
 
@@ -43,10 +43,10 @@ using cds::arena_grid;
  ******************************************************************************/
 static_cache_manager::static_cache_manager(
     const config::caches::caches_config* config,
-    cds::arena_grid* const arena_grid,
-    const std::vector<rmath::vector2z>& cache_locs,
+    carena::caching_arena_map* const map,
+    const std::vector<rmath::vector2d>& cache_locs,
     rmath::rng* rng)
-    : base_cache_manager(arena_grid),
+    : base_cache_manager(map),
       ER_CLIENT_INIT("fordyca.support.depth1.static_cache_manager"),
       mc_cache_config(*config),
       mc_cache_locs(cache_locs),
@@ -74,33 +74,46 @@ boost::optional<cads::acache_vectoro> static_cache_manager::create(
     return boost::optional<cads::acache_vectoro>();
   }
 
+  /* (re)-create the caches */
   auto dimension = dimension_check(mc_cache_config.dimension);
 
-  static_cache_creator creator(arena_grid(),
+  static_cache_creator creator(&arena_map()->decoratee(),
                                mc_cache_locs,
                                dimension);
 
-  auto created = creator.create_all(c_params, *to_use);
+  static_cache_creator::creation_result res = creator.create_all(c_params,
+                                                                 *to_use);
 
-  /* Fix hidden blocks and configure cache extents */
-  post_creation_blocks_absorb(created, c_alloc_blocks);
-  creator.configure_cache_extents(created);
-
-  auto free_blocks = utils::free_blocks_calc(created, c_alloc_blocks);
-  ER_ASSERT(creator.creation_sanity_checks(created,
+  /* verify the created caches */
+  cads::acache_vectorro sanity_caches;
+  std::transform(res.created.begin(),
+                 res.created.end(),
+                 std::back_inserter(sanity_caches),
+                 [&](const auto& c) {
+                   return c.get();
+                 });
+  auto free_blocks = utils::free_blocks_calc(sanity_caches, c_alloc_blocks);
+  ER_ASSERT(creator.creation_sanity_checks(sanity_caches,
                                            free_blocks,
-                                           c_params.clusters),
+                                           c_params.clusters,
+                                           arena_map()->nests()),
             "One or more bad caches on creation");
 
-  caches_created(created.size());
-  return boost::make_optional(created);
+  /* Fix hidden blocks and configure cache extents */
+  post_creation_blocks_absorb(res.created, c_alloc_blocks);
+  creator.configure_cache_extents(res.created);
+
+  caches_created(res.created.size());
+  caches_discarded(res.n_discarded);
+
+  return boost::make_optional(res.created);
 } /* create() */
 
 boost::optional<cads::acache_vectoro> static_cache_manager::create_conditional(
     const cache_create_ro_params& c_params,
     const cds::block3D_vectorno& c_alloc_blocks,
-    uint n_harvesters,
-    uint n_collectors) {
+    size_t n_harvesters,
+    size_t n_collectors) {
   math::cache_respawn_probability p(
       mc_cache_config.static_.respawn_scale_factor);
 
@@ -116,10 +129,11 @@ boost::optional<cds::block3D_vectorno> static_cache_manager::blocks_alloc(
     const cds::block3D_vectorno& all_blocks) const {
   cds::block3D_vectorno alloc_i;
   for (auto& loc : mc_cache_locs) {
+    auto dloc = rmath::dvec2zvec(loc, arena_map()->grid_resolution().v());
     if (auto cache_i = cache_i_blocks_alloc(existing_caches,
                                             alloc_i,
                                             all_blocks,
-                                            loc,
+                                            dloc,
                                             carepr::base_cache::kMinBlocks)) {
       ER_DEBUG("Alloc_blocks=[%s] for cache@%s",
                rcppsw::to_string(*cache_i).c_str(),
@@ -168,7 +182,9 @@ boost::optional<cds::block3D_vectorno> static_cache_manager::cache_i_blocks_allo
                std::all_of(mc_cache_locs.begin(),
                            mc_cache_locs.end(),
                            [&](const auto& loc) {
-                             return b->danchor2D() != loc;
+                             auto dloc = rmath::dvec2zvec(loc,
+                                                          arena_map()->grid_resolution().v());
+                             return b->danchor2D() != dloc;
                            });
       });
 
@@ -178,7 +194,7 @@ boost::optional<cds::block3D_vectorno> static_cache_manager::cache_i_blocks_allo
      * C++14/gcc7 when you are accumulating into a different type (e.g. from a
      * set of blocks into an int).
      */
-    uint count = 0;
+    size_t count = 0;
     std::for_each(cache_i_blocks.begin(),
                   cache_i_blocks.end(),
                   [&](const auto& b) {
@@ -232,7 +248,7 @@ void static_cache_manager::post_creation_blocks_absorb(
       if (!c->contains_block(b) && c->xrspan().overlaps_with(b->xrspan()) &&
           c->yrspan().overlaps_with(b->yrspan())) {
         cdops::cell2D_empty_visitor empty(b->danchor2D());
-        empty.visit(arena_grid()->access<arena_grid::kCell>(b->danchor2D()));
+        empty.visit(arena_map()->access<arena_grid::kCell>(b->danchor2D()));
         /*
          * We are not REALLY holding all the arena map locks, but since cache
          * creation always happens AFTER all robot control steps have been run,
@@ -241,9 +257,9 @@ void static_cache_manager::post_creation_blocks_absorb(
         caops::free_block_drop_visitor op(
             b,
             c->dcenter2D(),
-            arena_grid()->resolution(),
+            arena_map()->grid_resolution(),
             carena::arena_map_locking::ekALL_HELD);
-        op.visit(arena_grid()->access<arena_grid::kCell>(op.x(), op.y()));
+        op.visit(arena_map()->access<arena_grid::kCell>(op.x(), op.y()));
         c->block_add(b);
         ER_INFO("Hidden block%d added to cache%d", b->id().v(), c->id().v());
       }

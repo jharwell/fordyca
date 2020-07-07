@@ -153,7 +153,7 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
    * static caches that will be maintained by the simulation during
    * initialization.
    */
-  std::vector<rmath::vector2z> calc_cache_locs(
+  std::vector<rmath::vector2d> calc_cache_locs(
       const cfconfig::block_dist_config* distp) RCSW_COLD;
 
   /**
@@ -180,8 +180,6 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
    *       exclusion as needed).
    */
   void robot_post_step(argos::CFootBotEntity& robot);
-
-  argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
 
   /**
    * \brief Extract the numerical ID of the task each robot is currently

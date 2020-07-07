@@ -81,7 +81,7 @@ class task_executive_builder : public rer::client<task_executive_builder> {
   task_executive_builder& operator=(const task_executive_builder&) = delete;
   task_executive_builder(const task_executive_builder&) = delete;
 
-  std::unique_ptr<cta::bi_tdgraph_executive>
+  RCSW_COLD std::unique_ptr<cta::bi_tdgraph_executive>
   operator()(const config::depth1::controller_repository& config_repo,
              rmath::rng* rng) RCSW_COLD;
 

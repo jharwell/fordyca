@@ -39,6 +39,6 @@ crw_adaptor::crw_adaptor(const fsm::expstrat::foraging_expstrat::params* c_param
 
 crw_adaptor::crw_adaptor(crfootbot::footbot_saa_subsystem* saa, rmath::rng* rng) :
     foraging_expstrat(saa, rng),
-    decorator(static_cast<crfootbot::footbot_saa_subsystem*>(saa), rng){}
+    decorator(saa, rng){}
 
 NS_END(expstrat, fsm, fordyca);

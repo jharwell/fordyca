@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/support/base_cache_creator.hpp"
 #include "cosm/foraging/ds/block_cluster_vector.hpp"
 #include "rcppsw/math/rng.hpp"
@@ -66,6 +68,8 @@ class dynamic_cache_creator : public base_cache_creator,
     bool                       strict_constraints;
     /* clang-format on */
   };
+
+
   dynamic_cache_creator(const params* p, rmath::rng* rng);
   dynamic_cache_creator(const dynamic_cache_creator&) = delete;
   dynamic_cache_creator& operator=(const dynamic_cache_creator&) = delete;
@@ -74,7 +78,7 @@ class dynamic_cache_creator : public base_cache_creator,
    * \brief Create new caches in the arena from blocks that are close enough
    * together.
    */
-  cads::acache_vectoro create_all(
+  creation_result create_all(
       const cache_create_ro_params& c_params,
       const cds::block3D_vectorno& c_alloc_blocks) override;
 
@@ -87,13 +91,12 @@ class dynamic_cache_creator : public base_cache_creator,
    */
   bool cache_i_create(const cache_create_ro_params& c_params,
                       const cds::block3D_vectorno& c_alloc_blocks,
-                      cds::block3D_vectorno&& cache_i_blocks,
-                      cads::acache_vectoro* created_caches,
-                      cds::block3D_vectorno* used_blocks);
+                      const cds::block3D_vectorno& c_used_blocks,
+                      cds::block3D_vectorno* cache_i_blocks,
+                      cads::acache_vectoro* created_caches);
 
   /**
    * \brief If a newly created cache failed verification checks, delete it.
-   *
    *
    * 1. Clear host cell.
    * 2. Redistribute the blocks that have been deposited in the host cell.
@@ -101,7 +104,7 @@ class dynamic_cache_creator : public base_cache_creator,
    * Then the actual cache can safely be deleted.
    */
   void cache_delete(const cds::block3D_vectorno& cache_i_blocks,
-                    cads::acache_vectoro* created_caches);
+                    std::unique_ptr<carepr::arena_cache> victim);
   /**
    * \brief Calculate the blocks to be used in the creation of a single new
    * cache.
@@ -115,7 +118,7 @@ class dynamic_cache_creator : public base_cache_creator,
   cds::block3D_vectorno cache_i_blocks_alloc(
       const cds::block3D_vectorno& c_used_blocks,
       const cds::block3D_vectorno& c_alloc_blocks,
-      uint index) const;
+      size_t index) const;
 
   /**
    * \brief Calculate the blocks a cache will absorb as a result of its center
@@ -136,8 +139,8 @@ class dynamic_cache_creator : public base_cache_creator,
       const cds::block3D_vectorno& c_alloc_blocks,
       const cds::block3D_vectorno& c_cache_i_blocks,
       const cds::block3D_vectorno& c_used_blocks,
-      const rmath::vector2z& c_center,
-      rtypes::spatial_dist cache_dim) const;
+      const rmath::vector2d& c_center,
+      const rtypes::spatial_dist& c_cache_dim) const;
 
   /**
    * \brief Create the set of caches that our new cache needs to avoid during

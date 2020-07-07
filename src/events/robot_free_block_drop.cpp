@@ -146,11 +146,6 @@ void robot_free_block_drop::visit(
   controller.ndc_pop();
 } /* visit() */
 
-void robot_free_block_drop::visit(ds::dpo_semantic_map& map) {
-  cds::cell2D& cell = map.access<occupancy_grid::kCell>(cell2D_op::coord());
-  visit(cell);
-} /* visit() */
-
 void robot_free_block_drop::visit(tasks::depth2::cache_starter& task) {
   visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
@@ -162,24 +157,6 @@ void robot_free_block_drop::visit(tasks::depth2::cache_finisher& task) {
 void robot_free_block_drop::visit(fsm::block_to_goal_fsm& fsm) {
   fsm.inject_event(fsm::foraging_signal::ekBLOCK_DROP,
                    rpfsm::event_type::ekNORMAL);
-} /* visit() */
-
-void robot_free_block_drop::visit(cds::cell2D& cell) {
-  visit(*m_block);
-  visit(cell.fsm());
-  cell.entity(m_block.get());
-} /* visit() */
-
-void robot_free_block_drop::visit(cfsm::cell2D_fsm& fsm) {
-  fsm.event_block_drop();
-} /* visit() */
-
-void robot_free_block_drop::visit(crepr::base_block3D& block) {
-  block.md()->robot_id_reset();
-
-  block.ranchor3D(rmath::zvec2dvec(rmath::vector3z(cell2D_op::coord()),
-                                mc_resolution.v()));
-  block.danchor3D(rmath::vector3z(cell2D_op::coord()));
 } /* visit() */
 
 NS_END(detail, events, fordyca);

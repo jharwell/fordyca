@@ -36,8 +36,8 @@ using carepr::base_cache;
  ******************************************************************************/
 static_cache_creator::static_cache_creator(
     cds::arena_grid* const grid,
-    const std::vector<rmath::vector2z>& centers,
-    rtypes::spatial_dist cache_dim)
+    const std::vector<rmath::vector2d>& centers,
+    const rtypes::spatial_dist& cache_dim)
     : base_cache_creator(grid, cache_dim),
       ER_CLIENT_INIT("fordyca.support.depth1.static_cache_creator"),
       mc_centers(centers) {}
@@ -45,20 +45,21 @@ static_cache_creator::static_cache_creator(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-cads::acache_vectoro static_cache_creator::create_all(
+static_cache_creator::creation_result static_cache_creator::create_all(
     const cache_create_ro_params& c_params,
     const cds::block3D_vectorno& c_alloc_blocks) {
   ER_DEBUG("Creating caches: alloc_blocks=[%s] (%zu)",
            rcppsw::to_string(c_alloc_blocks).c_str(),
            c_alloc_blocks.size());
 
-  cads::acache_vectoro created;
+  creation_result res;
   auto it = c_alloc_blocks.begin();
   for (auto& center : mc_centers) {
+    auto dcenter = rmath::dvec2zvec(center, grid()->resolution().v());
     auto exists = std::find_if(c_params.current_caches.begin(),
                                c_params.current_caches.end(),
                                [&](const auto& c) {
-                                 return center == c->dcenter2D();
+                                 return dcenter == c->dcenter2D();
                                });
     /* static cache already exists */
     if (c_params.current_caches.end() != exists) {
@@ -85,9 +86,12 @@ cads::acache_vectoro static_cache_creator::create_all(
             center.to_str().c_str(),
             rcppsw::to_string(cache_i_blocks).c_str(),
             cache_i_blocks.size());
-    created.push_back(create_single_cache(center, cache_i_blocks, c_params.t));
+    res.created.push_back(create_single_cache(center,
+                                              cache_i_blocks,
+                                              c_params.t));
   } /* for(&center..) */
-  return created;
+
+  return res;
 } /* create_all() */
 
 NS_END(depth1, support, fordyca);

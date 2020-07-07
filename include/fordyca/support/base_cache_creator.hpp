@@ -37,6 +37,7 @@
 
 #include "cosm/ds/arena_grid.hpp"
 #include "cosm/ds/block3D_vector.hpp"
+#include "cosm/arena/ds/nest_vector.hpp"
 
 #include "fordyca/support/cache_create_ro_params.hpp"
 
@@ -56,6 +57,11 @@ NS_START(fordyca, support);
  */
 class base_cache_creator : public rer::client<base_cache_creator> {
  public:
+  struct creation_result {
+    cads::acache_vectoro created{};
+    size_t n_discarded{};
+  };
+
   /**
    * \brief Initialize a new cache creator.
    *
@@ -77,7 +83,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    *
    * \return A vector of created caches.
    */
-  virtual cads::acache_vectoro create_all(
+  virtual creation_result create_all(
       const cache_create_ro_params& c_params,
       const cds::block3D_vectorno& c_alloc_blocks) = 0;
 
@@ -100,14 +106,18 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    * \param c_free_blocks Blocks that are not carried by a robot or part of a
    *                     newly created cache.
    * \param c_clusters Current block clusters in the arena.
+   * \param c_nests The nests in the arena.
    *
    * \return \c TRUE iff no errors/inconsistencies are found, \c FALSE
-   * otherwise.
+   * otherwise. If \c FALSE, then the problem MUST be with the most newly
+   * created cache, since all previously created caches already have passed all
+   * checks.
    */
   bool creation_sanity_checks(
-      const cads::acache_vectoro& caches,
-      const cds::block3D_vectorno& free_blocks,
-      const cfds::block3D_cluster_vector& clusters) const RCSW_PURE;
+      const cads::acache_vectorro& c_caches,
+      const cds::block3D_vectorno& c_free_blocks,
+      const cfds::block3D_cluster_vector& c_clusters,
+      const cads::nest_vectorro& c_nests) const RCSW_PURE;
 
  protected:
   const cds::arena_grid* grid(void) const { return m_grid; }
@@ -124,21 +134,25 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    * \param t The current timestep.
    */
   std::unique_ptr<carepr::arena_cache> create_single_cache(
-      const rmath::vector2z& center,
+      const rmath::vector2d& center,
       cds::block3D_vectorno blocks,
       const rtypes::timestep& t);
 
   rtypes::spatial_dist cache_dim(void) const { return mc_cache_dim; }
 
  private:
-  bool sanity_check_internal_consistency(const cads::acache_vectoro& caches) const;
-  bool sanity_check_cross_consistency(const cads::acache_vectoro& caches) const;
-  bool sanity_check_cache_overlap(const cads::acache_vectoro& caches) const;
-  bool sanity_check_free_block_overlap(const cads::acache_vectoro& caches,
+  bool sanity_check_internal_consistency(const carepr::arena_cache* cache) const RCSW_PURE;
+  bool sanity_check_cross_consistency(const cads::acache_vectorro& c_caches) const;
+  bool sanity_check_cache_overlap(const cads::acache_vectorro& c_caches) const;
+  bool sanity_check_free_block_overlap(const carepr::arena_cache* cache,
                                        const cds::block3D_vectorno& free_blocks) const;
   bool sanity_check_block_cluster_overlap(
-      const cads::acache_vectoro& caches,
+      const carepr::arena_cache* cache,
       const cfds::block3D_cluster_vector& clusters) const;
+
+  bool sanity_check_nest_overlap(
+      const carepr::arena_cache* cache,
+      const cads::nest_vectorro& nests) const;
 
   /* clang-format off */
   const rtypes::spatial_dist mc_cache_dim;

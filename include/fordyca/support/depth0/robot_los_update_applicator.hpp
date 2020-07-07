@@ -62,11 +62,17 @@ class robot_los_update_applicator {
   explicit robot_los_update_applicator(controller::foraging_controller* const c)
       : controller(c) {}
 
-  void operator()(los_update_op_type<controller::depth0::crw_controller>& ) const {}
+  /*
+   * If the controller is not derived from DPO, then there is no LOS to update.
+   */
+  template<typename TController,
+           RCPPSW_SFINAE_FUNC(!std::is_base_of<controller::depth0::dpo_controller,
+                              TController>::value)>
+  void operator()(los_update_op_type<TController>& ) const {}
 
   template<typename TController,
-           RCPPSW_SFINAE_FUNC(!std::is_same<TController,
-                              controller::depth0::crw_controller>::value)>
+           RCPPSW_SFINAE_FUNC(std::is_base_of<controller::depth0::dpo_controller,
+                              TController>::value)>
   void operator()(los_update_op_type<TController>& impl) const {
     impl(dynamic_cast<TController*>(controller));
   }

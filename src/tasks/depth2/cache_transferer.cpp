@@ -64,7 +64,7 @@ double cache_transferer::abort_prob_calc(void) {
 rtypes::timestep cache_transferer::interface_time_calc(
     uint,
     const rtypes::timestep& start_time) {
-  return rtypes::timestep(current_time() - start_time);
+  return current_time() - start_time;
 } /* interface_time_calc() */
 
 void cache_transferer::active_interface_update(int) {

@@ -41,7 +41,7 @@ cds::block3D_vectorno forager_los::blocks(void) const {
     for (size_t j = 0; j < ysize(); ++j) {
       const cds::cell2D& cell = access(i, j);
       if (cell.state_has_block()) {
-        ER_ASSERT(nullptr != cell.block3D() || nullptr != cell.block3D(),
+        ER_ASSERT(nullptr != cell.block3D(),
                   "Cell@%s in HAS_BLOCK state, but does not have block",
                   rcppsw::to_string(cell.loc()).c_str());
         blocks.push_back(static_cast<crepr::base_block3D*>(cell.entity()));

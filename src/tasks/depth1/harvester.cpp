@@ -75,7 +75,7 @@ rtypes::timestep harvester::interface_time_calc(
     uint interface,
     const rtypes::timestep& start_time) {
   ER_ASSERT(0 == interface, "Bad interface ID: %u", interface);
-  return rtypes::timestep(current_time() - start_time);
+  return current_time() - start_time;
 } /* interface_time_calc() */
 
 void harvester::active_interface_update(int) {

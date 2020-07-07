@@ -45,19 +45,10 @@ mkdir -p build
 
 cd ..
 
-# Clone SIERRA and plugins
-if [ -d sierra-plugin-fordyca ]; then rm -rf sierra-plugin-fordyca; fi
-git clone https://github.com/swarm-robotics/sierra-plugin-fordyca.git
-cd sierra-plugin-fordyca
-git checkout devel
-
-cd ..
-
+# Clone SIERRA
 if [ -d sierra ]; then rm -rf sierra; fi
 git clone https://github.com/swarm-robotics/sierra.git
 cd sierra
 git checkout devel
-
-ln -s ../sierra-plugin-fordyca plugins/fordyca
 
 cd ..

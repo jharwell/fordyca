@@ -58,22 +58,23 @@ class task_executive_builder : public depth1::task_executive_builder,
                       foraging_perception_subsystem* perception) RCSW_COLD;
   ~task_executive_builder(void) override RCSW_COLD;
 
-  std::unique_ptr<cta::bi_tdgraph_executive>
+  RCSW_COLD std::unique_ptr<cta::bi_tdgraph_executive>
   operator()(const config::depth2::controller_repository& config_repo,
              rmath::rng* rng) RCSW_COLD;
 
   using depth1::task_executive_builder::tasking_map;
 
  protected:
-  tasking_map depth2_tasks_create(
+  RCSW_COLD tasking_map depth2_tasks_create(
       const config::depth2::controller_repository& config_repo,
       cta::ds::bi_tdgraph* graph,
       rmath::rng* rng) RCSW_COLD;
 
-  void depth2_exec_est_init(const config::depth2::controller_repository& config_repo,
-                            const tasking_map& map,
-                            cta::ds::bi_tdgraph* graph,
-                            rmath::rng* rng) RCSW_COLD;
+  RCSW_COLD void depth2_exec_est_init(
+      const config::depth2::controller_repository& config_repo,
+      const tasking_map& map,
+      cta::ds::bi_tdgraph* graph,
+      rmath::rng* rng) RCSW_COLD;
 
   RCSW_COLD void depth2_subtasks_init(
       const tasking_map& map,

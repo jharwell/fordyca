@@ -149,8 +149,7 @@ void mdpo_perception_subsystem::process_los_blocks(
     } /* for(j..) */
   }   /* for(i..) */
 
-  for (auto* b : c_los->blocks()) {
-    auto* block = static_cast<crepr::base_block3D*>(b);
+  for (auto* block : c_los->blocks()) {
     ER_ASSERT(!block->is_out_of_sight(),
               "Block%d out of sight in LOS?",
               block->id().v());

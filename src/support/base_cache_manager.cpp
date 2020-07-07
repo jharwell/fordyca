@@ -25,7 +25,7 @@
 
 #include <cmath>
 
-#include "cosm/ds/arena_grid.hpp"
+#include "cosm/arena/caching_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -37,12 +37,21 @@ NS_START(fordyca, support);
  ******************************************************************************/
 rtypes::spatial_dist base_cache_manager::dimension_check(
     rtypes::spatial_dist dim) const {
-  if (std::remainder(dim.v(), arena_grid()->resolution().v()) >=
-      std::numeric_limits<double>::epsilon()) {
-    ER_WARN("Reducing cache dimension %f -> %f during creation",
+  double remainder = std::remainder(dim.v(), m_map->grid_resolution().v());
+  if (remainder >= std::numeric_limits<double>::epsilon()) {
+    ER_WARN("Reduce cache dimension %f -> %f during creation to even multiple of grid resolution %f",
             dim.v(),
-            dim.v() - arena_grid()->resolution().v());
-    return dim -= arena_grid()->resolution().v();
+            dim.v() - remainder,
+            m_map->grid_resolution().v());
+    dim -= remainder;
+  }
+  auto ddims = rmath::dvec2zvec(rmath::vector2d(dim.v(), dim.v()),
+                                m_map->grid_resolution().v());
+  if (RCSW_IS_EVEN(ddims.x()) || RCSW_IS_EVEN(ddims.y())) {
+    ER_WARN("Reduce cache dimension %f -> %f during creation to contain odd # cells",
+            dim.v(),
+            dim.v() - m_map->grid_resolution().v());
+    dim -= m_map->grid_resolution().v();
   }
   return dim;
 }

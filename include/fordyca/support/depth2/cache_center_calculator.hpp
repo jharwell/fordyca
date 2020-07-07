@@ -33,6 +33,7 @@
 #include "cosm/ds/block3D_vector.hpp"
 #include "cosm/arena/ds/cache_vector.hpp"
 #include "cosm/foraging/ds/block_cluster_vector.hpp"
+#include "cosm/arena/ds/nest_vector.hpp"
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
@@ -64,7 +65,7 @@ NS_START(fordyca, support, depth2);
  */
 class cache_center_calculator : public rer::client<cache_center_calculator> {
  public:
-  static constexpr uint kOVERLAP_SEARCH_MAX_TRIES = 100;
+  static constexpr size_t kOVERLAP_SEARCH_MAX_TRIES = 100;
 
   /**
    * \brief Initialize a new cache calculator.
@@ -72,9 +73,13 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    * \param grid Reference to arena grid.
    * \param cache_dim Dimension of the cache (caches are square so can use a
    *                  scalar).
+   * \param nests The nests in the arena.
+   * \param c_clusters Vector of block clusters in the area.
    */
   cache_center_calculator(cds::arena_grid* grid,
-                          rtypes::spatial_dist cache_dim);
+                          const rtypes::spatial_dist& cache_dim,
+                          const cads::nest_vectorro& c_nests,
+                          const cfds::block3D_cluster_vector& c_clusters);
 
   cache_center_calculator(const cache_center_calculator&) = delete;
   cache_center_calculator& operator=(const cache_center_calculator&) = delete;
@@ -90,16 +95,14 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    *
    * \param c_cache_i_blocks The list of blocks to create a new cache from.
    * \param c_existing_caches Vector of existing caches in the arena.
-   * \param c_clusters Vector of block clusters in the area.
    * \param rng RNG to use duration cache center calculation (guess and check if
    *            initial computed location does not work).
    *
    * \return Coordinates of the new cache, if any were found.
    */
-  boost::optional<rmath::vector2z> operator()(
+  boost::optional<rmath::vector2d> operator()(
       const cds::block3D_vectorno& c_cache_i_blocks,
       const cads::acache_vectorno& c_existing_caches,
-      const cfds::block3D_cluster_vector& c_clusters,
       rmath::rng* rng) const;
 
  private:
@@ -109,10 +112,9 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    *
    * \return An updated cache center, if one is needed.
    */
-  boost::optional<rmath::vector2z> deconflict_loc(
+  boost::optional<rmath::vector2d> deconflict_loc(
       const cads::acache_vectorno& c_existing_caches,
-      const cfds::block3D_cluster_vector& c_clusters,
-      const rmath::vector2z& c_center,
+      const rmath::vector2d& c_center,
       rmath::rng* rng) const;
 
   /**
@@ -120,15 +122,12 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    * arena, possibily return a new location that does not overlap arena
    * boundaries if the current one does.
    *
-   * This function is provided for derived classes to use when they implement
-   * \ref create_all().
-   *
    * \param center The tentative location of the cache. It is an integer
    *               location, but it is a *REAL* location (i.e. not
    *               discretized).
    */
-  boost::optional<rmath::vector2z> deconflict_loc_boundaries(
-      const rmath::vector2z& c_center) const;
+  boost::optional<rmath::vector2d> deconflict_loc_boundaries(
+      const rmath::vector2d& c_center) const;
 
   /**
    * \brief Given an existing entity (cache or a block) that must be avoided
@@ -140,15 +139,18 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    *               location, but it is a *REAL* location (i.e. not
    *               discretized).
    */
-  boost::optional<rmath::vector2z> deconflict_loc_entity(
+  boost::optional<rmath::vector2d> deconflict_loc_entity(
       const crepr::entity2D* ent,
-      const rmath::vector2z& center,
+      const rmath::vector2d& c_center,
       rmath::rng* rng) const;
 
  private:
   /* clang-format off */
-  const rtypes::spatial_dist mc_cache_dim;
-  cds::arena_grid*           m_grid;
+  const rtypes::spatial_dist         mc_cache_dim;
+  const cads::nest_vectorro          mc_nests;
+  const cfds::block3D_cluster_vector mc_clusters;
+
+  cds::arena_grid*                   m_grid;
   /* clang-format on */
 };
 NS_END(depth2, support, fordyca);

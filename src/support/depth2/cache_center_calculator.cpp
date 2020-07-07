@@ -28,6 +28,7 @@
 #include "cosm/foraging/repr/block_cluster.hpp"
 #include "cosm/foraging/utils/utils.hpp"
 #include "cosm/repr/base_block3D.hpp"
+#include "cosm/repr/nest.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,40 +39,51 @@ NS_START(fordyca, support, depth2);
  * Constructors/Destructor
  ******************************************************************************/
 cache_center_calculator::cache_center_calculator(cds::arena_grid* const grid,
-                                                 rtypes::spatial_dist cache_dim)
+                                                 const rtypes::spatial_dist& cache_dim,
+                                                 const cads::nest_vectorro& c_nests,
+                                                 const cfds::block3D_cluster_vector& c_clusters)
     : ER_CLIENT_INIT("fordyca.support.depth2.cache_center_calculator"),
       mc_cache_dim(cache_dim),
+      mc_nests(c_nests),
+      mc_clusters(c_clusters),
       m_grid(grid) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-boost::optional<rmath::vector2z> cache_center_calculator::operator()(
+boost::optional<rmath::vector2d> cache_center_calculator::operator()(
     const cds::block3D_vectorno& c_cache_i_blocks,
     const cads::acache_vectorno& c_existing_caches,
-    const cfds::block3D_cluster_vector& c_clusters,
     rmath::rng* rng) const {
+  ER_TRACE("Existing caches: [%s]",
+           rcppsw::to_string(c_existing_caches).c_str());
+  ER_TRACE("Cache_i blocks: [%s]",
+           rcppsw::to_string(c_cache_i_blocks).c_str());
+  ER_TRACE("Block clusters: [%s]",
+           rcppsw::to_string(mc_clusters).c_str());
   auto sum = std::accumulate(c_cache_i_blocks.begin(),
                              c_cache_i_blocks.end(),
-                             rmath::vector2z(),
-                             [](rmath::vector2z accum, const auto& b) {
-                               return accum + b->danchor2D();
+                             rmath::vector2d(),
+                             [](rmath::vector2d accum, const auto& b) {
+                               return accum + b->rcenter2D();
                              });
 
-  rmath::vector2z center = sum / c_cache_i_blocks.size();
-  ER_DEBUG("Guess center=%s", center.to_str().c_str());
-
   /*
-   * This needs to be done even if there are no other known caches or blocks,
-   * because the guessed center might still be too close to the arena
-   * boundaries.
+   * After real -> discrete -> real coordinates transformation to the averaged
+   * location of the blocks, we have the location of the LL corner of the cell
+   * that is our guess for the cache center. We need to move it up to the center
+   * of that cell so that all the xspan/yspan calculations come out correct in
+   * all cases.
    */
-  if (auto new_center = deconflict_loc_boundaries(center)) {
-    center = new_center.get();
-  }
+  rmath::vector2d offset(m_grid->resolution().v() / 2.0,
+                         m_grid->resolution().v() / 2.0);
 
-  ER_DEBUG("Deconflict caches=[%s]",
-           rcppsw::to_string(c_existing_caches).c_str());
+  auto ll = rmath::dvec2zvec(sum / c_cache_i_blocks.size(),
+                              m_grid->resolution().v());
+  rmath::vector2d center = rmath::zvec2dvec(ll, m_grid->resolution().v()) +
+                           offset;
+
+  ER_DEBUG("Guess center=%s", center.to_str().c_str());
 
   /*
    * Every time we find an overlap we have to re-test EVERYTHING we've already
@@ -80,10 +92,17 @@ boost::optional<rmath::vector2z> cache_center_calculator::operator()(
    */
   size_t i = 0;
   while (i++ < kOVERLAP_SEARCH_MAX_TRIES) {
+    ER_TRACE("Begin search pass %zu", i);
     if (auto new_center =
-            deconflict_loc(c_existing_caches, c_clusters, center, rng)) {
+            deconflict_loc(c_existing_caches, center, rng)) {
       center = new_center.get();
+      ER_TRACE("Search pass %zu unsuccessful: center=%s",
+               i,
+               rcppsw::to_string(center).c_str());
     } else {
+      ER_TRACE("Search pass %zu successful: center=%s",
+               i,
+               rcppsw::to_string(center).c_str());
       break;
     }
   } /* while(i..) */
@@ -93,62 +112,88 @@ boost::optional<rmath::vector2z> cache_center_calculator::operator()(
    * can't find anything conflict free in that many, bail out.
    */
   if (i >= kOVERLAP_SEARCH_MAX_TRIES) {
-    ER_WARN("No conflict-free center found in %u tries: caches=[%s]",
+    ER_WARN("No conflict-free center found in %zu tries: caches=[%s] blocks=[%s] clusters=[%s], nests=[%s]",
             kOVERLAP_SEARCH_MAX_TRIES,
-            rcppsw::to_string(c_existing_caches).c_str());
-    return boost::optional<rmath::vector2z>();
+            rcppsw::to_string(c_existing_caches).c_str(),
+            rcppsw::to_string(c_cache_i_blocks).c_str(),
+            rcppsw::to_string(mc_clusters).c_str(),
+            rcppsw::to_string(mc_nests).c_str());
+    return boost::optional<rmath::vector2d>();
   }
 
-  return boost::make_optional(rmath::vector2z(center.x(), center.y()));
+  /* we found a center! */
+  return boost::make_optional(center);
 } /* calc_center() */
 
-boost::optional<rmath::vector2z> cache_center_calculator::deconflict_loc(
+boost::optional<rmath::vector2d> cache_center_calculator::deconflict_loc(
     const cads::acache_vectorno& c_existing_caches,
-    const cfds::block3D_cluster_vector& c_clusters,
-    const rmath::vector2z& c_center,
+    const rmath::vector2d& c_center,
     rmath::rng* rng) const {
   bool conflict = false;
-  rmath::vector2z new_center = c_center;
-  for (size_t i = 0; i < c_clusters.size(); ++i) {
-    for (size_t j = 0; j < c_existing_caches.size(); ++j) {
-      /* check arena boundaries */
-      if (auto new_loc = deconflict_loc_boundaries(c_center)) {
-        new_center = new_loc.get();
-        conflict = true;
-      }
+  rmath::vector2d new_center = c_center;
 
-      /* check the current cache */
-      if (auto new_loc =
-              deconflict_loc_entity(c_existing_caches[j], c_center, rng)) {
-        new_center = new_loc.get();
-        conflict = true;
-      }
-      /* check the current block cluster */
-      if (auto new_loc = deconflict_loc_entity(c_clusters[i], c_center, rng)) {
-        new_center = new_loc.get();
-        conflict = true;
-      }
-    } /* for(j..) */
+  /* check arena boundaries */
+  ER_TRACE("Check arena boundaries");
+  if (auto new_loc = deconflict_loc_boundaries(c_center)) {
+    new_center = new_loc.get();
+    conflict = true;
+  }
+
+  /* check nests */
+  for (size_t i = 0; i < mc_nests.size(); ++i) {
+    ER_TRACE("Check nest%d: xspan=%s,yspan=%s",
+             mc_nests[i]->id().v(),
+             rcppsw::to_string(mc_nests[i]->xrspan()).c_str(),
+             rcppsw::to_string(mc_nests[i]->yrspan()).c_str())
+        if (auto new_loc = deconflict_loc_entity(mc_nests[i], c_center, rng)) {
+          new_center = new_loc.get();
+          conflict = true;
+        }
   }   /* for(i..) */
 
+  /* check block clusters */
+  for (size_t i = 0; i < mc_clusters.size(); ++i) {
+    ER_TRACE("Check cluster%zu: xspan=%s,yspan=%s",
+             i,
+             rcppsw::to_string(mc_clusters[i]->xrspan()).c_str(),
+             rcppsw::to_string(mc_clusters[i]->yrspan()).c_str())
+        if (auto new_loc = deconflict_loc_entity(mc_clusters[i],
+                                                 c_center,
+                                                 rng)) {
+          new_center = new_loc.get();
+          conflict = true;
+        }
+  }   /* for(i..) */
+
+  /* check existing caches */
+  for (size_t j = 0; j < c_existing_caches.size(); ++j) {
+    ER_TRACE("Check cache%zu: xspan=%s,yspan=%s",
+             j,
+             rcppsw::to_string(c_existing_caches[j]->xrspan()).c_str(),
+             rcppsw::to_string(c_existing_caches[j]->yrspan()).c_str())
+        if (auto new_loc =
+            deconflict_loc_entity(c_existing_caches[j], c_center, rng)) {
+          new_center = new_loc.get();
+          conflict = true;
+        }
+  } /* for(j..) */
+
   return (conflict) ? boost::make_optional(new_center)
-                    : boost::optional<rmath::vector2z>();
+      : boost::optional<rmath::vector2d>();
 } /* deconflict_loc() */
 
-boost::optional<rmath::vector2z> cache_center_calculator::deconflict_loc_boundaries(
-    const rmath::vector2z& c_center) const {
+boost::optional<rmath::vector2d> cache_center_calculator::deconflict_loc_boundaries(
+    const rmath::vector2d& c_center) const {
   /*
    * We need to be sure the center of the new cache is not near the arena
    * boundaries, in order to avoid all sorts of weird corner cases.
    */
-  size_t size_in_cells = static_cast<size_t>(mc_cache_dim.v() /
-                                             m_grid->resolution().v());
-  rmath::rangeu xbounds(size_in_cells,
-                        m_grid->xdsize() - size_in_cells);
-  rmath::rangeu ybounds(size_in_cells,
-                        m_grid->ydsize() - size_in_cells);
+  rmath::ranged xbounds(mc_cache_dim.v(),
+                        m_grid->xrsize() - mc_cache_dim.v());
+  rmath::ranged ybounds(mc_cache_dim.v(),
+                        m_grid->yrsize() - mc_cache_dim.v());
   bool conflict = false;
-  rmath::vector2z new_center = c_center;
+  rmath::vector2d new_center = c_center;
 
   if (!xbounds.contains(new_center.x())) {
     new_center.x(xbounds.wrap_value(new_center.x()));
@@ -168,47 +213,42 @@ boost::optional<rmath::vector2z> cache_center_calculator::deconflict_loc_boundar
              rcppsw::to_string(ybounds).c_str());
   }
   if (conflict) {
-    ER_ASSERT(new_center.x() < xbounds.ub() && new_center.x() >= xbounds.lb() &&
-              new_center.y() < ybounds.ub() && new_center.y() >= ybounds.lb(),
-              "New center=%s violates bounds constraints: X=%s,Y=%s",
+    ER_ASSERT(new_center.x() <= xbounds.ub() && new_center.x() >= xbounds.lb() &&
+              new_center.y() <= ybounds.ub() && new_center.y() >= ybounds.lb(),
+              "New center=%s violates arena bounds constraints: X=%s,Y=%s",
               rcppsw::to_string(new_center).c_str(),
               rcppsw::to_string(xbounds).c_str(),
               rcppsw::to_string(ybounds).c_str());
     return boost::make_optional(new_center);
   }
-  return boost::optional<rmath::vector2z>();
+  return boost::optional<rmath::vector2d>();
 } /* deconflict_loc_boundaries() */
 
-boost::optional<rmath::vector2z> cache_center_calculator::deconflict_loc_entity(
+boost::optional<rmath::vector2d> cache_center_calculator::deconflict_loc_entity(
     const crepr::entity2D* ent,
-    const rmath::vector2z& center,
+    const rmath::vector2d& c_center,
     rmath::rng* rng) const {
-  /*
-   * The cache center is already a "real" coordinate, just one that has been
-   * truncated to an integer.
-   */
-  rmath::vector2d center_r(center.x(), center.y());
-
+  auto dcenter = rmath::dvec2zvec(c_center, m_grid->resolution().v());
   auto exc_xspan = ent->xrspan();
   auto exc_yspan = ent->yrspan();
-  auto newc_xspan = crepr::entity2D::xrspan(center_r, mc_cache_dim);
-  auto newc_yspan = crepr::entity2D::yrspan(center_r, mc_cache_dim);
+  auto newc_xspan = crepr::entity2D::xrspan(c_center, mc_cache_dim);
+  auto newc_yspan = crepr::entity2D::yrspan(c_center, mc_cache_dim);
 
-  ER_TRACE("cache: xspan=%s,center=%s/%s, ent%d: xspan=%s",
+  ER_TRACE("cache: xspan=%s,center=%s/%s ent%d: xspan=%s",
            rcppsw::to_string(newc_xspan).c_str(),
-           rcppsw::to_string(center_r).c_str(),
-           rcppsw::to_string(center).c_str(),
+           rcppsw::to_string(c_center).c_str(),
+           rcppsw::to_string(dcenter).c_str(),
            ent->id().v(),
            rcppsw::to_string(exc_xspan).c_str());
 
-  ER_TRACE("cache: yspan=%s,center=%s/%s, ent%d: yspan=%s",
+  ER_TRACE("cache: yspan=%s,center=%s/%s ent%d: yspan=%s",
            rcppsw::to_string(newc_yspan).c_str(),
-           rcppsw::to_string(center_r).c_str(),
-           rcppsw::to_string(center).c_str(),
+           rcppsw::to_string(c_center).c_str(),
+           rcppsw::to_string(dcenter).c_str(),
            ent->id().v(),
            rcppsw::to_string(exc_yspan).c_str());
 
-  rmath::vector2z new_center = center;
+  rmath::vector2d new_center = c_center;
 
   /*
    * We move the cache by units of the grid size when we discover a conflict in
@@ -221,33 +261,35 @@ boost::optional<rmath::vector2z> cache_center_calculator::deconflict_loc_entity(
       std::copysign(m_grid->resolution().v(), rng->uniform(-1.0, 1.0));
 
   /*
-   * Need to pass cache dimensions rather than dimensions of the entity, which
-   * may be a block.
+   * The placement_conflict2D() function expects the LL anchor of the entity,
+   * NOT the center, so we have to compute that.
    */
-  auto status = cfutils::placement_conflict2D(
-      center_r, rmath::vector2d(mc_cache_dim.v(), mc_cache_dim.v()), ent);
+  rmath::vector2d cache_dim(mc_cache_dim.v(), mc_cache_dim.v());
+  auto status = cfutils::placement_conflict2D(c_center - cache_dim / 2.0,
+                                              cache_dim,
+                                              ent);
 
   if (status.x_conflict) {
-    ER_TRACE("cache: xspan=%s,center=%s overlap ent%d: xspan=%s, x_delta=%f",
+    ER_TRACE("X conflict: cache xspan=%s,center=%s overlap ent%d: xspan=%s, x_delta=%f",
              rcppsw::to_string(newc_xspan).c_str(),
-             rcppsw::to_string(center).c_str(),
+             rcppsw::to_string(c_center).c_str(),
              ent->id().v(),
              rcppsw::to_string(exc_xspan).c_str(),
              x_delta);
-    new_center.x(static_cast<size_t>(new_center.x() + x_delta));
+    new_center.x(new_center.x() + x_delta);
   }
   if (status.y_conflict) {
-    ER_TRACE("cache: yspan=%s,center=%s overlap ent%d: yspan=%s, y_delta=%f",
+    ER_TRACE("Y conflict: cache yspan=%s,center=%s overlap ent%d: yspan=%s, y_delta=%f",
              rcppsw::to_string(newc_yspan).c_str(),
-             rcppsw::to_string(center).c_str(),
+             rcppsw::to_string(c_center).c_str(),
              ent->id().v(),
              rcppsw::to_string(exc_yspan).c_str(),
              y_delta);
-    new_center.y(static_cast<size_t>(new_center.y() + y_delta));
+    new_center.y(new_center.y() + y_delta);
   }
   return (status.x_conflict && status.y_conflict)
              ? boost::make_optional(new_center)
-             : boost::optional<rmath::vector2z>();
+             : boost::optional<rmath::vector2d>();
 } /* deconflict_loc_entity() */
 
 NS_END(depth2, support, fordyca);

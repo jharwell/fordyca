@@ -141,8 +141,6 @@ private:
    */
   void robot_post_step(argos::CFootBotEntity& robot);
 
-  argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override RCSW_PURE;
-
   /* clang-format off */
   std::unique_ptr<depth0_metrics_aggregator>  m_metrics_agg;
   std::unique_ptr<interactor_map_type>        m_interactor_map;

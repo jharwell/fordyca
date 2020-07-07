@@ -59,7 +59,7 @@
     <priority value ="info" />
   </category>
   <category name="fordyca.support.depth2.cache_center_calculator" >
-    <priority value ="trace" />
+    <priority value ="debug" />
   </category>
   <category name="fordyca.support.base_cache_creator" >
     <priority value ="trace" />
@@ -72,10 +72,10 @@
   </category>
 
   <category name="fordyca.controller.dpo_perception" >
-    <priority value ="info" />
+    <priority value ="debug" />
   </category>
   <category name="fordyca.controller.metrics.collector_registerer" >
-    <priority value ="trace" />
+    <priority value ="info" />
   </category>
   <category name="fordyca.controller.oracular_info_receptor" >
     <priority value ="info" />

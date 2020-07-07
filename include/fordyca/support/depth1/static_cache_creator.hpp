@@ -49,20 +49,20 @@ class static_cache_creator : public base_cache_creator,
                              public rer::client<static_cache_creator> {
  public:
   static_cache_creator(cds::arena_grid* grid,
-                       const std::vector<rmath::vector2z>& centers,
-                       rtypes::spatial_dist cache_dim);
+                       const std::vector<rmath::vector2d>& centers,
+                       const rtypes::spatial_dist& cache_dim);
 
   /**
    * \brief Re-create all static caches. Ignores block cluster locations because
    * the locations of the static caches do not change and are known to be
    * conflict free.
    */
-  cads::acache_vectoro create_all(const cache_create_ro_params& c_params,
-                                  const cds::block3D_vectorno&  c_alloc_blocks) override;
+  creation_result create_all(const cache_create_ro_params& c_params,
+                             const cds::block3D_vectorno&  c_alloc_blocks) override;
 
  private:
   /* clang-format off */
-  const std::vector<rmath::vector2z> mc_centers;
+  const std::vector<rmath::vector2d> mc_centers;
   /* clang-format on */
 };
 

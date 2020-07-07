@@ -53,7 +53,7 @@ NS_START(fordyca, support, utils);
  * \param all_caches All existing caches in the arena.
  * \param all_blocks All blocks in the arena.
  */
-cds::block3D_vectorno free_blocks_calc(const cads::acache_vectoro& all_caches,
+cds::block3D_vectorno free_blocks_calc(const cads::acache_vectorro& all_caches,
                                        const cds::block3D_vectorno& all_blocks);
 
 NS_END(utils, support, fordyca);

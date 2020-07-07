@@ -35,7 +35,7 @@ NS_START(fordyca, support, utils);
 /*******************************************************************************
  * Functions
  ******************************************************************************/
-cds::block3D_vectorno free_blocks_calc(const cads::acache_vectoro& all_caches,
+cds::block3D_vectorno free_blocks_calc(const cads::acache_vectorro& all_caches,
                                        const cds::block3D_vectorno& all_blocks) {
   cds::block3D_vectorno free_blocks;
   std::copy_if(all_blocks.begin(),
@@ -44,7 +44,7 @@ cds::block3D_vectorno free_blocks_calc(const cads::acache_vectoro& all_caches,
                [&](const auto& b) RCSW_PURE {
                  /* block not carried by robot */
                  return rtypes::constants::kNoUUID == b->md()->robot_id() &&
-                        /*
+                     /*
                       * Block not inside cache (to catch blocks that were on the
                       * host cell for the cache, and we incorporated into it
                       * during creation).

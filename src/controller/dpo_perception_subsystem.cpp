@@ -125,16 +125,11 @@ void dpo_perception_subsystem::process_los_blocks(
    * explicitly assign it.
    */
   auto los_blocks = c_los->blocks();
+  ER_DEBUG("Blocks in DPO store: [%s]",
+           rcppsw::to_string(m_store->blocks()).c_str());
   if (!los_blocks.empty()) {
-    ER_DEBUG("Blocks in DPO store: [%s]",
-             rcppsw::to_string(m_store->blocks()).c_str());
-    auto accum =
-        std::accumulate(los_blocks.begin(),
-                        los_blocks.end(),
-                        std::string(),
-                        [&](const std::string& a, const auto& b) {
-                          return a + "b" + rcppsw::to_string(b->id()) + ",";
-                        });
+    ER_DEBUG("Blocks in LOS: [%s]",
+             rcppsw::to_string(los_blocks).c_str());
   }
 
   /*

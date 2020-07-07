@@ -108,11 +108,12 @@ class block_op_filter : public rer::client<block_op_filter> {
    */
   template <typename TController>
   op_filter_status free_pickup_filter(const TController& controller) const {
-    auto block_id = utils::robot_on_block(controller, *mc_map);
     if (!(controller.goal_acquired() &&
           fsm::foraging_acq_goal::ekBLOCK == controller.acquisition_goal())) {
       return op_filter_status::ekROBOT_INTERNAL_UNREADY;
-    } else if (rtypes::constants::kNoUUID == block_id) {
+    }
+    auto block_id = utils::robot_on_block(controller, *mc_map);
+     if (rtypes::constants::kNoUUID == block_id) {
       return op_filter_status::ekROBOT_NOT_ON_BLOCK;
     }
     return op_filter_status::ekSATISFIED;

@@ -40,9 +40,9 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::ds {
-class arena_grid;
-} /* namespace cosm::ds */
+namespace cosm::arena {
+class caching_arena_map;
+} /* namespace cosm::arena */
 
 NS_START(fordyca, support);
 
@@ -59,16 +59,17 @@ NS_START(fordyca, support);
 class base_cache_manager : public metrics::caches::lifecycle_metrics,
                            public rer::client<base_cache_manager> {
  public:
-  explicit base_cache_manager(cds::arena_grid* const arena_grid)
-      : ER_CLIENT_INIT("fordyca.support.cache_manager"), m_grid(arena_grid) {}
+  explicit base_cache_manager(carena::caching_arena_map* const map)
+      : ER_CLIENT_INIT("fordyca.support.cache_manager"), m_map(map) {}
   ~base_cache_manager(void) override = default;
 
   base_cache_manager(const base_cache_manager&) = delete;
   base_cache_manager& operator=(const base_cache_manager&) = delete;
 
   /* cache lifecycle metrics */
-  uint caches_created(void) const override final { return m_caches_created; }
-  uint caches_depleted(void) const override final {
+  size_t caches_created(void) const override final { return m_caches_created; }
+  size_t caches_discarded(void) const override final { return m_caches_discarded; }
+  size_t caches_depleted(void) const override final {
     return m_depletion_ages.size();
   }
   std::vector<rtypes::timestep> cache_depletion_ages(void) const override {
@@ -80,6 +81,7 @@ class base_cache_manager : public metrics::caches::lifecycle_metrics,
   }
   void reset_metrics(void) override final {
     m_caches_created = 0;
+    m_caches_discarded = 0;
     m_depletion_ages.clear();
   }
   std::mutex& mtx(void) { return m_mutex; }
@@ -97,16 +99,18 @@ class base_cache_manager : public metrics::caches::lifecycle_metrics,
    */
   rtypes::spatial_dist dimension_check(rtypes::spatial_dist dim) const;
 
-  void caches_created(uint c) { m_caches_created += c; }
-  const cds::arena_grid* arena_grid(void) const { return m_grid; }
-  cds::arena_grid* arena_grid(void) { return m_grid; }
+  void caches_created(size_t c) { m_caches_created += c; }
+  void caches_discarded(size_t c) { m_caches_discarded += c; }
+  const carena::caching_arena_map* arena_map(void) const { return m_map; }
+  carena::caching_arena_map* arena_map(void) { return m_map; }
 
  private:
   /* clang-format off */
-  uint                          m_caches_created{0};
-  std::vector<rtypes::timestep> m_depletion_ages{};
-  cds::arena_grid * const       m_grid;
-  std::mutex                    m_mutex{};
+  size_t                            m_caches_created{0};
+  size_t                            m_caches_discarded{0};
+  std::vector<rtypes::timestep>     m_depletion_ages{};
+  carena::caching_arena_map * const m_map;
+  std::mutex                        m_mutex{};
   /* clang-format on */
 };
 

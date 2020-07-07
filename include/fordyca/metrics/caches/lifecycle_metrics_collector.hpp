@@ -65,12 +65,14 @@ class lifecycle_metrics_collector final : public rmetrics::base_metrics_collecto
    * \brief All stats are cumulative within an interval.
    */
   struct stats {
-    uint int_created{0};
-    uint int_depleted{0};
+    size_t int_created{0};
+    size_t int_depleted{0};
+    size_t int_discarded{0};
     rtypes::timestep int_depletion_sum{0};
 
-    uint cum_created{0};
-    uint cum_depleted{0};
+    size_t cum_created{0};
+    size_t cum_depleted{0};
+    size_t cum_discarded{0};
     rtypes::timestep cum_depletion_sum{0};
   };
 

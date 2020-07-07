@@ -130,8 +130,8 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
     return m_conv_calc.get();
   }
   cforacle::foraging_oracle* oracle(void) { return m_oracle.get(); }
-  const carena::caching_arena_map* arena_map(void) const;
-  carena::caching_arena_map* arena_map(void);
+  const carena::caching_arena_map* arena_map(void) const RCSW_PURE;
+  carena::caching_arena_map* arena_map(void) RCSW_PURE;
 
  private:
   /**
