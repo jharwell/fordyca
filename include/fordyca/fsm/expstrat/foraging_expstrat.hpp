@@ -66,7 +66,7 @@ class foraging_expstrat : public csexpstrat::base_expstrat {
            const controller::block_sel_matrix *const bsel_matrix_in,
            const controller::cache_sel_matrix *const csel_matrix_in,
            const ds::dpo_store *const dpo_store_in,
-           const rutils::color& ledtaxis_target_in = rutils::color())
+           const rutils::color& ledtaxis_target_in)
         : saa(saa_in),
           bsel_matrix(bsel_matrix_in),
           csel_matrix(csel_matrix_in),

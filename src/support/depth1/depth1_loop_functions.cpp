@@ -35,9 +35,7 @@
 
 #include "cosm/arena/config/arena_map_config.hpp"
 #include "cosm/controller/operations/applicator.hpp"
-#include "cosm/foraging/block_dist/base_distributor.hpp"
 #include "cosm/foraging/oracle/foraging_oracle.hpp"
-#include "cosm/foraging/repr/block_cluster.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
 #include "cosm/interactors/applicator.hpp"
 #include "cosm/oracle/config/aggregate_oracle_config.hpp"
@@ -46,6 +44,7 @@
 #include "cosm/robots/footbot/config/saa_xml_names.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
+#include "cosm/foraging/block_dist/base_distributor.hpp"
 
 #include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
 #include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
@@ -57,6 +56,7 @@
 #include "fordyca/support/depth1/robot_configurer.hpp"
 #include "fordyca/support/depth1/static_cache_manager.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
+#include "fordyca/support/depth1/static_cache_locs_calculator.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -187,6 +187,12 @@ void depth1_loop_functions::init(ticpp::Element& node) {
   ndc_push();
   ER_INFO("Initializing...");
 
+  config_parse(node);
+  auto* aconfig = config()->config_get<caconfig::arena_map_config>();
+  if (cfbd::dispatcher::kDistPowerlaw == aconfig->blocks.dist.dist_type) {
+    delay_arena_map_init(true);
+  }
+
   shared_init(node);
   private_init();
 
@@ -217,6 +223,15 @@ void depth1_loop_functions::private_init(void) {
   cache_handling_init(
       config()->config_get<config::caches::caches_config>(),
       &config()->config_get<caconfig::arena_map_config>()->blocks.dist);
+
+  /*
+   * Initialize arena map and distribute blocks after creating initial
+   * caches. This is only needed for powerlaw distributions.
+   */
+  auto* vconfig = config()->config_get<cvconfig::visualization_config>();
+  if (delay_arena_map_init()) {
+    arena_map_init(vconfig);
+  }
 
   /*
    * Initialize convergence calculations to include task distribution (if
@@ -302,109 +317,29 @@ void depth1_loop_functions::cache_handling_init(
    * Regardless of how many foragers/etc there are, always create
    * initial caches.
    */
+  auto cache_locs = static_cache_locs_calculator()(arena_map(), distp);
   m_cache_manager = std::make_unique<static_cache_manager>(cachep,
                                                            arena_map(),
-                                                           calc_cache_locs(distp),
+                                                           cache_locs,
                                                            rng());
-
+  cfds::block3D_cluster_vector clusters;
+  if (!delay_arena_map_init()) {
+    clusters = arena_map()->block_distributor()->block_clusters();
+  }
   cache_create_ro_params ccp = {
       .current_caches = arena_map()->caches(),
-      .clusters = arena_map()->block_distributor()->block_clusters(),
+      .clusters = clusters,
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
   cpal::argos_sm_adaptor::led_medium(crfootbot::config::saa_xml_names::leds_saa);
-  if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
+  bool pre_dist = (nullptr == arena_map()->block_distributor());
+  if (auto created = m_cache_manager->create(ccp,
+                                             arena_map()->blocks(),
+                                             pre_dist)) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }
 } /* cache_handling_init() */
-
-std::vector<rmath::vector2d> depth1_loop_functions::calc_cache_locs(
-    const cfconfig::block_dist_config* distp) {
-  using dispatcher_type = cfbd::dispatcher;
-
-  std::vector<rmath::vector2d> cache_rlocs;
-  ER_ASSERT(1 == arena_map()->nests().size(),
-            "Multiple nests incompatible with static cache management");
-  auto *nest = arena_map()->nest(rtypes::type_uuid(0));
-
-  /*
-   * For all block distributions that are supported, each of the static
-   * caches is halfway between the center of the nest and a block cluster.
-   */
-  if (dispatcher_type::kDistSingleSrc == distp->dist_type ||
-      dispatcher_type::kDistDualSrc == distp->dist_type) {
-    auto clusters = arena_map()->block_distributor()->block_clusters();
-
-    for (auto& c : clusters) {
-      cache_rlocs.push_back(
-          {(c->xrspan().center() + nest->rcenter2D().x()) / 2.0,
-           (c->yrspan().center() + nest->rcenter2D().y()) / 2.0});
-    } /* for(i..) */
-  } else if (dispatcher_type::kDistQuadSrc == distp->dist_type) {
-    /*
-     * Quad source is a tricky distribution to use with static caches, so we
-     * have to tweak the static cache locations in tandem with the block cluster
-     * locations to ensure that no segfaults results from cache/cache or
-     * cache/cluster overlap. See FORDYCA#581.
-     *
-     * Basically we want the cache centers to be halfway between the nest center
-     * and each of the block cluster centers (we assume a square arena).
-     */
-    auto clusters = arena_map()->block_distributor()->block_clusters();
-    for (auto& c : clusters) {
-      bool on_center_y =
-          std::fabs(c->xrspan().center() - nest->rcenter2D().x()) < 0.5;
-      bool on_center_x =
-          std::fabs(c->yrspan().center() - nest->rcenter2D().y()) < 0.5;
-      ER_ASSERT(on_center_y || on_center_x,
-                "Cluster@%f,%f not centered in arena X or Y",
-                c->xrspan().center(),
-                c->yrspan().center());
-      if (on_center_x &&
-          c->xrspan().center() < nest->rcenter2D().x()) { /* west */
-        cache_rlocs.push_back(
-            {arena_map()->xrsize() * 0.30, c->yrspan().center()});
-      } else if (on_center_x && c->xrspan().center() >
-                                    nest->rcenter2D().x()) { /* east */
-        cache_rlocs.push_back(
-            {arena_map()->xrsize() * 0.675, c->yrspan().center()});
-      } else if (on_center_y && c->yrspan().center() <
-                                    nest->rcenter2D().y()) { /* south */
-        cache_rlocs.push_back(
-            {c->xrspan().center(), arena_map()->yrsize() * 0.30});
-      } else if (on_center_y && c->yrspan().center() >
-                                    nest->rcenter2D().y()) { /* north */
-        cache_rlocs.push_back(
-            {c->xrspan().center(), arena_map()->yrsize() * 0.675});
-      }
-    } /* for(i..) */
-  } else {
-    ER_FATAL_SENTINEL(
-        "Block distribution '%s' unsupported for static cache management",
-        distp->dist_type.c_str());
-  }
-  /*
-   * For all cache locs, transform real -> discrete to ensure the real and
-   * discrete cache centers used during simulation are convertible without loss
-   * of precision/weird corner cases. Add 1/2 cell width to them so that the
-   * real center is in the center of the host cell, and not the LL corner.
-   */
-  std::vector<rmath::vector2d> cache_rcenters;
-  std::transform(cache_rlocs.begin(),
-                 cache_rlocs.end(),
-                 std::back_inserter(cache_rcenters),
-                 [&](const auto& rloc) {
-                   auto tmp = rmath::dvec2zvec(rloc,
-                                               arena_map()->grid_resolution().v());
-                   rmath::vector2d offset(arena_map()->grid_resolution().v() / 2.0,
-                                          arena_map()->grid_resolution().v() / 2.0);
-                   auto ll = rmath::zvec2dvec(tmp,
-                                              arena_map()->grid_resolution().v());
-                   return ll + offset;
-                 });
-  return cache_rcenters;
-} /* calc_cache_locs() */
 
 /*******************************************************************************
  * Convergence Calculations Callbacks
@@ -541,7 +476,9 @@ void depth1_loop_functions::reset(void) {
       .clusters = arena_map()->block_distributor()->block_clusters(),
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
-  if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
+  if (auto created = m_cache_manager->create(ccp,
+                                             arena_map()->blocks(),
+                                             false)) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }

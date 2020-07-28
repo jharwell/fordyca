@@ -47,7 +47,8 @@ static_cache_creator::static_cache_creator(
  ******************************************************************************/
 static_cache_creator::creation_result static_cache_creator::create_all(
     const cache_create_ro_params& c_params,
-    const cds::block3D_vectorno& c_alloc_blocks) {
+    const cds::block3D_vectorno& c_alloc_blocks,
+    bool pre_dist) {
   ER_DEBUG("Creating caches: alloc_blocks=[%s] (%zu)",
            rcppsw::to_string(c_alloc_blocks).c_str(),
            c_alloc_blocks.size());
@@ -88,7 +89,8 @@ static_cache_creator::creation_result static_cache_creator::create_all(
             cache_i_blocks.size());
     res.created.push_back(create_single_cache(center,
                                               cache_i_blocks,
-                                              c_params.t));
+                                              c_params.t,
+                                              pre_dist));
   } /* for(&center..) */
 
   return res;

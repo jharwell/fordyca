@@ -86,13 +86,13 @@ class cache_op_filter : public rer::client<cache_op_filter<T>> {
    * use an existing cache).
    */
   op_filter_status do_filter(const T& controller) const {
-    auto cache_id = utils::robot_on_cache(controller, *mc_map);
-    bool ready = (controller.goal_acquired() &&
-                  fsm::foraging_acq_goal::ekEXISTING_CACHE ==
-                      controller.acquisition_goal() &&
-                  rtypes::constants::kNoUUID != cache_id);
-    if (ready) {
-      return op_filter_status::ekSATISFIED;
+    if (controller.goal_acquired() &&
+        fsm::foraging_acq_goal::ekEXISTING_CACHE ==
+        controller.acquisition_goal()) {
+      auto cache_id = utils::robot_on_cache(controller, *mc_map);
+      if (rtypes::constants::kNoUUID != cache_id) {
+        return op_filter_status::ekSATISFIED;
+      }
     }
     return op_filter_status::ekROBOT_INTERNAL_UNREADY;
   }

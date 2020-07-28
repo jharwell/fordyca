@@ -53,7 +53,11 @@ void crw_controller::init(ticpp::Element& node) {
   ndc_push();
   ER_INFO("Initializing...");
 
-  fsm::expstrat::foraging_expstrat::params p(saa(), nullptr, nullptr, nullptr);
+  fsm::expstrat::foraging_expstrat::params p(saa(),
+                                             nullptr,
+                                             nullptr,
+                                             nullptr,
+                                             rutils::color());
   m_fsm = std::make_unique<fsm::depth0::crw_fsm>(
       saa(),
       fsm::expstrat::block_factory().create(

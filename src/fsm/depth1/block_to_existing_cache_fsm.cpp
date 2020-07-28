@@ -65,7 +65,8 @@ block_to_existing_cache_fsm::block_to_existing_cache_fsm(
                           saa,
                           nullptr,
                           nullptr,
-                          c_params->store)
+                          c_params->store,
+                          rutils::color())
                           .get(),
                       rng),
                   rng) {}

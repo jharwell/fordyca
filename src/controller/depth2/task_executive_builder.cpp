@@ -30,6 +30,7 @@
 #include "cosm/ta/config/task_alloc_config.hpp"
 #include "cosm/ta/config/task_executive_config.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
+#include "cosm/arena/repr/light_type_index.hpp"
 
 #include "fordyca/config/depth2/controller_repository.hpp"
 #include "fordyca/config/exploration_config.hpp"
@@ -73,10 +74,20 @@ task_executive_builder::tasking_map task_executive_builder::depth2_tasks_create(
     rmath::rng* rng) {
   auto* task_config = config_repo.config_get<cta::config::task_alloc_config>();
   auto* exp_config = config_repo.config_get<config::exploration_config>();
+  auto cache_color = carepr::light_type_index()[carepr::light_type_index::kCache];
+
   fsm::expstrat::block_factory block_factory;
   fsm::expstrat::cache_factory cache_factory;
-  fsm::expstrat::foraging_expstrat::params expbp(
-      saa(), nullptr, cache_sel_matrix(), perception()->dpo_store());
+  fsm::expstrat::foraging_expstrat::params expstrat_cachep(saa(),
+                                                           nullptr,
+                                                           cache_sel_matrix(),
+                                                           perception()->dpo_store(),
+                                                           cache_color);
+  fsm::expstrat::foraging_expstrat::params expstrat_blockp(saa(),
+                                                           nullptr,
+                                                           cache_sel_matrix(),
+                                                           perception()->dpo_store(),
+                                                           rutils::color());
 
   fsm::fsm_ro_params params = {.bsel_matrix = block_sel_matrix(),
                                .csel_matrix = cache_sel_matrix(),
@@ -86,28 +97,28 @@ task_executive_builder::tasking_map task_executive_builder::depth2_tasks_create(
       std::make_unique<fsm::depth2::block_to_cache_site_fsm>(
           &params,
           saa(),
-          block_factory.create(exp_config->block_strategy, &expbp, rng),
+          block_factory.create(exp_config->block_strategy, &expstrat_blockp, rng),
           rng);
 
   auto cache_finisher_fsm =
       std::make_unique<fsm::depth2::block_to_new_cache_fsm>(
           &params,
           saa(),
-          block_factory.create(exp_config->block_strategy, &expbp, rng),
+          block_factory.create(exp_config->block_strategy, &expstrat_blockp, rng),
           rng);
 
   auto cache_transferer_fsm =
       std::make_unique<fsm::depth2::cache_transferer_fsm>(
           &params,
           saa(),
-          cache_factory.create(exp_config->cache_strategy, &expbp, rng),
+          cache_factory.create(exp_config->cache_strategy, &expstrat_cachep, rng),
           rng);
 
   auto cache_collector_fsm =
       std::make_unique<fsm::depth1::cached_block_to_nest_fsm>(
           &params,
           saa(),
-          cache_factory.create(exp_config->cache_strategy, &expbp, rng),
+          cache_factory.create(exp_config->cache_strategy, &expstrat_cachep, rng),
           rng);
 
   auto cache_starter = std::make_unique<tasks::depth2::cache_starter>(

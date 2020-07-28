@@ -61,12 +61,7 @@ base_loop_functions::~base_loop_functions(void) = default;
  ******************************************************************************/
 void base_loop_functions::init(ticpp::Element& node) {
   /* parse simulation input file */
-  m_config.parse_all(node);
-
-  if (!m_config.validate_all()) {
-    ER_FATAL_SENTINEL("Not all parameters were validated");
-    std::exit(EXIT_FAILURE);
-  }
+  config_parse(node);
 
   /* initialize RNG */
   rng_init(config()->config_get<rmath::config::rng_config>());
@@ -77,7 +72,10 @@ void base_loop_functions::init(ticpp::Element& node) {
   /* initialize arena map and distribute blocks */
   auto* aconfig = config()->config_get<caconfig::arena_map_config>();
   auto* vconfig = config()->config_get<cvconfig::visualization_config>();
-  arena_map_init<carena::caching_arena_map>(aconfig, vconfig);
+  arena_map_create<carena::caching_arena_map>(aconfig);
+  if (!delay_arena_map_init()) {
+    arena_map_init(vconfig);
+  }
 
   /* initialize convergence calculations */
   convergence_init(config()->config_get<cconvconfig::convergence_config>());
@@ -88,6 +86,15 @@ void base_loop_functions::init(ticpp::Element& node) {
   /* initialize oracle, if configured */
   oracle_init(config()->config_get<coconfig::aggregate_oracle_config>());
 } /* init() */
+
+void base_loop_functions::config_parse(ticpp::Element& node) {
+  m_config.parse_all(node);
+
+  if (!m_config.validate_all()) {
+    ER_FATAL_SENTINEL("Not all parameters were validated");
+    std::exit(EXIT_FAILURE);
+  }
+} /* config_parse() */
 
 void base_loop_functions::convergence_init(
     const cconvconfig::convergence_config* const config) {

@@ -85,7 +85,8 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    */
   virtual creation_result create_all(
       const cache_create_ro_params& c_params,
-      const cds::block3D_vectorno& c_alloc_blocks) = 0;
+      const cds::block3D_vectorno& c_alloc_blocks,
+      bool pre_dist) = 0;
 
   /**
    * \brief Configure the the cache extent cells for all newly created caches.
@@ -136,7 +137,8 @@ class base_cache_creator : public rer::client<base_cache_creator> {
   std::unique_ptr<carepr::arena_cache> create_single_cache(
       const rmath::vector2d& center,
       cds::block3D_vectorno blocks,
-      const rtypes::timestep& t);
+      const rtypes::timestep& t,
+      bool pre_dist);
 
   rtypes::spatial_dist cache_dim(void) const { return mc_cache_dim; }
 

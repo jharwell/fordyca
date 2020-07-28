@@ -111,7 +111,7 @@ void mdpo_controller::private_init(
   auto* exp_config = config_repo.config_get<config::exploration_config>();
   fsm::expstrat::block_factory f;
   fsm::expstrat::foraging_expstrat::params expstrat_params(
-      saa(), nullptr, nullptr, perception()->dpo_store());
+      saa(), nullptr, nullptr, perception()->dpo_store(), rutils::color());
   fsm::fsm_ro_params fsm_ro_params = {.bsel_matrix = block_sel_matrix(),
                                       .csel_matrix = nullptr,
                                       .store = perception()->dpo_store(),

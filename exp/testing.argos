@@ -149,7 +149,7 @@
         </cache_sel_matrix>
         <exploration
             block_strategy="CRW"
-            cache_strategy="ledtaxis_search"/>
+            cache_strategy="utility_search"/>
         <sensing_subsystemQ3D>
           <!-- -5pi/6 : 5pi/6 -->
           <proximity_sensor fov="-2.61:2.61"
@@ -225,6 +225,7 @@
             perception_mdpo="perception-mdpo"
             swarm_convergence="swarm-convergence"
             tv_population="tv-population"
+            block_distributor="block-distributor"
             tv_environment="tv-environment"/>
 
         <create output_interval="10"
@@ -272,7 +273,7 @@
           </manipulation_penalty>
           <carry_throttle>
             <waveform
-                type="Sine"
+                type="Null"
                 frequency="0.004"
                 amplitude="0.4"
                 offset="0.4"
@@ -300,29 +301,29 @@
 
     <arena_map>
       <grid2D resolution="0.2"
-            dims="12, 6, 2"/>
+            dims="12, 12, 2"/>
       <blocks>
         <distribution
-            dist_type="single_source">
+            dist_type="powerlaw">
           <!-- <redist_governor -->
           <!--     trigger="Null" -->
           <!--     recurrence_policy="multi" -->
           <!--     timestep="500" -->
           <!--     block_count="2"/> -->
-          <!-- <powerlaw -->
-          <!--     pwr_min="0" -->
-          <!--     pwr_max="3" -->
-          <!--     n_clusters="15" -->
-          <!--     /> -->
+          <powerlaw
+              pwr_min="2"
+              pwr_max="7"
+              n_clusters="10"
+              />
           <manifest
-              n_cube="10"
-              n_ramp="10"
+              n_cube="200"
+              n_ramp="0"
               unit_dim="0.2"
               />
         </distribution>
       </blocks>
       <nests>
-        <nest dims="1.0, 4.0" center="6, 3" />
+        <nest dims="2.4, 2.4" center="6, 6" />
       </nests>
     </arena_map>
     <caches dimension="1.0">
@@ -335,33 +336,33 @@
                robot_drop_only="false"/>
     </caches>
 
-    <!--   <visualization robot_id="true" -->
-    <!--                  robot_los="true" -->
-    <!--                  robot_task="true" -->
-    <!--                  block_id="false" -->
-    <!--                  /> -->
+      <visualization robot_id="true"
+                     robot_los="true"
+                     robot_task="true"
+                     block_id="false"
+                     />
   </loop_functions>
 
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="12, 6, 10" center="6,3,5">
+  <arena size="12, 12, 10" center="6,6,5">
 
     <floor id="floor"
            source="loop_functions"
            pixels_per_meter="50" />
 
     <box id="wall_north" size="12,0.1,0.5" movable="false">
-      <body position="6,6.1,0" orientation="0,0,0" />
+      <body position="6,12.1,0" orientation="0,0,0" />
     </box>
     <box id="wall_south" size="12,0.1,0.5" movable="false">
       <body position="6,0,0" orientation="0,0,0" />
     </box>
-    <box id="wall_east" size="0.1,6,0.5" movable="false">
-      <body position="12,3,0" orientation="0,0,0" />
+    <box id="wall_east" size="0.1,12,0.5" movable="false">
+      <body position="12,6,0" orientation="0,0,0" />
     </box>
-    <box id="wall_west" size="0.1,6,0.5" movable="false">
-      <body position="0,3,0" orientation="0,0,0" />
+    <box id="wall_west" size="0.1,12,0.5" movable="false">
+      <body position="0,6,0" orientation="0,0,0" />
     </box>
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />

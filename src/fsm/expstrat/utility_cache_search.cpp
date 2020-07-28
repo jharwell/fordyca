@@ -27,11 +27,11 @@
 
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/spatial/fsm/point_argument.hpp"
 
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/depth2/cache_site_selector.hpp"
-#include "fordyca/tasks/argument.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -57,7 +57,7 @@ void utility_cache_search::task_start(cta::taskable_argument*) {
   }
   depth2::cache_site_selector sel(mc_matrix);
   if (auto site = sel(mc_store->caches(), mc_store->blocks(), position, rng())) {
-    tasks::vector_argument v(kCACHE_ARRIVAL_TOL, *site);
+    csfsm::point_argument v(kCACHE_ARRIVAL_TOL, *site);
     localized_search::task_start(&v);
   } else {
     localized_search::task_start(nullptr);

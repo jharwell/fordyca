@@ -30,6 +30,8 @@
 #include "cosm/foraging/repr/block_cluster.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/repr/nest.hpp"
+#include "cosm/arena/operations/cache_extent_set.hpp"
+#include "cosm/arena/operations/block_extent_clear.hpp"
 
 #include "fordyca/events/cell2D_empty.hpp"
 #include "fordyca/support/utils/loop_utils.hpp"
@@ -55,7 +57,8 @@ base_cache_creator::base_cache_creator(cds::arena_grid* const grid,
 std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
     const rmath::vector2d& center,
     cds::block3D_vectorno blocks,
-    const rtypes::timestep& t) {
+    const rtypes::timestep& t,
+    bool pre_dist) {
   ER_ASSERT(center.x() > 0 && center.y() > 0,
             "Center@%s is not positive definite",
             center.to_str().c_str());
@@ -98,15 +101,32 @@ std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
   }
 
   /*
-   * We don't need to lock around the cell empty and block drop events because
-   * cache creation always happens AFTER all robots have had their control steps
-   * run, never DURING. We are not REALLY holding all the locks, but no need to
-   * grab them in a non-concurrent context.
+   * Blocks have not been distributed yet, so nothing to do.
    */
-  for (auto& block : blocks) {
-    events::cell2D_empty_visitor op(block->danchor2D());
-    op.visit(m_grid->access<arena_grid::kCell>(block->danchor2D()));
-  } /* for(block..) */
+  if (!pre_dist) {
+    ER_INFO("Clearing host cells and block extents for %zu blocks",
+            blocks.size());
+    /*
+     * We don't need to lock around the cell empty and block drop events because
+     * cache creation always happens AFTER all robots have had their control
+     * steps run, never DURING. We are not REALLY holding all the locks, but no
+     * need to grab them in a non-concurrent context.
+     */
+    for (auto& block : blocks) {
+      ER_DEBUG("Clearing block%d host cell@%s and extents: x=%s,y=%s",
+              block->id().v(),
+              rcppsw::to_string(block->danchor2D()).c_str(),
+              rcppsw::to_string(block->xdspan()).c_str(),
+              rcppsw::to_string(block->ydspan()).c_str());
+      /* Mark block host cell as empty */
+      events::cell2D_empty_visitor cell_op(block->danchor2D());
+      cell_op.visit(m_grid->access<arena_grid::kCell>(block->danchor2D()));
+
+      /* Clear block extent */
+      caops::block_extent_clear_visitor block_op(block);
+      block_op.visit(*m_grid);
+    } /* for(block..) */
+  }
 
   /*
    * Loop through all blocks and deposit them in the cache host cell, which
@@ -120,6 +140,7 @@ std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
                                       carena::arena_map_locking::ekALL_HELD);
     op.visit(m_grid->access<arena_grid::kCell>(op.coord()));
   } /* for(block..) */
+
   ER_DEBUG("All %zu blocks now in host cell%s",
            blocks.size(),
            rcppsw::to_string(dcenter).c_str());
@@ -160,48 +181,10 @@ std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
 } /* create_single_cache() */
 
 void base_cache_creator::configure_cache_extents(cads::acache_vectoro& caches) {
-  /*
-   * To set the cells covered by a cache's extent, we simply send them a
-   * CACHE_EXTENT event, EXCEPT for the cell that hosts the actual cache,
-   * because it is currently in the HAS_CACHE state as part of the cache
-   * creation process.
-   */
   for (auto& cache : caches) {
-    auto xspan = cache->xdspan();
-    auto yspan = cache->ydspan();
-
-    for (size_t i = xspan.lb(); i <= xspan.ub() ; ++i) {
-      for (size_t j = yspan.lb(); j <= yspan.ub(); ++j) {
-        auto dcoord = rmath::vector2z(i, j);
-        auto rcoord = rmath::zvec2dvec(dcoord, m_grid->resolution().v());
-        auto& cell = m_grid->access<arena_grid::kCell>(dcoord);
-
-        ER_ASSERT(cache->contains_point2D(rcoord),
-                  "Cache%d@%s/%s xspan=%s,yspan=%s does not contain %s",
-                  cache->id().v(),
-                  rcppsw::to_string(cache->rcenter2D()).c_str(),
-                  rcppsw::to_string(cache->dcenter2D()).c_str(),
-                  rcppsw::to_string(cache->xrspan()).c_str(),
-                  rcppsw::to_string(cache->yrspan()).c_str(),
-                  rcppsw::to_string(rcoord).c_str());
-
-        if (dcoord != cache->dcenter2D()) {
-          ER_ASSERT(!cell.state_in_cache_extent(),
-                    "Cell@%s already in CACHE_EXTENT",
-                    rcppsw::to_string(dcoord).c_str());
-          ER_TRACE("Configure cache%d cell@%s: CACHE_EXTENT",
-                   cache->id().v(),
-                   rcppsw::to_string(dcoord).c_str());
-          cdops::cell2D_cache_extent_visitor e(dcoord, cache.get());
-          e.visit(cell);
-        } else {
-          ER_ASSERT(cell.state_has_cache(),
-                    "Cache host cell@%s not in HAS_CACHE",
-                    rcppsw::to_string(dcoord).c_str());
-        }
-      } /* for(j..) */
-    }   /* for(i..) */
-  }     /* for(cache..) */
+    caops::cache_extent_set_visitor e(cache.get());
+    e.visit(*m_grid);
+  } /* for(cache..) */
 } /* configure_cache_extents() */
 
 bool base_cache_creator::creation_sanity_checks(
@@ -261,6 +244,14 @@ bool base_cache_creator::sanity_check_internal_consistency(
            "Cache does not have enough blocks: %zu < %zu",
            cache->n_blocks(),
            carepr::base_cache::kMinBlocks);
+  for (auto *b : cache->blocks()) {
+    ER_CHECK(b->danchor2D() == cache->dcenter2D(),
+             "Block%d@%s not in cache host cell@%s",
+             b->id().v(),
+             rcppsw::to_string(b->danchor2D()).c_str(),
+             rcppsw::to_string(cache->dcenter2D()).c_str())
+  } /* for(*b..) */
+
   return true;
 
 error:

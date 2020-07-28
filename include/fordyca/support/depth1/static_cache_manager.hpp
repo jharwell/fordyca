@@ -67,15 +67,18 @@ class static_cache_manager final : public base_cache_manager,
   static_cache_manager& operator=(const static_cache_manager&) = delete;
 
   /**
-   * \brief (Re)-create the static cache in the arena (depth 1 only).
+   * \brief (Re)-create the static cache(s) in the arena.
    *
    * \return The created caches. Non-fatal failures to create the static cache
    * can occur if, for example, all blocks are currently being carried by robots
    * and there are not enough free blocks with which to create a cache of the
    * specified minimum size.
+   *
    */
-  boost::optional<cads::acache_vectoro> create(const cache_create_ro_params& c_params,
-                                             const cds::block3D_vectorno&  c_alloc_blocks);
+  boost::optional<cads::acache_vectoro> create(
+      const cache_create_ro_params& c_params,
+      const cds::block3D_vectorno&  c_alloc_blocks,
+      bool initial);
 
   boost::optional<cads::acache_vectoro> create_conditional(
       const cache_create_ro_params& c_params,

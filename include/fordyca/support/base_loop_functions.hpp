@@ -119,6 +119,7 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
     return m_conv_calc.get();
   }
   const cforacle::foraging_oracle* oracle(void) const { return m_oracle.get(); }
+  const carena::caching_arena_map* arena_map(void) const RCSW_PURE;
 
  protected:
   tv::tv_manager* tv_manager(void) { return m_tv_manager.get(); }
@@ -130,8 +131,10 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
     return m_conv_calc.get();
   }
   cforacle::foraging_oracle* oracle(void) { return m_oracle.get(); }
-  const carena::caching_arena_map* arena_map(void) const RCSW_PURE;
   carena::caching_arena_map* arena_map(void) RCSW_PURE;
+  void delay_arena_map_init(bool b) { m_delay_arena_map_init = b; }
+  bool delay_arena_map_init(void) const { return m_delay_arena_map_init; }
+  void config_parse(ticpp::Element& node);
 
  private:
   /**
@@ -163,6 +166,7 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
   void oracle_init(const coconfig::aggregate_oracle_config* oraclep) RCSW_COLD;
 
   /* clang-format off */
+  bool                                         m_delay_arena_map_init{false};
   config::loop_function_repository             m_config{};
   std::unique_ptr<tv::tv_manager>              m_tv_manager;
   std::unique_ptr<convergence_calculator_type> m_conv_calc;

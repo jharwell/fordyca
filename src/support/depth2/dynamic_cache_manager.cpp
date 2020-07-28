@@ -68,7 +68,8 @@ boost::optional<cads::acache_vectoro> dynamic_cache_manager::create(
     support::depth2::dynamic_cache_creator creator(&params, m_rng);
 
     dynamic_cache_creator::creation_result res = creator.create_all(c_params,
-                                                                    *to_use);
+                                                                    *to_use,
+                                                                    false);
     caches_created(res.created.size());
     caches_discarded(res.n_discarded);
 

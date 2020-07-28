@@ -30,6 +30,8 @@
 
 #include "cosm/metrics/collector_registerer.hpp"
 #include "cosm/pal/argos_convergence_calculator.hpp"
+#include "cosm/arena/caching_arena_map.hpp"
+#include "cosm/foraging/block_dist/base_distributor.hpp"
 
 #include "fordyca/controller/foraging_controller.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
@@ -94,6 +96,9 @@ void fordyca_metrics_aggregator::collect_from_loop(
       loop->tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>()) {
     collect("tv::population",
             *loop->tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>());
+  }
+  if (nullptr != loop->arena_map()->block_distributor()) {
+    collect("blocks::distributor", *loop->arena_map()->block_distributor());
   }
 } /* collect_from_loop() */
 

@@ -149,14 +149,6 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
                            const cfconfig::block_dist_config* distp) RCSW_COLD;
 
   /**
-   * \brief Map the block distribution type to the locations of one or more
-   * static caches that will be maintained by the simulation during
-   * initialization.
-   */
-  std::vector<rmath::vector2d> calc_cache_locs(
-      const cfconfig::block_dist_config* distp) RCSW_COLD;
-
-  /**
    * \brief Initialize all oracles.
    */
   void oracle_init(void) RCSW_COLD;

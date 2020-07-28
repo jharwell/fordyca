@@ -57,7 +57,8 @@ static_cache_manager::static_cache_manager(
  ******************************************************************************/
 boost::optional<cads::acache_vectoro> static_cache_manager::create(
     const cache_create_ro_params& c_params,
-    const cds::block3D_vectorno& c_alloc_blocks) {
+    const cds::block3D_vectorno& c_alloc_blocks,
+    bool initial) {
   ER_DEBUG("(Re)-Creating static cache(s)");
   ER_ASSERT(mc_cache_config.static_.size >= carepr::base_cache::kMinBlocks,
             "Static cache size %u < minimum %zu",
@@ -82,7 +83,13 @@ boost::optional<cads::acache_vectoro> static_cache_manager::create(
                                dimension);
 
   static_cache_creator::creation_result res = creator.create_all(c_params,
-                                                                 *to_use);
+                                                                 *to_use,
+                                                                 initial);
+
+
+  /* Fix hidden blocks and configure cache extents */
+  post_creation_blocks_absorb(res.created, c_alloc_blocks);
+  creator.configure_cache_extents(res.created);
 
   /* verify the created caches */
   cads::acache_vectorro sanity_caches;
@@ -99,10 +106,6 @@ boost::optional<cads::acache_vectoro> static_cache_manager::create(
                                            arena_map()->nests()),
             "One or more bad caches on creation");
 
-  /* Fix hidden blocks and configure cache extents */
-  post_creation_blocks_absorb(res.created, c_alloc_blocks);
-  creator.configure_cache_extents(res.created);
-
   caches_created(res.created.size());
   caches_discarded(res.n_discarded);
 
@@ -118,7 +121,7 @@ boost::optional<cads::acache_vectoro> static_cache_manager::create_conditional(
       mc_cache_config.static_.respawn_scale_factor);
 
   if (p.calc(n_harvesters, n_collectors) >= m_rng->uniform(0.0, 1.0)) {
-    return create(c_params, c_alloc_blocks);
+    return create(c_params, c_alloc_blocks, false);
   } else {
     return boost::optional<cads::acache_vectoro>();
   }
@@ -176,8 +179,8 @@ boost::optional<cds::block3D_vectorno> static_cache_manager::cache_i_blocks_allo
                              return !c->contains_block(b);
                            }) &&
                /*
-                * Not already on a cell where cache will be re-created, or on
-                * the cell where ANOTHER cache *might* be recreated.
+                * Not already on a cell where the cache will be re-created, or
+                * on the cell where ANOTHER cache *might* be recreated.
                 */
                std::all_of(mc_cache_locs.begin(),
                            mc_cache_locs.end(),

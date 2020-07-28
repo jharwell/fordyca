@@ -55,7 +55,8 @@ dynamic_cache_creator::dynamic_cache_creator(const params* const p,
  ******************************************************************************/
 dynamic_cache_creator::creation_result dynamic_cache_creator::create_all(
     const cache_create_ro_params& c_params,
-    const cds::block3D_vectorno& c_alloc_blocks) {
+    const cds::block3D_vectorno& c_alloc_blocks,
+    bool) {
   creation_result res;
 
   ER_DEBUG("Creating caches: min_dist=%f,min_blocks=%u,free_blocks=[%s] (%zu)",
@@ -236,7 +237,7 @@ bool dynamic_cache_creator::cache_i_create(
   cache_i_blocks->insert(cache_i_blocks->end(),
                         absorb_blocks.begin(),
                         absorb_blocks.end());
-  auto cache = create_single_cache(*center, *cache_i_blocks, c_params.t);
+  auto cache = create_single_cache(*center, *cache_i_blocks, c_params.t, false);
 
   /*
    * If sanity checks fail, we know the problem must lie with the cache we just

@@ -34,6 +34,7 @@
 #include "cosm/ta/config/task_alloc_config.hpp"
 #include "cosm/ta/config/task_executive_config.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
+#include "cosm/arena/repr/light_type_index.hpp"
 
 #include "fordyca/config/depth1/controller_repository.hpp"
 #include "fordyca/config/exploration_config.hpp"
@@ -82,8 +83,17 @@ task_executive_builder::tasking_map task_executive_builder::depth1_tasks_create(
   auto* exp_config = config_repo.config_get<config::exploration_config>();
   fsm::expstrat::block_factory block_factory;
   fsm::expstrat::cache_factory cache_factory;
-  fsm::expstrat::foraging_expstrat::params expbp(
-      saa(), nullptr, mc_csel_matrix, m_perception->dpo_store());
+  auto cache_color = carepr::light_type_index()[carepr::light_type_index::kCache];
+  fsm::expstrat::foraging_expstrat::params expstrat_cachep(saa(),
+                                                           nullptr,
+                                                           mc_csel_matrix,
+                                                           m_perception->dpo_store(),
+                                                           cache_color);
+  fsm::expstrat::foraging_expstrat::params expstrat_blockp(saa(),
+                                                           nullptr,
+                                                           mc_csel_matrix,
+                                                           m_perception->dpo_store(),
+                                                           rutils::color());
 
   ER_ASSERT(nullptr != mc_bsel_matrix, "NULL block selection matrix");
   ER_ASSERT(nullptr != mc_csel_matrix, "NULL cache selection matrix");
@@ -96,12 +106,12 @@ task_executive_builder::tasking_map task_executive_builder::depth1_tasks_create(
   auto generalist_fsm = std::make_unique<fsm::depth0::free_block_to_nest_fsm>(
       &params,
       saa(),
-      block_factory.create(exp_config->block_strategy, &expbp, rng),
+      block_factory.create(exp_config->block_strategy, &expstrat_blockp, rng),
       rng);
   auto collector_fsm = std::make_unique<fsm::depth1::cached_block_to_nest_fsm>(
       &params,
       saa(),
-      cache_factory.create(exp_config->cache_strategy, &expbp, rng),
+      cache_factory.create(exp_config->cache_strategy, &expstrat_cachep, rng),
       rng);
 
   auto harvester_fsm =
