@@ -105,7 +105,8 @@ std::vector<rmath::vector2d> static_cache_locs_calculator::operator()(
             {c->xrspan().center(), arena_map->yrsize() * 0.675});
       }
     } /* for(i..) */
-  } else if (dispatcher_type::kDistPowerlaw == distp->dist_type) {
+  } else if (dispatcher_type::kDistPowerlaw == distp->dist_type ||
+             dispatcher_type::kDistRandom == distp->dist_type) {
     /* west */
     cache_rlocs.push_back({arena_map->xrsize() * 0.25,
             arena_map->yrsize() * 0.5});

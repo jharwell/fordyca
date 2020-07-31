@@ -26,9 +26,9 @@
 #include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/ds/cell2D.hpp"
 #include "cosm/foraging/repr/block_cluster.hpp"
-#include "cosm/foraging/utils/utils.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/repr/nest.hpp"
+#include "cosm/spatial/conflict_checker.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -265,11 +265,11 @@ boost::optional<rmath::vector2d> cache_center_calculator::deconflict_loc_entity(
    * NOT the center, so we have to compute that.
    */
   rmath::vector2d cache_dim(mc_cache_dim.v(), mc_cache_dim.v());
-  auto status = cfutils::placement_conflict2D(c_center - cache_dim / 2.0,
-                                              cache_dim,
-                                              ent);
+  auto status = cspatial::conflict_checker::placement2D(c_center - cache_dim / 2.0,
+                                                        cache_dim,
+                                                        ent);
 
-  if (status.x_conflict) {
+  if (status.x) {
     ER_TRACE("X conflict: cache xspan=%s,center=%s overlap ent%d: xspan=%s, x_delta=%f",
              rcppsw::to_string(newc_xspan).c_str(),
              rcppsw::to_string(c_center).c_str(),
@@ -278,7 +278,7 @@ boost::optional<rmath::vector2d> cache_center_calculator::deconflict_loc_entity(
              x_delta);
     new_center.x(new_center.x() + x_delta);
   }
-  if (status.y_conflict) {
+  if (status.y) {
     ER_TRACE("Y conflict: cache yspan=%s,center=%s overlap ent%d: yspan=%s, y_delta=%f",
              rcppsw::to_string(newc_yspan).c_str(),
              rcppsw::to_string(c_center).c_str(),
@@ -287,7 +287,7 @@ boost::optional<rmath::vector2d> cache_center_calculator::deconflict_loc_entity(
              y_delta);
     new_center.y(new_center.y() + y_delta);
   }
-  return (status.x_conflict && status.y_conflict)
+  return (status.x && status.y)
              ? boost::make_optional(new_center)
              : boost::optional<rmath::vector2d>();
 } /* deconflict_loc_entity() */

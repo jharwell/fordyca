@@ -32,7 +32,6 @@
 #include "cosm/tv/temporal_penalty_handler.hpp"
 
 #include "fordyca/support/tv/block_op_filter.hpp"
-#include "fordyca/support/utils/loop_utils.hpp"
 #include "fordyca/support/tv/block_op_penalty_id_calculator.hpp"
 
 /*******************************************************************************

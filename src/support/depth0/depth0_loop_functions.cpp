@@ -36,7 +36,7 @@
 #include "cosm/arena/config/arena_map_config.hpp"
 #include "cosm/controller/operations/applicator.hpp"
 #include "cosm/foraging/oracle/foraging_oracle.hpp"
-#include "cosm/metrics/blocks/transport_metrics_collector.hpp"
+#include "cosm/foraging/metrics/block_transport_metrics_collector.hpp"
 #include "cosm/interactors/applicator.hpp"
 #include "cosm/pal/argos_convergence_calculator.hpp"
 #include "cosm/pal/argos_swarm_iterator.hpp"
@@ -221,7 +221,7 @@ void depth0_loop_functions::post_step(void) {
   ndc_push();
   /* Update block distribution status */
   auto* collector =
-      m_metrics_agg->get<cmetrics::blocks::transport_metrics_collector>(
+      m_metrics_agg->get<cfmetrics::block_transport_metrics_collector>(
           "blocks::transport");
   arena_map()->redist_governor()->update(
       rtypes::timestep(GetSpace().GetSimulationClock()),

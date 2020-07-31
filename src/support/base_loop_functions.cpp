@@ -169,12 +169,20 @@ void base_loop_functions::oracle_init(
  * ARGoS Hooks
  ******************************************************************************/
 void base_loop_functions::pre_step(void) {
+  auto t = rtypes::timestep(GetSpace().GetSimulationClock());
+
+  /* update the arena map, which MIGHT require a redraw of the floor */
+  auto status = arena_map()->update(t);
+  if (carena::update_status::ekBLOCK_MOTION == status) {
+    floor()->SetChanged();
+  }
+
   /*
    * Needs to be before robot controllers are run, so they run with the correct
    * throttling/are subjected to the correct penalties, etc.
    */
   if (nullptr != m_tv_manager) {
-    m_tv_manager->update(rtypes::timestep(GetSpace().GetSimulationClock()));
+    m_tv_manager->update(t);
   }
 
   if (nullptr != oracle()) {

@@ -132,9 +132,16 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
   }
   cforacle::foraging_oracle* oracle(void) { return m_oracle.get(); }
   carena::caching_arena_map* arena_map(void) RCSW_PURE;
+  void config_parse(ticpp::Element& node);
+
+  /*
+   * If we are doing a powerlaw distribution we may need to create caches BEFORE
+   * clusters, so that cluster mapping will avoid the placed caches, and we
+   * don't know where the clusters are going to map to ahead of time. This hook
+   * allows derived classes to do that if needed.
+   */
   void delay_arena_map_init(bool b) { m_delay_arena_map_init = b; }
   bool delay_arena_map_init(void) const { return m_delay_arena_map_init; }
-  void config_parse(ticpp::Element& node);
 
  private:
   /**

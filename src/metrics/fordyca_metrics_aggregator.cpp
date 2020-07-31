@@ -97,9 +97,7 @@ void fordyca_metrics_aggregator::collect_from_loop(
     collect("tv::population",
             *loop->tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>());
   }
-  if (nullptr != loop->arena_map()->block_distributor()) {
-    collect("blocks::distributor", *loop->arena_map()->block_distributor());
-  }
+  collect_from_arena(loop->arena_map());
 } /* collect_from_loop() */
 
 NS_END(metrics, fordyca);

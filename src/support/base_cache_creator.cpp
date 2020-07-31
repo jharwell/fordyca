@@ -34,7 +34,6 @@
 #include "cosm/arena/operations/block_extent_clear.hpp"
 
 #include "fordyca/events/cell2D_empty.hpp"
-#include "fordyca/support/utils/loop_utils.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -139,6 +138,7 @@ std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
                                       m_grid->resolution(),
                                       carena::arena_map_locking::ekALL_HELD);
     op.visit(m_grid->access<arena_grid::kCell>(op.coord()));
+    op.visit(*block);
   } /* for(block..) */
 
   ER_DEBUG("All %zu blocks now in host cell%s",

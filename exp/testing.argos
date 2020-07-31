@@ -226,6 +226,7 @@
             swarm_convergence="swarm-convergence"
             tv_population="tv-population"
             block_distributor="block-distributor"
+            block_motion="block-motion"
             tv_environment="tv-environment"/>
 
         <create output_interval="10"
@@ -301,22 +302,27 @@
 
     <arena_map>
       <grid2D resolution="0.2"
-            dims="12, 12, 2"/>
+              dims="12, 12, 2"/>
       <blocks>
+        <motion
+            policy="random_walk"
+            prob="1.0"/>
         <distribution
-            dist_type="powerlaw">
+            dist_type="random">
+
           <!-- <redist_governor -->
-          <!--     trigger="Null" -->
+          <!--     trigger="timestep" -->
           <!--     recurrence_policy="multi" -->
-          <!--     timestep="500" -->
+          <!--     timestep="0" -->
           <!--     block_count="2"/> -->
+
           <powerlaw
               pwr_min="2"
               pwr_max="7"
               n_clusters="10"
               />
           <manifest
-              n_cube="200"
+              n_cube="20"
               n_ramp="0"
               unit_dim="0.2"
               />

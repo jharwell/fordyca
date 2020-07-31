@@ -26,11 +26,12 @@
 #include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/arena/caching_arena_map.hpp"
-#include "cosm/foraging/utils/utils.hpp"
+#include "cosm/spatial/conflict_checker.hpp"
+#include "cosm/arena/free_blocks_calculator.hpp"
+#include "cosm/arena/operations/cache_extent_clear.hpp"
 
 #include "fordyca/events/cell2D_empty.hpp"
 #include "fordyca/support/depth2/cache_center_calculator.hpp"
-#include "fordyca/support/utils/loop_utils.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -115,12 +116,13 @@ cds::block3D_vectorno dynamic_cache_creator::absorb_blocks_calc(
     const rtypes::spatial_dist& c_cache_dim) const {
   cds::block3D_vectorno absorb_blocks;
   rmath::vector2d cache_dim(c_cache_dim.v(), c_cache_dim.v());
+  using checker = cspatial::conflict_checker;
 
   std::copy_if(c_alloc_blocks.begin(),
                c_alloc_blocks.end(),
                std::back_inserter(absorb_blocks),
                [&](crepr::base_block3D* b) RCSW_PURE {
-                 auto status = cfutils::placement_conflict2D(
+                 auto status = checker::placement2D(
                      c_center - cache_dim / 2.0,
                      cache_dim,
                      b);
@@ -135,7 +137,7 @@ cds::block3D_vectorno dynamic_cache_creator::absorb_blocks_calc(
                                c_cache_i_blocks.end(),
                                b) &&
                      /* block overlaps cache i */
-                     status.x_conflict && status.y_conflict;
+                     status.x && status.y;
                });
   return absorb_blocks;
 } /* absorb_blocks_calc() */
@@ -251,7 +253,8 @@ bool dynamic_cache_creator::cache_i_create(
                    return c.get();
                  });
   sanity_caches.push_back(cache.get());
-  auto free_blocks = utils::free_blocks_calc(sanity_caches, c_alloc_blocks);
+  auto free_blocks = carena::free_blocks_calculator()(c_alloc_blocks,
+                                                      sanity_caches);
 
   if (!creation_sanity_checks(sanity_caches,
                               free_blocks,
@@ -286,18 +289,13 @@ bool dynamic_cache_creator::cache_i_create(
 void dynamic_cache_creator::cache_delete(
     const cds::block3D_vectorno& cache_i_blocks,
     std::unique_ptr<carepr::arena_cache> victim) {
-  auto xspan = victim->xdspan();
-  auto yspan = victim->ydspan();
 
   /* clear out all cache host cell AND cells that were in CACHE_EXTENT */
-  for (size_t i = xspan.lb(); i <= xspan.ub() ; ++i) {
-    for (size_t j = yspan.lb(); j <= yspan.ub(); ++j) {
-      auto dcoord = rmath::vector2z(i, j);
-      auto& cell = m_map->access<cds::arena_grid::kCell>(dcoord);
-      events::cell2D_empty_visitor op(dcoord);
-      op.visit(cell);
-    } /* for(j..) */
-  }   /* for(i..) */
+  events::cell2D_empty_visitor hc(victim->dcenter2D());
+  caops::cache_extent_clear_visitor ec(victim.get());
+
+  hc.visit(m_map->decoratee());
+  ec.visit(m_map->decoratee());
 
   /* redistribute blocks */
   for (auto *b : cache_i_blocks) {

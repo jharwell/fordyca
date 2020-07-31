@@ -25,12 +25,12 @@
 #include "cosm/arena/operations/free_block_drop.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/arena/caching_arena_map.hpp"
-#include "cosm/ds/operations/cell2D_empty.hpp"
 #include "cosm/repr/base_block3D.hpp"
+#include "cosm/arena/free_blocks_calculator.hpp"
+#include "cosm/arena/operations/free_block_pickup.hpp"
 
 #include "fordyca/math/cache_respawn_probability.hpp"
 #include "fordyca/support/depth1/static_cache_creator.hpp"
-#include "fordyca/support/utils/loop_utils.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -99,7 +99,8 @@ boost::optional<cads::acache_vectoro> static_cache_manager::create(
                  [&](const auto& c) {
                    return c.get();
                  });
-  auto free_blocks = utils::free_blocks_calc(sanity_caches, c_alloc_blocks);
+  auto free_blocks = carena::free_blocks_calculator()(c_alloc_blocks,
+                                                      sanity_caches);
   ER_ASSERT(creator.creation_sanity_checks(sanity_caches,
                                            free_blocks,
                                            c_params.clusters,
@@ -250,8 +251,11 @@ void static_cache_manager::post_creation_blocks_absorb(
     for (auto& c : caches) {
       if (!c->contains_block(b) && c->xrspan().overlaps_with(b->xrspan()) &&
           c->yrspan().overlaps_with(b->yrspan())) {
-        cdops::cell2D_empty_visitor empty(b->danchor2D());
-        empty.visit(arena_map()->access<arena_grid::kCell>(b->danchor2D()));
+        auto pickup = caops::free_block_pickup_visitor::by_arena(b);
+
+        /* pickup the block: mark host cell as empty and clear extent */
+        pickup.visit(*arena_map());
+
         /*
          * We are not REALLY holding all the arena map locks, but since cache
          * creation always happens AFTER all robot control steps have been run,
@@ -262,7 +266,8 @@ void static_cache_manager::post_creation_blocks_absorb(
             c->dcenter2D(),
             arena_map()->grid_resolution(),
             carena::arena_map_locking::ekALL_HELD);
-        op.visit(arena_map()->access<arena_grid::kCell>(op.x(), op.y()));
+        op.visit(arena_map()->access<arena_grid::kCell>(op.coord()));
+        op.visit(*b);
         c->block_add(b);
         ER_INFO("Hidden block%d added to cache%d", b->id().v(), c->id().v());
       }
