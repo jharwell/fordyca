@@ -68,6 +68,7 @@ class env_dynamics_parser final : public rconfig::xml::xml_config_parser {
 
   /* clang-format off */
   std::unique_ptr<config_type>      m_config{nullptr};
+  rct::config::xml::waveform_parser m_motion{};
   rct::config::xml::waveform_parser m_block_manip{};
   rct::config::xml::waveform_parser m_block_carry{};
   rct::config::xml::waveform_parser m_cache_usage{};

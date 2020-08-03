@@ -223,6 +223,10 @@ void foraging_controller::irv_init(const ctv::robot_dynamics_applicator* rda) {
     saa()->actuation()->governed_diff_drive()->tv_generator(
         rda->motion_throttler(entity_id()));
   }
+  if (rda->bc_throttling_enabled()) {
+    saa()->actuation()->governed_diff_drive()->tv_generator(
+        rda->bc_throttler(entity_id()));
+  }
 } /* irv_init() */
 
 class crfootbot::footbot_saa_subsystem* foraging_controller::saa(void) {
