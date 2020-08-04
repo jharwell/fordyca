@@ -98,7 +98,9 @@ class bitd_dpo_controller : public depth0::dpo_controller,
   RCPPSW_WRAP_OVERRIDE_DECL(csmetrics::goal_acq_metrics::goal_type,
                             acquisition_goal,
                             const final);
-  RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid, entity_acquired_id, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid,
+                            entity_acquired_id,
+                            const final);
 
   /* block transportation */
   RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal,

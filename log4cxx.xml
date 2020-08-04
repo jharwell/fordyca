@@ -26,7 +26,7 @@
     <priority value ="info" />
   </category>
   <category name="cosm.robots.footbot" >
-    <priority value ="debug" />
+    <!-- <priority value ="debug" /> -->
   </category>
   <category name="cosm.tv.population_dynamics" >
     <priority value ="info" />

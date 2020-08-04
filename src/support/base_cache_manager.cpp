@@ -45,8 +45,8 @@ rtypes::spatial_dist base_cache_manager::dimension_check(
             m_map->grid_resolution().v());
     dim -= remainder;
   }
-  auto ddims = rmath::dvec2zvec(rmath::vector2d(dim.v(), dim.v()),
-                                m_map->grid_resolution().v());
+  auto rdims = rmath::vector2d(dim.v(), dim.v());
+  auto ddims = rmath::dvec2zvec(rdims, m_map->grid_resolution().v());
   if (RCSW_IS_EVEN(ddims.x()) || RCSW_IS_EVEN(ddims.y())) {
     ER_WARN("Reduce cache dimension %f -> %f during creation to contain odd # cells",
             dim.v(),

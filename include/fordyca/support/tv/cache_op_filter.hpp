@@ -30,7 +30,7 @@
 
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/support/utils/event_utils.hpp"
-#include "fordyca/support/tv/op_filter_status.hpp"
+#include "fordyca/support/tv/op_filter_result.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 
 /*******************************************************************************
@@ -49,8 +49,7 @@ NS_START(fordyca, support, tv);
  * \brief The filter for cache operation for robots (e.g. picking up, dropping
  * in places that involve existing caches.
  */
-template <typename T>
-class cache_op_filter : public rer::client<cache_op_filter<T>> {
+class cache_op_filter : public rer::client<cache_op_filter> {
  public:
   explicit cache_op_filter(const carena::caching_arena_map* const map)
       : ER_CLIENT_INIT("fordyca.support.tv.cache_op_filter"), mc_map(map) {}
@@ -63,7 +62,8 @@ class cache_op_filter : public rer::client<cache_op_filter<T>> {
    * \brief Filters out controllers that actually are not eligible to start
    * serving penalties.
    */
-  op_filter_status operator()(const T& controller, cache_op_src src) {
+  template<typename TController>
+  op_filter_result operator()(const TController& controller, cache_op_src src) {
     /*
      * If the robot has not acquired a cache, or thinks it has but actually has
      * not, nothing to do. If a robot is carrying a cache but is still
@@ -76,7 +76,7 @@ class cache_op_filter : public rer::client<cache_op_filter<T>> {
       default:
         ER_FATAL_SENTINEL("Unhandled penalty type %d", static_cast<int>(src));
     } /* switch() */
-    return op_filter_status{};
+    return op_filter_result{};
   }
 
  private:
@@ -85,16 +85,21 @@ class cache_op_filter : public rer::client<cache_op_filter<T>> {
    * operations (e.g. pickup/drop) (i.e. controller not ready/not intending to
    * use an existing cache).
    */
-  op_filter_status do_filter(const T& controller) const {
-    if (controller.goal_acquired() &&
+  template <typename TController>
+  op_filter_result do_filter(const TController& controller) const {
+    op_filter_result result;
+    if (!(controller.goal_acquired() &&
         fsm::foraging_acq_goal::ekEXISTING_CACHE ==
-        controller.acquisition_goal()) {
+          controller.acquisition_goal())) {
+      result.status = op_filter_status::ekROBOT_INTERNAL_UNREADY;
+    } else {
       auto cache_id = utils::robot_on_cache(controller, *mc_map);
       if (rtypes::constants::kNoUUID != cache_id) {
-        return op_filter_status::ekSATISFIED;
+        result.status = op_filter_status::ekSATISFIED;
+        result.id = cache_id;
       }
     }
-    return op_filter_status::ekROBOT_INTERNAL_UNREADY;
+    return result;
   }
 
   /* clang-format off */

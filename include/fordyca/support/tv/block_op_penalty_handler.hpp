@@ -53,7 +53,7 @@ NS_START(fordyca, support, tv);
 class block_op_penalty_handler final : public ctv::temporal_penalty_handler,
                                        public rer::client<block_op_penalty_handler> {
  public:
-  block_op_penalty_handler(carena::caching_arena_map* const map,
+  block_op_penalty_handler(const carena::caching_arena_map* const map,
                            const rct::config::waveform_config* const config,
                            const std::string& name)
       : temporal_penalty_handler(config, name),
@@ -72,7 +72,7 @@ class block_op_penalty_handler final : public ctv::temporal_penalty_handler,
    * trying to drop/pickup a block. If so, create a \ref temporal_penalty object
    * and associate it with the robot.
    *
-   * \tparam TControllerType The type of the controller. Must be a template
+   * \tparam TController The type of the controller. Must be a template
    * parameter, rather than \ref controller::foraging_controller, because of the
    * goal acquisition determination done by \ref block_op_filter.
    *
@@ -88,15 +88,39 @@ class block_op_penalty_handler final : public ctv::temporal_penalty_handler,
                                 const rtypes::timestep& t,
                                 block_op_src src,
                                 boost::optional<rtypes::spatial_dist> cache_prox) {
+    /*
+     * Check if we have satisfied the conditions for a block operation, which
+     * involves querying the area map.
+     *
+     * NO LOCKING IS PERFORMED.
+     *
+     * There really can't be any locking here, because if there was, the
+     * simulation would get REALLY slow for large swarms, because every robot
+     * has to make this check every timestep. This makes the resulting block ID
+     * we get on some successful operations potentially invalid; that's OK, as
+     * validity is thoroughly checked after the penalty is served before
+     * executing the action.
+     *
+     * See FORDYCA#668.
+     */
     auto filter = m_filter(controller, src, cache_prox);
-    if (filter != op_filter_status::ekSATISFIED) {
-      return filter;
+    if (filter.status != op_filter_status::ekSATISFIED) {
+      return filter.status;
     }
     ER_ASSERT(!is_serving_penalty(controller),
               "%s already serving block penalty?",
               controller.GetId().c_str());
 
-    rtypes::type_uuid id = m_id_calc(controller, src);
+    /*
+     * Because NO LOCKING IS PERFORMED around the first check and this one, we
+     * may no longer meet the conditions for free block pickup, and the ID we
+     * already have of the block we are on/might be on might not be valid
+     * anymore.
+     *
+     * See FORDYCA#668.
+     */
+    rtypes::type_uuid id = m_id_calc(controller, src, filter);
+
     rtypes::timestep orig_duration = penalty_calc(t);
     rtypes::timestep RCSW_UNUSED duration = penalty_add(&controller,
                                                         id,
@@ -111,7 +135,7 @@ class block_op_penalty_handler final : public ctv::temporal_penalty_handler,
             duration.v(),
             static_cast<int>(src));
 
-    return filter;
+    return filter.status;
   }
 
  private:

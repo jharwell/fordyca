@@ -1,7 +1,7 @@
 /**
- * \file op_filter_status.hpp
+ * \file op_filter_result.hpp
  *
- * \copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2020 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,13 +18,16 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_TV_OP_FILTER_STATUS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_TV_OP_FILTER_STATUS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_TV_OP_FILTER_RESULT_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_TV_OP_FILTER_RESULT_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "rcppsw/types/type_uuid.hpp"
+
 #include "fordyca/fordyca.hpp"
+#include "fordyca/support/tv/op_filter_status.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -32,46 +35,14 @@
 NS_START(fordyca, support, tv);
 
 /*******************************************************************************
- * Class Definitions
+ * Struct Definitions
  ******************************************************************************/
-/**
- * \brief Contains the various statuses relating to robots and block operations
- * (picking up, dropping).
- */
-enum class op_filter_status {
-  /**
-   * \brief The robot has not currently achieved the necessary internal state
-   * for the block operation.
-   */
-  ekROBOT_INTERNAL_UNREADY,
-
-  /**
-   * \brief The robot has passed all necessary filter checkes for the requested
-   * operation.
-   *
-   */
-  ekSATISFIED,
-
-  /**
-   * \brief The robot has achieved the necessary internal state for the block
-   * operation, but is not actually on a block, so the desired operation is
-   * invalid.
-   */
-  ekROBOT_NOT_ON_BLOCK,
-
-  /**
-   * \brief The robot has requested an action that while too close to an
-   * existing block in the arena.
-   */
-  ekBLOCK_PROXIMITY,
-
-  /**
-   * \brief The robot has requested an action while too close to an existing
-   * cache in the arena.
-   */
-  ekCACHE_PROXIMITY
+struct op_filter_result {
+  enum op_filter_status status{op_filter_status::ekROBOT_INTERNAL_UNREADY};
+  rtypes::type_uuid     id{rtypes::constants::kNoUUID};
 };
+
 
 NS_END(tv, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_TV_OP_FILTER_STATUS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_TV_OP_FILTER_RESULT_HPP_ */

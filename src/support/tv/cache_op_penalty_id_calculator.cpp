@@ -1,7 +1,7 @@
 /**
- * \file op_filter_status.hpp
+ * \file cache_op_penalty_id_calculator.cpp
  *
- * \copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2020 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,13 +18,10 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_TV_OP_FILTER_STATUS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_TV_OP_FILTER_STATUS_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fordyca.hpp"
+#include "fordyca/support/tv/cache_op_penalty_id_calculator.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -32,46 +29,28 @@
 NS_START(fordyca, support, tv);
 
 /*******************************************************************************
- * Class Definitions
+ * Constructors/Destructors
  ******************************************************************************/
-/**
- * \brief Contains the various statuses relating to robots and block operations
- * (picking up, dropping).
- */
-enum class op_filter_status {
-  /**
-   * \brief The robot has not currently achieved the necessary internal state
-   * for the block operation.
-   */
-  ekROBOT_INTERNAL_UNREADY,
+cache_op_penalty_id_calculator::cache_op_penalty_id_calculator(void)
+    : ER_CLIENT_INIT("fordyca.support.tv.cache_op_penalty_id_calculator") {}
 
-  /**
-   * \brief The robot has passed all necessary filter checkes for the requested
-   * operation.
-   *
-   */
-  ekSATISFIED,
-
-  /**
-   * \brief The robot has achieved the necessary internal state for the block
-   * operation, but is not actually on a block, so the desired operation is
-   * invalid.
-   */
-  ekROBOT_NOT_ON_BLOCK,
-
-  /**
-   * \brief The robot has requested an action that while too close to an
-   * existing block in the arena.
-   */
-  ekBLOCK_PROXIMITY,
-
-  /**
-   * \brief The robot has requested an action while too close to an existing
-   * cache in the arena.
-   */
-  ekCACHE_PROXIMITY
-};
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+rtypes::type_uuid cache_op_penalty_id_calculator::operator()(
+    cache_op_src src,
+    op_filter_result filter) const {
+  rtypes::type_uuid id = rtypes::constants::kNoUUID;
+  switch (src) {
+    case cache_op_src::ekEXISTING_CACHE_DROP:
+    case cache_op_src::ekEXISTING_CACHE_PICKUP:
+      ER_ASSERT(rtypes::constants::kNoUUID != filter.id,
+                "Robot not in cache?");
+      id = filter.id;
+    default:
+      break;
+  }
+  return id;
+} /* penalty_id_calc() */
 
 NS_END(tv, support, fordyca);
-
-#endif /* INCLUDE_FORDYCA_SUPPORT_TV_OP_FILTER_STATUS_HPP_ */

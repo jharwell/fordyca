@@ -1,5 +1,5 @@
 /**
- * \file block_op_penalty_id_calculator.hpp
+ * \file cache_op_penalty_id_calculator.hpp
  *
  * \copyright 2020 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_TV_BLOCK_OP_PENALTY_ID_CALCULATOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_TV_BLOCK_OP_PENALTY_ID_CALCULATOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_TV_CACHE_OP_PENALTY_ID_CALCULATOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_TV_CACHE_OP_PENALTY_ID_CALCULATOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -30,52 +30,40 @@
 #include "cosm/foraging/tv/penalty_id_calculator.hpp"
 
 #include "fordyca/fordyca.hpp"
-#include "fordyca/support/tv/block_op_src.hpp"
+#include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/support/tv/op_filter_result.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-namespace cosm::arena {
-class caching_arena_map;
-} /* namespace cosm::arena */
-
-namespace fordyca::controller {
-class foraging_controller;
-} /* namespace fordyca::controller */
-
 NS_START(fordyca, support, tv);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class block_op_penalty_id_calculator
+ * \class cache_op_penalty_id_calculator
  * \ingroup support tv
  *
- * \brief Extents \ref ctv::penalty_id_calculator with additional
- * FORDYCA-specific ways to calculate the ID that should be associated with a
- * particular temporal penalty.
+ * \brief Calculates the ID that should be associated with a particular temporal
+ * penalty relating to cache operations.
+ *
+ * \note This class does not really do much now, and is not REALLY necessary,
+ * but a similar class IS necessary for calculating block op IDs, and I'm trying
+ * to future proof the design here.
  */
-class block_op_penalty_id_calculator : public rer::client<block_op_penalty_id_calculator>,
+class cache_op_penalty_id_calculator : public rer::client<cache_op_penalty_id_calculator>,
                                        public rpdecorator::decorator<cforaging::tv::penalty_id_calculator> {
  public:
-  explicit block_op_penalty_id_calculator(const carena::caching_arena_map* map);
+  cache_op_penalty_id_calculator(void);
 
   /* Not copy constructable/assignable by default */
-  block_op_penalty_id_calculator(const block_op_penalty_id_calculator&) = delete;
-  const block_op_penalty_id_calculator& operator=(const block_op_penalty_id_calculator&) = delete;
+  cache_op_penalty_id_calculator(const cache_op_penalty_id_calculator&) = delete;
+  const cache_op_penalty_id_calculator& operator=(const cache_op_penalty_id_calculator&) = delete;
 
-  rtypes::type_uuid operator()(const controller::foraging_controller& controller,
-                               block_op_src src,
-                               op_filter_result filter) const;
-
- private:
-  /* clang-formatoff */
-  const carena::caching_arena_map* mc_map;
-  /* clang-format on */
+  rtypes::type_uuid operator()(cache_op_src src, op_filter_result filter) const;
 };
 
 NS_END(tv, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_TV_BLOCK_OP_PENALTY_ID_CALCULATOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_TV_CACHE_OP_PENALTY_ID_CALCULATOR_HPP_ */
