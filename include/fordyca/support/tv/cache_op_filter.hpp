@@ -29,9 +29,9 @@
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 
 #include "fordyca/support/tv/cache_op_src.hpp"
-#include "fordyca/support/utils/event_utils.hpp"
 #include "fordyca/support/tv/op_filter_result.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
+#include "fordyca/support/cache_prox_checker.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,8 +51,8 @@ NS_START(fordyca, support, tv);
  */
 class cache_op_filter : public rer::client<cache_op_filter> {
  public:
-  explicit cache_op_filter(const carena::caching_arena_map* const map)
-      : ER_CLIENT_INIT("fordyca.support.tv.cache_op_filter"), mc_map(map) {}
+  explicit cache_op_filter(carena::caching_arena_map* const map)
+      : ER_CLIENT_INIT("fordyca.support.tv.cache_op_filter"), m_map(map) {}
 
   ~cache_op_filter(void) override = default;
   cache_op_filter& operator=(const cache_op_filter&) = delete;
@@ -93,7 +93,17 @@ class cache_op_filter : public rer::client<cache_op_filter> {
           controller.acquisition_goal())) {
       result.status = op_filter_status::ekROBOT_INTERNAL_UNREADY;
     } else {
-      auto cache_id = utils::robot_on_cache(controller, *mc_map);
+      /*
+       * OK to lock around this calculation, because relatively few robots will
+       * have the correct internal state for a cache operation each timestep,
+       * and we don't need exclusive access to the arena map at this point--only
+       * a guarantee that the cache array will not be modified while we are
+       * checking it.
+       */
+      m_map->cache_mtx()->lock_shared();
+      auto cache_id = m_map->robot_on_cache(controller.rpos2D());
+      m_map->cache_mtx()->unlock_shared();
+
       if (rtypes::constants::kNoUUID != cache_id) {
         result.status = op_filter_status::ekSATISFIED;
         result.id = cache_id;
@@ -103,7 +113,7 @@ class cache_op_filter : public rer::client<cache_op_filter> {
   }
 
   /* clang-format off */
-  const carena::caching_arena_map* const mc_map;
+  carena::caching_arena_map* m_map;
   /* clang-format on */
 };
 NS_END(tv, support, fordyca);

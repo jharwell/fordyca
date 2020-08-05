@@ -39,7 +39,7 @@
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/support/interactor_status.hpp"
-#include "fordyca/support/depth2/cache_prox_checker.hpp"
+#include "fordyca/support/cache_prox_checker.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -118,7 +118,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
     const auto& penalty = m_penalty_handler->penalty_next();
     interactor_status status;
 
-    if (m_prox_checker(controller, "cache site")) {
+    if (m_prox_checker.check_and_notify(controller, "cache site")) {
       status = interactor_status::ekNO_EVENT;
     } else {
       execute_cache_site_block_drop(controller, penalty);

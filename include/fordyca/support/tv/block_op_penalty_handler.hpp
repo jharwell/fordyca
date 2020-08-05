@@ -53,14 +53,14 @@ NS_START(fordyca, support, tv);
 class block_op_penalty_handler final : public ctv::temporal_penalty_handler,
                                        public rer::client<block_op_penalty_handler> {
  public:
-  block_op_penalty_handler(const carena::caching_arena_map* const map,
+  block_op_penalty_handler(carena::caching_arena_map* const map,
                            const rct::config::waveform_config* const config,
                            const std::string& name)
       : temporal_penalty_handler(config, name),
         ER_CLIENT_INIT("fordyca.support.tv.block_op_penalty_handler"),
-        mc_map(map),
-        m_filter(mc_map),
-        m_id_calc(mc_map) {}
+        m_map(map),
+        m_filter(m_map),
+        m_id_calc(m_map) {}
 
   ~block_op_penalty_handler(void) override = default;
   block_op_penalty_handler& operator=(const block_op_penalty_handler& other) =
@@ -140,10 +140,10 @@ class block_op_penalty_handler final : public ctv::temporal_penalty_handler,
 
  private:
   /* clang-format off */
-  const carena::caching_arena_map* const mc_map;
+  carena::caching_arena_map*     m_map;
 
-  block_op_filter                        m_filter;
-  block_op_penalty_id_calculator         m_id_calc;
+  block_op_filter                m_filter;
+  block_op_penalty_id_calculator m_id_calc;
   /* clang-format on */
 };
 NS_END(tv, support, fordyca);

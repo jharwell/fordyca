@@ -51,9 +51,9 @@ NS_START(fordyca, support);
  * \brief Handles a robot's (possible) \ref cache_block_drop event for existing
  * caches on a given timestep.
  */
-template <typename T>
+template <typename TController>
 class existing_cache_block_drop_interactor
-    : public rer::client<existing_cache_block_drop_interactor<T>> {
+    : public rer::client<existing_cache_block_drop_interactor<TController>> {
  public:
   existing_cache_block_drop_interactor(carena::caching_arena_map* const map_in,
                                        tv::env_dynamics* envd)
@@ -77,10 +77,12 @@ class existing_cache_block_drop_interactor
    * \param controller The controller to handle interactions for.
    * \param t   The current timestep.
    */
-  void operator()(T& controller, rtypes::timestep t) {
+  void operator()(TController& controller, rtypes::timestep t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
       if (m_penalty_handler->is_penalty_satisfied(controller, t)) {
-        finish_cache_block_drop(controller);
+        ER_ASSERT(pre_process_check(controller), "Pre-drop check failed");
+        process_cache_block_drop(controller);
+        ER_ASSERT(post_process_check(controller), "Post-drop check failed");
       }
     } else {
       m_penalty_handler->penalty_init(controller,
@@ -94,17 +96,8 @@ class existing_cache_block_drop_interactor
    * \brief Handles handshaking between cache, robot, and arena if the robot is
    * has acquired a cache and is looking to drop an object in it.
    */
-  void finish_cache_block_drop(T& controller) {
-    const ctv::temporal_penalty& p = m_penalty_handler->penalty_next();
-    ER_ASSERT(p.controller() == &controller,
-              "Out of order cache penalty handling");
-    ER_ASSERT(nullptr != dynamic_cast<events::existing_cache_interactor*>(
-                             controller.current_task()),
-              "Non-cache interface task!");
-    ER_ASSERT(controller.current_task()->goal_acquired() &&
-                  fsm::foraging_acq_goal::ekEXISTING_CACHE ==
-                      controller.current_task()->acquisition_goal(),
-              "Controller not waiting for cache block drop");
+  void process_cache_block_drop(TController& controller) {
+    const auto& penalty = m_penalty_handler->penalty_next();
     /*
      * We cannot just lock around the critical arena map updates here in order
      * to make this section thread safe, and need to lock around the whole
@@ -137,29 +130,33 @@ class existing_cache_block_drop_interactor
      * serving our penalty is the same as the one the penalty was originally
      * initialized with (not just checking if it is not -1).
      */
-    auto cache_id = utils::robot_on_cache(controller, *m_map);
+    auto cache_id = m_map->robot_on_cache(controller.rpos2D());
 
-    if (p.id() != cache_id) {
+    if (penalty.id() != cache_id) {
       ER_WARN("%s cannot drop in cache%d: No such cache",
               controller.GetId().c_str(),
-              p.id().v());
-      events::cache_vanished_visitor vanished_op(p.id());
+              penalty.id().v());
+      /*
+       * We now know we aren't going to update arena state, because the cache
+       * associated with the penalty doesn't exist anymore.
+       */
+      m_map->cache_mtx()->unlock();
+
+      events::cache_vanished_visitor vanished_op(penalty.id());
       vanished_op.visit(controller);
     } else {
-      perform_cache_block_drop(controller, p);
+      execute_cache_block_drop(controller, penalty);
+      m_map->cache_mtx()->unlock();
     }
-    m_map->cache_mtx()->unlock();
 
-    m_penalty_handler->penalty_remove(p);
-    ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),
-              "Multiple instances of same controller serving cache penalty");
+    m_penalty_handler->penalty_remove(penalty);
   }
 
   /**
    * \brief Perform the actual dropping of a block in the cache once all
    * preconditions have been satisfied.
    */
-  void perform_cache_block_drop(T& controller,
+  void execute_cache_block_drop(TController& controller,
                                 const ctv::temporal_penalty& penalty) {
     auto cache_it =
         std::find_if(m_map->caches().begin(),
@@ -202,6 +199,40 @@ class existing_cache_block_drop_interactor
     rdrop_op.visit(controller);
   }
 
+  bool pre_process_check(const TController& controller) const {
+    const auto& penalty = m_penalty_handler->penalty_next();
+    auto acq_goal = controller.current_task()->acquisition_goal();
+    auto* task = dynamic_cast<const events::existing_cache_interactor*>(
+        controller.current_task());
+    RCSW_UNUSED auto* polled = dynamic_cast<const cta::polled_task*>(
+        controller.current_task());
+
+    ER_CHECK(penalty.controller() == &controller,
+              "Out of order cache penalty handling");
+    ER_CHECK(nullptr != task,
+             "Non-cache interface task '%s'!",
+             polled->name().c_str());
+    ER_CHECK(controller.current_task()->goal_acquired() &&
+             fsm::foraging_acq_goal::ekEXISTING_CACHE == acq_goal,
+             "Robot%d@%s/%s not waiting for cache block drop",
+             controller.entity_id().v(),
+             rcppsw::to_string(controller.rpos2D()).c_str(),
+             rcppsw::to_string(controller.dpos2D()).c_str());
+    return true;
+
+ error:
+    return false;
+  }
+
+  bool post_process_check(const TController& controller) const {
+    ER_CHECK(!m_penalty_handler->is_serving_penalty(controller),
+             "Multiple instances of same controller serving existing cache drop penalty");
+
+    return true;
+
+ error:
+    return false;
+  }
   /* clang-format off */
   carena::caching_arena_map* const   m_map;
   tv::cache_op_penalty_handler*const m_penalty_handler;

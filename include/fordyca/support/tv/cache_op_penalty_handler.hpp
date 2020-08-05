@@ -31,7 +31,6 @@
 #include "fordyca/support/tv/cache_op_filter.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/support/tv/cache_op_penalty_id_calculator.hpp"
-#include "fordyca/support/utils/event_utils.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,13 +51,13 @@ class cache_op_penalty_handler final
     : public ctv::temporal_penalty_handler,
       public rer::client<cache_op_penalty_handler> {
  public:
-  cache_op_penalty_handler(const carena::caching_arena_map* const map,
+  cache_op_penalty_handler(carena::caching_arena_map* const map,
                            const rct::config::waveform_config* const config,
                            const std::string& name)
       : temporal_penalty_handler(config, name),
         ER_CLIENT_INIT("fordyca.support.tv.cache_op_penalty_handler"),
-        mc_map(map),
-        m_filter(mc_map) {}
+        m_map(map),
+        m_filter(m_map) {}
 
   ~cache_op_penalty_handler(void) override = default;
   cache_op_penalty_handler& operator=(const cache_op_penalty_handler& other) =
@@ -121,10 +120,10 @@ class cache_op_penalty_handler final
 
  private:
   /* clang-format off */
-  const carena::caching_arena_map* const mc_map;
+  carena::caching_arena_map*     m_map;
 
-  cache_op_filter                        m_filter;
-  cache_op_penalty_id_calculator         m_id_calc{};
+  cache_op_filter                m_filter;
+  cache_op_penalty_id_calculator m_id_calc{};
   /* clang-format on */
 };
 NS_END(tv, support, fordyca);

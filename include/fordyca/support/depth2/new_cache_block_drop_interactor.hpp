@@ -36,7 +36,7 @@
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
 #include "fordyca/support/interactor_status.hpp"
 #include "fordyca/events/robot_free_block_drop.hpp"
-#include "fordyca/support/depth2/cache_prox_checker.hpp"
+#include "fordyca/support/cache_prox_checker.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -112,7 +112,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
     const auto& penalty = m_penalty_handler->penalty_next();
     interactor_status status;
 
-    if (m_prox_checker(controller, "new cache")) {
+    if (m_prox_checker.check_and_notify(controller, "new cache")) {
       status = interactor_status::ekNO_EVENT;
     } else {
       execute_new_cache_block_drop(controller, penalty);
@@ -186,7 +186,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
 
  error:
     return false;
-  } /* post_process_check() */
+  }
 
   /* clang-format off */
   argos::CFloorEntity*  const         m_floor;

@@ -28,11 +28,13 @@
 #include <boost/optional.hpp>
 
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
+#include "cosm/arena/caching_arena_map.hpp"
+
 #include "fordyca/support/tv/block_op_src.hpp"
-#include "fordyca/support/utils/event_utils.hpp"
 #include "fordyca/support/tv/op_filter_result.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/fsm/foraging_transport_goal.hpp"
+#include "fordyca/support/cache_prox_checker.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -112,7 +114,20 @@ class block_op_filter : public rer::client<block_op_filter> {
           fsm::foraging_acq_goal::ekBLOCK == controller.acquisition_goal())) {
       result.status = op_filter_status::ekROBOT_INTERNAL_UNREADY;
     } else {
-      auto block_id = utils::robot_on_block(controller, *mc_map);
+      /*
+       * OK to lock around this calculation, because relatively few robots will
+       * have the correct internal state for a free block pickup each timestep,
+       * and we don't need exclusive access to the arena map at this point--only
+       * a guarantee that the blocks/caches arrays will not be modified while we
+       * are checking them.
+       */
+      mc_map->cache_mtx()->lock_shared();
+      mc_map->block_mtx()->lock_shared();
+      auto block_id = mc_map->robot_on_block(controller.rpos2D(),
+                                            controller.entity_acquired_id());
+      mc_map->block_mtx()->unlock_shared();
+      mc_map->cache_mtx()->unlock_shared();
+
       if (rtypes::constants::kNoUUID == block_id) {
         result.status = op_filter_status::ekROBOT_NOT_ON_BLOCK;
       } else {
@@ -153,11 +168,10 @@ class block_op_filter : public rer::client<block_op_filter> {
           fsm::foraging_transport_goal::ekCACHE_SITE == controller.block_transport_goal())) {
       result.status = op_filter_status::ekROBOT_INTERNAL_UNREADY;
     } else {
-      auto cache_id = utils::new_cache_cache_proximity(controller,
-                                                       *mc_map,
-                                                       cache_prox)
-                      .entity_id;
-      if (rtypes::constants::kNoUUID != cache_id) {
+      cache_prox_checker checker(mc_map, cache_prox);
+      auto prox = checker.check(controller);
+
+      if (rtypes::constants::kNoUUID != prox.id) {
         result.status = op_filter_status::ekCACHE_PROXIMITY;
       } else {
         result.status = op_filter_status::ekSATISFIED;
@@ -181,11 +195,10 @@ class block_op_filter : public rer::client<block_op_filter> {
           fsm::foraging_transport_goal::ekNEW_CACHE == controller.block_transport_goal())) {
       result.status = op_filter_status::ekROBOT_INTERNAL_UNREADY;
     } else {
-      auto cache_id = utils::new_cache_cache_proximity(controller,
-                                                       *mc_map,
-                                                       cache_prox)
-                      .entity_id;
-      if (rtypes::constants::kNoUUID != cache_id) {
+      cache_prox_checker checker(mc_map, cache_prox);
+      auto prox = checker.check(controller);
+
+      if (rtypes::constants::kNoUUID != prox.id) {
         result.status = op_filter_status::ekCACHE_PROXIMITY;
       } else {
         result.status = op_filter_status::ekSATISFIED;
@@ -195,7 +208,7 @@ class block_op_filter : public rer::client<block_op_filter> {
   }
 
   /* clang-format off */
-  const carena::caching_arena_map* const mc_map;
+  const carena::caching_arena_map* mc_map;
   /* clang-format on */
 };
 NS_END(tv, support, fordyca);
