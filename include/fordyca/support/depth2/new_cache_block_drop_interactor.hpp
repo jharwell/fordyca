@@ -26,14 +26,17 @@
  ******************************************************************************/
 #include <argos3/core/simulator/entity/floor_entity.h>
 
-#include "fordyca/support/tv/env_dynamics.hpp"
 #include "cosm/arena/operations/free_block_drop.hpp"
+#include "cosm/ta/polled_task.hpp"
+#include "cosm/arena/caching_arena_map.hpp"
+
+#include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/events/cache_proximity.hpp"
 #include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
-#include "cosm/arena/caching_arena_map.hpp"
 #include "fordyca/support/interactor_status.hpp"
 #include "fordyca/events/robot_free_block_drop.hpp"
+#include "fordyca/support/depth2/cache_prox_checker.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,19 +53,20 @@ NS_START(fordyca, support, depth2);
  * \brief Handles a robot's (possible) \ref free_block_drop event at a new cache
  * on a given timestep.
  */
-template <typename T>
-class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_interactor<T>> {
+template <typename TController>
+class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_interactor<TController>> {
  public:
   new_cache_block_drop_interactor(carena::caching_arena_map* const map_in,
-                                   argos::CFloorEntity* const floor_in,
+                                  argos::CFloorEntity* const floor_in,
                                   tv::env_dynamics* const envd,
-                                   dynamic_cache_manager* const cache_manager)
+                                  dynamic_cache_manager* const cache_manager)
       : ER_CLIENT_INIT("fordyca.support.depth2.new_cache_block_drop_interactor"),
         m_floor(floor_in),
         m_map(map_in),
         m_cache_manager(cache_manager),
         m_penalty_handler(envd->penalty_handler(
-            tv::block_op_src::ekNEW_CACHE_DROP)) {}
+            tv::block_op_src::ekNEW_CACHE_DROP)),
+        m_prox_checker(map_in, m_cache_manager->cache_proximity_dist()) {}
 
   new_cache_block_drop_interactor(
       new_cache_block_drop_interactor&&) = default;
@@ -81,143 +85,53 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
    *
    * \return \c TRUE if a block was dropped in a new cache, \c FALSE otherwise.
    */
-  interactor_status operator()(T& controller, const rtypes::timestep& t) {
+  interactor_status operator()(TController& controller, const rtypes::timestep& t) {
+    interactor_status status = interactor_status::ekNO_EVENT;
     if (m_penalty_handler->is_serving_penalty(controller)) {
       if (m_penalty_handler->is_penalty_satisfied(controller, t)) {
-        return finish_new_cache_block_drop(controller);
+        ER_ASSERT(pre_process_check(controller), "Pre-drop check failed");
+        status = process_new_cache_block_drop(controller);
+        ER_ASSERT(post_process_check(controller), "Post-drop check failed");
       }
     } else {
-      /*
-       * If we failed initialize a penalty because there is another
-       * block/cache too close, then that probably means that the robot is not
-       * aware of said block, so we should send an event to fix that. Better
-       * to do this here AND after serving the penalty rather than always just
-       * waiting until after the penalty is served to figure out that the
-       * robot is too close to a block/cache.
-       */
-      auto status = m_penalty_handler->penalty_init(controller,
-                                                   t,
-                                                    tv::block_op_src::ekNEW_CACHE_DROP,
-                                                    boost::make_optional(m_cache_manager->cache_proximity_dist()));
-      if (tv::op_filter_status::ekCACHE_PROXIMITY == status) {
-        auto prox_status = utils::new_cache_cache_proximity(controller,
-                                                            *m_map,
-                                                            m_cache_manager->cache_proximity_dist());
-        /*
-         * This is a check, not an assert, because we are not holding the cache
-         * mutex between the first and second checks, and the cache could have
-         * become depleted in between. See FORDYCA#633.
-         */
-        if (rtypes::constants::kNoUUID != prox_status.entity_id) {
-          cache_proximity_notify(controller, prox_status);
-        }
-      }
+      auto prox_dist = boost::make_optional(m_cache_manager->cache_proximity_dist());
+      m_penalty_handler->penalty_init(controller,
+                                      t,
+                                      tv::block_op_src::ekNEW_CACHE_DROP,
+                                      prox_dist);
     }
-    return interactor_status::ekNO_EVENT;
+    return status;
   }
 
  private:
-  void cache_proximity_notify(T& controller,
-                              const utils::proximity_status_t& status) {
-    ER_WARN("Robot%d@%s cannot drop block in new cache: Cache%d@%s too close (%f <= %f)",
-            controller.entity_id().v(),
-            controller.rpos2D().to_str().c_str(),
-            status.entity_id.v(),
-            status.entity_loc.to_str().c_str(),
-            status.distance.length(),
-            m_cache_manager->cache_proximity_dist().v());
-    /*
-     * Because caches can be dynamically created/destroyed, we cannot rely on
-     * the index position of cache i to be the same as its ID, so we need to
-     * search for the correct cache.
-     */
-    m_map->cache_mtx()->lock();
-    auto it = std::find_if(m_map->caches().begin(),
-                           m_map->caches().end(),
-                           [&](const auto& c) {
-                             return c->id() == status.entity_id;
-                           });
-    /*
-     * After verifying that (1) we are too close to a cache, (2) that cache
-     * still exists (it could have been depleted by another robot between when
-     * we checked the first time and now because we were not holding the cache
-     * mutex), we visit the robot.
-     *
-     * This is necessary because if the cache we are referencing is depleted and
-     * deleted while we are in the middle of updating the robot's DPO store, we
-     * will get a segfault/memory error of some kind. See FORDYCA#633.
-     */
-    if (it != m_map->caches().end()) {
-      events::cache_proximity_visitor prox_op(*it);
-      prox_op.visit(controller);
-    }
-    m_map->cache_mtx()->unlock();
-  }
-
   /**
    * \brief Handles handshaking between cache, robot, and arena if the robot is
    * has acquired a cache site and is looking to drop an object on it.
    */
-  interactor_status finish_new_cache_block_drop(T& controller) {
-    const ctv::temporal_penalty& p = m_penalty_handler->penalty_next();
-    ER_ASSERT(p.controller() == &controller,
-              "Out of order cache penalty handling");
-    ER_ASSERT(nullptr != dynamic_cast<events::dynamic_cache_interactor*>(
-        controller.current_task()), "Non-cache interface task!");
-    auto acq_goal = controller.current_task()->acquisition_goal();
-    ER_ASSERT(controller.current_task()->goal_acquired() &&
-              fsm::foraging_acq_goal::ekNEW_CACHE == acq_goal,
-              "Robot%d not waiting for new cache block drop: acq_goal=%d",
-              controller.entity_id().v(),
-              acq_goal.v());
-    auto status = utils::new_cache_cache_proximity(controller,
-                                                   *m_map,
-                                                   m_cache_manager->cache_proximity_dist());
+  interactor_status process_new_cache_block_drop(TController& controller) {
+    const auto& penalty = m_penalty_handler->penalty_next();
+    interactor_status status;
 
-    if (rtypes::constants::kNoUUID != status.entity_id) {
-      /*
-     * If there is another cache nearby that the robot is unaware of, and if
-     * that cache is close enough to the robot's current location that a block
-     * drop would result in the creation of a new cache which would overlap with
-     * said cache, then abort the drop and tell the robot about the undiscovered
-     * cache so that it will update its state and pick a different new cache.
-     */
-      ER_WARN("Robot%d cannot drop block in new cache %s: Cache%d too close (%f <= %f)",
-              controller.entity_id().v(),
-              controller.rpos2D().to_str().c_str(),
-              status.entity_id.v(),
-              status.distance.length(),
-              m_cache_manager->cache_proximity_dist().v());
-
-      /*
-       * We need to perform the proxmity check again after serving our block
-       * drop penalty, because a cache might have been created nearby while we
-       * were waiting, rendering our chosen location invalid.
-       */
-      auto it = std::find_if(m_map->caches().begin(),
-                             m_map->caches().end(),
-                             [&](const auto& c) {
-                               return c->id() == status.entity_id; });
-      ER_ASSERT(m_map->caches().end() != it,
-                "FATAL: Cache%d does not exist?",
-                status.entity_id.v());
-      events::cache_proximity_visitor prox_op(*it);
-      prox_op.visit(controller);
-      return interactor_status::ekNO_EVENT;
+    if (m_prox_checker(controller, "new cache")) {
+      status = interactor_status::ekNO_EVENT;
     } else {
-      perform_new_cache_block_drop(controller, p);
-      m_penalty_handler->penalty_remove(p);
-      ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),
-                "Multiple instances of same controller serving cache penalty");
-      return interactor_status::ekNEW_CACHE_BLOCK_DROP;
+      execute_new_cache_block_drop(controller, penalty);
+      status = interactor_status::ekNEW_CACHE_BLOCK_DROP;
     }
+    /*
+     * Epilogue--need to remove the robot from the penalty list unconditionally,
+     * because if it aborted the drop due to cache proximity, it will still be
+     * on the list otherwise. See FORDYCA#669.
+     */
+    m_penalty_handler->penalty_remove(penalty);
+    return status;
   }
 
   /**
    * \brief Perform the actual dropping of a block in the cache once all
    * preconditions have been satisfied.
    */
-  void perform_new_cache_block_drop(T& controller,
+  void execute_new_cache_block_drop(TController& controller,
                                     const ctv::temporal_penalty& penalty) {
     auto loc = rmath::dvec2zvec(controller.rpos2D(),
                                 m_map->grid_resolution().v());
@@ -238,11 +152,48 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
     m_floor->SetChanged();
   }
 
+  bool pre_process_check(const TController& controller) const {
+    const auto& penalty = m_penalty_handler->penalty_next();
+    auto acq_goal = controller.current_task()->acquisition_goal();
+    auto* task = dynamic_cast<const events::dynamic_cache_interactor*>(
+        controller.current_task());
+    RCSW_UNUSED auto* polled = dynamic_cast<const cta::polled_task*>(
+        controller.current_task());
+
+    ER_CHECK(penalty.controller() == &controller,
+             "Out of order cache penalty handling");
+    ER_CHECK(nullptr != task,
+             "Non-cache interface task '%s'!",
+             polled->name().c_str());
+    ER_CHECK(controller.current_task()->goal_acquired() &&
+             fsm::foraging_acq_goal::ekNEW_CACHE == acq_goal,
+             "Robot%d@%s/%s not waiting for new cache block drop: acq_goal=%d",
+             controller.entity_id().v(),
+             rcppsw::to_string(controller.rpos2D()).c_str(),
+             rcppsw::to_string(controller.dpos2D()).c_str(),
+             acq_goal.v());
+    return true;
+
+ error:
+    return false;
+  }
+
+  bool post_process_check(const TController& controller) const {
+    ER_CHECK(!m_penalty_handler->is_serving_penalty(controller),
+              "Multiple instances of same controller serving new cache drop penalty");
+
+    return true;
+
+ error:
+    return false;
+  } /* post_process_check() */
+
   /* clang-format off */
   argos::CFloorEntity*  const         m_floor;
   carena::caching_arena_map* const    m_map;
   dynamic_cache_manager*const         m_cache_manager;
   tv::block_op_penalty_handler* const m_penalty_handler;
+  cache_prox_checker                  m_prox_checker;
   /* clang-format on */
 };
 

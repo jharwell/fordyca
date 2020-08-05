@@ -49,8 +49,7 @@ rtypes::type_uuid robot_on_cache(const controller::foraging_controller& controll
 proximity_status_t new_cache_cache_proximity(
     const controller::foraging_controller& c,
     const carena::caching_arena_map& map,
-    rtypes::spatial_dist new_cache_prox) {
-  std::scoped_lock lock(*map.cache_mtx());
+    const rtypes::spatial_dist& new_cache_prox) {
   for (const auto* cache : map.caches()) {
     if (new_cache_prox >= (cache->rcenter2D() - c.rpos2D()).length()) {
       return {cache->id(), cache->rcenter2D(), cache->rcenter2D() - c.rpos2D()};

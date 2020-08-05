@@ -100,15 +100,13 @@ rtypes::type_uuid robot_on_cache(const controller::foraging_controller& controll
  * creating a new cache, but this should serve as a good check against invalid
  * cache creation.
  *
- * \note Holding the arena map cache mutex necessary in multi-threaded contexts;
- *       this is *NOT* handled internally by this function.
  *
  * \return (cache id of cache that is too close (-1 if none), distance to said
  *         cache).
  */
 proximity_status_t new_cache_cache_proximity(const controller::foraging_controller& c,
                                              const carena::caching_arena_map& map,
-                                             rtypes::spatial_dist new_cache_prox);
+                                             const rtypes::spatial_dist& new_cache_prox);
 
 
 NS_END(utils, support, fordyca);

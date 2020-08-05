@@ -68,8 +68,8 @@ class cache_proximity : public rer::client<cache_proximity> {
   explicit cache_proximity(carepr::base_cache* cache);
   ~cache_proximity(void) override = default;
 
-  cache_proximity(const cache_proximity& op) = delete;
-  cache_proximity& operator=(const cache_proximity& op) = delete;
+  cache_proximity(const cache_proximity&) = delete;
+  cache_proximity& operator=(const cache_proximity&) = delete;
 
   /* depth2 foraging */
   void visit(controller::depth2::birtd_dpo_controller& c);
@@ -91,8 +91,8 @@ class cache_proximity : public rer::client<cache_proximity> {
 NS_END(detail);
 
 /**
- * \brief We use the precise visitor in order to force compile errors if a call to
- * a visitor is made that involves a visitee that is not in our visit set
+ * \brief We use the precise visitor in order to force compile errors if a call
+ * to a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */

@@ -41,14 +41,13 @@ NS_START(fordyca, support, tv);
 enum class op_filter_status {
   /**
    * \brief The robot has not currently achieved the necessary internal state
-   * for the block operation.
+   * for the operation.
    */
   ekROBOT_INTERNAL_UNREADY,
 
   /**
    * \brief The robot has passed all necessary filter checkes for the requested
    * operation.
-   *
    */
   ekSATISFIED,
 

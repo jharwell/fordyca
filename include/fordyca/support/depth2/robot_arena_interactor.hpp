@@ -79,29 +79,29 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
   explicit robot_arena_interactor(const params& p)
       : ER_CLIENT_INIT("fordyca.support.depth2.robot_arena_interactor"),
         m_free_pickup(p.map,
-                                 p.floor,
-                                 p.envd->penalty_handler(tv::block_op_src::ekFREE_PICKUP)),
+                      p.floor,
+                      p.envd->penalty_handler(tv::block_op_src::ekFREE_PICKUP)),
         m_nest_drop(p.map, p.metrics_agg, p.floor, p.envd),
         m_task_abort(p.map, p.envd, p.floor),
         m_cached_pickup(p.map,
-                                   p.floor,
-                                   p.envd,
-                                   p.cache_manager,
-                                   p.loop),
+                        p.floor,
+                        p.envd,
+                        p.cache_manager,
+                        p.loop),
         m_existing_cache_drop(p.map, p.envd),
         m_cache_site_drop(p.map,
-                                     p.floor,
-                                     p.envd,
-                                     p.cache_manager),
+                          p.floor,
+                          p.envd,
+                          p.cache_manager),
         m_new_cache_drop(p.map,
-                                    p.floor,
-                                    p.envd,
-                                    p.cache_manager) {}
+                         p.floor,
+                         p.envd,
+                         p.cache_manager) {}
 
   robot_arena_interactor(robot_arena_interactor&&) = default;
 
   /* Not copy-constructible/assignable by default. */
-  robot_arena_interactor(const robot_arena_interactor&) = default;
+  robot_arena_interactor(const robot_arena_interactor&) = delete;
   robot_arena_interactor& operator=(const robot_arena_interactor&) = delete;
 
   /**

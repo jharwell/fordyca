@@ -104,7 +104,6 @@ class block_op_filter : public rer::client<block_op_filter> {
   /**
    * \brief Filter out spurious penalty initializations for free block pickup
    * (i.e. controller not ready/not intending to pickup a free block).
-   *
    */
   template <typename TController>
   op_filter_result free_pickup_filter(const TController& controller) const {
