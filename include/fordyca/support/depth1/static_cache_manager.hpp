@@ -36,6 +36,7 @@
 #include "rcppsw/math/rng.hpp"
 #include "rcppsw/er/client.hpp"
 #include "fordyca/support/cache_create_ro_params.hpp"
+#include "fordyca/ds/block_alloc_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -77,12 +78,12 @@ class static_cache_manager final : public base_cache_manager,
    */
   boost::optional<cads::acache_vectoro> create(
       const cache_create_ro_params& c_params,
-      const cds::block3D_vectorno&  c_alloc_blocks,
+      const cds::block3D_vectorno&  c_all_blocks,
       bool initial);
 
   boost::optional<cads::acache_vectoro> create_conditional(
       const cache_create_ro_params& c_params,
-      const cds::block3D_vectorno&  c_alloc_blocks,
+      const cds::block3D_vectorno&  c_all_blocks,
       size_t n_harvesters,
       size_t n_collectors);
 
@@ -95,17 +96,16 @@ class static_cache_manager final : public base_cache_manager,
   /**
    * \brief Allocate blocks for static cache(s) re-creation.
    *
-   * \param existing_caches The caches that currently exist in the arena.
-   * \param blocks Vector of all blocks in the arena.
+   * \param c_existing_caches The caches that currently exist in the arena.
+   * \param c_all_blocks Vector of all blocks in the arena.
    *
-   * \return A vector of all blocks that will be used in the re-creation of
-   * caches in the arena this timestep. There may not be enough free blocks in
-   * the arena to meet the desired initial size of at least one cache, which is
-   * not an error (all blocks can currently be carried by robots, for example).
+   * \return A map of (cache id, block vector) for all caches. There may not be
+   * enough free blocks in the arena to meet the desired initial size of at
+   * least one cache, which is not an error (all blocks can currently be carried
+   * by robots, for example).
    */
-  boost::optional<cds::block3D_vectorno> blocks_alloc(
-      const cads::acache_vectorno& existing_caches,
-      const cds::block3D_vectorno& all_blocks) const;
+  ds::block_alloc_map blocks_alloc(const cads::acache_vectorno& existing_caches,
+                                   const cds::block3D_vectorno& all_c_blocks) const;
 
   /**
    * \brief Allocate the blocks that should be used when re-creating cache i.
@@ -122,38 +122,24 @@ class static_cache_manager final : public base_cache_manager,
    *
    * are eligible.
    *
-   * \param existing_caches Vector of existing static caches.
-   * \param allocated_blocks Vector of blocks that have already been allocated
-   *                         to the re-creation of other static caches this
-   *                         timestep.
-   * \param all_blocks All blocks available for cache creation (already
-   *                   allocated blocks are not filtered out).
-   * \param center The location the new cache is to be created at.
+   * \param c_existing_caches Vector of existing static caches.
+   * \param c_alloc_map Blocks that have already been allocated to the
+   *                    re-creation of other static caches this timestep.
+   * \param c_all_blocks All blocks available for cache creation (already
+   *                     allocated blocks are not filtered out).
+   * \param c_center The location the new cache is to be created at, in real
+   *                 coordinates.
    * \param n_blocks How many blocks to try to allocate for cache i.
    */
   boost::optional<cds::block3D_vectorno> cache_i_blocks_alloc(
-      const cads::acache_vectorno& existing_caches,
-      const cds::block3D_vectorno& allocated_blocks,
-      const cds::block3D_vectorno& all_blocks,
-      const rmath::vector2z& center,
+      const cads::acache_vectorno& c_existing_caches,
+      const ds::block_alloc_map& c_alloc_map,
+      const cds::block3D_vectorno& c_all_blocks,
+      const rmath::vector2d& c_center,
       size_t n_blocks) const;
 
-  /**
-   * \brief Absorb free blocks that are under caches into the newly created
-   * caches.
-   *
-   * This is necessary for the current static cache creation strategy of
-   * randomly picking free blocks in the arena when it is necessary to re-create
-   * the cache. There *may* be free blocks that will be within the newly created
-   * cache's extent that are NOT considered during cache creation.
-   *
-   * This is generally only an issue at the start of simulation if random block
-   * distribution is used, but weird cases can arise due to task abort+block
-   * drop as well, so it is best to be safe and do it unconditionally after
-   * creation.
-   */
-  void post_creation_blocks_absorb(const cads::acache_vectoro& caches,
-                                   const cds::block3D_vectorno& blocks);
+  bool cache_i_blocks_alloc_check(const cds::block3D_vectorno& cache_i_blocks,
+                                  const rmath::vector2d& c_center) const;
 
   /* clang-format off */
   const config::caches::caches_config mc_cache_config;

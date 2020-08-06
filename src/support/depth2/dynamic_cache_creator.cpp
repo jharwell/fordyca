@@ -56,20 +56,19 @@ dynamic_cache_creator::dynamic_cache_creator(const params* const p,
  ******************************************************************************/
 dynamic_cache_creator::creation_result dynamic_cache_creator::create_all(
     const cache_create_ro_params& c_params,
-    const cds::block3D_vectorno& c_alloc_blocks,
-    bool) {
+    const cds::block3D_vectorno& c_all_blocks) {
   creation_result res;
 
   ER_DEBUG("Creating caches: min_dist=%f,min_blocks=%u,free_blocks=[%s] (%zu)",
            mc_min_dist.v(),
            mc_min_blocks,
-           rcppsw::to_string(c_alloc_blocks).c_str(),
-           c_alloc_blocks.size());
+           rcppsw::to_string(c_all_blocks).c_str(),
+           c_all_blocks.size());
 
   cds::block3D_vectorno used_blocks;
-  for (size_t i = 0; i < c_alloc_blocks.size() - 1; ++i) {
+  for (size_t i = 0; i < c_all_blocks.size() - 1; ++i) {
     cds::block3D_vectorno cache_i_blocks =
-        cache_i_blocks_alloc(used_blocks, c_alloc_blocks, i);
+        cache_i_blocks_alloc(used_blocks, c_all_blocks, i);
 
     /*
      * We now have all the blocks that are close enough to block i to be
@@ -80,7 +79,7 @@ dynamic_cache_creator::creation_result dynamic_cache_creator::create_all(
     }
 
     if (cache_i_create(c_params,
-                       c_alloc_blocks,
+                       c_all_blocks,
                        used_blocks,
                        &cache_i_blocks,
                        &res.created)) {
@@ -205,7 +204,7 @@ cds::block3D_vectorno dynamic_cache_creator::cache_i_blocks_alloc(
 
 bool dynamic_cache_creator::cache_i_create(
     const cache_create_ro_params& c_params,
-    const cds::block3D_vectorno& c_alloc_blocks,
+    const cds::block3D_vectorno& c_all_blocks,
     const cds::block3D_vectorno& c_used_blocks,
     cds::block3D_vectorno* cache_i_blocks,
     cads::acache_vectoro* created) {
@@ -229,7 +228,7 @@ bool dynamic_cache_creator::cache_i_create(
    * to the center moving. If so, we absorb them into the block list for
    * the new cache.
    */
-  auto absorb_blocks = absorb_blocks_calc(c_alloc_blocks,
+  auto absorb_blocks = absorb_blocks_calc(c_all_blocks,
                                           *cache_i_blocks,
                                           c_used_blocks,
                                           *center,
@@ -253,7 +252,7 @@ bool dynamic_cache_creator::cache_i_create(
                    return c.get();
                  });
   sanity_caches.push_back(cache.get());
-  auto free_blocks = carena::free_blocks_calculator()(c_alloc_blocks,
+  auto free_blocks = carena::free_blocks_calculator()(c_all_blocks,
                                                       sanity_caches);
 
   if (!creation_sanity_checks(sanity_caches,

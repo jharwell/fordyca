@@ -75,20 +75,6 @@ class base_cache_creator : public rer::client<base_cache_creator> {
   base_cache_creator& operator=(const base_cache_creator&) = delete;
 
   /**
-   * \brief (Potentially) create new caches.
-   *
-   * \param c_params Cache creation parameters
-   * \param c_alloc_blocks The blocks that have been allocated for cache
-   *                       creation this timestep for all caches.
-   *
-   * \return A vector of created caches.
-   */
-  virtual creation_result create_all(
-      const cache_create_ro_params& c_params,
-      const cds::block3D_vectorno& c_alloc_blocks,
-      bool pre_dist) = 0;
-
-  /**
    * \brief Configure the the cache extent cells for all newly created caches.
    *
    * \param caches Vector of newly created caches.

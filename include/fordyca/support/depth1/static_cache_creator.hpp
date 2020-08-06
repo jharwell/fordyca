@@ -25,8 +25,11 @@
  * Includes
  ******************************************************************************/
 #include <vector>
-#include "fordyca/support/base_cache_creator.hpp"
+
 #include "rcppsw/types/spatial_dist.hpp"
+
+#include "fordyca/support/base_cache_creator.hpp"
+#include "fordyca/ds/block_alloc_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,15 +54,20 @@ class static_cache_creator : public base_cache_creator,
   static_cache_creator(cds::arena_grid* grid,
                        const std::vector<rmath::vector2d>& centers,
                        const rtypes::spatial_dist& cache_dim);
+  ~static_cache_creator(void) override = default;
 
   /**
    * \brief Re-create all static caches. Ignores block cluster locations because
-   * the locations of the static caches do not change and are known to be
-   * conflict free.
+   * the locations of the static caches do not change and are known
+   * (err...assumed) to be conflict free.
+   *
+   * \param c_params Cache creation parameters
+   * \param c_alloc_map The blocks which have been allocated for the creation
+   *                     of ALL static caches this timestep.
    */
   creation_result create_all(const cache_create_ro_params& c_params,
-                             const cds::block3D_vectorno&  c_alloc_blocks,
-                             bool pre_dist) override;
+                             const ds::block_alloc_map& c_alloc_map,
+                             bool pre_dist);
 
  private:
   /* clang-format off */

@@ -156,7 +156,7 @@ class crw_fsm final : public csfsm::util_hfsm,
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 
   /* clang-format off */
-  bool                       m_task_finished{false};
+  bool                        m_task_finished{false};
   csfsm::explore_for_goal_fsm m_explore_fsm;
   /* clang-format on */
 };

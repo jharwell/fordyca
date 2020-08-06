@@ -47,16 +47,19 @@ static_cache_creator::static_cache_creator(
  ******************************************************************************/
 static_cache_creator::creation_result static_cache_creator::create_all(
     const cache_create_ro_params& c_params,
-    const cds::block3D_vectorno& c_alloc_blocks,
+    const ds::block_alloc_map& c_alloc_map,
     bool pre_dist) {
-  ER_DEBUG("Creating caches: alloc_blocks=[%s] (%zu)",
-           rcppsw::to_string(c_alloc_blocks).c_str(),
-           c_alloc_blocks.size());
+
 
   creation_result res;
-  auto it = c_alloc_blocks.begin();
-  for (auto& center : mc_centers) {
-    auto dcenter = rmath::dvec2zvec(center, grid()->resolution().v());
+  for (const auto &alloc_i : c_alloc_map) {
+    ER_DEBUG("Cache%d allocked blocks: [%s] (%zu)",
+             alloc_i.first,
+             rcppsw::to_string(alloc_i.second).c_str(),
+             mc_centers.size());
+    auto rcenter = mc_centers[alloc_i.first];
+    auto dcenter = rmath::dvec2zvec(rcenter,
+                                    grid()->resolution().v());
     auto exists = std::find_if(c_params.current_caches.begin(),
                                c_params.current_caches.end(),
                                [&](const auto& c) {
@@ -71,29 +74,31 @@ static_cache_creator::creation_result static_cache_creator::create_all(
       continue;
     }
 
-    if (static_cast<uint>(std::distance(it, c_alloc_blocks.end())) <
-        base_cache::kMinBlocks) {
-      ER_WARN("Not enough blocks provided to construct cache@%s: %u < %zu",
-              center.to_str().c_str(),
-              static_cast<uint>(std::distance(it, c_alloc_blocks.end())),
-              base_cache::kMinBlocks);
+    if (alloc_i.second.size() < base_cache::kMinBlocks) {
+        ER_WARN("Not enough blocks provided to construct cache%d@%s/%s: %zu < %zu",
+                alloc_i.first,
+                rcppsw::to_string(rcenter).c_str(),
+                rcppsw::to_string(dcenter).c_str(),
+                alloc_i.second.size(),
+                base_cache::kMinBlocks);
       continue;
     }
-    auto it2 = it;
-    std::advance(it, base_cache::kMinBlocks);
-    cds::block3D_vectorno cache_i_blocks(it2, it);
 
-    ER_INFO("Creating static cache@%s: blocks=[%s] (%zu)",
-            center.to_str().c_str(),
-            rcppsw::to_string(cache_i_blocks).c_str(),
-            cache_i_blocks.size());
-    res.created.push_back(create_single_cache(center,
-                                              cache_i_blocks,
-                                              c_params.t,
-                                              pre_dist));
-  } /* for(&center..) */
+    ER_INFO("Creating static cache%d@%s/%s: blocks=[%s] (%zu)",
+            alloc_i.first,
+            rcppsw::to_string(rcenter).c_str(),
+            rcppsw::to_string(dcenter).c_str(),
+            rcppsw::to_string(alloc_i.second).c_str(),
+            alloc_i.second.size());
+    auto cache = create_single_cache(rcenter,
+                                     alloc_i.second,
+                                     c_params.t,
+                                     pre_dist);
+    res.created.push_back(std::move(cache));
+  } /* for(&alloc_i..) */
 
   return res;
 } /* create_all() */
+
 
 NS_END(depth1, support, fordyca);

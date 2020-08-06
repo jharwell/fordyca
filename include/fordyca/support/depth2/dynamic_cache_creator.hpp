@@ -78,10 +78,8 @@ class dynamic_cache_creator : public base_cache_creator,
    * \brief Create new caches in the arena from blocks that are close enough
    * together.
    */
-  creation_result create_all(
-      const cache_create_ro_params& c_params,
-      const cds::block3D_vectorno& c_alloc_blocks,
-      bool) override;
+  creation_result create_all(const cache_create_ro_params& c_params,
+                             const cds::block3D_vectorno& c_all_blocks);
 
  private:
   /**
@@ -91,7 +89,7 @@ class dynamic_cache_creator : public base_cache_creator,
    * \return \c TRUE if creation was successful, and \c FALSE otherwise.
    */
   bool cache_i_create(const cache_create_ro_params& c_params,
-                      const cds::block3D_vectorno& c_alloc_blocks,
+                      const cds::block3D_vectorno& c_all_blocks,
                       const cds::block3D_vectorno& c_used_blocks,
                       cds::block3D_vectorno* cache_i_blocks,
                       cads::acache_vectoro* created_caches);

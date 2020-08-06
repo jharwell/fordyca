@@ -119,39 +119,42 @@ class cache_prox_checker: public rer::client<cache_prox_checker> {
      * close before, there might be one too close now.
      */
     auto prox_status = check(controller, false);
+    bool ret = true;
 
     /*
      * We are holding the cache mutex, so if our check says that there is no
      * cache too close, we can trust it.
      */
     if (rtypes::constants::kNoUUID == prox_status.id) {
-      return false;
+      ret = false;
+    } else {
+      ER_WARN("Robot%d@%s cannot drop block in %s: Cache%d@%s too close (%f <= %f)",
+              controller.entity_id().v(),
+              controller.rpos2D().to_str().c_str(),
+              drop_dest.c_str(),
+              prox_status.id.v(),
+              prox_status.loc.to_str().c_str(),
+              prox_status.distance.length(),
+              mc_prox_dist.v());
+
+      /*
+       * Because caches can be dynamically created/destroyed, we cannot rely on
+       * the index position of cache i to be the same as its ID, so we need to
+       * search for the correct cache.
+       */
+      auto it = std::find_if(mc_map->caches().begin(),
+                             mc_map->caches().end(),
+                             [&](const auto& c) {
+                               return c->id() == prox_status.id;
+                             });
+
+
+      events::cache_proximity_visitor prox_op(*it);
+      prox_op.visit(controller);
+      ret = true;
     }
-
-    ER_WARN("Robot%d@%s cannot drop block in %s: Cache%d@%s too close (%f <= %f)",
-            controller.entity_id().v(),
-            controller.rpos2D().to_str().c_str(),
-            drop_dest.c_str(),
-            prox_status.id.v(),
-            prox_status.loc.to_str().c_str(),
-            prox_status.distance.length(),
-            mc_prox_dist.v());
-
-    /*
-     * Because caches can be dynamically created/destroyed, we cannot rely on
-     * the index position of cache i to be the same as its ID, so we need to
-     * search for the correct cache.
-     */
-    auto it = std::find_if(mc_map->caches().begin(),
-                           mc_map->caches().end(),
-                           [&](const auto& c) {
-                             return c->id() == prox_status.id;
-                           });
-
-    events::cache_proximity_visitor prox_op(*it);
-    prox_op.visit(controller);
     mc_map->cache_mtx()->unlock_shared();
-    return true;
+    return ret;
   }
 
  private:
