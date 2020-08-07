@@ -95,7 +95,7 @@ class cache_prox_checker: public rer::client<cache_prox_checker> {
      * guarantee that the cache array will not be modified while we are checking
      * it.
      */
-    mc_map->maybe_lock_shared(mc_map->cache_mtx(), need_lock);
+    mc_map->maybe_lock_rd(mc_map->cache_mtx(), need_lock);
     for (const auto* cache : mc_map->caches()) {
       if (mc_prox_dist >= (cache->rcenter2D() - c.rpos2D()).length()) {
         result = {cache->id(),
@@ -104,14 +104,15 @@ class cache_prox_checker: public rer::client<cache_prox_checker> {
         break;
       }
     } /* for(&b..) */
-    mc_map->maybe_unlock_shared(mc_map->cache_mtx(), need_lock);
+    mc_map->maybe_unlock_rd(mc_map->cache_mtx(), need_lock);
     return result;
   }
 
   template<typename TController>
   bool check_and_notify(TController& controller,
                         RCSW_UNUSED const std::string& drop_dest) const {
-    mc_map->cache_mtx()->lock_shared();
+    mc_map->lock_rd(mc_map->cache_mtx());
+
     /*
      * Check again if there is a cache too close, and we were not holding the
      * cache mutex between the check during penalty initialization and now
@@ -119,14 +120,14 @@ class cache_prox_checker: public rer::client<cache_prox_checker> {
      * close before, there might be one too close now.
      */
     auto prox_status = check(controller, false);
-    bool ret = true;
 
     /*
      * We are holding the cache mutex, so if our check says that there is no
      * cache too close, we can trust it.
      */
     if (rtypes::constants::kNoUUID == prox_status.id) {
-      ret = false;
+      mc_map->unlock_rd(mc_map->cache_mtx());
+      return false;
     } else {
       ER_WARN("Robot%d@%s cannot drop block in %s: Cache%d@%s too close (%f <= %f)",
               controller.entity_id().v(),
@@ -151,10 +152,9 @@ class cache_prox_checker: public rer::client<cache_prox_checker> {
 
       events::cache_proximity_visitor prox_op(*it);
       prox_op.visit(controller);
-      ret = true;
+      mc_map->unlock_rd(mc_map->cache_mtx());
+      return true;
     }
-    mc_map->cache_mtx()->unlock_shared();
-    return ret;
   }
 
  private:

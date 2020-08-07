@@ -73,7 +73,11 @@ boost::optional<cads::acache_vectoro> dynamic_cache_manager::create(
     caches_discarded(res.n_discarded);
 
     /* Configure cache extents */
-    creator.configure_cache_extents(res.created);
+    creator.cache_extents_configure(res.created);
+
+    /* update bloctree */
+    bloctree_update(res.created);
+
     return boost::make_optional(res.created);
   } else {
     return boost::optional<cads::acache_vectoro>();

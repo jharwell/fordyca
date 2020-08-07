@@ -92,7 +92,10 @@ boost::optional<cads::acache_vectoro> static_cache_manager::create(
 
 
   /* Configure cache extents */
-  creator.configure_cache_extents(res.created);
+  creator.cache_extents_configure(res.created);
+
+  /* update bloctree */
+  bloctree_update(res.created);
 
   /* verify the created caches */
   cads::acache_vectorro sanity_caches;

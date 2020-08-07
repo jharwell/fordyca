@@ -192,7 +192,7 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
    * timestep (or on previous timesteps and have not been re-created yet, for
    * whatever reason).
    */
-  bool caches_depleted(void) const;
+  bool caches_depleted(void) const RCSW_PURE;
 
   /**
    * \brief Collect task counts from controllers on timesteps one or more static

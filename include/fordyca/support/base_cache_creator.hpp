@@ -79,7 +79,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    *
    * \param caches Vector of newly created caches.
    */
-  void configure_cache_extents(cads::acache_vectoro& caches);
+  void cache_extents_configure(const cads::acache_vectoro& caches);
 
   /**
    * \brief Basic sanity checks on newly created caches:

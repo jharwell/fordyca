@@ -201,7 +201,7 @@ void base_loop_functions::post_step(void) {
 } /* post_step() */
 
 void base_loop_functions::reset(void) {
-  arena_map()->distribute_all_blocks();
+  arena_map()->initialize(this);
 } /* reset() */
 
 /*******************************************************************************

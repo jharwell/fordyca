@@ -104,6 +104,14 @@ class base_cache_manager : public metrics::caches::lifecycle_metrics,
   const carena::caching_arena_map* arena_map(void) const { return m_map; }
   carena::caching_arena_map* arena_map(void) { return m_map; }
 
+  /**
+   * \brief Update the arena map bloctree as a result of successful cache
+   * creation.
+   *
+   * \param caches Vector of newly created caches.
+   */
+  void bloctree_update(const cads::acache_vectoro& caches);
+
  private:
   /* clang-format off */
   size_t                            m_caches_created{0};

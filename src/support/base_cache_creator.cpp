@@ -180,12 +180,13 @@ std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
   return ret;
 } /* create_single_cache() */
 
-void base_cache_creator::configure_cache_extents(cads::acache_vectoro& caches) {
+void base_cache_creator::cache_extents_configure(
+    const cads::acache_vectoro& caches) {
   for (auto& cache : caches) {
     caops::cache_extent_set_visitor e(cache.get());
     e.visit(*m_grid);
   } /* for(cache..) */
-} /* configure_cache_extents() */
+} /* cache_extents_configure() */
 
 bool base_cache_creator::creation_sanity_checks(
     const cads::acache_vectorro& c_caches,

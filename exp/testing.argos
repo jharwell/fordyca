@@ -314,7 +314,7 @@
       <blocks>
         <motion
             policy="random_walk"
-            prob="1.0"/>
+            random_walk_prob="1.0"/>
         <distribution
             dist_type="random">
 

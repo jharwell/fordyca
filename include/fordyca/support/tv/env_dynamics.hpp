@@ -116,10 +116,11 @@ class env_dynamics final : public rer::client<env_dynamics>,
    * type of block operation; scope of usage must not exceed that of the
    * instance of this class used to generate the reference.
    */
-  const block_op_penalty_handler* penalty_handler(const block_op_src& src) const {
+  RCSW_PURE const block_op_penalty_handler* penalty_handler(
+      const block_op_src& src) const {
     return const_cast<env_dynamics*>(this)->penalty_handler(src);
   }
-  block_op_penalty_handler* penalty_handler(const block_op_src& src) {
+  RCSW_PURE block_op_penalty_handler* penalty_handler(const block_op_src& src) {
     switch (src) {
       case block_op_src::ekFREE_PICKUP:
         return &m_fb_pickup;
@@ -140,11 +141,12 @@ class env_dynamics final : public rer::client<env_dynamics>,
    * type of cache operation; scope of usage must not exceed that of the
    * instance of this class used to generate the reference.
    */
-  const cache_op_penalty_handler* penalty_handler(const cache_op_src& src) const {
+  RCSW_PURE const cache_op_penalty_handler* penalty_handler(
+      const cache_op_src& src) const {
     return const_cast<env_dynamics*>(this)->penalty_handler(src);
   }
 
-  cache_op_penalty_handler* penalty_handler(const cache_op_src& src) {
+  RCSW_PURE cache_op_penalty_handler* penalty_handler(const cache_op_src& src) {
     switch (src) {
       case cache_op_src::ekEXISTING_CACHE_PICKUP:
       case cache_op_src::ekEXISTING_CACHE_DROP:

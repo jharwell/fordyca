@@ -51,8 +51,8 @@ NS_START(fordyca, support, tv);
  */
 class cache_op_filter : public rer::client<cache_op_filter> {
  public:
-  explicit cache_op_filter(carena::caching_arena_map* const map)
-      : ER_CLIENT_INIT("fordyca.support.tv.cache_op_filter"), m_map(map) {}
+  explicit cache_op_filter(const carena::caching_arena_map* const map)
+      : ER_CLIENT_INIT("fordyca.support.tv.cache_op_filter"), mc_map(map) {}
 
   ~cache_op_filter(void) override = default;
   cache_op_filter& operator=(const cache_op_filter&) = delete;
@@ -100,9 +100,9 @@ class cache_op_filter : public rer::client<cache_op_filter> {
        * a guarantee that the cache array will not be modified while we are
        * checking it.
        */
-      m_map->cache_mtx()->lock_shared();
-      auto cache_id = m_map->robot_on_cache(controller.rpos2D());
-      m_map->cache_mtx()->unlock_shared();
+      mc_map->lock_rd(mc_map->cache_mtx());
+      auto cache_id = mc_map->robot_on_cache(controller.rpos2D());
+      mc_map->unlock_rd(mc_map->cache_mtx());
 
       if (rtypes::constants::kNoUUID != cache_id) {
         result.status = op_filter_status::ekSATISFIED;
@@ -113,7 +113,7 @@ class cache_op_filter : public rer::client<cache_op_filter> {
   }
 
   /* clang-format off */
-  carena::caching_arena_map* m_map;
+  const carena::caching_arena_map* mc_map;
   /* clang-format on */
 };
 NS_END(tv, support, fordyca);

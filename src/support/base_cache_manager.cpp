@@ -56,4 +56,14 @@ rtypes::spatial_dist base_cache_manager::dimension_check(
   return dim;
 }
 
+void base_cache_manager::bloctree_update(const cads::acache_vectoro& caches) {
+  for (auto &cache : caches) {
+    for (auto *block : cache->blocks()) {
+      m_map->bloctree_update(block,
+                             carena::arena_map_locking::ekALL_HELD,
+                             caches);
+    } /* for(*block..) */
+  } /* for(&cache..) */
+} /* bloctree_update() */
+
 NS_END(support, fordyca);
