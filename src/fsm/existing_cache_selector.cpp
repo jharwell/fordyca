@@ -84,18 +84,16 @@ const carepr::base_cache* existing_cache_selector::operator()(
     }
   } /* for(existing_cache..) */
 
-  if (nullptr != best) {
-    ER_INFO("Best utility: existing_cache%d@%s/%s w/%zu blocks: %f",
+  ER_CHECKI(nullptr != best,
+            "Best utility: existing_cache%d@%s/%s w/%zu blocks: %f",
             best->id().v(),
             rcppsw::to_string(best->rcenter2D()).c_str(),
             rcppsw::to_string(best->dcenter2D()).c_str(),
             best->n_blocks(),
             max_utility);
-    return best;
-  } else {
-    ER_WARN("No best existing cache found: all known caches excluded!");
-    return best;
-  }
+  ER_CHECKW(nullptr != best,
+            "No best existing cache found: all known caches excluded!");
+  return best;
 } /* operator()() */
 
 bool existing_cache_selector::cache_is_excluded(

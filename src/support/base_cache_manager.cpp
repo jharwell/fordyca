@@ -58,8 +58,8 @@ rtypes::spatial_dist base_cache_manager::dimension_check(
 
 void base_cache_manager::bloctree_update(const cads::acache_vectoro& caches) {
   for (auto &cache : caches) {
-    for (auto *block : cache->blocks()) {
-      m_map->bloctree_update(block,
+    for (auto &pair : cache->blocks()) {
+      m_map->bloctree_update(pair.second,
                              carena::arena_map_locking::ekALL_HELD,
                              caches);
     } /* for(*block..) */

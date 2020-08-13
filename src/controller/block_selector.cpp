@@ -82,17 +82,16 @@ const crepr::base_block3D* block_selector::operator()(
     }
   } /* for(block..) */
 
-  if (nullptr != best) {
-    ER_INFO("Best utility: block%d@%s/%s: %f",
+  ER_CHECKI(nullptr != best,
+            "Best utility: block%d@%s/%s: %f",
             best->id().v(),
             rcppsw::to_string(best->ranchor2D()).c_str(),
             rcppsw::to_string(best->danchor2D()).c_str(),
             max_utility);
-    return best;
-  } else {
-    ER_WARN("No best block found: all known blocks excluded!");
-    return best;
-  }
+
+  ER_CHECKW(nullptr != best,
+            "No best block found: all known blocks excluded!");
+  return best;
 } /* operator() */
 
 bool block_selector::block_is_excluded(

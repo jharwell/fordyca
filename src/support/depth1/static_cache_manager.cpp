@@ -165,7 +165,12 @@ boost::optional<cds::block3D_vectorno> static_cache_manager::cache_i_blocks_allo
     size_t n_blocks) const {
   cds::block3D_vectorno cache_i_blocks;
 
-    /* initial allocation */
+    /*
+     * Initial allocation.
+     *
+     * Note that the calculations for membership are ordered from least to most
+     * computationally expensive to compute, so don't reorder them willy-nilly.
+    */
   std::copy_if(
       c_all_blocks.begin(),
       c_all_blocks.end(),
@@ -175,14 +180,6 @@ boost::optional<cds::block3D_vectorno> static_cache_manager::cache_i_blocks_allo
         return (cache_i_blocks.size() < n_blocks) &&
             /* not carried by robot */
             rtypes::constants::kNoUUID == b->md()->robot_id() &&
-            /* not already allocated for a different cache */
-            !c_alloc_map.contains(b) &&
-            /* not already in an existing cache */
-            std::all_of(c_existing_caches.begin(),
-                        c_existing_caches.end(),
-                        [&](const auto& c) {
-                          return !c->contains_block(b);
-                        }) &&
             /*
              * Not already on a cell where the cache will be re-created, or
              * on the cell where ANOTHER cache *might* be recreated.
@@ -193,6 +190,16 @@ boost::optional<cds::block3D_vectorno> static_cache_manager::cache_i_blocks_allo
                           auto dloc = rmath::dvec2zvec(loc,
                                                        arena_map()->grid_resolution().v());
                           return b->danchor2D() != dloc;
+                        }) &&
+
+            /* not already allocated for a different cache */
+            !c_alloc_map.contains(b) &&
+
+
+            std::all_of(c_existing_caches.begin(),
+                        c_existing_caches.end(),
+                        [&](const auto& c) {
+                          return !c->contains_block(b);
                         });
       });
 

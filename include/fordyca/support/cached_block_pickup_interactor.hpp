@@ -218,7 +218,7 @@ class cached_block_pickup_interactor
      * because it points to somewhere within the the block vector owned by the
      * arena map.
      */
-    crepr::base_block3D* to_pickup = (*real_it)->oldest_block();
+    crepr::base_block3D* to_pickup = (*real_it)->block_select(m_loop->rng());
 
     caops::cached_block_pickup_visitor arena_pickup(*real_it,
                                                     to_pickup,

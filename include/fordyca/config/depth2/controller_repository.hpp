@@ -43,7 +43,7 @@ NS_START(fordyca, config, depth2);
  */
 class controller_repository: public depth1::controller_repository {
  public:
-  controller_repository(void);
+  controller_repository(void) RCSW_COLD;
 };
 
 NS_END(depth2, config, fordyca);

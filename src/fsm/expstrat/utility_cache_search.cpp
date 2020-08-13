@@ -56,7 +56,7 @@ void utility_cache_search::task_start(cta::taskable_argument*) {
     position = saa()->sensing()->rpos2D();
   }
   depth2::cache_site_selector sel(mc_matrix);
-  if (auto site = sel(mc_store->caches(), mc_store->blocks(), position, rng())) {
+  if (auto site = sel(mc_store->caches(), position, rng())) {
     csfsm::point_argument v(kCACHE_ARRIVAL_TOL, *site);
     localized_search::task_start(&v);
   } else {

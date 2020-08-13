@@ -80,17 +80,16 @@ const crepr::base_block3D* new_cache_selector::operator()(
     }
   } /* for(new_cache..) */
 
-  if (nullptr != best) {
-    ER_INFO("Best utility: new cache%d@%s/%s: %f",
+  ER_CHECKI(nullptr != best,
+            "Best utility: new cache%d@%s/%s: %f",
             best->id().v(),
             rcppsw::to_string(best->ranchor2D()).c_str(),
             rcppsw::to_string(best->danchor2D()).c_str(),
             max_utility);
-    return best;
-  } else {
-    ER_WARN("No best new cache found: all known new caches excluded!");
-    return best;
-  }
+
+  ER_CHECKW(nullptr != best,
+            "No best new cache found: all known new caches excluded!");
+  return best;
 } /* operator() */
 
 bool new_cache_selector::new_cache_is_excluded(

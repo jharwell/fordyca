@@ -132,7 +132,7 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
   }
   cforacle::foraging_oracle* oracle(void) { return m_oracle.get(); }
   carena::caching_arena_map* arena_map(void) RCSW_PURE;
-  void config_parse(ticpp::Element& node);
+  void config_parse(ticpp::Element& node) RCSW_COLD;
 
   /*
    * If we are doing a powerlaw distribution we may need to create caches BEFORE

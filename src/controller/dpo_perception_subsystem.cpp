@@ -145,17 +145,16 @@ void dpo_perception_subsystem::process_los_blocks(
               rcppsw::to_string(block->ranchor2D()).c_str(),
               rcppsw::to_string(block->danchor2D()).c_str());
 
-    if (!m_store->contains(block)) {
-      ER_INFO("Discovered block%d@%s/%s",
+    ER_CHECKI(!m_store->contains(block),
+              "Discovered block%d@%s/%s",
               block->id().v(),
               rcppsw::to_string(block->ranchor2D()).c_str(),
               rcppsw::to_string(block->danchor2D()).c_str());
-    } else {
-      ER_DEBUG("Block%d@%s/%s already known",
-               block->id().v(),
-               rcppsw::to_string(block->ranchor2D()).c_str(),
-               rcppsw::to_string(block->danchor2D()).c_str());
-    }
+    ER_CHECKD(m_store->contains(block),
+              "Block%d@%s/%s already known",
+              block->id().v(),
+              rcppsw::to_string(block->ranchor2D()).c_str(),
+              rcppsw::to_string(block->danchor2D()).c_str());
     events::block_found_visitor op(block);
     op.visit(*m_store);
   } /* for(block..) */

@@ -68,11 +68,6 @@ class cache_site_selector: public rer::client<cache_site_selector> {
     cache_site_selector*    selector{nullptr};
     rtypes::spatial_dist     cache_prox{0.0};
   };
-  struct block_constraint_data {
-    const crepr::base_block3D* mc_block{nullptr};
-    cache_site_selector*    selector{nullptr};
-    rtypes::spatial_dist    block_prox{0.0};
-  };
   struct nest_constraint_data {
     rmath::vector2d      nest_loc{};
     cache_site_selector* selector{nullptr};
@@ -84,7 +79,6 @@ class cache_site_selector: public rer::client<cache_site_selector> {
   };
 
   using cache_constraint_vector = std::vector<cache_constraint_data>;
-  using block_constraint_vector = std::vector<block_constraint_data>;
   using nest_constraint_vector = std::vector<nest_constraint_data>;
 
   explicit cache_site_selector(const controller::cache_sel_matrix* matrix);
@@ -103,7 +97,6 @@ class cache_site_selector: public rer::client<cache_site_selector> {
    */
   boost::optional<rmath::vector2d> operator()(
       const ds::dp_cache_map& known_caches,
-      const ds::dp_block_map& known_blocks,
       rmath::vector2d position,
       rmath::rng* rng);
 
@@ -144,12 +137,10 @@ class cache_site_selector: public rer::client<cache_site_selector> {
 
   struct opt_init_conditions {
     const ds::dp_cache_map& known_caches;
-    const ds::dp_block_map& known_blocks;
     rmath::vector2d position;
   };
 
   using constraint_set = std::tuple<cache_constraint_vector,
-                                    block_constraint_vector,
                                     nest_constraint_vector>;
 
   /**
@@ -157,7 +148,6 @@ class cache_site_selector: public rer::client<cache_site_selector> {
    * the nest.
    */
   void constraints_create(const ds::dp_cache_map& known_caches,
-                          const ds::dp_block_map& known_blocks,
                           const rmath::vector2d& nest_loc);
 
 
@@ -167,8 +157,7 @@ class cache_site_selector: public rer::client<cache_site_selector> {
                       rmath::rng* rng);
 
   bool verify_site(const rmath::vector2d& site,
-                   const ds::dp_cache_map& known_caches,
-                   const ds::dp_block_map& known_blocks) const RCSW_CONST;
+                   const ds::dp_cache_map& known_caches) const RCSW_CONST;
 
   std::string nlopt_ret_str(nlopt::result res) const;
 
@@ -182,15 +171,6 @@ class cache_site_selector: public rer::client<cache_site_selector> {
 };
 
 double __cache_constraint_func(const std::vector<double>& x,
-                               std::vector<double>& ,
-                               void *data) RCSW_PURE;
-
-/**
- * \brief Implements the block nearness constraint for cache site selection, as
- * described in \todo paper ref. Cannot be a member function because of how
- * NLopt works, apparently.
- */
-double __block_constraint_func(const std::vector<double>& x,
                                std::vector<double>& ,
                                void *data) RCSW_PURE;
 

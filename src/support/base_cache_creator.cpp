@@ -245,7 +245,8 @@ bool base_cache_creator::sanity_check_internal_consistency(
            "Cache does not have enough blocks: %zu < %zu",
            cache->n_blocks(),
            carepr::base_cache::kMinBlocks);
-  for (auto *b : cache->blocks()) {
+  for (auto &pair : cache->blocks()) {
+    auto* b = pair.second;
     ER_CHECK(b->danchor2D() == cache->dcenter2D(),
              "Block%d@%s not in cache host cell@%s",
              b->id().v(),
@@ -339,7 +340,8 @@ bool base_cache_creator::sanity_check_cross_consistency(
       if (c1->id() == c2->id()) {
         continue;
       }
-      for (auto& b : c1->blocks()) {
+      for (auto& pair : c1->blocks()) {
+        auto* b = pair.second;
         ER_CHECK(c1->blocks().end() == std::adjacent_find(c1->blocks().begin(),
                                                           c1->blocks().end()),
                  "Multiple blocks with the same ID in cache%d",
