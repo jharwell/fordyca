@@ -73,7 +73,7 @@ double collector::abort_prob_calc(void) {
 } /* abort_prob_calc() */
 
 rtypes::timestep collector::interface_time_calc(
-    uint interface,
+    size_t interface,
     const rtypes::timestep& start_time) {
   ER_ASSERT(0 == interface, "Bad interface ID: %u", interface);
   return current_time() - start_time;

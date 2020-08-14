@@ -90,7 +90,7 @@ class cache_finisher final : public foraging_task,
 
   void task_start(cta::taskable_argument*) override;
   double abort_prob_calc(void) override RCSW_PURE;
-  rtypes::timestep interface_time_calc(uint interface,
+  rtypes::timestep interface_time_calc(size_t interface,
                                        const rtypes::timestep& start_time) override RCSW_PURE;
   void active_interface_update(int) override;
 };

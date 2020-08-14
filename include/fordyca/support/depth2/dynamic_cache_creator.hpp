@@ -26,9 +26,12 @@
  ******************************************************************************/
 #include <memory>
 
-#include "fordyca/support/base_cache_creator.hpp"
-#include "cosm/foraging/ds/block_cluster_vector.hpp"
 #include "rcppsw/math/rng.hpp"
+
+#include "cosm/foraging/ds/block_cluster_vector.hpp"
+#include "cosm/ds/block3D_ht.hpp"
+
+#include "fordyca/support/base_cache_creator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -77,22 +80,45 @@ class dynamic_cache_creator : public base_cache_creator,
   /**
    * \brief Create new caches in the arena from blocks that are close enough
    * together.
+   *
+   *
+   * \param usable_blocks Those that been used (duh) to successfully create
+   * caches this timestep. Once a block has been used during attempted cache
+   * creation (even if creation failes), it is no longer available for the
+   * creation of additional caches this timestep.
+   *
+   * This is because if creation fails and the cache is deleted, we STILL need
+   * to add the blocks to the used list, because they have now been distributed
+   * in the arena, possibly as member of a block cluster (for distributions
+   * other than random), and are no longer free. See FORDYCA#673.
+   *
+   * \param absorbable_blocks A superset of \p usable_blocks which also contains
+   * all free blocks in the arena (including those in clusters).
    */
   creation_result create_all(const cache_create_ro_params& c_params,
-                             const cds::block3D_vectorno& c_all_blocks);
+                             cds::block3D_vectorno&& usable_blocks,
+                             cds::block3D_htno&& absorbable_blocks);
 
  private:
+  struct cache_i_result {
+    bool status{false};
+    std::unique_ptr<carepr::arena_cache> cache{nullptr};
+    cds::block3D_vectorno used{};
+  };
+
   /**
    * \brief Do the actual creation of a cache, once blocks have been allocated
    * for it.
    *
    * \return \c TRUE if creation was successful, and \c FALSE otherwise.
    */
-  bool cache_i_create(const cache_create_ro_params& c_params,
+  cache_i_result cache_i_create(const cache_create_ro_params& c_params,
+                                const cds::block3D_vectorno& c_alloc_blocks,
+                                const cds::block3D_htno& c_absorbable_blocks,
+                                cads::acache_vectoro* created_caches);
+  bool cache_i_verify(const cads::acache_vectorro& c_caches,
                       const cds::block3D_vectorno& c_all_blocks,
-                      const cds::block3D_vectorno& c_used_blocks,
-                      cds::block3D_vectorno* cache_i_blocks,
-                      cads::acache_vectoro* created_caches);
+                      const cfds::block3D_cluster_vector& c_clusters) const;
 
   /**
    * \brief If a newly created cache failed verification checks, delete it.
@@ -102,31 +128,27 @@ class dynamic_cache_creator : public base_cache_creator,
    *
    * Then the actual cache can safely be deleted.
    */
-  void cache_delete(const cds::block3D_vectorno& cache_i_blocks,
-                    std::unique_ptr<carepr::arena_cache> victim);
+  void cache_delete(const cache_i_result& cache_i);
+
   /**
    * \brief Calculate the blocks to be used in the creation of a single new
    * cache.
    *
-   * \param used_blocks The blocks that have been used to successfully create
-   *                    other caches during this invocation of the creator.
-   * \param alloc_blocks The total list of all blocks available for cache
-   *                     creation when the creator was called.
-   * \param index Our current index within the candidate vector.
+   * \param c_usable_blocks The total list of all blocks available for cache
+   *                        creation when the creator was called.
+   * \param anchor The current anchor block.
    */
   cds::block3D_vectorno cache_i_blocks_alloc(
-      const cds::block3D_vectorno& c_used_blocks,
-      const cds::block3D_vectorno& c_alloc_blocks,
-      size_t index) const;
+      const cds::block3D_vectorno& c_usable_blocks,
+      cds::block3D_vectorno::iterator anchor) const;
 
   /**
    * \brief Calculate the blocks a cache will absorb as a result of its center
    * beyond moved to deconflict with other caches/clusters/etc.
    *
-   * \param alloc_blocks     The total list of all blocks available for cache
-   *                         creation when the creator was called.
+   * \param absorbable_blocks Free blocks which have not yet been successfully
+   *                          used as part of cache creation.
    * \param cache_i_blocks   The blocks to be used in creating the new cache.
-   * \param used_blocks      The blocks already used to create other caches.
    * \param center           The cache center.
    * \param cache_dim        The cache dimension.
    *
@@ -134,10 +156,9 @@ class dynamic_cache_creator : public base_cache_creator,
    * blocks getting added to created caches twice, which causes all sorts of
    * problems. See FORDYCA#578.
    */
-  cds::block3D_vectorno absorb_blocks_calc(
-      const cds::block3D_vectorno& c_alloc_blocks,
+  cds::block3D_htno absorb_blocks_calc(
+      const cds::block3D_htno& c_absorbable_blocks,
       const cds::block3D_vectorno& c_cache_i_blocks,
-      const cds::block3D_vectorno& c_used_blocks,
       const rmath::vector2d& c_center,
       const rtypes::spatial_dist& c_cache_dim) const;
 

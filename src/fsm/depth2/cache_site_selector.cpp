@@ -134,7 +134,7 @@ void cache_site_selector::opt_initialize(const opt_init_conditions* cond,
   constraints_create(cond->known_caches, nest_loc);
   ER_INFO("Calculated %zu cache, %zu nest constraints",
           std::get<0>(m_constraints).size(),
-          std::get<2>(m_constraints).size());
+          std::get<1>(m_constraints).size());
 
   auto xrange =
       boost::get<rmath::rangeu>(mc_matrix->find(cselm::kSiteXRange)->second);

@@ -30,6 +30,7 @@
 #include "rcppsw/er/client.hpp"
 
 #include "cosm/ds/block3D_vector.hpp"
+#include "cosm/ds/block3D_ht.hpp"
 #include "cosm/arena/ds/cache_vector.hpp"
 #include "cosm/foraging/ds/block_cluster_vector.hpp"
 
@@ -72,7 +73,7 @@ class dynamic_cache_manager final : public base_cache_manager,
    * \return The created caches (if any were created).
    */
   boost::optional<cads::acache_vectoro> create(const cache_create_ro_params& c_params,
-                                              const cds::block3D_vectorno&  c_alloc_blocks);
+                                              const cds::block3D_vectorno&  c_all_blocks);
 
   /**
    * \brief Get the minimum distance that must be maintained between two caches
@@ -86,6 +87,11 @@ class dynamic_cache_manager final : public base_cache_manager,
   }
 
  private:
+  struct creation_blocks {
+    cds::block3D_vectorno usable{};
+    cds::block3D_htno absorbable{};
+  };
+
   /*
    * \brief Calculate the blocks eligible to be considered for dynamic cache
    * creation. Only blocks that are not:
@@ -93,12 +99,26 @@ class dynamic_cache_manager final : public base_cache_manager,
    * - Currently carried by a robot
    * - Currently part of a cache
    *
-   * are eligible.
+   * are eligible to be USED during cache creation this timestep.
+   *
+   * Only blocks that are not:
+   *
+   * - Currently carried by a robot
+   * - Currently part of a cache
+   *
+   * are eligible to be ABSORBED during cache creation this timestep. Blocks in
+   * clusters need to be eligible for absorbtion because if a cache-to-be is
+   * location on the RIGHT of a cluster (e.g. quad source/powerlaw
+   * distribution), then block extents from ramp blocks in the cluster are not
+   * considered during the creation process otherwise.
    */
-  boost::optional<cds::block3D_vectorno> calc_blocks_for_creation(
+  boost::optional<creation_blocks> creation_blocks_alloc(
       const cads::acache_vectorno& existing_caches,
       const cfds::block3D_cluster_vector& clusters,
-      const cds::block3D_vectorno& blocks);
+      const cds::block3D_vectorno& all_blocks);
+
+  bool creation_blocks_alloc_check(const creation_blocks& c_blocks,
+                                   const cads::acache_vectorno& c_existing_caches) const;
 
   /* clang-format off */
   const config::caches::caches_config mc_cache_config;

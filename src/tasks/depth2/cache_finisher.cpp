@@ -60,7 +60,7 @@ double cache_finisher::abort_prob_calc(void) {
 } /* abort_prob_calc() */
 
 rtypes::timestep cache_finisher::interface_time_calc(
-    uint interface,
+    size_t interface,
     const rtypes::timestep& start_time) {
   ER_ASSERT(0 == interface, "Bad interface ID: %u", interface);
   return current_time() - start_time;

@@ -50,9 +50,9 @@ NS_START(fordyca, tasks, depth1);
  * cache. It is abortable, and has one task interface.
  */
 class harvester final : public foraging_task,
-                  public events::existing_cache_interactor,
-                  public events::free_block_interactor,
-                  public rer::client<harvester> {
+                        public events::existing_cache_interactor,
+                        public events::free_block_interactor,
+                        public rer::client<harvester> {
  public:
   harvester(const struct cta::config::task_alloc_config* config,
             std::unique_ptr<cta::taskable> mechanism);
@@ -96,7 +96,7 @@ class harvester final : public foraging_task,
 
   void task_start(cta::taskable_argument*) override;
   double abort_prob_calc(void) override RCSW_PURE;
-  rtypes::timestep interface_time_calc(uint interface,
+  rtypes::timestep interface_time_calc(size_t interface,
                                        const rtypes::timestep& start_time) override RCSW_PURE;
   void active_interface_update(int) override;
 };
