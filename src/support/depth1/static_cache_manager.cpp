@@ -29,6 +29,7 @@
 #include "cosm/arena/free_blocks_calculator.hpp"
 #include "cosm/arena/operations/free_block_pickup.hpp"
 #include "cosm/spatial/conflict_checker.hpp"
+#include "cosm/spatial/dimension_checker.hpp"
 
 #include "fordyca/math/cache_respawn_probability.hpp"
 #include "fordyca/support/depth1/static_cache_creator.hpp"
@@ -71,7 +72,6 @@ boost::optional<cads::acache_vectoro> static_cache_manager::create(
   if (std::any_of(to_use.begin(),
                   to_use.end(),
                   [&](const auto& cache_i) { return cache_i.second.empty(); })) {
-
     ER_WARN(
         "Unable to create all static cache(s): Not enough free blocks "
         "(n_caches=%zu)",
@@ -80,16 +80,19 @@ boost::optional<cads::acache_vectoro> static_cache_manager::create(
   }
 
   /* (re)-create the caches */
-  auto dimension = dimension_check(mc_cache_config.dimension);
+  using checker = cspatial::dimension_checker;
+  auto even_multiple = checker::even_multiple(arena_map()->grid_resolution(),
+                                              mc_cache_config.dimension);
+  auto odd_dsize = checker::odd_dsize(arena_map()->grid_resolution(),
+                                      even_multiple);
 
   static_cache_creator creator(&arena_map()->decoratee(),
                                mc_cache_locs,
-                               dimension);
+                               odd_dsize);
 
   static_cache_creator::creation_result res = creator.create_all(c_params,
                                                                  to_use,
                                                                  initial);
-
 
   /* Configure cache extents */
   creator.cache_extents_configure(res.created);

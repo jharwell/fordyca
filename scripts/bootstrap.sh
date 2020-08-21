@@ -109,6 +109,24 @@ cmake \
 make -j $4
 make documentation
 
+cd ../../
+
+# Bootstrap sierra
+if [ -d sierra ]; then rm -rf sierra; fi
+git clone https://github.com/swarm-robotics/sierra.git
+cd sierra
+git checkout devel
+cd ..
+
+if [ -d sierra-plugin-fordyca ]; then rm -rf sierra-plugin-fordyca; fi
+git clone https://github.com/swarm-robotics/sierra-plugin-fordyca.git
+cd sierra-plugin-fordyca
+git checkout devel
+
+cd ..
+
+ln -s $1/sierra-plugin-fordyca sierra/plugins/fordyca
+
 # If installed ARGoS as root, all project repos are also owned by root, so we
 # need to fix that.
 if [ "$YES" = "$2" ]; then

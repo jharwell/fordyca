@@ -12,7 +12,9 @@ define_property(CACHED_VARIABLE PROPERTY "WITH_FOOTBOT_BATTERY"
   FULL_DOCS "Default=NO.")
 
 # Needed by COSM for population dynamics and swarm iteration
-set(COSM_BUILD_FOR "ARGOS")
+if (NOT COSM_BUILD_FOR)
+  set(COSM_BUILD_FOR "ARGOS")
+endif()
 set(COSM_ARGOS_ROBOT_TYPE "foot-bot")
 set(COSM_ARGOS_ROBOT_NAME_PREFIX "fb")
 set(COSM_ARGOS_CONTROLLER_XML_ID "ffc")

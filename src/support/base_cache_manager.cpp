@@ -35,27 +35,6 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-rtypes::spatial_dist base_cache_manager::dimension_check(
-    rtypes::spatial_dist dim) const {
-  double remainder = std::remainder(dim.v(), m_map->grid_resolution().v());
-  if (remainder >= std::numeric_limits<double>::epsilon()) {
-    ER_WARN("Reduce cache dimension %f -> %f during creation to even multiple of grid resolution %f",
-            dim.v(),
-            dim.v() - remainder,
-            m_map->grid_resolution().v());
-    dim -= remainder;
-  }
-  auto rdims = rmath::vector2d(dim.v(), dim.v());
-  auto ddims = rmath::dvec2zvec(rdims, m_map->grid_resolution().v());
-  if (RCSW_IS_EVEN(ddims.x()) || RCSW_IS_EVEN(ddims.y())) {
-    ER_WARN("Reduce cache dimension %f -> %f during creation to contain odd # cells",
-            dim.v(),
-            dim.v() - m_map->grid_resolution().v());
-    dim -= m_map->grid_resolution().v();
-  }
-  return dim;
-}
-
 void base_cache_manager::bloctree_update(const cads::acache_vectoro& caches) {
   for (auto &cache : caches) {
     for (auto &pair : cache->blocks()) {

@@ -29,6 +29,7 @@
 #include "cosm/foraging/repr/block_cluster.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/arena/caching_arena_map.hpp"
+#include "cosm/spatial/dimension_checker.hpp"
 
 #include "fordyca/events/cell2D_empty.hpp"
 #include "fordyca/support/depth2/dynamic_cache_creator.hpp"
@@ -60,11 +61,15 @@ boost::optional<cads::acache_vectoro> dynamic_cache_manager::create(
   if (auto for_creation = creation_blocks_alloc(c_params.current_caches,
                                                 c_params.clusters,
                                                 c_all_blocks)) {
-    auto dimension = dimension_check(mc_cache_config.dimension);
+    using checker = cspatial::dimension_checker;
+    auto even_multiple = checker::even_multiple(arena_map()->grid_resolution(),
+                                                mc_cache_config.dimension);
+    auto odd_dsize = checker::odd_dsize(arena_map()->grid_resolution(),
+                                        even_multiple);
 
     support::depth2::dynamic_cache_creator::params params = {
         .map = m_map,
-        .cache_dim = dimension,
+        .cache_dim = odd_dsize,
         .min_dist = mc_cache_config.dynamic.min_dist,
         .min_blocks = mc_cache_config.dynamic.min_blocks,
         .strict_constraints = mc_cache_config.dynamic.strict_constraints};

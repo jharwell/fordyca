@@ -265,10 +265,10 @@
       <env_dynamics>
         <motion_throttle>
             <waveform
-                type="Constant"
-                frequency="0.004"
-                amplitude="0.9"
-                offset="0.4"
+                type="Sine"
+                frequency="10000"
+                amplitude="0.1"
+                offset="0.0"
                 phase="0"/>
           </motion_throttle>
         <blocks>

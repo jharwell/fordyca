@@ -99,7 +99,8 @@ dynamic_cache_creator::creation_result dynamic_cache_creator::create_all(
                      });
       sanity_caches.push_back(cache_i.cache.get());
 
-      if (!cache_i_verify(sanity_caches,
+      if (!cache_i_verify(cache_i.cache.get(),
+                          sanity_caches,
                           all_blocks,
                           c_params.clusters)) {
         cache_delete(cache_i);
@@ -169,6 +170,7 @@ dynamic_cache_creator::cache_i_result dynamic_cache_creator::cache_i_create(
 } /* cache_i_create() */
 
 bool dynamic_cache_creator::cache_i_verify(
+    const carepr::arena_cache* cache,
     const cads::acache_vectorro& c_caches,
     const cds::block3D_vectorno& c_all_blocks,
     const cfds::block3D_cluster_vector& c_clusters) const {
@@ -292,7 +294,7 @@ cds::block3D_vectorno dynamic_cache_creator::cache_i_blocks_alloc(
                 "Block%d already on src list",
                 candidate->id().v());
       ER_TRACE("Add block%d@%s/%s to src list",
-               c_usable_blocks[i]->id().v(),
+               candidate->id().v(),
                rcppsw::to_string(candidate->ranchor2D()).c_str(),
                rcppsw::to_string(candidate->danchor2D()).c_str());
       cache_i_blocks.push_back(candidate);

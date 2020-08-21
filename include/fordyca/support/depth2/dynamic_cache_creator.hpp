@@ -116,7 +116,8 @@ class dynamic_cache_creator : public base_cache_creator,
                                 const cds::block3D_vectorno& c_alloc_blocks,
                                 const cds::block3D_htno& c_absorbable_blocks,
                                 cads::acache_vectoro* created_caches);
-  bool cache_i_verify(const cads::acache_vectorro& c_caches,
+  bool cache_i_verify(const carepr::arena_cache* cache,
+                      const cads::acache_vectorro& c_caches,
                       const cds::block3D_vectorno& c_all_blocks,
                       const cfds::block3D_cluster_vector& c_clusters) const;
 

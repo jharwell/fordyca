@@ -74,7 +74,7 @@ double harvester::abort_prob_calc(void) {
 rtypes::timestep harvester::interface_time_calc(
     size_t interface,
     const rtypes::timestep& start_time) {
-  ER_ASSERT(0 == interface, "Bad interface ID: %u", interface);
+  ER_ASSERT(0 == interface, "Bad interface ID: %zu", interface);
   return current_time() - start_time;
 } /* interface_time_calc() */
 

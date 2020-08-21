@@ -42,4 +42,7 @@ cmake -DCMAKE_BUILD_TYPE=Release \
       -DARGOS_INSTALL_LDSOCONF=OFF \
       -DARGOS_WITH_LUA=OFF\
       ../src
+
 make -j $3 && make doc && make install
+
+cd ../..

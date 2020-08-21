@@ -19,5 +19,4 @@ if [ -d argos3 ]; then rm -rf argos3; fi
 git clone https://github.com/swarm-robotics/argos3.git
 cd argos3
 git checkout devel
-
 cd ..
