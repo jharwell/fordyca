@@ -62,7 +62,7 @@ class cache_found : public cdops::cell2D_op, public rer::client<cache_found> {
   struct visit_typelist_impl {
     using inherited = cell2D_op::visit_typelist;
     using others = rmpl::typelist<ds::dpo_store, ds::dpo_semantic_map>;
-    using controllers = controller::depth2::typelist;
+    using controllers = controller::d2::typelist;
     using value = boost::mpl::joint_view<
         boost::mpl::joint_view<controllers::type, others::type>,
         inherited::type>;
@@ -85,11 +85,11 @@ class cache_found : public cdops::cell2D_op, public rer::client<cache_found> {
   void visit(ds::dpo_semantic_map& map);
   void visit(cfsm::cell2D_fsm& fsm);
 
-  /* depth2 foraging */
-  void visit(controller::cognitive::depth2::birtd_dpo_controller& c);
-  void visit(controller::cognitive::depth2::birtd_mdpo_controller& c);
-  void visit(controller::cognitive::depth2::birtd_odpo_controller& c);
-  void visit(controller::cognitive::depth2::birtd_omdpo_controller& c);
+  /* d2 foraging */
+  void visit(controller::cognitive::d2::birtd_dpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_mdpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_odpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_omdpo_controller& c);
 
  private:
   /* clang-format off */

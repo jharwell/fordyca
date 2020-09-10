@@ -60,7 +60,7 @@ class block_found : public rer::client<block_found>, public cdops::cell2D_op {
  private:
   struct visit_typelist_impl {
     using inherited = cell2D_op::visit_typelist;
-    using controllers = controller::depth2::typelist;
+    using controllers = controller::d2::typelist;
     using others = rmpl::typelist<ds::dpo_store, ds::dpo_semantic_map>;
 
     using value = boost::mpl::joint_view<
@@ -85,11 +85,11 @@ class block_found : public rer::client<block_found>, public cdops::cell2D_op {
   void visit(cfsm::cell2D_fsm& fsm);
   void visit(ds::dpo_semantic_map& map);
 
-  /* depth2 foraging */
-  void visit(controller::cognitive::depth2::birtd_dpo_controller& c);
-  void visit(controller::cognitive::depth2::birtd_mdpo_controller& c);
-  void visit(controller::cognitive::depth2::birtd_odpo_controller& c);
-  void visit(controller::cognitive::depth2::birtd_omdpo_controller& c);
+  /* d2 foraging */
+  void visit(controller::cognitive::d2::birtd_dpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_mdpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_odpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_omdpo_controller& c);
 
  private:
   void pheromone_update(ds::dpo_semantic_map& map);

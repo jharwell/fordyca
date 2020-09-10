@@ -70,16 +70,16 @@ class robot_cached_block_pickup : public rer::client<robot_cached_block_pickup>,
  private:
   struct visit_typelist_impl {
     using controllers =
-        boost::mpl::joint_view<controller::depth1::typelist::type,
-                               controller::depth2::typelist::type>;
+        boost::mpl::joint_view<controller::d1::typelist::type,
+                               controller::d2::typelist::type>;
     using others = rmpl::typelist<
-        /* depth1 */
+        /* d1 */
         fsm::block_to_goal_fsm,
-        fsm::depth1::cached_block_to_nest_fsm,
-        tasks::depth1::collector,
-        /* depth2 */
-        tasks::depth2::cache_transferer,
-        tasks::depth2::cache_collector>;
+        fsm::d1::cached_block_to_nest_fsm,
+        tasks::d1::collector,
+        /* d2 */
+        tasks::d2::cache_transferer,
+        tasks::d2::cache_collector>;
 
     using value = boost::mpl::joint_view<controllers, others::type>;
   };
@@ -97,28 +97,28 @@ class robot_cached_block_pickup : public rer::client<robot_cached_block_pickup>,
   robot_cached_block_pickup& operator=(const robot_cached_block_pickup& op) =
       delete;
 
-  /* depth1 foraging */
+  /* d1 foraging */
 
   void visit(cds::cell2D& cell);
   void visit(cfsm::cell2D_fsm& fsm);
   void visit(ds::dpo_semantic_map& map);
   void visit(ds::dpo_store& store);
   void visit(crepr::base_block3D& block);
-  void visit(tasks::depth1::collector& task);
+  void visit(tasks::d1::collector& task);
   void visit(fsm::block_to_goal_fsm& fsm);
-  void visit(fsm::depth1::cached_block_to_nest_fsm& fsm);
-  void visit(controller::cognitive::depth1::bitd_dpo_controller& controller);
-  void visit(controller::cognitive::depth1::bitd_mdpo_controller& controller);
-  void visit(controller::cognitive::depth1::bitd_odpo_controller& controller);
-  void visit(controller::cognitive::depth1::bitd_omdpo_controller& controller);
+  void visit(fsm::d1::cached_block_to_nest_fsm& fsm);
+  void visit(controller::cognitive::d1::bitd_dpo_controller& controller);
+  void visit(controller::cognitive::d1::bitd_mdpo_controller& controller);
+  void visit(controller::cognitive::d1::bitd_odpo_controller& controller);
+  void visit(controller::cognitive::d1::bitd_omdpo_controller& controller);
 
-  /* depth2 foraging */
-  void visit(controller::cognitive::depth2::birtd_dpo_controller& controller);
-  void visit(controller::cognitive::depth2::birtd_mdpo_controller& controller);
-  void visit(controller::cognitive::depth2::birtd_odpo_controller& controller);
-  void visit(controller::cognitive::depth2::birtd_omdpo_controller& controller);
-  void visit(tasks::depth2::cache_transferer& task);
-  void visit(tasks::depth2::cache_collector& task);
+  /* d2 foraging */
+  void visit(controller::cognitive::d2::birtd_dpo_controller& controller);
+  void visit(controller::cognitive::d2::birtd_mdpo_controller& controller);
+  void visit(controller::cognitive::d2::birtd_odpo_controller& controller);
+  void visit(controller::cognitive::d2::birtd_omdpo_controller& controller);
+  void visit(tasks::d2::cache_transferer& task);
+  void visit(tasks::d2::cache_collector& task);
 
  private:
   using ccops::base_block_pickup::visit;

@@ -71,16 +71,16 @@ class robot_free_block_drop : public rer::client<robot_free_block_drop>,
   struct visit_typelist_impl {
     using inherited = cdops::cell2D_op::visit_typelist;
     using controllers = boost::mpl::joint_view<
-        boost::mpl::joint_view<controller::depth0::typelist,
-                               controller::depth1::typelist>,
-        controller::depth2::typelist>;
+        boost::mpl::joint_view<controller::d0::typelist,
+                               controller::d1::typelist>,
+        controller::d2::typelist>;
 
     using others = rmpl::typelist<
-        /* depth0 */
+        /* d0 */
         fsm::block_to_goal_fsm,
-        /* depth2 */
-        tasks::depth2::cache_starter,
-        tasks::depth2::cache_finisher>;
+        /* d2 */
+        tasks::d2::cache_starter,
+        tasks::d2::cache_finisher>;
 
     using value = boost::mpl::joint_view<
         boost::mpl::joint_view<controllers::type, others::type>,
@@ -95,19 +95,19 @@ class robot_free_block_drop : public rer::client<robot_free_block_drop>,
   robot_free_block_drop(const robot_free_block_drop& op) = delete;
   robot_free_block_drop& operator=(const robot_free_block_drop& op) = delete;
 
-  /* depth1 */
-  void visit(controller::cognitive::depth1::bitd_dpo_controller&) {}
-  void visit(controller::cognitive::depth1::bitd_mdpo_controller&) {}
-  void visit(controller::cognitive::depth1::bitd_odpo_controller&) {}
-  void visit(controller::cognitive::depth1::bitd_omdpo_controller&) {}
+  /* d1 */
+  void visit(controller::cognitive::d1::bitd_dpo_controller&) {}
+  void visit(controller::cognitive::d1::bitd_mdpo_controller&) {}
+  void visit(controller::cognitive::d1::bitd_odpo_controller&) {}
+  void visit(controller::cognitive::d1::bitd_omdpo_controller&) {}
 
-  /* depth2 */
-  void visit(controller::cognitive::depth2::birtd_dpo_controller&);
-  void visit(controller::cognitive::depth2::birtd_mdpo_controller&);
-  void visit(controller::cognitive::depth2::birtd_odpo_controller&);
-  void visit(controller::cognitive::depth2::birtd_omdpo_controller&);
-  void visit(tasks::depth2::cache_starter&);
-  void visit(tasks::depth2::cache_finisher&);
+  /* d2 */
+  void visit(controller::cognitive::d2::birtd_dpo_controller&);
+  void visit(controller::cognitive::d2::birtd_mdpo_controller&);
+  void visit(controller::cognitive::d2::birtd_odpo_controller&);
+  void visit(controller::cognitive::d2::birtd_omdpo_controller&);
+  void visit(tasks::d2::cache_starter&);
+  void visit(tasks::d2::cache_finisher&);
 
  protected:
   /**

@@ -37,7 +37,7 @@ using bselm = block_sel_matrix;
  * Constructors/Destructor
  ******************************************************************************/
 block_selector::block_selector(const block_sel_matrix* const sel_matrix)
-    : ER_CLIENT_INIT("fordyca.controller.depth0.block_selector"),
+    : ER_CLIENT_INIT("fordyca.controller.d0.block_selector"),
       mc_matrix(sel_matrix) {}
 
 /*******************************************************************************

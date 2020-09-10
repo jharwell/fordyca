@@ -59,7 +59,7 @@ class cache_prox_checker: public rer::client<cache_prox_checker> {
 
   cache_prox_checker(const carena::caching_arena_map* const map,
                      const rtypes::spatial_dist& prox_dist)
-      : ER_CLIENT_INIT("fordyca.support.depth2.cache_prox_checker"),
+      : ER_CLIENT_INIT("fordyca.support.d2.cache_prox_checker"),
         mc_prox_dist(prox_dist),
         mc_map(map) {}
 

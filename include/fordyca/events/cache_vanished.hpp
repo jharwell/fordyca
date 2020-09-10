@@ -52,13 +52,13 @@ class cache_vanished : public rer::client<cache_vanished> {
  private:
   struct visit_typelist_impl {
     using controllers =
-        boost::mpl::joint_view<controller::depth1::typelist::type,
-                               controller::depth2::typelist::type>;
-    using tasks = rmpl::typelist<tasks::depth1::collector,
-                                 tasks::depth1::harvester,
-                                 tasks::depth2::cache_transferer>;
+        boost::mpl::joint_view<controller::d1::typelist::type,
+                               controller::d2::typelist::type>;
+    using tasks = rmpl::typelist<tasks::d1::collector,
+                                 tasks::d1::harvester,
+                                 tasks::d2::cache_transferer>;
     using fsms = rmpl::typelist<fsm::block_to_goal_fsm,
-                                fsm::depth1::cached_block_to_nest_fsm>;
+                                fsm::d1::cached_block_to_nest_fsm>;
     using value =
         boost::mpl::joint_view<boost::mpl::joint_view<tasks::type, fsms::type>,
                                controllers::type>;
@@ -72,22 +72,22 @@ class cache_vanished : public rer::client<cache_vanished> {
   cache_vanished(const cache_vanished& op) = delete;
   cache_vanished& operator=(const cache_vanished& op) = delete;
 
-  /* depth1 foraging */
+  /* d1 foraging */
   void visit(fsm::block_to_goal_fsm& fsm);
-  void visit(fsm::depth1::cached_block_to_nest_fsm& fsm);
-  void visit(tasks::depth1::collector& task);
-  void visit(tasks::depth1::harvester& task);
-  void visit(controller::cognitive::depth1::bitd_dpo_controller& controller);
-  void visit(controller::cognitive::depth1::bitd_mdpo_controller& controller);
-  void visit(controller::cognitive::depth1::bitd_odpo_controller& controller);
-  void visit(controller::cognitive::depth1::bitd_omdpo_controller& controller);
+  void visit(fsm::d1::cached_block_to_nest_fsm& fsm);
+  void visit(tasks::d1::collector& task);
+  void visit(tasks::d1::harvester& task);
+  void visit(controller::cognitive::d1::bitd_dpo_controller& controller);
+  void visit(controller::cognitive::d1::bitd_mdpo_controller& controller);
+  void visit(controller::cognitive::d1::bitd_odpo_controller& controller);
+  void visit(controller::cognitive::d1::bitd_omdpo_controller& controller);
 
-  /* depth2 foraging */
-  void visit(controller::cognitive::depth2::birtd_dpo_controller& controller);
-  void visit(controller::cognitive::depth2::birtd_mdpo_controller& controller);
-  void visit(controller::cognitive::depth2::birtd_odpo_controller& controller);
-  void visit(controller::cognitive::depth2::birtd_omdpo_controller& controller);
-  void visit(tasks::depth2::cache_transferer& task);
+  /* d2 foraging */
+  void visit(controller::cognitive::d2::birtd_dpo_controller& controller);
+  void visit(controller::cognitive::d2::birtd_mdpo_controller& controller);
+  void visit(controller::cognitive::d2::birtd_odpo_controller& controller);
+  void visit(controller::cognitive::d2::birtd_omdpo_controller& controller);
+  void visit(tasks::d2::cache_transferer& task);
 
  private:
   /* clang-format off */

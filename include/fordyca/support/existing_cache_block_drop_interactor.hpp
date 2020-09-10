@@ -34,7 +34,7 @@
 #include "fordyca/events/robot_cache_block_drop.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
-#include "fordyca/tasks/depth1/foraging_task.hpp"
+#include "fordyca/tasks/d1/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces

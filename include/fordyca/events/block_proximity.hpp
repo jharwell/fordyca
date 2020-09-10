@@ -55,9 +55,9 @@ NS_START(fordyca, events, detail);
 class block_proximity : public rer::client<block_proximity> {
  private:
   struct visit_typelist_impl {
-    using controllers = controller::depth2::typelist;
+    using controllers = controller::d2::typelist;
     using others =
-        rmpl::typelist<fsm::block_to_goal_fsm, tasks::depth2::cache_starter>;
+        rmpl::typelist<fsm::block_to_goal_fsm, tasks::d2::cache_starter>;
     using value = boost::mpl::joint_view<controllers, others::type>;
   };
 
@@ -70,13 +70,13 @@ class block_proximity : public rer::client<block_proximity> {
   block_proximity(const block_proximity& op) = delete;
   block_proximity& operator=(const block_proximity& op) = delete;
 
-  /* depth2 foraging */
-  void visit(controller::cognitive::depth2::birtd_dpo_controller& c);
-  void visit(controller::cognitive::depth2::birtd_mdpo_controller& c);
-  void visit(controller::cognitive::depth2::birtd_odpo_controller& c);
-  void visit(controller::cognitive::depth2::birtd_omdpo_controller& c);
+  /* d2 foraging */
+  void visit(controller::cognitive::d2::birtd_dpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_mdpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_odpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_omdpo_controller& c);
   void visit(fsm::block_to_goal_fsm& fsm);
-  void visit(tasks::depth2::cache_starter& task);
+  void visit(tasks::d2::cache_starter& task);
 
  private:
   void dispatch_cache_starter(tasks::base_foraging_task* task);

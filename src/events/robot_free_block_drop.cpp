@@ -27,21 +27,21 @@
 #include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/controller/cognitive/block_sel_matrix.hpp"
-#include "fordyca/controller/cognitive/depth1/bitd_dpo_controller.hpp"
-#include "fordyca/controller/cognitive/depth1/bitd_mdpo_controller.hpp"
-#include "fordyca/controller/cognitive/depth1/bitd_odpo_controller.hpp"
-#include "fordyca/controller/cognitive/depth1/bitd_omdpo_controller.hpp"
-#include "fordyca/controller/cognitive/depth2/birtd_dpo_controller.hpp"
-#include "fordyca/controller/cognitive/depth2/birtd_mdpo_controller.hpp"
-#include "fordyca/controller/cognitive/depth2/birtd_odpo_controller.hpp"
-#include "fordyca/controller/cognitive/depth2/birtd_omdpo_controller.hpp"
+#include "fordyca/controller/cognitive/d1/bitd_dpo_controller.hpp"
+#include "fordyca/controller/cognitive/d1/bitd_mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/d1/bitd_odpo_controller.hpp"
+#include "fordyca/controller/cognitive/d1/bitd_omdpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_dpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
-#include "fordyca/tasks/depth1/foraging_task.hpp"
-#include "fordyca/tasks/depth2/cache_finisher.hpp"
-#include "fordyca/tasks/depth2/cache_starter.hpp"
-#include "fordyca/tasks/depth2/foraging_task.hpp"
+#include "fordyca/tasks/d1/foraging_task.hpp"
+#include "fordyca/tasks/d2/cache_finisher.hpp"
+#include "fordyca/tasks/d2/cache_starter.hpp"
+#include "fordyca/tasks/d2/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -80,7 +80,7 @@ bool robot_free_block_drop::dispatch_free_block_interactor(
      * If we are performing a free block drop because we have just aborted our
      * task, then obviously no need to do that.
      */
-    if (tasks::depth2::foraging_task::task_in_depth2(polled) &&
+    if (tasks::d2::foraging_task::task_in_d2(polled) &&
         !polled->task_aborted()) {
       ER_INFO("Added block%d@%s/%s to exception list,task='%s'",
               m_block->id().v(),
@@ -99,7 +99,7 @@ bool robot_free_block_drop::dispatch_free_block_interactor(
  * Depth2
  ******************************************************************************/
 void robot_free_block_drop::visit(
-    controller::cognitive::depth2::birtd_mdpo_controller& controller) {
+    controller::cognitive::d2::birtd_mdpo_controller& controller) {
   controller.ndc_pusht();
 
   if (dispatch_free_block_interactor(controller.current_task(),
@@ -111,7 +111,7 @@ void robot_free_block_drop::visit(
 } /* visit() */
 
 void robot_free_block_drop::visit(
-    controller::cognitive::depth2::birtd_dpo_controller& controller) {
+    controller::cognitive::d2::birtd_dpo_controller& controller) {
   controller.ndc_pusht();
 
   if (dispatch_free_block_interactor(controller.current_task(),
@@ -123,7 +123,7 @@ void robot_free_block_drop::visit(
 } /* visit() */
 
 void robot_free_block_drop::visit(
-    controller::cognitive::depth2::birtd_omdpo_controller& controller) {
+    controller::cognitive::d2::birtd_omdpo_controller& controller) {
   controller.ndc_pusht();
 
   if (dispatch_free_block_interactor(controller.current_task(),
@@ -135,7 +135,7 @@ void robot_free_block_drop::visit(
 } /* visit() */
 
 void robot_free_block_drop::visit(
-    controller::cognitive::depth2::birtd_odpo_controller& controller) {
+    controller::cognitive::d2::birtd_odpo_controller& controller) {
   controller.ndc_pusht();
 
   if (dispatch_free_block_interactor(controller.current_task(),
@@ -146,11 +146,11 @@ void robot_free_block_drop::visit(
   controller.ndc_pop();
 } /* visit() */
 
-void robot_free_block_drop::visit(tasks::depth2::cache_starter& task) {
+void robot_free_block_drop::visit(tasks::d2::cache_starter& task) {
   visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 
-void robot_free_block_drop::visit(tasks::depth2::cache_finisher& task) {
+void robot_free_block_drop::visit(tasks::d2::cache_finisher& task) {
   visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 

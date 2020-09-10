@@ -31,15 +31,15 @@
  ******************************************************************************/
 NS_START(fordyca, fsm);
 class block_to_goal_fsm;
-namespace depth0 {
+namespace d0 {
 class crw_fsm;
 class dpo_fsm;
 class free_block_to_nest_fsm;
-} // namespace depth0
+} // namespace d0
 
-namespace depth1 {
+namespace d1 {
 class cached_block_to_nest_fsm;
-} // namespace depth1
+} // namespace d1
 
 NS_END(fsm, fordyca);
 

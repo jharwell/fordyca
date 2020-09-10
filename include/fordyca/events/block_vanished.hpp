@@ -52,16 +52,16 @@ class block_vanished : public rer::client<block_vanished> {
  private:
   struct visit_typelist_impl {
     using controllers = boost::mpl::joint_view<
-      boost::mpl::joint_view<controller::depth0::typelist,
-                             controller::depth1::typelist>,
-        controller::depth2::typelist>;
-    using tasks = rmpl::typelist<tasks::depth0::generalist,
-                                 tasks::depth1::harvester,
-                                 tasks::depth2::cache_starter,
-                                 tasks::depth2::cache_finisher>;
-    using fsms = rmpl::typelist<fsm::depth0::crw_fsm,
-                                fsm::depth0::dpo_fsm,
-                                fsm::depth0::free_block_to_nest_fsm,
+      boost::mpl::joint_view<controller::d0::typelist,
+                             controller::d1::typelist>,
+        controller::d2::typelist>;
+    using tasks = rmpl::typelist<tasks::d0::generalist,
+                                 tasks::d1::harvester,
+                                 tasks::d2::cache_starter,
+                                 tasks::d2::cache_finisher>;
+    using fsms = rmpl::typelist<fsm::d0::crw_fsm,
+                                fsm::d0::dpo_fsm,
+                                fsm::d0::free_block_to_nest_fsm,
                                 fsm::block_to_goal_fsm>;
 
     using value = boost::mpl::joint_view<
@@ -78,32 +78,32 @@ class block_vanished : public rer::client<block_vanished> {
   block_vanished(const block_vanished&) = delete;
   block_vanished& operator=(const block_vanished&) = delete;
 
-  /* depth0 foraging */
-  void visit(controller::reactive::depth0::crw_controller& controller);
-  void visit(controller::cognitive::depth0::dpo_controller& controller);
-  void visit(controller::cognitive::depth0::mdpo_controller& controller);
-  void visit(controller::cognitive::depth0::odpo_controller& controller);
-  void visit(controller::cognitive::depth0::omdpo_controller& controller);
-  void visit(tasks::depth0::generalist& task);
-  void visit(fsm::depth0::crw_fsm& fsm);
-  void visit(fsm::depth0::dpo_fsm& fsm);
+  /* d0 foraging */
+  void visit(controller::reactive::d0::crw_controller& controller);
+  void visit(controller::cognitive::d0::dpo_controller& controller);
+  void visit(controller::cognitive::d0::mdpo_controller& controller);
+  void visit(controller::cognitive::d0::odpo_controller& controller);
+  void visit(controller::cognitive::d0::omdpo_controller& controller);
+  void visit(tasks::d0::generalist& task);
+  void visit(fsm::d0::crw_fsm& fsm);
+  void visit(fsm::d0::dpo_fsm& fsm);
 
-  /* depth1 foraging */
-  void visit(fsm::depth0::free_block_to_nest_fsm& fsm);
+  /* d1 foraging */
+  void visit(fsm::d0::free_block_to_nest_fsm& fsm);
   void visit(fsm::block_to_goal_fsm& fsm);
-  void visit(tasks::depth1::harvester& task);
-  void visit(controller::cognitive::depth1::bitd_dpo_controller& controller);
-  void visit(controller::cognitive::depth1::bitd_mdpo_controller& controller);
-  void visit(controller::cognitive::depth1::bitd_odpo_controller& controller);
-  void visit(controller::cognitive::depth1::bitd_omdpo_controller& controller);
+  void visit(tasks::d1::harvester& task);
+  void visit(controller::cognitive::d1::bitd_dpo_controller& controller);
+  void visit(controller::cognitive::d1::bitd_mdpo_controller& controller);
+  void visit(controller::cognitive::d1::bitd_odpo_controller& controller);
+  void visit(controller::cognitive::d1::bitd_omdpo_controller& controller);
 
-  /* depth2 foraging */
-  void visit(controller::cognitive::depth2::birtd_dpo_controller& controller);
-  void visit(controller::cognitive::depth2::birtd_mdpo_controller& controller);
-  void visit(controller::cognitive::depth2::birtd_odpo_controller& controller);
-  void visit(controller::cognitive::depth2::birtd_omdpo_controller& controller);
-  void visit(tasks::depth2::cache_starter& task);
-  void visit(tasks::depth2::cache_finisher& task);
+  /* d2 foraging */
+  void visit(controller::cognitive::d2::birtd_dpo_controller& controller);
+  void visit(controller::cognitive::d2::birtd_mdpo_controller& controller);
+  void visit(controller::cognitive::d2::birtd_odpo_controller& controller);
+  void visit(controller::cognitive::d2::birtd_omdpo_controller& controller);
+  void visit(tasks::d2::cache_starter& task);
+  void visit(tasks::d2::cache_finisher& task);
 
  private:
   void dispatch_free_block_interactor(tasks::base_foraging_task* task);

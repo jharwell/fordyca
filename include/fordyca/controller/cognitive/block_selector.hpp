@@ -42,7 +42,7 @@ NS_START(fordyca, controller, cognitive);
  ******************************************************************************/
 /**
  * \class block_selector
- * \ingroup controller cognitive depth0
+ * \ingroup controller cognitive d0
  *
  * \brief Select the best block that a robot knows about, for use in acquiring a
  * block as part of a higher level FSM.

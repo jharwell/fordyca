@@ -55,11 +55,11 @@ NS_START(fordyca, events, detail);
 class cache_proximity : public rer::client<cache_proximity> {
  private:
   struct visit_typelist_impl {
-    using others = rmpl::typelist<tasks::depth2::cache_finisher,
-                                  tasks::depth2::cache_starter,
+    using others = rmpl::typelist<tasks::d2::cache_finisher,
+                                  tasks::d2::cache_starter,
                                   fsm::block_to_goal_fsm>;
     using value =
-        boost::mpl::joint_view<controller::depth2::typelist::type, others::type>;
+        boost::mpl::joint_view<controller::d2::typelist::type, others::type>;
   };
 
  public:
@@ -71,13 +71,13 @@ class cache_proximity : public rer::client<cache_proximity> {
   cache_proximity(const cache_proximity&) = delete;
   cache_proximity& operator=(const cache_proximity&) = delete;
 
-  /* depth2 foraging */
-  void visit(controller::cognitive::depth2::birtd_dpo_controller& c);
-  void visit(controller::cognitive::depth2::birtd_odpo_controller& c);
-  void visit(controller::cognitive::depth2::birtd_mdpo_controller& c);
-  void visit(controller::cognitive::depth2::birtd_omdpo_controller& c);
-  void visit(tasks::depth2::cache_finisher& task);
-  void visit(tasks::depth2::cache_starter& task);
+  /* d2 foraging */
+  void visit(controller::cognitive::d2::birtd_dpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_odpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_mdpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_omdpo_controller& c);
+  void visit(tasks::d2::cache_finisher& task);
+  void visit(tasks::d2::cache_starter& task);
   void visit(fsm::block_to_goal_fsm& fsm);
 
  private:

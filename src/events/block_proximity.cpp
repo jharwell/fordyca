@@ -25,17 +25,17 @@
 
 #include "cosm/repr/base_block3D.hpp"
 
-#include "fordyca/controller/cognitive/depth2/birtd_dpo_controller.hpp"
-#include "fordyca/controller/cognitive/depth2/birtd_mdpo_controller.hpp"
-#include "fordyca/controller/cognitive/depth2/birtd_odpo_controller.hpp"
-#include "fordyca/controller/cognitive/depth2/birtd_omdpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_dpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
 #include "fordyca/controller/cognitive/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
-#include "fordyca/tasks/depth2/cache_starter.hpp"
+#include "fordyca/tasks/d2/cache_starter.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,7 +53,7 @@ block_proximity::block_proximity(crepr::base_block3D* block)
  ******************************************************************************/
 void block_proximity::dispatch_cache_starter(
     tasks::base_foraging_task* const task) {
-  auto* starter = dynamic_cast<tasks::depth2::cache_starter*>(task);
+  auto* starter = dynamic_cast<tasks::d2::cache_starter*>(task);
   ER_ASSERT(nullptr != starter,
             "Non cache starter task %s received block proximity event",
             dynamic_cast<cta::logical_task*>(task)->name().c_str());
@@ -63,7 +63,7 @@ void block_proximity::dispatch_cache_starter(
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void block_proximity::visit(controller::cognitive::depth2::birtd_dpo_controller& c) {
+void block_proximity::visit(controller::cognitive::d2::birtd_dpo_controller& c) {
   c.ndc_pusht();
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
@@ -74,7 +74,7 @@ void block_proximity::visit(controller::cognitive::depth2::birtd_dpo_controller&
   c.ndc_pop();
 } /* visit() */
 
-void block_proximity::visit(controller::cognitive::depth2::birtd_mdpo_controller& c) {
+void block_proximity::visit(controller::cognitive::d2::birtd_mdpo_controller& c) {
   c.ndc_pusht();
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
@@ -85,7 +85,7 @@ void block_proximity::visit(controller::cognitive::depth2::birtd_mdpo_controller
   c.ndc_pop();
 } /* visit() */
 
-void block_proximity::visit(controller::cognitive::depth2::birtd_odpo_controller& c) {
+void block_proximity::visit(controller::cognitive::d2::birtd_odpo_controller& c) {
   c.ndc_pusht();
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
@@ -96,7 +96,7 @@ void block_proximity::visit(controller::cognitive::depth2::birtd_odpo_controller
   c.ndc_pop();
 } /* visit() */
 
-void block_proximity::visit(controller::cognitive::depth2::birtd_omdpo_controller& c) {
+void block_proximity::visit(controller::cognitive::d2::birtd_omdpo_controller& c) {
   c.ndc_pusht();
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
@@ -107,7 +107,7 @@ void block_proximity::visit(controller::cognitive::depth2::birtd_omdpo_controlle
   c.ndc_pop();
 } /* visit() */
 
-void block_proximity::visit(tasks::depth2::cache_starter& task) {
+void block_proximity::visit(tasks::d2::cache_starter& task) {
   visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 

@@ -66,7 +66,7 @@ class foraging_expstrat;
  ******************************************************************************/
 /**
  * \class acquire_existing_cache_fsm
- * \ingroup fsm depth1
+ * \ingroup fsm d1
  *
  * \brief Acquire an existing cache within the arena. Once such a cache has been
  * acquired (always by vectoring), it signals that it has completed its task.

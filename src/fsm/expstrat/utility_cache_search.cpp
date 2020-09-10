@@ -31,7 +31,7 @@
 
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
-#include "fordyca/fsm/depth2/cache_site_selector.hpp"
+#include "fordyca/fsm/d2/cache_site_selector.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -55,7 +55,7 @@ void utility_cache_search::task_start(cta::taskable_argument*) {
   } else {
     position = saa()->sensing()->rpos2D();
   }
-  depth2::cache_site_selector sel(mc_matrix);
+  d2::cache_site_selector sel(mc_matrix);
   if (auto site = sel(mc_store->caches(), position, rng())) {
     csfsm::point_argument v(kCACHE_ARRIVAL_TOL, *site);
     localized_search::task_start(&v);

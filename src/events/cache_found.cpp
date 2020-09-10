@@ -25,10 +25,10 @@
 
 #include "cosm/arena/repr/base_cache.hpp"
 
-#include "fordyca/controller/cognitive/depth2/birtd_dpo_controller.hpp"
-#include "fordyca/controller/cognitive/depth2/birtd_mdpo_controller.hpp"
-#include "fordyca/controller/cognitive/depth2/birtd_odpo_controller.hpp"
-#include "fordyca/controller/cognitive/depth2/birtd_omdpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_dpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
 #include "fordyca/controller/cognitive/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
@@ -234,7 +234,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void cache_found::visit(controller::cognitive::depth2::birtd_mdpo_controller& c) {
+void cache_found::visit(controller::cognitive::d2::birtd_mdpo_controller& c) {
   c.ndc_pusht();
 
   visit(*c.mdpo_perception()->map());
@@ -242,7 +242,7 @@ void cache_found::visit(controller::cognitive::depth2::birtd_mdpo_controller& c)
   c.ndc_pop();
 } /* visit() */
 
-void cache_found::visit(controller::cognitive::depth2::birtd_dpo_controller& c) {
+void cache_found::visit(controller::cognitive::d2::birtd_dpo_controller& c) {
   c.ndc_pusht();
 
   visit(*c.dpo_perception()->dpo_store());
@@ -250,7 +250,7 @@ void cache_found::visit(controller::cognitive::depth2::birtd_dpo_controller& c) 
   c.ndc_pop();
 } /* visit() */
 
-void cache_found::visit(controller::cognitive::depth2::birtd_omdpo_controller& c) {
+void cache_found::visit(controller::cognitive::d2::birtd_omdpo_controller& c) {
   c.ndc_pusht();
 
   visit(*c.mdpo_perception()->map());
@@ -258,7 +258,7 @@ void cache_found::visit(controller::cognitive::depth2::birtd_omdpo_controller& c
   c.ndc_pop();
 } /* visit() */
 
-void cache_found::visit(controller::cognitive::depth2::birtd_odpo_controller& c) {
+void cache_found::visit(controller::cognitive::d2::birtd_odpo_controller& c) {
   c.ndc_pusht();
 
   visit(*c.dpo_perception()->dpo_store());
