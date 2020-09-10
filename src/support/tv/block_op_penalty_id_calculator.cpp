@@ -26,7 +26,7 @@
 #include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/repr/base_block3D.hpp"
 
-#include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca//controller/foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

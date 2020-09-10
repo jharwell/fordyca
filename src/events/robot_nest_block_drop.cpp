@@ -25,19 +25,19 @@
 
 #include "cosm/repr/base_block3D.hpp"
 
-#include "fordyca/controller/depth0/crw_controller.hpp"
-#include "fordyca/controller/depth0/dpo_controller.hpp"
-#include "fordyca/controller/depth0/mdpo_controller.hpp"
-#include "fordyca/controller/depth0/odpo_controller.hpp"
-#include "fordyca/controller/depth0/omdpo_controller.hpp"
-#include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
-#include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
-#include "fordyca/controller/depth1/bitd_odpo_controller.hpp"
-#include "fordyca/controller/depth1/bitd_omdpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_odpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_omdpo_controller.hpp"
+#include "fordyca/controller/reactive/depth0/crw_controller.hpp"
+#include "fordyca/controller/cognitive/depth0/dpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth0/mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth0/odpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth0/omdpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth1/bitd_dpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth1/bitd_mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth1/bitd_odpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth1/bitd_omdpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth2/birtd_dpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth2/birtd_mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth2/birtd_odpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth2/birtd_omdpo_controller.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
@@ -76,7 +76,7 @@ void robot_nest_block_drop::dispatch_nest_interactor(
 /*******************************************************************************
  * Depth0 Foraging
  ******************************************************************************/
-void robot_nest_block_drop::visit(controller::depth0::crw_controller& controller) {
+void robot_nest_block_drop::visit(controller::reactive::depth0::crw_controller& controller) {
   controller.ndc_pusht();
   visit(*controller.fsm());
 
@@ -89,7 +89,7 @@ void robot_nest_block_drop::visit(fsm::depth0::crw_fsm& fsm) {
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
-void robot_nest_block_drop::visit(controller::depth0::dpo_controller& controller) {
+void robot_nest_block_drop::visit(controller::cognitive::depth0::dpo_controller& controller) {
   controller.ndc_pusht();
 
   visit(*controller.fsm());
@@ -99,7 +99,7 @@ void robot_nest_block_drop::visit(controller::depth0::dpo_controller& controller
 } /* visit() */
 
 void robot_nest_block_drop::visit(
-    controller::depth0::odpo_controller& controller) {
+    controller::cognitive::depth0::odpo_controller& controller) {
   controller.ndc_pusht();
 
   visit(*controller.fsm());
@@ -114,7 +114,7 @@ void robot_nest_block_drop::visit(fsm::depth0::dpo_fsm& fsm) {
 } /* visit() */
 
 void robot_nest_block_drop::visit(
-    controller::depth0::mdpo_controller& controller) {
+    controller::cognitive::depth0::mdpo_controller& controller) {
   controller.ndc_pusht();
 
   visit(*controller.fsm());
@@ -124,7 +124,7 @@ void robot_nest_block_drop::visit(
 } /* visit() */
 
 void robot_nest_block_drop::visit(
-    controller::depth0::omdpo_controller& controller) {
+    controller::cognitive::depth0::omdpo_controller& controller) {
   controller.ndc_pusht();
 
   visit(*controller.fsm());
@@ -137,7 +137,7 @@ void robot_nest_block_drop::visit(
  * Depth1 Foraging
  ******************************************************************************/
 void robot_nest_block_drop::visit(
-    controller::depth1::bitd_dpo_controller& controller) {
+    controller::cognitive::depth1::bitd_dpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_nest_interactor(controller.current_task());
@@ -147,7 +147,7 @@ void robot_nest_block_drop::visit(
 } /* visit() */
 
 void robot_nest_block_drop::visit(
-    controller::depth1::bitd_odpo_controller& controller) {
+    controller::cognitive::depth1::bitd_odpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_nest_interactor(controller.current_task());
@@ -157,7 +157,7 @@ void robot_nest_block_drop::visit(
 } /* visit() */
 
 void robot_nest_block_drop::visit(
-    controller::depth1::bitd_mdpo_controller& controller) {
+    controller::cognitive::depth1::bitd_mdpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_nest_interactor(controller.current_task());
@@ -167,7 +167,7 @@ void robot_nest_block_drop::visit(
 } /* visit() */
 
 void robot_nest_block_drop::visit(
-    controller::depth1::bitd_omdpo_controller& controller) {
+    controller::cognitive::depth1::bitd_omdpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_nest_interactor(controller.current_task());
@@ -198,7 +198,7 @@ void robot_nest_block_drop::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
  * Depth2 Foraging
  ******************************************************************************/
 void robot_nest_block_drop::visit(
-    controller::depth2::birtd_mdpo_controller& controller) {
+    controller::cognitive::depth2::birtd_mdpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_nest_interactor(controller.current_task());
@@ -208,7 +208,7 @@ void robot_nest_block_drop::visit(
 } /* visit() */
 
 void robot_nest_block_drop::visit(
-    controller::depth2::birtd_dpo_controller& controller) {
+    controller::cognitive::depth2::birtd_dpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_nest_interactor(controller.current_task());
@@ -218,7 +218,7 @@ void robot_nest_block_drop::visit(
 } /* visit() */
 
 void robot_nest_block_drop::visit(
-    controller::depth2::birtd_odpo_controller& controller) {
+    controller::cognitive::depth2::birtd_odpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_nest_interactor(controller.current_task());
@@ -228,7 +228,7 @@ void robot_nest_block_drop::visit(
 } /* visit() */
 
 void robot_nest_block_drop::visit(
-    controller::depth2::birtd_omdpo_controller& controller) {
+    controller::cognitive::depth2::birtd_omdpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_nest_interactor(controller.current_task());

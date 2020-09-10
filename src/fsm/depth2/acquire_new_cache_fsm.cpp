@@ -26,7 +26,7 @@
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
-#include "fordyca/controller/depth2/new_cache_selector.hpp"
+#include "fordyca/controller/cognitive/depth2/new_cache_selector.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
@@ -90,7 +90,7 @@ bool acquire_new_cache_fsm::candidates_exist(void) const {
 
 boost::optional<csfsm::acquire_goal_fsm::candidate_type> acquire_new_cache_fsm::
     cache_select(void) const {
-  controller::depth2::new_cache_selector selector(mc_matrix);
+  controller::cognitive::depth2::new_cache_selector selector(mc_matrix);
 
   /* A "new" cache is the same as a single block  */
   if (auto best =

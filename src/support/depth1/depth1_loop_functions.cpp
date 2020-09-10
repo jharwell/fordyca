@@ -46,10 +46,10 @@
 #include "cosm/ta/ds/bi_tdgraph.hpp"
 #include "cosm/foraging/block_dist/base_distributor.hpp"
 
-#include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
-#include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
-#include "fordyca/controller/depth1/bitd_odpo_controller.hpp"
-#include "fordyca/controller/depth1/bitd_omdpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth1/bitd_dpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth1/bitd_mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth1/bitd_odpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth1/bitd_omdpo_controller.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/support/depth1/depth1_metrics_aggregator.hpp"
 #include "fordyca/support/depth1/robot_arena_interactor.hpp"
@@ -300,7 +300,7 @@ void depth1_loop_functions::oracle_init(void) {
     argos::CFootBotEntity& robot0 = *argos::any_cast<argos::CFootBotEntity*>(
         GetSpace().GetEntitiesByType(kARGoSRobotType).begin()->second);
     const auto& controller0 =
-        dynamic_cast<controller::depth1::bitd_dpo_controller&>(
+        dynamic_cast<controller::cognitive::depth1::bitd_dpo_controller&>(
             robot0.GetControllableEntity().GetController());
     auto* bigraph = controller0.executive()->graph();
     oracle()->tasking_oracle(

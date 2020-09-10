@@ -26,15 +26,15 @@
 #include "cosm/ds/cell2D.hpp"
 #include "cosm/repr/base_block3D.hpp"
 
-#include "fordyca/controller/block_sel_matrix.hpp"
-#include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
-#include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
-#include "fordyca/controller/depth1/bitd_odpo_controller.hpp"
-#include "fordyca/controller/depth1/bitd_omdpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_odpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_omdpo_controller.hpp"
+#include "fordyca/controller/cognitive/block_sel_matrix.hpp"
+#include "fordyca/controller/cognitive/depth1/bitd_dpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth1/bitd_mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth1/bitd_odpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth1/bitd_omdpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth2/birtd_dpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth2/birtd_mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth2/birtd_odpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth2/birtd_omdpo_controller.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
@@ -66,7 +66,7 @@ robot_free_block_drop::robot_free_block_drop(
  ******************************************************************************/
 bool robot_free_block_drop::dispatch_free_block_interactor(
     tasks::base_foraging_task* const task,
-    controller::block_sel_matrix* const bsel_matrix) {
+    controller::cognitive::block_sel_matrix* const bsel_matrix) {
   auto* polled = dynamic_cast<cta::polled_task*>(task);
   auto* interactor = dynamic_cast<events::free_block_interactor*>(task);
   bool ret = false;
@@ -99,7 +99,7 @@ bool robot_free_block_drop::dispatch_free_block_interactor(
  * Depth2
  ******************************************************************************/
 void robot_free_block_drop::visit(
-    controller::depth2::birtd_mdpo_controller& controller) {
+    controller::cognitive::depth2::birtd_mdpo_controller& controller) {
   controller.ndc_pusht();
 
   if (dispatch_free_block_interactor(controller.current_task(),
@@ -111,7 +111,7 @@ void robot_free_block_drop::visit(
 } /* visit() */
 
 void robot_free_block_drop::visit(
-    controller::depth2::birtd_dpo_controller& controller) {
+    controller::cognitive::depth2::birtd_dpo_controller& controller) {
   controller.ndc_pusht();
 
   if (dispatch_free_block_interactor(controller.current_task(),
@@ -123,7 +123,7 @@ void robot_free_block_drop::visit(
 } /* visit() */
 
 void robot_free_block_drop::visit(
-    controller::depth2::birtd_omdpo_controller& controller) {
+    controller::cognitive::depth2::birtd_omdpo_controller& controller) {
   controller.ndc_pusht();
 
   if (dispatch_free_block_interactor(controller.current_task(),
@@ -135,7 +135,7 @@ void robot_free_block_drop::visit(
 } /* visit() */
 
 void robot_free_block_drop::visit(
-    controller::depth2::birtd_odpo_controller& controller) {
+    controller::cognitive::depth2::birtd_odpo_controller& controller) {
   controller.ndc_pusht();
 
   if (dispatch_free_block_interactor(controller.current_task(),

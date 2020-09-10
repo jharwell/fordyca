@@ -37,7 +37,7 @@
 #include "fordyca/support/tv/block_op_src.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/metrics/tv/env_dynamics_metrics.hpp"
-#include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca//controller/foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

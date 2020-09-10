@@ -37,7 +37,7 @@ class depth1_metrics_aggregator;
 
 NS_START(detail);
 using configurer_map_type = rds::type_map<
-   rmpl::typelist_wrap_apply<controller::depth1::typelist,
+   rmpl::typelist_wrap_apply<controller::cognitive::depth1::typelist,
                              robot_configurer,
                              depth1_metrics_aggregator>::type>;
 

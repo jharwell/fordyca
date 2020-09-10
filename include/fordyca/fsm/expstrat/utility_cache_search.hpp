@@ -58,7 +58,7 @@ class utility_cache_search : public localized_search {
                              c_params->dpo_store,
                              c_params->saa,
                              rng) {}
-  utility_cache_search(const controller::cache_sel_matrix* csel_matrix,
+  utility_cache_search(const controller::cognitive::cache_sel_matrix* csel_matrix,
                        const ds::dpo_store* store,
                        crfootbot::footbot_saa_subsystem* saa,
                        rmath::rng* rng)
@@ -83,8 +83,8 @@ class utility_cache_search : public localized_search {
 
  private:
   /* clang-format off */
-  const controller::cache_sel_matrix* mc_matrix;
-  const ds::dpo_store*                mc_store;
+  const controller::cognitive::cache_sel_matrix* mc_matrix;
+  const ds::dpo_store*                           mc_store;
   /* clang-format on */
 };
 

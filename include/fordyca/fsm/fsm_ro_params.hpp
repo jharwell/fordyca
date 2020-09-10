@@ -36,7 +36,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace controller {
+namespace controller::cognitive {
 class block_sel_matrix;
 class cache_sel_matrix;
 } /* namespace controller */
@@ -58,8 +58,8 @@ NS_START(fsm);
  * by the FSM at run-time; not all FSMs need all members.
  */
 struct fsm_ro_params {
-  const controller::block_sel_matrix* bsel_matrix;
-  const controller::cache_sel_matrix* csel_matrix;
+  const controller::cognitive::block_sel_matrix* bsel_matrix;
+  const controller::cognitive::cache_sel_matrix* csel_matrix;
   const ds::dpo_store* store;
   const fordyca::config::exploration_config exp_config;
 };

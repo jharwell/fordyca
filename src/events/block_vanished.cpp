@@ -23,19 +23,19 @@
  ******************************************************************************/
 #include "fordyca/events/block_vanished.hpp"
 
-#include "fordyca/controller/depth0/crw_controller.hpp"
-#include "fordyca/controller/depth0/dpo_controller.hpp"
-#include "fordyca/controller/depth0/mdpo_controller.hpp"
-#include "fordyca/controller/depth0/odpo_controller.hpp"
-#include "fordyca/controller/depth0/omdpo_controller.hpp"
-#include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
-#include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
-#include "fordyca/controller/depth1/bitd_odpo_controller.hpp"
-#include "fordyca/controller/depth1/bitd_omdpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_odpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_omdpo_controller.hpp"
+#include "fordyca/controller/reactive/depth0/crw_controller.hpp"
+#include "fordyca/controller/cognitive/depth0/dpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth0/mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth0/odpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth0/omdpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth1/bitd_dpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth1/bitd_mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth1/bitd_odpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth1/bitd_omdpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth2/birtd_dpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth2/birtd_mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth2/birtd_odpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth2/birtd_omdpo_controller.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
@@ -73,7 +73,7 @@ void block_vanished::dispatch_free_block_interactor(
 /*******************************************************************************
  * Depth0 Foraging
  ******************************************************************************/
-void block_vanished::visit(controller::depth0::crw_controller& controller) {
+void block_vanished::visit(controller::reactive::depth0::crw_controller& controller) {
   controller.ndc_pusht();
 
   ER_INFO("Abort pickup: block%d vanished", mc_block_id.v());
@@ -82,7 +82,7 @@ void block_vanished::visit(controller::depth0::crw_controller& controller) {
   controller.ndc_pop();
 } /* visit() */
 
-void block_vanished::visit(controller::depth0::dpo_controller& controller) {
+void block_vanished::visit(controller::cognitive::depth0::dpo_controller& controller) {
   controller.ndc_pusht();
 
   ER_INFO("Abort pickup: block%d vanished", mc_block_id.v());
@@ -91,7 +91,7 @@ void block_vanished::visit(controller::depth0::dpo_controller& controller) {
   controller.ndc_pop();
 } /* visit() */
 
-void block_vanished::visit(controller::depth0::mdpo_controller& controller) {
+void block_vanished::visit(controller::cognitive::depth0::mdpo_controller& controller) {
   controller.ndc_pusht();
 
   ER_INFO("Abort pickup: block%d vanished", mc_block_id.v());
@@ -100,7 +100,7 @@ void block_vanished::visit(controller::depth0::mdpo_controller& controller) {
   controller.ndc_pop();
 } /* visit() */
 
-void block_vanished::visit(controller::depth0::odpo_controller& controller) {
+void block_vanished::visit(controller::cognitive::depth0::odpo_controller& controller) {
   controller.ndc_pusht();
 
   ER_INFO("Abort pickup: block%d vanished", mc_block_id.v());
@@ -109,7 +109,7 @@ void block_vanished::visit(controller::depth0::odpo_controller& controller) {
   controller.ndc_pop();
 } /* visit() */
 
-void block_vanished::visit(controller::depth0::omdpo_controller& controller) {
+void block_vanished::visit(controller::cognitive::depth0::omdpo_controller& controller) {
   controller.ndc_pusht();
 
   ER_INFO("Abort pickup: block%d vanished", mc_block_id.v());
@@ -131,7 +131,7 @@ void block_vanished::visit(fsm::depth0::dpo_fsm& fsm) {
 /*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
-void block_vanished::visit(controller::depth1::bitd_dpo_controller& controller) {
+void block_vanished::visit(controller::cognitive::depth1::bitd_dpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_free_block_interactor(controller.current_task());
@@ -139,7 +139,7 @@ void block_vanished::visit(controller::depth1::bitd_dpo_controller& controller) 
   controller.ndc_pop();
 } /* visit() */
 
-void block_vanished::visit(controller::depth1::bitd_mdpo_controller& controller) {
+void block_vanished::visit(controller::cognitive::depth1::bitd_mdpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_free_block_interactor(controller.current_task());
@@ -147,7 +147,7 @@ void block_vanished::visit(controller::depth1::bitd_mdpo_controller& controller)
   controller.ndc_pop();
 } /* visit() */
 
-void block_vanished::visit(controller::depth1::bitd_odpo_controller& controller) {
+void block_vanished::visit(controller::cognitive::depth1::bitd_odpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_free_block_interactor(controller.current_task());
@@ -155,7 +155,7 @@ void block_vanished::visit(controller::depth1::bitd_odpo_controller& controller)
   controller.ndc_pop();
 } /* visit() */
 
-void block_vanished::visit(controller::depth1::bitd_omdpo_controller& controller) {
+void block_vanished::visit(controller::cognitive::depth1::bitd_omdpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_free_block_interactor(controller.current_task());
@@ -185,7 +185,7 @@ void block_vanished::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void block_vanished::visit(controller::depth2::birtd_mdpo_controller& controller) {
+void block_vanished::visit(controller::cognitive::depth2::birtd_mdpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_free_block_interactor(controller.current_task());
@@ -193,7 +193,7 @@ void block_vanished::visit(controller::depth2::birtd_mdpo_controller& controller
   controller.ndc_pop();
 } /* visit() */
 
-void block_vanished::visit(controller::depth2::birtd_dpo_controller& controller) {
+void block_vanished::visit(controller::cognitive::depth2::birtd_dpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_free_block_interactor(controller.current_task());
@@ -202,7 +202,7 @@ void block_vanished::visit(controller::depth2::birtd_dpo_controller& controller)
 } /* visit() */
 
 void block_vanished::visit(
-    controller::depth2::birtd_omdpo_controller& controller) {
+    controller::cognitive::depth2::birtd_omdpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_free_block_interactor(controller.current_task());
@@ -210,7 +210,7 @@ void block_vanished::visit(
   controller.ndc_pop();
 } /* visit() */
 
-void block_vanished::visit(controller::depth2::birtd_odpo_controller& controller) {
+void block_vanished::visit(controller::cognitive::depth2::birtd_odpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_free_block_interactor(controller.current_task());

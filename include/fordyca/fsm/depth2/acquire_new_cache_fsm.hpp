@@ -36,7 +36,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace controller { class cache_sel_matrix; }
+namespace controller::cognitive { class cache_sel_matrix; }
 namespace ds { class dpo_store; }
 
 NS_START(fsm);
@@ -82,8 +82,8 @@ class acquire_new_cache_fsm final : public rer::client<acquire_new_cache_fsm>,
   bool cache_acquired_cb(bool explore_result) const;
 
   /* clang-format off */
-  const controller::cache_sel_matrix* const mc_matrix;
-  const ds::dpo_store*      const           mc_store;
+  const controller::cognitive::cache_sel_matrix* const mc_matrix;
+  const ds::dpo_store*      const                      mc_store;
   /* clang-format on */
 };
 

@@ -30,7 +30,7 @@
 #include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
 #include "cosm/ta/taskable.hpp"
 
-#include "fordyca/controller/block_sel_matrix.hpp"
+#include "fordyca/controller/cognitive/block_sel_matrix.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/fsm/foraging_transport_goal.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
@@ -92,8 +92,8 @@ class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
                        const rtypes::type_uuid& id) const;
 
   /* clang-format off */
-  const controller::block_sel_matrix* const mc_matrix;
-  const ds::dpo_store*      const           mc_store;
+  const controller::cognitive::block_sel_matrix* const mc_matrix;
+  const ds::dpo_store*      const                      mc_store;
   /* clang-format on */
 };
 

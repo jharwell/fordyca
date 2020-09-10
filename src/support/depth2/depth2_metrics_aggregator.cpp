@@ -36,7 +36,7 @@
 #include "cosm/ta/metrics/execution_metrics.hpp"
 #include "cosm/ta/metrics/execution_metrics_collector.hpp"
 
-#include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth2/birtd_mdpo_controller.hpp"
 #include "fordyca/metrics/caches/site_selection_metrics_collector.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"

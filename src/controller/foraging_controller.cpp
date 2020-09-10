@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca//controller/foraging_controller.hpp"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <filesystem>

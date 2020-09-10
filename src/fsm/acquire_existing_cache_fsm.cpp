@@ -40,7 +40,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
-using cselm = controller::cache_sel_matrix;
 
 /*******************************************************************************
  * Constructors/Destructors

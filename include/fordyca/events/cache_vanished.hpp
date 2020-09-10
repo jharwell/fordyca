@@ -77,16 +77,16 @@ class cache_vanished : public rer::client<cache_vanished> {
   void visit(fsm::depth1::cached_block_to_nest_fsm& fsm);
   void visit(tasks::depth1::collector& task);
   void visit(tasks::depth1::harvester& task);
-  void visit(controller::depth1::bitd_dpo_controller& controller);
-  void visit(controller::depth1::bitd_mdpo_controller& controller);
-  void visit(controller::depth1::bitd_odpo_controller& controller);
-  void visit(controller::depth1::bitd_omdpo_controller& controller);
+  void visit(controller::cognitive::depth1::bitd_dpo_controller& controller);
+  void visit(controller::cognitive::depth1::bitd_mdpo_controller& controller);
+  void visit(controller::cognitive::depth1::bitd_odpo_controller& controller);
+  void visit(controller::cognitive::depth1::bitd_omdpo_controller& controller);
 
   /* depth2 foraging */
-  void visit(controller::depth2::birtd_dpo_controller& controller);
-  void visit(controller::depth2::birtd_mdpo_controller& controller);
-  void visit(controller::depth2::birtd_odpo_controller& controller);
-  void visit(controller::depth2::birtd_omdpo_controller& controller);
+  void visit(controller::cognitive::depth2::birtd_dpo_controller& controller);
+  void visit(controller::cognitive::depth2::birtd_mdpo_controller& controller);
+  void visit(controller::cognitive::depth2::birtd_odpo_controller& controller);
+  void visit(controller::cognitive::depth2::birtd_omdpo_controller& controller);
   void visit(tasks::depth2::cache_transferer& task);
 
  private:

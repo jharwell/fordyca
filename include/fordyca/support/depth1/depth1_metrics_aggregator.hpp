@@ -36,9 +36,9 @@
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
 #include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
 #include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
-#include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca//controller/foraging_controller.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
-#include "fordyca/controller/foraging_perception_subsystem.hpp"
+#include "fordyca/controller/cognitive/foraging_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces

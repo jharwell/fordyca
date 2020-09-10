@@ -49,7 +49,7 @@
 #include "cosm/ta/metrics/execution_metrics.hpp"
 #include "cosm/ta/metrics/execution_metrics_collector.hpp"
 
-#include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth1/bitd_mdpo_controller.hpp"
 #include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"

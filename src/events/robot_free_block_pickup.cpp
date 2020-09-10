@@ -25,21 +25,21 @@
 
 #include "cosm/repr/base_block3D.hpp"
 
-#include "fordyca/controller/depth0/crw_controller.hpp"
-#include "fordyca/controller/depth0/dpo_controller.hpp"
-#include "fordyca/controller/depth0/mdpo_controller.hpp"
-#include "fordyca/controller/depth0/odpo_controller.hpp"
-#include "fordyca/controller/depth0/omdpo_controller.hpp"
-#include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
-#include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
-#include "fordyca/controller/depth1/bitd_odpo_controller.hpp"
-#include "fordyca/controller/depth1/bitd_omdpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_odpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_omdpo_controller.hpp"
-#include "fordyca/controller/dpo_perception_subsystem.hpp"
-#include "fordyca/controller/mdpo_perception_subsystem.hpp"
+#include "fordyca/controller/reactive/depth0/crw_controller.hpp"
+#include "fordyca/controller/cognitive/depth0/dpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth0/mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth0/odpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth0/omdpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth1/bitd_dpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth1/bitd_mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth1/bitd_odpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth1/bitd_omdpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth2/birtd_dpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth2/birtd_mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth2/birtd_odpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth2/birtd_omdpo_controller.hpp"
+#include "fordyca/controller/cognitive/dpo_perception_subsystem.hpp"
+#include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cell2D_empty.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
@@ -133,7 +133,7 @@ void robot_free_block_pickup::d0_mdpo_controller_visit(
  * CRW Foraging
  ******************************************************************************/
 void robot_free_block_pickup::visit(
-    controller::depth0::crw_controller& controller) {
+    controller::reactive::depth0::crw_controller& controller) {
   controller.ndc_pusht();
 
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
@@ -195,22 +195,22 @@ void robot_free_block_pickup::visit(fsm::depth0::dpo_fsm& fsm) {
 } /* visit() */
 
 void robot_free_block_pickup::visit(
-    controller::depth0::mdpo_controller& controller) {
+    controller::cognitive::depth0::mdpo_controller& controller) {
   d0_mdpo_controller_visit(controller);
 } /* visit() */
 
 void robot_free_block_pickup::visit(
-    controller::depth0::omdpo_controller& controller) {
+    controller::cognitive::depth0::omdpo_controller& controller) {
   d0_mdpo_controller_visit(controller);
 } /* visit() */
 
 void robot_free_block_pickup::visit(
-    controller::depth0::dpo_controller& controller) {
+    controller::cognitive::depth0::dpo_controller& controller) {
   d0_dpo_controller_visit(controller);
 } /* visit() */
 
 void robot_free_block_pickup::visit(
-    controller::depth0::odpo_controller& controller) {
+    controller::cognitive::depth0::odpo_controller& controller) {
   d0_dpo_controller_visit(controller);
 } /* visit() */
 
@@ -218,22 +218,22 @@ void robot_free_block_pickup::visit(
  * DPO/MDPO Depth1 Foraging
  ******************************************************************************/
 void robot_free_block_pickup::visit(
-    controller::depth1::bitd_dpo_controller& controller) {
+    controller::cognitive::depth1::bitd_dpo_controller& controller) {
   d1d2_dpo_controller_visit(controller);
 } /* visit() */
 
 void robot_free_block_pickup::visit(
-    controller::depth1::bitd_odpo_controller& controller) {
+    controller::cognitive::depth1::bitd_odpo_controller& controller) {
   d1d2_dpo_controller_visit(controller);
 } /* visit() */
 
 void robot_free_block_pickup::visit(
-    controller::depth1::bitd_mdpo_controller& controller) {
+    controller::cognitive::depth1::bitd_mdpo_controller& controller) {
   d1d2_mdpo_controller_visit(controller);
 } /* visit() */
 
 void robot_free_block_pickup::visit(
-    controller::depth1::bitd_omdpo_controller& controller) {
+    controller::cognitive::depth1::bitd_omdpo_controller& controller) {
   d1d2_mdpo_controller_visit(controller);
 } /* visit() */
 
@@ -259,22 +259,22 @@ void robot_free_block_pickup::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
  * DPO/MDPO Depth2 Foraging
  ******************************************************************************/
 void robot_free_block_pickup::visit(
-    controller::depth2::birtd_dpo_controller& controller) {
+    controller::cognitive::depth2::birtd_dpo_controller& controller) {
   d1d2_dpo_controller_visit(controller);
 } /* visit() */
 
 void robot_free_block_pickup::visit(
-    controller::depth2::birtd_mdpo_controller& controller) {
+    controller::cognitive::depth2::birtd_mdpo_controller& controller) {
   d1d2_mdpo_controller_visit(controller);
 } /* visit() */
 
 void robot_free_block_pickup::visit(
-    controller::depth2::birtd_odpo_controller& controller) {
+    controller::cognitive::depth2::birtd_odpo_controller& controller) {
   d1d2_dpo_controller_visit(controller);
 } /* visit() */
 
 void robot_free_block_pickup::visit(
-    controller::depth2::birtd_omdpo_controller& controller) {
+    controller::cognitive::depth2::birtd_omdpo_controller& controller) {
   d1d2_mdpo_controller_visit(controller);
 } /* visit() */
 

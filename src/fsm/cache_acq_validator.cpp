@@ -26,21 +26,21 @@
 #include "cosm/arena/repr/base_cache.hpp"
 
 #include "fordyca/config/cache_sel/cache_pickup_policy_config.hpp"
-#include "fordyca/controller/cache_sel_matrix.hpp"
+#include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, fsm);
-using cselm = controller::cache_sel_matrix;
+using cselm = controller::cognitive::cache_sel_matrix;
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 cache_acq_validator::cache_acq_validator(
     const ds::dp_cache_map* dpo_map,
-    const controller::cache_sel_matrix* csel_matrix,
+    const controller::cognitive::cache_sel_matrix* csel_matrix,
     bool for_pickup)
     : ER_CLIENT_INIT("fordyca.fsm.cache_acq_validator"),
       mc_for_pickup(for_pickup),

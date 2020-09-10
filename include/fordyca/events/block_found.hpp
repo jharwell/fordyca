@@ -86,10 +86,10 @@ class block_found : public rer::client<block_found>, public cdops::cell2D_op {
   void visit(ds::dpo_semantic_map& map);
 
   /* depth2 foraging */
-  void visit(controller::depth2::birtd_dpo_controller& c);
-  void visit(controller::depth2::birtd_mdpo_controller& c);
-  void visit(controller::depth2::birtd_odpo_controller& c);
-  void visit(controller::depth2::birtd_omdpo_controller& c);
+  void visit(controller::cognitive::depth2::birtd_dpo_controller& c);
+  void visit(controller::cognitive::depth2::birtd_mdpo_controller& c);
+  void visit(controller::cognitive::depth2::birtd_odpo_controller& c);
+  void visit(controller::cognitive::depth2::birtd_omdpo_controller& c);
 
  private:
   void pheromone_update(ds::dpo_semantic_map& map);

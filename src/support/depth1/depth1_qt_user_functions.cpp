@@ -29,14 +29,14 @@ RCPPSW_WARNING_DISABLE_OVERLOADED_VIRTUAL()
 RCPPSW_WARNING_DISABLE_POP()
 #include "cosm/vis/task_visualizer.hpp"
 
-#include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
+#include "fordyca/controller/cognitive/depth1/bitd_dpo_controller.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
-namespace controller = controller::depth1;
+namespace controller = controller::cognitive::depth1;
 
 /*******************************************************************************
  * Constructors/Destructor

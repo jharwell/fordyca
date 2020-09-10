@@ -47,7 +47,7 @@ class arena_cache;
 
 NS_START(fordyca);
 
-namespace controller {
+namespace controller::cognitive {
 class cache_sel_matrix;
 }
 
@@ -107,16 +107,16 @@ class robot_cached_block_pickup : public rer::client<robot_cached_block_pickup>,
   void visit(tasks::depth1::collector& task);
   void visit(fsm::block_to_goal_fsm& fsm);
   void visit(fsm::depth1::cached_block_to_nest_fsm& fsm);
-  void visit(controller::depth1::bitd_dpo_controller& controller);
-  void visit(controller::depth1::bitd_mdpo_controller& controller);
-  void visit(controller::depth1::bitd_odpo_controller& controller);
-  void visit(controller::depth1::bitd_omdpo_controller& controller);
+  void visit(controller::cognitive::depth1::bitd_dpo_controller& controller);
+  void visit(controller::cognitive::depth1::bitd_mdpo_controller& controller);
+  void visit(controller::cognitive::depth1::bitd_odpo_controller& controller);
+  void visit(controller::cognitive::depth1::bitd_omdpo_controller& controller);
 
   /* depth2 foraging */
-  void visit(controller::depth2::birtd_dpo_controller& controller);
-  void visit(controller::depth2::birtd_mdpo_controller& controller);
-  void visit(controller::depth2::birtd_odpo_controller& controller);
-  void visit(controller::depth2::birtd_omdpo_controller& controller);
+  void visit(controller::cognitive::depth2::birtd_dpo_controller& controller);
+  void visit(controller::cognitive::depth2::birtd_mdpo_controller& controller);
+  void visit(controller::cognitive::depth2::birtd_odpo_controller& controller);
+  void visit(controller::cognitive::depth2::birtd_omdpo_controller& controller);
   void visit(tasks::depth2::cache_transferer& task);
   void visit(tasks::depth2::cache_collector& task);
 
@@ -125,7 +125,7 @@ class robot_cached_block_pickup : public rer::client<robot_cached_block_pickup>,
 
   void dispatch_d1_cache_interactor(tasks::base_foraging_task* task);
   bool dispatch_d2_cache_interactor(tasks::base_foraging_task* task,
-                                    controller::cache_sel_matrix* csel_matrix);
+                                    controller::cognitive::cache_sel_matrix* csel_matrix);
 
   /* clang-format off */
   const rtypes::timestep               mc_timestep;

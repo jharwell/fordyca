@@ -38,7 +38,7 @@ class saa_subsystemQ3D;
 
 NS_START(fordyca);
 
-namespace controller {
+namespace controller::cognitive {
 class cache_sel_matrix;
 class block_sel_matrix;
 } /* namespace controller */
@@ -63,8 +63,8 @@ class foraging_expstrat : public csexpstrat::base_expstrat {
  public:
   struct params {
     params(crfootbot::footbot_saa_subsystem* const saa_in,
-           const controller::block_sel_matrix *const bsel_matrix_in,
-           const controller::cache_sel_matrix *const csel_matrix_in,
+           const controller::cognitive::block_sel_matrix *const bsel_matrix_in,
+           const controller::cognitive::cache_sel_matrix *const csel_matrix_in,
            const ds::dpo_store *const dpo_store_in,
            const rutils::color& ledtaxis_target_in)
         : saa(saa_in),
@@ -74,8 +74,8 @@ class foraging_expstrat : public csexpstrat::base_expstrat {
           ledtaxis_target(ledtaxis_target_in) {}
 
     crfootbot::footbot_saa_subsystem* saa;
-    const controller::block_sel_matrix *bsel_matrix;
-    const controller::cache_sel_matrix *csel_matrix;
+    const controller::cognitive::block_sel_matrix *bsel_matrix;
+    const controller::cognitive::cache_sel_matrix *csel_matrix;
     const ds::dpo_store *dpo_store;
     rutils::color ledtaxis_target;
   };

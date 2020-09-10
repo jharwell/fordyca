@@ -36,7 +36,7 @@
 #include "cosm/vis/config/visualization_config.hpp"
 
 #include "fordyca/config/tv/tv_manager_config.hpp"
-#include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca//controller/foraging_controller.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/support/tv/fordyca_pd_adaptor.hpp"
 

@@ -29,8 +29,10 @@
 #include "fordyca/controller/controller_fwd.hpp"
 #include "cosm/oracle/tasking_oracle.hpp"
 #include "cosm/vis/config/visualization_config.hpp"
+#include "cosm/foraging/oracle/foraging_oracle.hpp"
+
 #include "fordyca/support/depth1/depth1_metrics_aggregator.hpp"
-#include "fordyca/controller/oracular_info_receptor.hpp"
+#include "fordyca/controller/cognitive/oracular_info_receptor.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -112,7 +114,7 @@ class robot_configurer {
       m_oracle->tasking()->listener_add(c->executive());
     }
     if (nullptr != m_oracle) {
-      auto receptor = std::make_unique<controller::oracular_info_receptor>(m_oracle);
+      auto receptor = std::make_unique<controller::cognitive::oracular_info_receptor>(m_oracle);
       c->oracle_init(std::move(receptor));
     }
   } /* controller_config_oracle() */

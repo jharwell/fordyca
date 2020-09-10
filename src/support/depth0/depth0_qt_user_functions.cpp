@@ -31,8 +31,8 @@ RCPPSW_WARNING_DISABLE_POP()
 
 #include "cosm/vis/block_carry_visualizer.hpp"
 
-#include "fordyca/controller/depth0/mdpo_controller.hpp"
-#include "fordyca/controller/mdpo_perception_subsystem.hpp"
+#include "fordyca/controller/cognitive/depth0/mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "cosm/vis/polygon2D_visualizer.hpp"
 
@@ -53,7 +53,7 @@ depth0_qt_user_functions::depth0_qt_user_functions(void) {
  * Member Functions
  ******************************************************************************/
 void depth0_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
-  auto* mdpo = dynamic_cast<const controller::depth0::mdpo_controller*>(
+  auto* mdpo = dynamic_cast<const controller::cognitive::depth0::mdpo_controller*>(
       &c_entity.GetControllableEntity().GetController());
   auto* base = dynamic_cast<const controller::foraging_controller*>(
       &c_entity.GetControllableEntity().GetController());

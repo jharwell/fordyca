@@ -25,20 +25,20 @@
 
 #include "cosm/arena/repr/base_cache.hpp"
 
-#include "fordyca/controller/cache_sel_matrix.hpp"
+#include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/math/cache_site_utility.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm, depth2);
-using cselm = controller::cache_sel_matrix;
+using cselm = controller::cognitive::cache_sel_matrix;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 cache_site_selector::cache_site_selector(
-    const controller::cache_sel_matrix* const matrix)
+    const controller::cognitive::cache_sel_matrix* const matrix)
     : ER_CLIENT_INIT("fordyca.controller.depth2.cache_site_selector"),
       mc_matrix(matrix) {}
 

@@ -33,7 +33,7 @@
 #include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/foraging/block_dist/base_distributor.hpp"
 
-#include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca//controller/foraging_controller.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
 #include "fordyca/metrics/tv/env_dynamics_metrics_collector.hpp"
 #include "fordyca/support/base_loop_functions.hpp"

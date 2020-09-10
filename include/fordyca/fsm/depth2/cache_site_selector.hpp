@@ -44,7 +44,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace controller {
+namespace controller::cognitive {
 class cache_sel_matrix;
 } /* namespace controller */
 
@@ -81,7 +81,7 @@ class cache_site_selector: public rer::client<cache_site_selector> {
   using cache_constraint_vector = std::vector<cache_constraint_data>;
   using nest_constraint_vector = std::vector<nest_constraint_data>;
 
-  explicit cache_site_selector(const controller::cache_sel_matrix* matrix);
+  explicit cache_site_selector(const controller::cognitive::cache_sel_matrix* matrix);
 
   ~cache_site_selector(void) override = default;
   cache_site_selector& operator=(const cache_site_selector&) = delete;
@@ -162,7 +162,7 @@ class cache_site_selector: public rer::client<cache_site_selector> {
   std::string nlopt_ret_str(nlopt::result res) const;
 
   /* clang-format off */
-  const controller::cache_sel_matrix* const mc_matrix;
+  const controller::cognitive::cache_sel_matrix* const mc_matrix;
 
   nlopt::result   m_nlopt_res{};
   nlopt::opt      m_alg{nlopt::algorithm::GN_ISRES, 2};

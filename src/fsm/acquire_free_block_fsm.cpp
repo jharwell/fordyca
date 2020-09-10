@@ -28,7 +28,7 @@
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
-#include "fordyca/controller/block_selector.hpp"
+#include "fordyca/controller/cognitive/block_selector.hpp"
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/block_acq_validator.hpp"
@@ -115,7 +115,7 @@ bool acquire_free_block_fsm::block_acquired_cb(bool explore_result) const {
 
 boost::optional<csfsm::acquire_goal_fsm::candidate_type> acquire_free_block_fsm::
     block_select(void) const {
-  controller::block_selector selector(mc_matrix);
+  controller::cognitive::block_selector selector(mc_matrix);
 
   if (auto best = selector(mc_store->blocks(), saa()->sensing()->rpos2D())) {
     return boost::make_optional(acquire_goal_fsm::candidate_type(

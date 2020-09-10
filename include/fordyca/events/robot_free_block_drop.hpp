@@ -40,7 +40,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace fordyca::controller {
+namespace fordyca::controller::cognitive {
 class block_sel_matrix;
 } /* namespace fordyca::controller */
 
@@ -96,16 +96,16 @@ class robot_free_block_drop : public rer::client<robot_free_block_drop>,
   robot_free_block_drop& operator=(const robot_free_block_drop& op) = delete;
 
   /* depth1 */
-  void visit(controller::depth1::bitd_dpo_controller&) {}
-  void visit(controller::depth1::bitd_mdpo_controller&) {}
-  void visit(controller::depth1::bitd_odpo_controller&) {}
-  void visit(controller::depth1::bitd_omdpo_controller&) {}
+  void visit(controller::cognitive::depth1::bitd_dpo_controller&) {}
+  void visit(controller::cognitive::depth1::bitd_mdpo_controller&) {}
+  void visit(controller::cognitive::depth1::bitd_odpo_controller&) {}
+  void visit(controller::cognitive::depth1::bitd_omdpo_controller&) {}
 
   /* depth2 */
-  void visit(controller::depth2::birtd_dpo_controller&);
-  void visit(controller::depth2::birtd_mdpo_controller&);
-  void visit(controller::depth2::birtd_odpo_controller&);
-  void visit(controller::depth2::birtd_omdpo_controller&);
+  void visit(controller::cognitive::depth2::birtd_dpo_controller&);
+  void visit(controller::cognitive::depth2::birtd_mdpo_controller&);
+  void visit(controller::cognitive::depth2::birtd_odpo_controller&);
+  void visit(controller::cognitive::depth2::birtd_omdpo_controller&);
   void visit(tasks::depth2::cache_starter&);
   void visit(tasks::depth2::cache_finisher&);
 
@@ -123,7 +123,7 @@ class robot_free_block_drop : public rer::client<robot_free_block_drop>,
   void visit(fsm::block_to_goal_fsm& fsm);
 
   bool dispatch_free_block_interactor(tasks::base_foraging_task* task,
-                                      controller::block_sel_matrix* bsel_matrix);
+                                      controller::cognitive::block_sel_matrix* bsel_matrix);
 
   /* clang-format off */
   const rtypes::discretize_ratio       mc_resolution;

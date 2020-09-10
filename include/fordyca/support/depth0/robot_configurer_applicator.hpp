@@ -53,11 +53,11 @@ class robot_configurer_applicator {
   explicit robot_configurer_applicator(controller::foraging_controller* const c)
       : m_controller(c) {}
 
-  void operator()(robot_configurer<controller::depth0::crw_controller>& ) const {}
+  void operator()(robot_configurer<controller::reactive::depth0::crw_controller>& ) const {}
 
   template<typename T,
            RCPPSW_SFINAE_FUNC(!std::is_same<T,
-                                 controller::depth0::crw_controller>::value)>
+                              controller::reactive::depth0::crw_controller>::value)>
   void operator()(robot_configurer<T>& configurer) const {
     auto cast = dynamic_cast<typename support::depth0::robot_configurer<T>::controller_type*>(m_controller);
     configurer(cast);

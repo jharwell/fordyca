@@ -71,10 +71,10 @@ class block_proximity : public rer::client<block_proximity> {
   block_proximity& operator=(const block_proximity& op) = delete;
 
   /* depth2 foraging */
-  void visit(controller::depth2::birtd_dpo_controller& c);
-  void visit(controller::depth2::birtd_mdpo_controller& c);
-  void visit(controller::depth2::birtd_odpo_controller& c);
-  void visit(controller::depth2::birtd_omdpo_controller& c);
+  void visit(controller::cognitive::depth2::birtd_dpo_controller& c);
+  void visit(controller::cognitive::depth2::birtd_mdpo_controller& c);
+  void visit(controller::cognitive::depth2::birtd_odpo_controller& c);
+  void visit(controller::cognitive::depth2::birtd_omdpo_controller& c);
   void visit(fsm::block_to_goal_fsm& fsm);
   void visit(tasks::depth2::cache_starter& task);
 

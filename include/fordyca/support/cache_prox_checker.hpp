@@ -29,7 +29,7 @@
 #include "cosm/arena/caching_arena_map.hpp"
 
 #include "fordyca/events/cache_proximity.hpp"
-#include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca//controller/foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

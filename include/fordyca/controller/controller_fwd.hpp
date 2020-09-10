@@ -30,40 +30,76 @@
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
- * Macros
+ * Depth0 Macros
  ******************************************************************************/
-#define DEPTH0_NON_ORACULAR_CONTROLLER_TYPES                              \
-  controller::depth0::crw_controller, controller::depth0::dpo_controller, \
-      controller::depth0::mdpo_controller
+#define DEPTH0_NON_ORACULAR_CONTROLLER_TYPES                            \
+  controller::reactive::depth0::crw_controller,                         \
+    controller::cognitive::depth0::dpo_controller,                      \
+    controller::cognitive::depth0::mdpo_controller
 
-#define DEPTH0_ORACULAR_CONTROLLER_TYPES \
-  controller::depth0::odpo_controller, controller::depth0::omdpo_controller
+#define DEPTH0_ORACULAR_CONTROLLER_TYPES        \
+  controller::cognitive::depth0::odpo_controller,       \
+    controller::cognitive::depth0::omdpo_controller
+
+#define DEPTH0_REACTIVE_CONTROLLER_TYPES        \
+  controller::cognitive::depth0::reactive::crw_controller
+
+#define DEPTH0_COGNITIVE_CONTROLLER_TYPES       \
+  controller::cognitive::depth0::dpo_controller,           \
+    controller::cognitive::depth0::mdpo_controller,        \
+    controller::cognitive::depth0::odpo_controller,        \
+    controller::cognitive::depth0::omdpo_controller
 
 #define DEPTH0_CONTROLLER_TYPES \
   DEPTH0_NON_ORACULAR_CONTROLLER_TYPES, DEPTH0_ORACULAR_CONTROLLER_TYPES
 
-#define DEPTH1_ORACULAR_CONTROLLER_TYPES    \
-  controller::depth1::bitd_odpo_controller, \
-      controller::depth1::bitd_omdpo_controller
+/*******************************************************************************
+ * Depth1 Macros
+ ******************************************************************************/
+#define DEPTH1_ORACULAR_CONTROLLER_TYPES        \
+  controller::cognitive::depth1::bitd_odpo_controller,     \
+    controller::cognitive::depth1::bitd_omdpo_controller
 
-#define DEPTH1_NON_ORACULAR_CONTROLLER_TYPES \
-  controller::depth1::bitd_dpo_controller,   \
-      controller::depth1::bitd_mdpo_controller
+#define DEPTH1_NON_ORACULAR_CONTROLLER_TYPES    \
+  controller::cognitive::depth1::bitd_dpo_controller,      \
+    controller::cognitive::depth1::bitd_mdpo_controller
 
-#define DEPTH1_CONTROLLER_TYPES \
+#define DEPTH1_REACTIVE_CONTROLLER_TYPES
+
+#define DEPTH1_COGNITIVE_CONTROLLER_TYPES            \
+  controller::cognitive::depth1::bitd_dpo_controller,           \
+    controller::cognitive::depth1::btd_mdpo_controller,         \
+    controller::cognitive::depth1::bitd_odpo_controller,        \
+    controller::cognitive::depth1::bitd_omdpo_controller
+
+#define DEPTH1_CONTROLLER_TYPES                                         \
   DEPTH1_NON_ORACULAR_CONTROLLER_TYPES, DEPTH1_ORACULAR_CONTROLLER_TYPES
 
+/*******************************************************************************
+ * Depth2 Macros
+ ******************************************************************************/
 #define DEPTH2_ORACULAR_CONTROLLER_TYPES     \
-  controller::depth2::birtd_odpo_controller, \
-      controller::depth2::birtd_omdpo_controller
+  controller::cognitive::depth2::birtd_odpo_controller, \
+      controller::cognitive::depth2::birtd_omdpo_controller
 
 #define DEPTH2_NON_ORACULAR_CONTROLLER_TYPES \
-  controller::depth2::birtd_dpo_controller,  \
-      controller::depth2::birtd_mdpo_controller
+  controller::cognitive::depth2::birtd_dpo_controller,  \
+      controller::cognitive::depth2::birtd_mdpo_controller
+
+#define DEPTH2_REACTIVE_CONTROLLER_TYPES
+
+#define DEPTH2_COGNITIVE_CONTROLLER_TYPES       \
+  controller::cognitive::depth2::birtd_dpo_controller,      \
+    controller::cognitive::depth2::birtd_mdpo_controller,    \
+    controller::cognitive::depth2::birtd_odpo_controller,   \
+    controller::cognitive::depth2::birtd_omdpo_controller
 
 #define DEPTH2_CONTROLLER_TYPES \
   DEPTH2_NON_ORACULAR_CONTROLLER_TYPES, DEPTH2_ORACULAR_CONTROLLER_TYPES
 
+/*******************************************************************************
+ * Other Macros
+ ******************************************************************************/
 #define ORACULAR_CONTROLLER_TYPES                                     \
   DEPTH0_ORACULAR_CONTROLLER_TYPES, DEPTH1_ORACULAR_CONTROLLER_TYPES, \
       DEPTH2_ORACULAR_CONTROLLER_TYPES
@@ -80,32 +116,40 @@
  ******************************************************************************/
 NS_START(fordyca, controller);
 class foraging_controller;
-namespace depth0 {
+namespace reactive::depth0 {
 class crw_controller;
+}
+namespace cognitive::depth0 {
 class dpo_controller;
 class odpo_controller;
 class mdpo_controller;
 class omdpo_controller;
+}
+namespace depth0 {
 using oracular_typelist = rmpl::typelist<DEPTH0_ORACULAR_CONTROLLER_TYPES>;
 using non_oracular_typelist =
     rmpl::typelist<DEPTH0_NON_ORACULAR_CONTROLLER_TYPES>;
 using typelist = rmpl::typelist<DEPTH0_ORACULAR_CONTROLLER_TYPES,
                                 DEPTH0_NON_ORACULAR_CONTROLLER_TYPES>;
-} // namespace depth0
-namespace depth1 {
+}
+namespace cognitive::depth1 {
 class bitd_dpo_controller;
 class bitd_mdpo_controller;
 class bitd_odpo_controller;
 class bitd_omdpo_controller;
+}
+namespace depth1 {
 using oracular_typelist = rmpl::typelist<DEPTH1_ORACULAR_CONTROLLER_TYPES>;
 using typelist = rmpl::typelist<DEPTH1_ORACULAR_CONTROLLER_TYPES,
                                 DEPTH1_NON_ORACULAR_CONTROLLER_TYPES>;
 } // namespace depth1
-namespace depth2 {
+namespace cognitive::depth2 {
 class birtd_dpo_controller;
 class birtd_mdpo_controller;
 class birtd_odpo_controller;
 class birtd_omdpo_controller;
+}
+namespace depth2 {
 using oracular_typelist = rmpl::typelist<DEPTH2_ORACULAR_CONTROLLER_TYPES>;
 using typelist = rmpl::typelist<DEPTH2_ORACULAR_CONTROLLER_TYPES,
                                 DEPTH2_NON_ORACULAR_CONTROLLER_TYPES>;

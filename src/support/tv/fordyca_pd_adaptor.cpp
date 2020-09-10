@@ -27,7 +27,7 @@
 #include "cosm/arena/operations/free_block_drop.hpp"
 #include "cosm/repr/base_block3D.hpp"
 
-#include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca//controller/foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

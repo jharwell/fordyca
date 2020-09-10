@@ -66,12 +66,12 @@ class robot_los_update_applicator {
    * If the controller is not derived from DPO, then there is no LOS to update.
    */
   template<typename TController,
-           RCPPSW_SFINAE_FUNC(!std::is_base_of<controller::depth0::dpo_controller,
+           RCPPSW_SFINAE_FUNC(!std::is_base_of<controller::cognitive::depth0::dpo_controller,
                               TController>::value)>
   void operator()(los_update_op_type<TController>& ) const {}
 
   template<typename TController,
-           RCPPSW_SFINAE_FUNC(std::is_base_of<controller::depth0::dpo_controller,
+           RCPPSW_SFINAE_FUNC(std::is_base_of<controller::cognitive::depth0::dpo_controller,
                               TController>::value)>
   void operator()(los_update_op_type<TController>& impl) const {
     impl(dynamic_cast<TController*>(controller));

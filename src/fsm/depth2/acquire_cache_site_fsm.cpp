@@ -26,7 +26,7 @@
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
-#include "fordyca/controller/cache_sel_matrix.hpp"
+#include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/depth2/cache_site_selector.hpp"
@@ -36,7 +36,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm, depth2);
-using cselm = controller::cache_sel_matrix;
 
 /*******************************************************************************
  * Constructors/Destructors

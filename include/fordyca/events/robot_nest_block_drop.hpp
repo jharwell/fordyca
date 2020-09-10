@@ -88,25 +88,25 @@ class robot_nest_block_drop : public rer::client<robot_nest_block_drop> {
   robot_nest_block_drop& operator=(const robot_nest_block_drop& op) = delete;
 
   /* Depth0 DPO/MDPO foraging */
-  void visit(controller::depth0::crw_controller& controller);
-  void visit(controller::depth0::dpo_controller& controller);
-  void visit(controller::depth0::mdpo_controller& controller);
-  void visit(controller::depth0::odpo_controller& controller);
-  void visit(controller::depth0::omdpo_controller& controller);
+  void visit(controller::reactive::depth0::crw_controller& controller);
+  void visit(controller::cognitive::depth0::dpo_controller& controller);
+  void visit(controller::cognitive::depth0::mdpo_controller& controller);
+  void visit(controller::cognitive::depth0::odpo_controller& controller);
+  void visit(controller::cognitive::depth0::omdpo_controller& controller);
 
   /* Depth1 foraging */
-  void visit(controller::depth1::bitd_dpo_controller& controller);
-  void visit(controller::depth1::bitd_mdpo_controller& controller);
-  void visit(controller::depth1::bitd_odpo_controller& controller);
-  void visit(controller::depth1::bitd_omdpo_controller& controller);
+  void visit(controller::cognitive::depth1::bitd_dpo_controller& controller);
+  void visit(controller::cognitive::depth1::bitd_mdpo_controller& controller);
+  void visit(controller::cognitive::depth1::bitd_odpo_controller& controller);
+  void visit(controller::cognitive::depth1::bitd_omdpo_controller& controller);
   void visit(tasks::depth1::collector& task);
   void visit(tasks::depth0::generalist& task);
 
   /* depth2 foraging */
-  void visit(controller::depth2::birtd_dpo_controller& controller);
-  void visit(controller::depth2::birtd_mdpo_controller& controller);
-  void visit(controller::depth2::birtd_odpo_controller& controller);
-  void visit(controller::depth2::birtd_omdpo_controller& controller);
+  void visit(controller::cognitive::depth2::birtd_dpo_controller& controller);
+  void visit(controller::cognitive::depth2::birtd_mdpo_controller& controller);
+  void visit(controller::cognitive::depth2::birtd_odpo_controller& controller);
+  void visit(controller::cognitive::depth2::birtd_omdpo_controller& controller);
 
  private:
   void visit(fsm::depth0::free_block_to_nest_fsm& fsm);

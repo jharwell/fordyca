@@ -79,11 +79,11 @@ class block_vanished : public rer::client<block_vanished> {
   block_vanished& operator=(const block_vanished&) = delete;
 
   /* depth0 foraging */
-  void visit(controller::depth0::crw_controller& controller);
-  void visit(controller::depth0::dpo_controller& controller);
-  void visit(controller::depth0::mdpo_controller& controller);
-  void visit(controller::depth0::odpo_controller& controller);
-  void visit(controller::depth0::omdpo_controller& controller);
+  void visit(controller::reactive::depth0::crw_controller& controller);
+  void visit(controller::cognitive::depth0::dpo_controller& controller);
+  void visit(controller::cognitive::depth0::mdpo_controller& controller);
+  void visit(controller::cognitive::depth0::odpo_controller& controller);
+  void visit(controller::cognitive::depth0::omdpo_controller& controller);
   void visit(tasks::depth0::generalist& task);
   void visit(fsm::depth0::crw_fsm& fsm);
   void visit(fsm::depth0::dpo_fsm& fsm);
@@ -92,16 +92,16 @@ class block_vanished : public rer::client<block_vanished> {
   void visit(fsm::depth0::free_block_to_nest_fsm& fsm);
   void visit(fsm::block_to_goal_fsm& fsm);
   void visit(tasks::depth1::harvester& task);
-  void visit(controller::depth1::bitd_dpo_controller& controller);
-  void visit(controller::depth1::bitd_mdpo_controller& controller);
-  void visit(controller::depth1::bitd_odpo_controller& controller);
-  void visit(controller::depth1::bitd_omdpo_controller& controller);
+  void visit(controller::cognitive::depth1::bitd_dpo_controller& controller);
+  void visit(controller::cognitive::depth1::bitd_mdpo_controller& controller);
+  void visit(controller::cognitive::depth1::bitd_odpo_controller& controller);
+  void visit(controller::cognitive::depth1::bitd_omdpo_controller& controller);
 
   /* depth2 foraging */
-  void visit(controller::depth2::birtd_dpo_controller& controller);
-  void visit(controller::depth2::birtd_mdpo_controller& controller);
-  void visit(controller::depth2::birtd_odpo_controller& controller);
-  void visit(controller::depth2::birtd_omdpo_controller& controller);
+  void visit(controller::cognitive::depth2::birtd_dpo_controller& controller);
+  void visit(controller::cognitive::depth2::birtd_mdpo_controller& controller);
+  void visit(controller::cognitive::depth2::birtd_odpo_controller& controller);
+  void visit(controller::cognitive::depth2::birtd_omdpo_controller& controller);
   void visit(tasks::depth2::cache_starter& task);
   void visit(tasks::depth2::cache_finisher& task);
 

@@ -49,7 +49,7 @@ namespace fordyca::ds {
 class dpo_semantic_map;
 } // namespace fordyca::ds
 
-namespace fordyca::controller {
+namespace fordyca::controller::cognitive {
 class cache_sel_matrix;
 } // namespace fordyca::controller
 
@@ -102,16 +102,16 @@ class robot_cache_block_drop : public rer::client<robot_cache_block_drop>,
   void visit(ds::dpo_semantic_map& map);
   void visit(fsm::block_to_goal_fsm& fsm);
   void visit(tasks::depth1::harvester& task);
-  void visit(controller::depth1::bitd_dpo_controller& controller);
-  void visit(controller::depth1::bitd_mdpo_controller& controller);
-  void visit(controller::depth1::bitd_odpo_controller& controller);
-  void visit(controller::depth1::bitd_omdpo_controller& controller);
+  void visit(controller::cognitive::depth1::bitd_dpo_controller& controller);
+  void visit(controller::cognitive::depth1::bitd_mdpo_controller& controller);
+  void visit(controller::cognitive::depth1::bitd_odpo_controller& controller);
+  void visit(controller::cognitive::depth1::bitd_omdpo_controller& controller);
 
   /* depth2 foraging */
-  void visit(controller::depth2::birtd_dpo_controller& controller);
-  void visit(controller::depth2::birtd_mdpo_controller& controller);
-  void visit(controller::depth2::birtd_odpo_controller& controller);
-  void visit(controller::depth2::birtd_omdpo_controller& controller);
+  void visit(controller::cognitive::depth2::birtd_dpo_controller& controller);
+  void visit(controller::cognitive::depth2::birtd_mdpo_controller& controller);
+  void visit(controller::cognitive::depth2::birtd_odpo_controller& controller);
+  void visit(controller::cognitive::depth2::birtd_omdpo_controller& controller);
   void visit(tasks::depth2::cache_transferer& task);
 
  protected:
@@ -130,7 +130,7 @@ class robot_cache_block_drop : public rer::client<robot_cache_block_drop>,
   /* clang-format off */
   void dispatch_d1_cache_interactor(tasks::base_foraging_task* task);
   bool dispatch_d2_cache_interactor(tasks::base_foraging_task* task,
-                                    controller::cache_sel_matrix* csel_matrix);
+                                    controller::cognitive::cache_sel_matrix* csel_matrix);
 
   const rtypes::discretize_ratio       mc_resolution;
 

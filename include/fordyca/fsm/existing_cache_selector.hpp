@@ -35,7 +35,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace controller {
+namespace controller::cognitive {
 class cache_sel_matrix;
 } /* namespace controller */
 
@@ -55,7 +55,7 @@ NS_START(fsm);
 class existing_cache_selector : public rer::client<existing_cache_selector> {
  public:
   existing_cache_selector(bool is_pickup,
-                          const controller::cache_sel_matrix* matrix,
+                          const controller::cognitive::cache_sel_matrix* matrix,
                           const ds::dp_cache_map* cache_map);
 
   ~existing_cache_selector(void) override = default;
@@ -88,9 +88,9 @@ class existing_cache_selector : public rer::client<existing_cache_selector> {
                          const carepr::base_cache* cache) const;
 
   /* clang-format off */
-  const bool                                mc_is_pickup;
-  const controller::cache_sel_matrix* const mc_matrix;
-  const ds::dp_cache_map* const             mc_cache_map;
+  const bool                                           mc_is_pickup;
+  const controller::cognitive::cache_sel_matrix* const mc_matrix;
+  const ds::dp_cache_map* const                        mc_cache_map;
   /* clang-format on */
 };
 

@@ -43,7 +43,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace fordyca::controller {
+namespace fordyca::controller::cognitive {
 class foraging_perception_subsystem;
 } /* namespace fordyca::controller */
 
@@ -115,7 +115,7 @@ class foraging_controller : public cpal::argos_controller2D_adaptor,
    * \brief By default controllers have no perception subsystem, and are
    * basically blind centipedes.
    */
-  virtual const foraging_perception_subsystem* perception(void) const {
+  virtual const cognitive::foraging_perception_subsystem* perception(void) const {
     return nullptr;
   }
 
@@ -123,7 +123,7 @@ class foraging_controller : public cpal::argos_controller2D_adaptor,
    * \brief By default controllers have no perception subsystem, and are
    * basically blind centipedes.
    */
-  virtual foraging_perception_subsystem* perception(void) { return nullptr; }
+  virtual cognitive::foraging_perception_subsystem* perception(void) { return nullptr; }
 
   /**
    * \brief If \c TRUE, the robot is currently at least most of the way in the
