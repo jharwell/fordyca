@@ -56,13 +56,19 @@ class lifecycle_metrics : public rmetrics::base_metrics {
    * \brief Should return the # caches that have been created in the arena this
    * timestep.
    */
-  virtual uint caches_created(void) const = 0;
+  virtual size_t caches_created(void) const = 0;
+
+  /**
+   * \brief Should return the # caches that have been created, but then
+   * discarded due to constraint violation in the arena this timestep.
+   */
+  virtual size_t caches_discarded(void) const = 0;
 
   /**
    * \brief Should return the # of caches that have been depleted in the arena
    * this timestep.
    */
-  virtual uint caches_depleted(void) const = 0;
+  virtual size_t caches_depleted(void) const = 0;
 
   /**
    * \brief Should return the ages of the caches that were depleted this

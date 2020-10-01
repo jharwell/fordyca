@@ -29,7 +29,7 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitor.hpp"
 
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/fordyca.hpp"
@@ -55,36 +55,38 @@ NS_START(fordyca, events, detail);
 class block_proximity : public rer::client<block_proximity> {
  private:
   struct visit_typelist_impl {
-    using controllers = controller::depth2::typelist;
+    using controllers = controller::d2::typelist;
     using others =
-        rmpl::typelist<fsm::block_to_goal_fsm, tasks::depth2::cache_starter>;
+        rmpl::typelist<fsm::block_to_goal_fsm, tasks::d2::cache_starter>;
     using value = boost::mpl::joint_view<controllers, others::type>;
   };
 
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  explicit block_proximity(crepr::base_block2D* block);
+  explicit block_proximity(crepr::base_block3D* block);
   ~block_proximity(void) override = default;
 
   block_proximity(const block_proximity& op) = delete;
   block_proximity& operator=(const block_proximity& op) = delete;
 
-  /* depth2 foraging */
-  void visit(controller::depth2::birtd_dpo_controller& c);
-  void visit(controller::depth2::birtd_mdpo_controller& c);
-  void visit(controller::depth2::birtd_odpo_controller& c);
-  void visit(controller::depth2::birtd_omdpo_controller& c);
+  /* d2 foraging */
+  void visit(controller::cognitive::d2::birtd_dpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_mdpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_odpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_omdpo_controller& c);
   void visit(fsm::block_to_goal_fsm& fsm);
-  void visit(tasks::depth2::cache_starter& task);
+  void visit(tasks::d2::cache_starter& task);
 
  private:
   void dispatch_cache_starter(tasks::base_foraging_task* task);
 
   /* clang-format off */
-  crepr::base_block2D* m_block;
+  crepr::base_block3D* m_block;
   /* clang-format on */
 };
+
+NS_END(detail);
 
 /**
  * \brief We use the precise visitor in order to force compile errors if a call to
@@ -92,15 +94,7 @@ class block_proximity : public rer::client<block_proximity> {
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using block_proximity_visitor_impl =
-    rpvisitor::precise_visitor<detail::block_proximity,
-                               detail::block_proximity::visit_typelist>;
-
-NS_END(detail);
-
-class block_proximity_visitor : public detail::block_proximity_visitor_impl {
-  using detail::block_proximity_visitor_impl::block_proximity_visitor_impl;
-};
+using block_proximity_visitor = rpvisitor::filtered_visitor<detail::block_proximity>;
 
 NS_END(events, fordyca);
 

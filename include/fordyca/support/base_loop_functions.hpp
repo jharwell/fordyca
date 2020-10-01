@@ -55,7 +55,7 @@ struct convergence_config;
 } /* namespace cosm::convergence */
 
 namespace cosm::pal {
-template<class TControllerType>
+template <class TController>
 class argos_convergence_calculator;
 } /* namespace cosm::pal */
 
@@ -98,7 +98,8 @@ NS_START(support);
 class base_loop_functions : public cpal::argos_sm_adaptor,
                             public rer::client<base_loop_functions> {
  public:
-  using convergence_calculator_type = cpal::argos_convergence_calculator<cpal::argos_controller2D_adaptor>;
+  using convergence_calculator_type =
+      cpal::argos_convergence_calculator<cpal::argos_controller2D_adaptor>;
 
   base_loop_functions(void) RCSW_COLD;
   ~base_loop_functions(void) override RCSW_COLD;
@@ -117,9 +118,8 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
   const convergence_calculator_type* conv_calculator(void) const {
     return m_conv_calc.get();
   }
-  const cforacle::foraging_oracle* oracle(void) const {
-    return m_oracle.get();
-  }
+  const cforacle::foraging_oracle* oracle(void) const { return m_oracle.get(); }
+  const carena::caching_arena_map* arena_map(void) const RCSW_PURE;
 
  protected:
   tv::tv_manager* tv_manager(void) { return m_tv_manager.get(); }
@@ -130,22 +130,26 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
   convergence_calculator_type* conv_calculator(void) {
     return m_conv_calc.get();
   }
-  cforacle::foraging_oracle* oracle(void) {
-    return m_oracle.get();
-  }
-  const carena::caching_arena_map* arena_map(void) const {
-    return argos_sm_adaptor::arena_map<carena::caching_arena_map>();
-  }
-  carena::caching_arena_map* arena_map(void) {
-    return argos_sm_adaptor::arena_map<carena::caching_arena_map>();
-  }
+  cforacle::foraging_oracle* oracle(void) { return m_oracle.get(); }
+  carena::caching_arena_map* arena_map(void) RCSW_PURE;
+  void config_parse(ticpp::Element& node) RCSW_COLD;
+
+  /*
+   * If we are doing a powerlaw distribution we may need to create caches BEFORE
+   * clusters, so that cluster mapping will avoid the placed caches, and we
+   * don't know where the clusters are going to map to ahead of time. This hook
+   * allows derived classes to do that if needed.
+   */
+  void delay_arena_map_init(bool b) { m_delay_arena_map_init = b; }
+  bool delay_arena_map_init(void) const { return m_delay_arena_map_init; }
+
  private:
   /**
    * \brief Initialize convergence calculations.
    *
    * \param config Parsed convergence parameters.
    */
-  void convergence_init(const ccconfig::convergence_config* config) RCSW_COLD;
+  void convergence_init(const cconvconfig::convergence_config* config) RCSW_COLD;
 
   /**
    * \brief Initialize temporal variance handling.
@@ -169,6 +173,7 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
   void oracle_init(const coconfig::aggregate_oracle_config* oraclep) RCSW_COLD;
 
   /* clang-format off */
+  bool                                         m_delay_arena_map_init{false};
   config::loop_function_repository             m_config{};
   std::unique_ptr<tv::tv_manager>              m_tv_manager;
   std::unique_ptr<convergence_calculator_type> m_conv_calc;

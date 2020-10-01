@@ -1,68 +1,106 @@
 Loop Functions XML Configuration
 ================================
 
-The following root XML tags are defined under ``<loop_functions>`` in addition to the ones defined in :xref:`COSM`.
+The following root XML tags are defined under ``<loop_functions>``:
 
-+------------------------+----------------------------+------------------------------------------------------------------------------------------------------------------------------+
-| Root XML tag           | Mandatory For?             | Description                                                                                                                  |
-+------------------------+----------------------------+------------------------------------------------------------------------------------------------------------------------------+
-| ``caches``             | Depth1, depth2 controllers | Parameters for the use of caches in the arena.                                                                               |
-+------------------------+----------------------------+------------------------------------------------------------------------------------------------------------------------------+
++------------------------+----------------------------+------------------------------------------------+
+| Root XML tag           | Mandatory For?             | Description                                    |
++------------------------+----------------------------+------------------------------------------------+
+| ``output``             |             All            | See :xref:`COSM` docs.                         |
++------------------------+----------------------------+------------------------------------------------+
+| ``convergence``        |             None           | See :xref:`COSM` docs.                         |
++------------------------+----------------------------+------------------------------------------------+
+| ``arena_map``          |             All            | See :xref:`COSM` docs.                         |
++------------------------+----------------------------+------------------------------------------------+
+| ``temporal_variance``  |             None           | See :xref:`COSM` docs.                         |
++------------------------+----------------------------+------------------------------------------------+
+| ``visualization``      |             None           | See :xref:`COSM` docs.                         |
++------------------------+----------------------------+------------------------------------------------+
+|  ``oracle_manager``    |             None           | See :xref:`COSM` docs.                         |
++------------------------+----------------------------+------------------------------------------------+
+| ``caches``             | Depth1, depth2 controllers | Parameters for the use of caches in the arena. |
++------------------------+----------------------------+------------------------------------------------+
 
 Any of the following attributes can be added under the ``metrics`` tag in place
 of one of the ``<append>,<create>,<truncate>`` tags, in addition to the ones
 specified in :xref:`COSM`. Not defining them disables metric collection of the
 given type.
 
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| XML attribute                                  | Description                                                                   | Additional Notes                                 |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``block_manipulation``                         | Free block pickup/drop counts/penalties.                                      |                                                  |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``cache_acq_counts``                           | Counts of robots exploring for, vectoring to, and acquiring caches.           |                                                  |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``cache_acq_locs``                             | Spatial distribution of where robots acquire caches.                          |                                                  |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``cache_acq_explore_locs``                     | Spatial distribution of robots exploring for caches.                          |                                                  |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``cache_acq_vector_locs``                      | Spatial distribution of robots vectoring to caches.                           |                                                  |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``cache_utilization``                          | Average block pickup/drop rates within caches.                                |                                                  |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``cache_lifecycle``                            | Depletion/creation rates of caches in the arena.                              |                                                  |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``cache_locations``                            | Spatial distribution of the locations of caches in the arena.                 |                                                  |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``cache_site_selection``                       | Cache site selection counts, NLOpt insights.                                  |                                                  |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``task_execution_generalist``                  | Execution time/estimate, interface time/estimate, completion/abort counts.    |                                                  |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``task_execution_collector``                   | Execution time/estimate, interface time/estimate, completion/abort counts.    |                                                  |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``task_execution_harvester``                   | Execution time/estimate, interface time/estimate, completion/abort counts.    |                                                  |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``task_execution_cache_starter``               | Execution time/estimate, interface time/estimate, completion/abort counts.    |                                                  |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``task_execution_cache_finisher``              | Execution time/estimate, interface time/estimate, completion/abort counts.    |                                                  |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``task_execution_cache_transferer``            | Execution time/estimate, interface time/estimate, completion/abort counts.    |                                                  |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``task_execution_cache_collector``             | Execution time/estimate, interface time/estimate, completion/abort counts.    |                                                  |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``task_tab_generalist``                        | TAB task allocation probabilities/counts.                                     |                                                  |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``task_tab_collector``                         | TAB task allocation probabilities/counts.                                     |                                                  |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``task_tab_harvester``                         | TAB task allocation probabilities/counts.                                     |                                                  |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``task_distribution``                          | TAB task allocation probabilities/counts.                                     |                                                  |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``perception_dpo``                             | Metrics from each robots' decaying pheromone store.                           |                                                  |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``perception_mdpo``                            | Metrics from each robot's internal map of the arena.                          |                                                  |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``tv_environment``                             | Waveforms of the penalties applied to the swarm.                              | Output every timestep.                           |
-+------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
++------------------------------------------------+-------------------------------------------------------------------------------+
+| XML attribute                                  | Description                                                                   |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``fsm_interference_counts``                    | See :xref:`COSM` docs.                                                        |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``fsm_interference_locs2D``                    | See :xref:`COSM` docs.                                                        |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``fsm_movement``                               | See :xref:`COSM` docs.                                                        |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``block_acq_counts``                           | See :xref:`COSM` docs.                                                        |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``block_acq_locs2D``                           | See :xref:`COSM` docs.                                                        |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``block_acq_explore_locs2D``                   | See :xref:`COSM` docs.                                                        |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``block_acq_vector_locs2D``                    | See :xref:`COSM` docs.                                                        |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``block_transport``                            | See :xref:`COSM` docs.                                                        |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``task_distribution``                          | See :xref:`COSM` docs.                                                        |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``swarm_dist_pos2D``                           | See :xref:`COSM` docs.                                                        |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``swarm_convergence``                          | See :xref:`COSM` docs.                                                        |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``tv_population``                              | See :xref:`COSM` docs.                                                        |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``oracle_manager``                             | See :xref:`COSM` docs.                                                        |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``block_manipulation``                         | Free block pickup/drop counts/penalties.                                      |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``cache_acq_counts``                           || Counts of robots exploring for, vectoring to, and acquiring caches.          |
++------------------------------------------------++------------------------------------------------------------------------------+
+| ``cache_acq_locs2D``                           | Spatial distribution of where robots acquire caches.                          |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``cache_acq_explore_locs2D``                   | Spatial distribution of robots exploring for caches.                          |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``cache_acq_vector_locs2D``                    | Spatial distribution of robots vectoring to caches.                           |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``cache_utilization``                          | Average block pickup/drop rates within caches.                                |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``cache_lifecycle``                            | Depletion/creation rates of caches in the arena.                              |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``cache_locations``                            | Spatial distribution of the locations of caches in the arena.                 |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``cache_site_selection``                       | Cache site selection counts, NLOpt insights.                                  |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``task_execution_generalist``                  | Execution time/estimate, interface time/estimate, completion/abort counts.    |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``task_execution_collector``                   | Execution time/estimate, interface time/estimate, completion/abort counts.    |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``task_execution_harvester``                   | Execution time/estimate, interface time/estimate, completion/abort counts.    |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``task_execution_cache_starter``               | Execution time/estimate, interface time/estimate, completion/abort counts.    |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``task_execution_cache_finisher``              | Execution time/estimate, interface time/estimate, completion/abort counts.    |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``task_execution_cache_transferer``            | Execution time/estimate, interface time/estimate, completion/abort counts.    |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``task_execution_cache_collector``             | Execution time/estimate, interface time/estimate, completion/abort counts.    |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``task_tab_generalist``                        | TAB task allocation probabilities/counts.                                     |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``task_tab_collector``                         | TAB task allocation probabilities/counts.                                     |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``task_tab_harvester``                         | TAB task allocation probabilities/counts.                                     |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``task_distribution``                          | TAB task allocation probabilities/counts.                                     |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``perception_dpo``                             | Metrics from each robots' decaying pheromone store.                           |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``perception_mdpo``                            | Metrics from each robot's internal map of the arena.                          |
++------------------------------------------------+-------------------------------------------------------------------------------+
+| ``tv_environment``                             | Waveforms of the penalties applied to the swarm.                              |
++------------------------------------------------+-------------------------------------------------------------------------------+
 
 Extend the temporal variance capabilities in :xref:`COSM` with caches:
 
@@ -192,7 +230,8 @@ the ``enable`` attribute is required; all other attributes are parsed iff
 - Required by: [depth2 controllers].
 - Required child attributes if present: ``enable``.
 - Required child tags if present: none.
-- Optional child attributes: [ ``min_dist``, ``min_blocks``, ``robot_drop_only`` ].
+- Optional child attributes: [ ``min_dist``, ``min_blocks``,
+  ``robot_drop_only``, ``strict_constraints`` ].
 - Optional child tags: none.
 
 XML configuration:
@@ -205,7 +244,8 @@ XML configuration:
            enable="false"
            min_dist="FLOAT"
            min_blocks="INTEGER"
-           robot_drop_only="false"/>
+           robot_drop_only="false"
+           strict_constraints="true"/>
        ...
    </caches>
 
@@ -220,3 +260,18 @@ XML configuration:
 - ``robot_drop_only`` - If `true`, then caches will only be created by intential
   robot block drops rather than drops due to abort/block distribution after
   collection. Default if omitted: `false`.
+
+- ``strict_constraints`` - If `true`, then dynamic cache creation will be
+  strict, meaning that any caches that fail validation after creation will be
+  discarded. This can happen because when robots select cache sites they only
+  consider the distance between the `center` of existing
+  caches/blocks/nests/etc, and do not take the extent into
+  consideration. Depending on what the values of the various proximity
+  constraints robots use when searching for a cache site, validation can fail
+  after cache creation.
+
+  If `false`, then dynamically created caches will be kept regardless if they
+  violate constraints or not, which MIGHT be OK, or MIGHT cause
+  issues/segfaults. Provided as an option so that it will be possible to more
+  precisely duplicate the results of papers run with earlier versions of FORDYCA
+  which had more bugs. Default if omitted: `true`.

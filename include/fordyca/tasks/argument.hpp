@@ -40,28 +40,6 @@ NS_START(fordyca, tasks);
  * Class Definitions
  ******************************************************************************/
 /**
- * \class vector_argument
- * \ingroup tasks
- *
- * \brief An argument that can be passed to a \ref
- * cta::taskable function which contains a vector, mostly
- * likely representing an arena location.
- */
-class vector_argument : public cta::taskable_argument {
- public:
-  vector_argument(double tolerance, const rmath::vector2d& v)
-      : m_tolerance(tolerance), m_vector(v) {}
-
-  ~vector_argument(void) override = default;
-  const rmath::vector2d& vector(void) const { return m_vector; }
-  double tolerance(void) const { return m_tolerance; }
-
- private:
-  double m_tolerance;
-  rmath::vector2d m_vector;
-};
-
-/**
  * \class foraging_signal_argument
  * \ingroup tasks
  *

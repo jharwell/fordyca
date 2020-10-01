@@ -26,13 +26,12 @@
  ******************************************************************************/
 #include <string>
 
-#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
+#include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 
-#include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
-#include "fordyca/support/utils/event_utils.hpp"
-#include "fordyca/support/tv/op_filter_status.hpp"
+#include "fordyca/support/tv/op_filter_result.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
+#include "fordyca/support/cache_prox_checker.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,8 +49,7 @@ NS_START(fordyca, support, tv);
  * \brief The filter for cache operation for robots (e.g. picking up, dropping
  * in places that involve existing caches.
  */
-template <typename T>
-class cache_op_filter : public rer::client<cache_op_filter<T>> {
+class cache_op_filter : public rer::client<cache_op_filter> {
  public:
   explicit cache_op_filter(const carena::caching_arena_map* const map)
       : ER_CLIENT_INIT("fordyca.support.tv.cache_op_filter"), mc_map(map) {}
@@ -64,7 +62,8 @@ class cache_op_filter : public rer::client<cache_op_filter<T>> {
    * \brief Filters out controllers that actually are not eligible to start
    * serving penalties.
    */
-  op_filter_status operator()(const T& controller, cache_op_src src) {
+  template<typename TController>
+  op_filter_result operator()(const TController& controller, cache_op_src src) {
     /*
      * If the robot has not acquired a cache, or thinks it has but actually has
      * not, nothing to do. If a robot is carrying a cache but is still
@@ -77,7 +76,7 @@ class cache_op_filter : public rer::client<cache_op_filter<T>> {
       default:
         ER_FATAL_SENTINEL("Unhandled penalty type %d", static_cast<int>(src));
     } /* switch() */
-    return op_filter_status{};
+    return op_filter_result{};
   }
 
  private:
@@ -86,20 +85,35 @@ class cache_op_filter : public rer::client<cache_op_filter<T>> {
    * operations (e.g. pickup/drop) (i.e. controller not ready/not intending to
    * use an existing cache).
    */
-  op_filter_status do_filter(const T& controller) const {
-    auto cache_id = utils::robot_on_cache(controller, *mc_map);
-    bool ready = (controller.goal_acquired() &&
-                  fsm::foraging_acq_goal::ekEXISTING_CACHE ==
-                      controller.acquisition_goal() &&
-                  rtypes::constants::kNoUUID != cache_id);
-    if (ready) {
-      return op_filter_status::ekSATISFIED;
+  template <typename TController>
+  op_filter_result do_filter(const TController& controller) const {
+    op_filter_result result;
+    if (!(controller.goal_acquired() &&
+        fsm::foraging_acq_goal::ekEXISTING_CACHE ==
+          controller.acquisition_goal())) {
+      result.status = op_filter_status::ekROBOT_INTERNAL_UNREADY;
+    } else {
+      /*
+       * OK to lock around this calculation, because relatively few robots will
+       * have the correct internal state for a cache operation each timestep,
+       * and we don't need exclusive access to the arena map at this point--only
+       * a guarantee that the cache array will not be modified while we are
+       * checking it.
+       */
+      mc_map->lock_rd(mc_map->cache_mtx());
+      auto cache_id = mc_map->robot_on_cache(controller.rpos2D());
+      mc_map->unlock_rd(mc_map->cache_mtx());
+
+      if (rtypes::constants::kNoUUID != cache_id) {
+        result.status = op_filter_status::ekSATISFIED;
+        result.id = cache_id;
+      }
     }
-    return op_filter_status::ekROBOT_INTERNAL_UNREADY;
+    return result;
   }
 
   /* clang-format off */
-  const carena::caching_arena_map* const mc_map;
+  const carena::caching_arena_map* mc_map;
   /* clang-format on */
 };
 NS_END(tv, support, fordyca);

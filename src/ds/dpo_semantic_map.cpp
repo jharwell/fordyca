@@ -25,7 +25,6 @@
 
 #include "cosm/arena/repr/base_cache.hpp"
 
-#include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/events/cell2D_empty.hpp"
 
 /*******************************************************************************
@@ -37,7 +36,7 @@ NS_START(fordyca, ds);
  * Constructors/Destructor
  ******************************************************************************/
 dpo_semantic_map::dpo_semantic_map(
-    const config::perception::perception_config* c_config,
+    const cspconfig::perception_config* c_config,
     const std::string& robot_id)
     : ER_CLIENT_INIT("fordyca.ds.dpo_semantic_map"),
       decorator(c_config, robot_id),
@@ -49,20 +48,20 @@ dpo_semantic_map::dpo_semantic_map(
 bool dpo_semantic_map::cache_remove(carepr::base_cache* const victim) {
   if (m_store.cache_remove(victim)) {
     ER_DEBUG("Updating cell@%s for removed cache",
-             victim->dloc().to_str().c_str());
-    cdops::cell2D_empty_visitor op(victim->dloc());
-    op.visit(decoratee().access<occupancy_grid::kCell>(victim->dloc()));
+             victim->dcenter2D().to_str().c_str());
+    cdops::cell2D_empty_visitor op(victim->dcenter2D());
+    op.visit(decoratee().access<occupancy_grid::kCell>(victim->dcenter2D()));
     return true;
   }
   return false;
 } /* cache_remove() */
 
-bool dpo_semantic_map::block_remove(crepr::base_block2D* const victim) {
+bool dpo_semantic_map::block_remove(crepr::base_block3D* const victim) {
   if (m_store.block_remove(victim)) {
     ER_DEBUG("Updating cell@%s for removed block",
-             victim->dloc().to_str().c_str());
-    events::cell2D_empty_visitor op(victim->dloc());
-    op.visit(access<occupancy_grid::kCell>(victim->dloc()));
+             victim->danchor2D().to_str().c_str());
+    events::cell2D_empty_visitor op(victim->danchor2D());
+    op.visit(access<occupancy_grid::kCell>(victim->danchor2D()));
     return true;
   }
   return false;
@@ -73,7 +72,7 @@ void dpo_semantic_map::decay_all(void) {
   m_store.decay_all();
 
   for (auto& b : m_store.blocks().const_values_range()) {
-    const rmath::vector2z& loc = b.ent()->dloc();
+    const rmath::vector2z& loc = b.ent()->danchor2D();
     crepr::pheromone_density& map_density =
         decoratee().access<occupancy_grid::kPheromone>(loc);
 
@@ -87,7 +86,7 @@ void dpo_semantic_map::decay_all(void) {
   } /* for(&b..) */
 
   for (auto&& c : m_store.caches().const_values_range()) {
-    const rmath::vector2z& loc = c.ent()->dloc();
+    const rmath::vector2z& loc = c.ent()->dcenter2D();
     crepr::pheromone_density& map_density =
         decoratee().access<occupancy_grid::kPheromone>(loc);
 

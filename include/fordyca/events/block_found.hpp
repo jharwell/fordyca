@@ -29,7 +29,7 @@
 #include "rcppsw/er/client.hpp"
 
 #include "cosm/ds/operations/cell2D_op.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
 
@@ -60,7 +60,7 @@ class block_found : public rer::client<block_found>, public cdops::cell2D_op {
  private:
   struct visit_typelist_impl {
     using inherited = cell2D_op::visit_typelist;
-    using controllers = controller::depth2::typelist;
+    using controllers = controller::d2::typelist;
     using others = rmpl::typelist<ds::dpo_store, ds::dpo_semantic_map>;
 
     using value = boost::mpl::joint_view<
@@ -71,7 +71,7 @@ class block_found : public rer::client<block_found>, public cdops::cell2D_op {
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  explicit block_found(crepr::base_block2D* block);
+  explicit block_found(crepr::base_block3D* block);
   ~block_found(void) override = default;
 
   block_found(const block_found&) = delete;
@@ -85,19 +85,22 @@ class block_found : public rer::client<block_found>, public cdops::cell2D_op {
   void visit(cfsm::cell2D_fsm& fsm);
   void visit(ds::dpo_semantic_map& map);
 
-  /* depth2 foraging */
-  void visit(controller::depth2::birtd_dpo_controller& c);
-  void visit(controller::depth2::birtd_mdpo_controller& c);
-  void visit(controller::depth2::birtd_odpo_controller& c);
-  void visit(controller::depth2::birtd_omdpo_controller& c);
+  /* d2 foraging */
+  void visit(controller::cognitive::d2::birtd_dpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_mdpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_odpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_omdpo_controller& c);
 
  private:
   void pheromone_update(ds::dpo_semantic_map& map);
 
   /* clang-format off */
-  crepr::base_block2D* m_block;
+  crepr::base_block3D* m_block;
   /* clang-format on */
 };
+
+
+NS_END(detail);
 
 /**
  * \brief We use the precise visitor in order to force compile errors if a call to
@@ -105,15 +108,7 @@ class block_found : public rer::client<block_found>, public cdops::cell2D_op {
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using block_found_visitor_impl =
-    rpvisitor::precise_visitor<detail::block_found,
-                               detail::block_found::visit_typelist>;
-
-NS_END(detail);
-
-class block_found_visitor : public detail::block_found_visitor_impl {
-  using detail::block_found_visitor_impl::block_found_visitor_impl;
-};
+using block_found_visitor = rpvisitor::filtered_visitor<detail::block_found>;
 
 NS_END(events, fordyca);
 

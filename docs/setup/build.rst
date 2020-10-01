@@ -9,6 +9,7 @@ Building The Code Locally
    shown in the :ref:`ln-opt-build` section below, as that script is for a debug
    build by default.
 
+
 Debug Build
 -----------
 
@@ -29,6 +30,10 @@ can be downloaded by navigating to the file on github, clicking the ``raw``
 button, and then right clicking and doing ``Save As``. After downloading, mark
 the script as executable (``chmod +x bootstrap.sh``) and then run it (it can be
 run from anywhere), with the following arguments:
+
+.. IMPORTANT:: Make sure you download the ``bootstrap.sh`` script from the
+               ``devel`` branch of the FORDYCA repo. The one on the ``master``
+               branch may be out of date.
 
 - 1st arg: The root directory for the project (all repos will be cloned/built
   in here, and it **must** be an absolute path).
@@ -71,7 +76,6 @@ one ``bootstrap.sh`` uses for you. Something like the following, run from the
   -DWITH_FOOTBOT_LEDS=NO \
   -DCMAKE_BUILD_TYPE=OPT \
   -DLIBRA_ER=NONE \
-  -DLIBRA_BUILD_FOR=ARGOS \
   \..
 
 To get an idea of what some of the non-project specific options mean, head over

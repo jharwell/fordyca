@@ -29,6 +29,8 @@
 
 #include "rcppsw/patterns/decorator/decorator.hpp"
 
+#include "cosm/subsystem/perception/config/perception_config.hpp"
+
 #include "fordyca/ds/dp_block_map.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
 #include "fordyca/ds/dpo_store.hpp"
@@ -37,12 +39,7 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca);
-namespace config { namespace perception {
-struct perception_config;
-}} // namespace config::perception
-
-NS_START(ds);
+NS_START(fordyca, ds);
 
 /*******************************************************************************
  * Class Definitions
@@ -67,7 +64,7 @@ NS_START(ds);
 class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
                                public rpdecorator::decorator<occupancy_grid> {
  public:
-  dpo_semantic_map(const config::perception::perception_config* c_config,
+  dpo_semantic_map(const cspconfig::perception_config* c_config,
                    const std::string& robot_id);
 
   RCPPSW_DECORATE_FUNC(pheromone_repeat_deposit, const);
@@ -126,7 +123,7 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
   RCPPSW_DECORATE_FUNC(resolution, const)
 
   bool cache_remove(carepr::base_cache* victim);
-  bool block_remove(crepr::base_block2D* victim);
+  bool block_remove(crepr::base_block3D* victim);
 
   const dpo_store* store(void) const { return &m_store; }
   dpo_store* store(void) { return &m_store; }
@@ -138,10 +135,10 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
 
  public:
   /* wrapping DPO store--must be after declaration -_- */
-  RCPPSW_DECLDEF_WRAP(blocks, (*store()))
-  RCPPSW_DECLDEF_WRAP(caches, (*store()))
-  RCPPSW_DECLDEF_WRAP(blocks, (*store()), const)
-  RCPPSW_DECLDEF_WRAP(caches, (*store()), const)
+  RCPPSW_WRAP_DECLDEF(blocks, (*store()))
+  RCPPSW_WRAP_DECLDEF(caches, (*store()))
+  RCPPSW_WRAP_DECLDEF(blocks, (*store()), const)
+  RCPPSW_WRAP_DECLDEF(caches, (*store()), const)
 };
 
 NS_END(ds, fordyca);

@@ -55,11 +55,11 @@ NS_START(fordyca, events, detail);
 class cache_proximity : public rer::client<cache_proximity> {
  private:
   struct visit_typelist_impl {
-    using others = rmpl::typelist<tasks::depth2::cache_finisher,
-                                  tasks::depth2::cache_starter,
+    using others = rmpl::typelist<tasks::d2::cache_finisher,
+                                  tasks::d2::cache_starter,
                                   fsm::block_to_goal_fsm>;
     using value =
-        boost::mpl::joint_view<controller::depth2::typelist::type, others::type>;
+        boost::mpl::joint_view<controller::d2::typelist::type, others::type>;
   };
 
  public:
@@ -68,16 +68,16 @@ class cache_proximity : public rer::client<cache_proximity> {
   explicit cache_proximity(carepr::base_cache* cache);
   ~cache_proximity(void) override = default;
 
-  cache_proximity(const cache_proximity& op) = delete;
-  cache_proximity& operator=(const cache_proximity& op) = delete;
+  cache_proximity(const cache_proximity&) = delete;
+  cache_proximity& operator=(const cache_proximity&) = delete;
 
-  /* depth2 foraging */
-  void visit(controller::depth2::birtd_dpo_controller& c);
-  void visit(controller::depth2::birtd_odpo_controller& c);
-  void visit(controller::depth2::birtd_mdpo_controller& c);
-  void visit(controller::depth2::birtd_omdpo_controller& c);
-  void visit(tasks::depth2::cache_finisher& task);
-  void visit(tasks::depth2::cache_starter& task);
+  /* d2 foraging */
+  void visit(controller::cognitive::d2::birtd_dpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_odpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_mdpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_omdpo_controller& c);
+  void visit(tasks::d2::cache_finisher& task);
+  void visit(tasks::d2::cache_starter& task);
   void visit(fsm::block_to_goal_fsm& fsm);
 
  private:
@@ -88,21 +88,15 @@ class cache_proximity : public rer::client<cache_proximity> {
   /* clang-format on */
 };
 
+NS_END(detail);
+
 /**
- * \brief We use the precise visitor in order to force compile errors if a call to
- * a visitor is made that involves a visitee that is not in our visit set
+ * \brief We use the precise visitor in order to force compile errors if a call
+ * to a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using cache_proximity_visitor_impl =
-    rpvisitor::precise_visitor<detail::cache_proximity,
-                               detail::cache_proximity::visit_typelist>;
-
-NS_END(detail);
-
-class cache_proximity_visitor : public detail::cache_proximity_visitor_impl {
-  using detail::cache_proximity_visitor_impl::cache_proximity_visitor_impl;
-};
+using cache_proximity_visitor = rpvisitor::filtered_visitor<detail::cache_proximity>;
 
 NS_END(events, fordyca);
 

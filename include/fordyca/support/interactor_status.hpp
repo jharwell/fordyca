@@ -51,13 +51,13 @@ enum class interactor_status {
   /**
    * \brief The robot dropped a block in the nest, from \ref nest_interactor.
    */
-  ekNEST_BLOCK_DROP = 1 << 1,
+  ekNEST_BLOCK_PROCESS = 1 << 1,
 
   /**
    * \brief The robot picked up a free block in the arena, from \ref
    * free_block_interactor.
    */
-  ekFREE_BLOCK_PICKUP = 1 << 2,
+  ekARENA_FREE_BLOCK_PICKUP = 1 << 2,
 
   /**
    * \brief The robot purposefully dropped a block in the arena, NOT as a part

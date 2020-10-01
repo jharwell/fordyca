@@ -24,15 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <memory>
-
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitor.hpp"
-#include "rcppsw/types/timestep.hpp"
 #include "rcppsw/types/type_uuid.hpp"
 
-#include "cosm/ds/operations/cell2D_op.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/controller/operations/base_block_pickup.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
@@ -59,20 +55,20 @@ NS_START(fordyca, events, detail);
  * that is not part of a cache).
  */
 class robot_free_block_pickup : public rer::client<robot_free_block_pickup>,
-                                public cdops::cell2D_op {
+                                public ccops::base_block_pickup {
  private:
   struct visit_typelist_impl {
     using controllers = boost::mpl::joint_view<
-        boost::mpl::joint_view<controller::depth0::typelist,
-                               controller::depth1::typelist>,
-        controller::depth2::typelist>;
-    using tasks = rmpl::typelist<tasks::depth0::generalist,
-                                 tasks::depth1::harvester,
-                                 tasks::depth2::cache_starter,
-                                 tasks::depth2::cache_finisher>;
-    using fsms = rmpl::typelist<fsm::depth0::crw_fsm,
-                                fsm::depth0::dpo_fsm,
-                                fsm::depth0::free_block_to_nest_fsm,
+        boost::mpl::joint_view<controller::d0::typelist,
+                               controller::d1::typelist>,
+        controller::d2::typelist>;
+    using tasks = rmpl::typelist<tasks::d0::generalist,
+                                 tasks::d1::harvester,
+                                 tasks::d2::cache_starter,
+                                 tasks::d2::cache_finisher>;
+    using fsms = rmpl::typelist<fsm::d0::crw_fsm,
+                                fsm::d0::dpo_fsm,
+                                fsm::d0::free_block_to_nest_fsm,
                                 fsm::block_to_goal_fsm>;
     using value1 = boost::mpl::joint_view<controllers::type, tasks::type>;
     using value = boost::mpl::joint_view<value1, fsms::type>;
@@ -83,67 +79,64 @@ class robot_free_block_pickup : public rer::client<robot_free_block_pickup>,
 
   ~robot_free_block_pickup(void) override = default;
 
-  robot_free_block_pickup(const robot_free_block_pickup& op) = delete;
-  robot_free_block_pickup& operator=(const robot_free_block_pickup& op) = delete;
+  robot_free_block_pickup(const robot_free_block_pickup&) = delete;
+  robot_free_block_pickup& operator=(const robot_free_block_pickup&) = delete;
 
   /* CRW foraging */
-  void visit(controller::depth0::crw_controller& controller);
-  void visit(fsm::depth0::crw_fsm& fsm);
+  void visit(controller::reactive::d0::crw_controller& controller);
+  void visit(fsm::d0::crw_fsm& fsm);
 
   /* Depth0 DPO/MDPO foraging */
   void visit(ds::dpo_store& store);
   void visit(ds::dpo_semantic_map& map);
-  void visit(fsm::depth0::dpo_fsm& fsm);
-  void visit(controller::depth0::dpo_controller& controller);
-  void visit(controller::depth0::mdpo_controller& controller);
-  void visit(controller::depth0::odpo_controller& controller);
-  void visit(controller::depth0::omdpo_controller& controller);
+  void visit(fsm::d0::dpo_fsm& fsm);
+  void visit(controller::cognitive::d0::dpo_controller& controller);
+  void visit(controller::cognitive::d0::mdpo_controller& controller);
+  void visit(controller::cognitive::d0::odpo_controller& controller);
+  void visit(controller::cognitive::d0::omdpo_controller& controller);
 
-  /* depth1 DPO/MDPO foraging */
-  void visit(fsm::depth0::free_block_to_nest_fsm& fsm);
-  void visit(controller::depth1::bitd_dpo_controller& controller);
-  void visit(controller::depth1::bitd_mdpo_controller& controller);
-  void visit(controller::depth1::bitd_odpo_controller& controller);
-  void visit(controller::depth1::bitd_omdpo_controller& controller);
+  /* d1 DPO/MDPO foraging */
+  void visit(fsm::d0::free_block_to_nest_fsm& fsm);
+  void visit(controller::cognitive::d1::bitd_dpo_controller& controller);
+  void visit(controller::cognitive::d1::bitd_mdpo_controller& controller);
+  void visit(controller::cognitive::d1::bitd_odpo_controller& controller);
+  void visit(controller::cognitive::d1::bitd_omdpo_controller& controller);
   void visit(fsm::block_to_goal_fsm& fsm);
-  void visit(tasks::depth0::generalist& task);
-  void visit(tasks::depth1::harvester& task);
+  void visit(tasks::d0::generalist& task);
+  void visit(tasks::d1::harvester& task);
 
-  /* depth2 DPO/MDPO foraging */
-  void visit(controller::depth2::birtd_dpo_controller& controller);
-  void visit(controller::depth2::birtd_mdpo_controller& controller);
-  void visit(controller::depth2::birtd_odpo_controller& controller);
-  void visit(controller::depth2::birtd_omdpo_controller& controller);
-  void visit(tasks::depth2::cache_starter& task);
-  void visit(tasks::depth2::cache_finisher& task);
+  /* d2 DPO/MDPO foraging */
+  void visit(controller::cognitive::d2::birtd_dpo_controller& controller);
+  void visit(controller::cognitive::d2::birtd_mdpo_controller& controller);
+  void visit(controller::cognitive::d2::birtd_odpo_controller& controller);
+  void visit(controller::cognitive::d2::birtd_omdpo_controller& controller);
+  void visit(tasks::d2::cache_starter& task);
+  void visit(tasks::d2::cache_finisher& task);
 
  protected:
-  robot_free_block_pickup(crepr::base_block2D* block,
+  robot_free_block_pickup(crepr::base_block3D* block,
                           const rtypes::type_uuid& robot_id,
                           const rtypes::timestep& t);
 
  private:
+  using ccops::base_block_pickup::visit;
+
   void dispatch_robot_free_block_interactor(tasks::base_foraging_task* task);
 
-  template<typename TControllerType>
-  void d1d2_dpo_controller_visit(TControllerType& controller);
+  template <typename TController>
+  void d1d2_dpo_controller_visit(TController& controller);
 
-  template<typename TControllerType>
-  void d1d2_mdpo_controller_visit(TControllerType& controller);
+  template <typename TController>
+  void d1d2_mdpo_controller_visit(TController& controller);
 
-  template<typename TControllerType>
-  void d0_dpo_controller_visit(TControllerType& controller);
+  template <typename TController>
+  void d0_dpo_controller_visit(TController& controller);
 
-  template<typename TControllerType>
-  void d0_mdpo_controller_visit(TControllerType& controller);
-
-  /* clang-format off */
-  const rtypes::timestep  mc_timestep;
-  const rtypes::type_uuid mc_robot_id;
-
-  crepr::base_block2D*    m_block;
-  /* clang-format on */
+  template <typename TController>
+  void d0_mdpo_controller_visit(TController& controller);
 };
+
+NS_END(detail);
 
 /**
  * \brief We use the precise visitor in order to force compile errors if a call
@@ -151,18 +144,7 @@ class robot_free_block_pickup : public rer::client<robot_free_block_pickup>,
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using robot_free_block_pickup_visitor_impl =
-    rpvisitor::precise_visitor<detail::robot_free_block_pickup,
-                               detail::robot_free_block_pickup::visit_typelist>;
-
-NS_END(detail);
-
-class robot_free_block_pickup_visitor
-    : public detail::robot_free_block_pickup_visitor_impl {
- public:
-  using detail::robot_free_block_pickup_visitor_impl::
-      robot_free_block_pickup_visitor_impl;
-};
+using robot_free_block_pickup_visitor = rpvisitor::filtered_visitor<detail::robot_free_block_pickup>;
 
 NS_END(events, fordyca);
 

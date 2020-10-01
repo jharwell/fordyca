@@ -11,38 +11,24 @@ define_property(CACHED_VARIABLE PROPERTY "WITH_FOOTBOT_BATTERY"
   BRIEF_DOCS "Enable footbot robots to use the battery. Only for simulation robots."
   FULL_DOCS "Default=NO.")
 
-set(LIBRA_BUILD_FOR "ARGOS" CACHE STRING "Build for ARGoS.")
-set(LOCAL_INSTALL_PREFIX "/opt/data/local" CACHE STRING "Prefix for where ARGoS
-and other packages needed by the project have been installed.")
-
 # Needed by COSM for population dynamics and swarm iteration
-set(ARGOS_ROBOT_TYPE "foot-bot")
-set(ARGOS_ROBOT_NAME_PREFIX "fb")
-set(ARGOS_CONTROLLER_XML_ID "ffc")
+if (NOT COSM_BUILD_FOR)
+  set(COSM_BUILD_FOR "ARGOS")
+endif()
+set(COSM_ARGOS_ROBOT_TYPE "foot-bot")
+set(COSM_ARGOS_ROBOT_NAME_PREFIX "fb")
+set(COSM_ARGOS_CONTROLLER_XML_ID "ffc")
+set(COSM_WITH_ARGOS_ROBOT_LEDS "NO")
 
 ################################################################################
 # External Projects                                                            #
 ################################################################################
 set(${target}_CHECK_LANGUAGE "CXX")
 
-if("${LIBRA_BUILD_FOR}" MATCHES "MSI" )
-  message(STATUS "Building for MSI")
-  set(LOCAL_INSTALL_PREFIX /home/gini/shared/swarm/$ENV{MSICLUSTER})
-elseif("${LIBRA_BUILD_FOR}" MATCHES "ARGOS")
-  message(STATUS "Building for ARGoS")
-elseif("${LIBRA_BUILD_FOR}" MATCHES "EV3")
-  message(STATUS "Building for EV3")
-else()
-  message(FATAL_ERROR
-    "Unknown build target '${LIBRA_BUILD_FOR}'. Must be: [MSI,ARGOS,EV3]")
-endif()
-
 # Support libraries
 add_subdirectory(ext/cosm)
 
-set(FORDYCA_WITH_VIS "${COSM_WITH_VIS}")
-
-if (${FORDYCA_WITH_VIS})
+if (${COSM_WITH_VIS})
   set(CMAKE_AUTOMOC ON)
   find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui)
   set(CMAKE_AUTOMOC OFF)
@@ -51,7 +37,7 @@ endif()
 ################################################################################
 # Sources                                                                      #
 ################################################################################
-if (NOT ${FORDYCA_WITH_VIS})
+if (NOT ${COSM_WITH_VIS})
     list(REMOVE_ITEM ${target}_ROOT_SRC
     ${${target}_SRC_PATH}/support/los_visualizer.cpp
     ${${target}_SRC_PATH}/support/depth0/depth0_qt_user_functions.cpp
@@ -75,7 +61,7 @@ set(${target}_LIBRARY_DIRS
   ${rcppsw_LIBRARY_DIRS}
   ${cosm_LIBRARY_DIRS})
 
-if ("${LIBRA_BUILD_FOR}" MATCHES "ARGOS" OR "${LIBRA_BUILD_FOR}" MATCHES "MSI")
+if ("${COSM_BUILD_FOR}" MATCHES "ARGOS" OR "${COSM_BUILD_FOR}" MATCHES "MSI")
   set(argos3_LIBRARIES
   argos3core_simulator
   argos3plugin_simulator_footbot
@@ -95,14 +81,14 @@ if ("${LIBRA_BUILD_FOR}" MATCHES "ARGOS" OR "${LIBRA_BUILD_FOR}" MATCHES "MSI")
     ${${target}_LIBRARY_DIRS}
     /usr/lib/argos3
     /usr/local/lib/argos3
-    ${LOCAL_INSTALL_PREFIX}/lib/argos3
+    ${COSM_PROJECT_DEPS_PREFIX}/lib/argos3
     )
-  if ("${LIBRA_BUILD_FOR}" MATCHES "MSI")
+  if ("${COSM_BUILD_FOR}" MATCHES "MSI")
     # For nlopt
     set(${target}_LIBRARY_DIRS
       ${$target}_LIBRARY_DIRS}
-      ${LOCAL_INSTALL_PREFIX}/lib/argos3
-      ${LOCAL_INSTALL_PREFIX}/lib64)
+      ${COSM_PROJECT_DEPS_PREFIX}/lib/argos3
+      ${COSM_PROJECT_DEPS_PREFIX}/lib64)
   endif()
 endif()
 
@@ -126,13 +112,6 @@ set(${target}_SYS_INCLUDE_DIRS
   ${cosm_SYS_INCLUDE_DIRS}
   ${NLOPT_INCLUDE_DIRS})
 
-if ("${LIBRA_BUILD_FOR}" MATCHES "ARGOS")
-  set(${target}_SYS_INCLUDE_DIRS
-    ${${target}_SYS_INCLUDE_DIRS}
-  ${LOCAL_INSTALL_PREFIX}/include
-  )
-endif()
-
 target_include_directories(${target} PUBLIC ${${target}_INCLUDE_DIRS})
 
 target_include_directories(${target} SYSTEM PUBLIC
@@ -147,7 +126,7 @@ target_link_libraries(${target} ${${target}_LIBRARIES} cosm nlopt)
 ################################################################################
 # Compile Options/Definitions                                                  #
 ################################################################################
-if ("${LIBRA_BUILD_FOR}" MATCHES "ARGOS")
+if ("${COSM_BUILD_FOR}" MATCHES "ARGOS")
   if (WITH_FOOTBOT_RAB)
     target_compile_definitions(${target} PUBLIC FORDYCA_WITH_ROBOT_RAB)
   endif()
@@ -158,7 +137,7 @@ if ("${LIBRA_BUILD_FOR}" MATCHES "ARGOS")
 endif()
 
 
-if ("${LIBRA_BUILD_FOR}" MATCHES "MSI")
+if ("${COSM_BUILD_FOR}" MATCHES "MSI")
   target_compile_options(${target} PUBLIC
     -Wno-missing-include-dirs
     -fno-new-inheriting-ctors)

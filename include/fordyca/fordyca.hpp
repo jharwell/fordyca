@@ -41,9 +41,9 @@
  *
  * Convention: Namespace aliases from FORDYCA all start with \c 'f', and the
  * first letter of all nested namespaces except the innermost one should be
- * included before the innermost. For example, fordyca::support::depth0
+ * included before the innermost. For example, fordyca::support::d0
  * should have the \c 'f' from \c 'fordyca' and the \c 's' from \c 'support'
- * before the target namespace \c 'depth0'.
+ * before the target namespace \c 'd0'.
  *
  * \defgroup config config
  * \brief XML configuration for controllers and simulation manager.
@@ -77,16 +77,16 @@
  * \brief XML configuration and parsing for the \ref tv_manager and its
  * components.
  *
- * \defgroup depth0 depth0
- * \brief XML configuration and parsing for depth0 controllers (those which do
+ * \defgroup d0 d0
+ * \brief XML configuration and parsing for d0 controllers (those which do
  * not employ partitioning/use caches).
  *
- * \defgroup depth1 depth1
- * \brief XML configuration and parsing for depth1 controllers (those which
+ * \defgroup d1 d1
+ * \brief XML configuration and parsing for d1 controllers (those which
  * utilize a single static cache).
  *
- * \defgroup depth1 depth1
- * \brief XML configuration and parsing for depth2 controllers (those which
+ * \defgroup d1 d1
+ * \brief XML configuration and parsing for d2 controllers (those which
  * dynamically create, utilize, and deplete caches).
  *
  * @}
@@ -97,14 +97,14 @@
  *
  * @{
  *
- * \defgroup depth0 depth0
+ * \defgroup d0 d0
  * \brief Depth0 controllers (those which do not employ partitioning/use
  * caches).
  *
- * \defgroup depth1 depth1
+ * \defgroup d1 d1
  * \brief Depth1 controllers (those which utilize a single static cache).
  *
- * \defgroup depth2 depth2
+ * \defgroup d2 d2
  * \brief Depth2 controllers (those which dynamically create, utilize, and
  * deplete caches).
  *
@@ -148,16 +148,16 @@
  *
  * @{
  *
- * \defgroup depth0 depth0
- * \brief Support classes specific for depth0 controllers (those which do not
+ * \defgroup d0 d0
+ * \brief Support classes specific for d0 controllers (those which do not
  * employ partitioning/use caches).
  *
- * \defgroup depth1 depth1
- * \brief Support classes specific for depth1 controllers (those which utilize a
+ * \defgroup d1 d1
+ * \brief Support classes specific for d1 controllers (those which utilize a
  * single static cache).
  *
- * \defgroup depth2 depth2
- * \brief Support classes specific for depth2 controllers (those which dynamic
+ * \defgroup d2 d2
+ * \brief Support classes specific for d2 controllers (those which dynamic
  * create, utilize, and deplete caches).
  *
  * @}

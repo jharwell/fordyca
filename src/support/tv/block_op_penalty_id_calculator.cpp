@@ -24,8 +24,9 @@
 #include "fordyca/support/tv/block_op_penalty_id_calculator.hpp"
 
 #include "cosm/arena/caching_arena_map.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
-#include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca//controller/foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -45,13 +46,19 @@ block_op_penalty_id_calculator::block_op_penalty_id_calculator(
  ******************************************************************************/
 rtypes::type_uuid block_op_penalty_id_calculator::operator()(
     const controller::foraging_controller& controller,
-    block_op_src src) const {
+    block_op_src src,
+    op_filter_result filter) const {
   rtypes::type_uuid id = rtypes::constants::kNoUUID;
   switch (src) {
     case block_op_src::ekFREE_PICKUP:
-      id = decoratee().from_free_pickup(controller.pos2D(),
-                                        controller.entity_acquired_id(),
-                                        mc_map);
+      /*
+       * We don't call the base class function for this because of the lack of
+       * locking around the BOTH block op filtering and penalty ID calculation
+       * to make them atomic, and the conditions for free pickup might not be
+       * met anymore. Plus, we already have the ID from the block op filter
+       * calculation, and there can be a LOT of blocks in the area to check.
+       */
+      id = filter.id;
       break;
     case block_op_src::ekNEST_DROP:
       id = decoratee().from_nest_drop(controller.block());

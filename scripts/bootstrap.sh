@@ -68,12 +68,24 @@ fi;
 
 cd ../../
 
+# Bootstrap RCPPSW
+if [ -d rcppsw ]; then rm -rf rcppsw; fi
+git clone https://github.com/swarm-robotics/rcppsw.git
+cd rcppsw
+git checkout devel
+git submodule update --init --recursive --remote
+
+cd ..
+
 # Bootstrap cosm
 if [ -d cosm ]; then rm -rf cosm; fi
 git clone https://github.com/swarm-robotics/cosm.git
 cd cosm
 git checkout devel
 git submodule update --init --recursive --remote
+
+rm -rf ext/rcppsw
+ln -s $1/rcppsw ext/rcppsw
 
 cd ..
 
@@ -93,10 +105,27 @@ mkdir -p build && cd build
 cmake \
     -DCMAKE_C_COMPILER=gcc-9\
     -DCMAKE_CXX_COMPILER=g++-9\
-    -DLIBRA_BUILD_FOR=ARGOS \
     ..
 make -j $4
 make documentation
+
+cd ../../
+
+# Bootstrap sierra
+if [ -d sierra ]; then rm -rf sierra; fi
+git clone https://github.com/swarm-robotics/sierra.git
+cd sierra
+git checkout devel
+cd ..
+
+if [ -d sierra-plugin-fordyca ]; then rm -rf sierra-plugin-fordyca; fi
+git clone https://github.com/swarm-robotics/sierra-plugin-fordyca.git
+cd sierra-plugin-fordyca
+git checkout devel
+
+cd ..
+
+ln -s $1/sierra-plugin-fordyca sierra/plugins/fordyca
 
 # If installed ARGoS as root, all project repos are also owned by root, so we
 # need to fix that.

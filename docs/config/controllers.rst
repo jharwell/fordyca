@@ -3,9 +3,9 @@ Controller XML Configuration
 
 The following controllers are available:
 
-+--------------+----------------+--------+---------------------------------------------------------------------------------------------------------------------------------------+
++--------------+-------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
 | Controller   | Required Loop functions | Notes                                                                                                                                 |
-+--------------+----------------+------------------------------------------------------------------------------------------------------------------------------------------------+
++--------------+-------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
 | crw          | depth0                  | CRW = Correlated Random Walk.                                                                                                         |
 +--------------+-------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
 | dpo          | depth0                  | DPO = Mapped Decaying Pheromone Object. Uses pheromones to track objects within the arena.                                            |
@@ -34,26 +34,30 @@ The following controllers are available:
 +--------------+-------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
 
 
-The following root XML tags are defined under ``<params>`` in addition to the ones defined in :xref:`COSM`.
+The following root XML tags are defined under ``<params>``:
 
-+---------------------------+---------------------------+----------------------------------------------------------------+
-| Root XML tag              | Mandatory For?            | Description                                                    |
-+---------------------------+---------------------------+----------------------------------------------------------------+
-| ``perception``            | All but CRW               | See :xref:`COSM` docs also; only augmented slightly here.      |
-+---------------------------+---------------------------+----------------------------------------------------------------+
-| ``block_sel_matrix``      | All but CRW controller    | Parameters used by robots when selecting which block to acquire|
-|                           |                           | as part of the task they are currently executing.              |
-+---------------------------+---------------------------+----------------------------------------------------------------+
-| ``cache_sel_matrix``      |depth1 depth2 controllers  | Parameters used by robots when selecting which cache to acquire|
-|                           |                           | as part of the task they are currently executing.              |
-+---------------------------+---------------------------+----------------------------------------------------------------+
-| ``sensing_subsystem2D``   | All controllers           | See :xref:`COSM` docs.                                         |
-+---------------------------+---------------------------+----------------------------------------------------------------+
-| ``actuation_subsystem2D`` | All controllers           | See :xref:`COSM` docs.                                         |
-+---------------------------+---------------------------+----------------------------------------------------------------+
-| ``exploration``           | All but CRW               | Parameters for robot exploration in the absence of knowledge of|
-|                           |                           | an instance of the goal type.                                  |
-+---------------------------+---------------------------+----------------------------------------------------------------+
++---------------------------+----------------------------+----------------------------------------------------------------+
+| Root XML tag              | Mandatory For?             | Description                                                    |
++---------------------------+----------------------------+----------------------------------------------------------------+
+| ``perception``            | All but CRW                | See :xref:`COSM` docs also; only augmented slightly here.      |
++---------------------------+----------------------------+----------------------------------------------------------------+
+| ``block_sel_matrix``      | All but CRW                | Parameters used by robots when selecting which block to acquire|
+|                           |                            | as part of the task they are currently executing.              |
++---------------------------+----------------------------+----------------------------------------------------------------+
+| ``cache_sel_matrix``      | Depth1, depth2 controllers | Parameters used by robots when selecting which cache to acquire|
+|                           |                            | as part of the task they are currently executing.              |
++---------------------------+----------------------------+----------------------------------------------------------------+
+| ``sensing_subsystemQ3D``  | All controllers            | See :xref:`COSM` docs.                                         |
++---------------------------+----------------------------+----------------------------------------------------------------+
+| ``actuation_subsystem2D`` | All controllers            | See :xref:`COSM` docs.                                         |
++---------------------------+----------------------------+----------------------------------------------------------------+
+| ``exploration``           | All but CRW                | Parameters for robot exploration in the absence of knowledge of|
+|                           |                            | an instance of the goal type.                                  |
++---------------------------+----------------------------+----------------------------------------------------------------+
+| ``task_executive``        | Depth1, depth2 controllers | See :xref:`COSM` docs.                                         |
++---------------------------+---------------------------------------------------------------------------------------------+
+| ``task_alloc``            | Depth1, depth2 controllers | See :xref:`COSM` docs.                                         |
++---------------------------+---------------------------------------------------------------------------------------------+
 
 ``block_sel_matrix``
 --------------------
@@ -274,8 +278,8 @@ XML configuration:
   - ``ledtaxis_search`` - Use the sensing information given off by a cache to
     perform LEDtaxis towards it, and then perform CRW once a robot is
 
-Additional notes to :xref:`COSM` controller docs:
-=================================================
+Additional notes to :xref:`COSM` controller docs
+================================================
 
 ``perception``
 --------------

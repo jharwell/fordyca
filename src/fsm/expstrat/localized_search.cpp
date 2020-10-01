@@ -23,10 +23,22 @@
  ******************************************************************************/
 #include "fordyca/fsm/expstrat/localized_search.hpp"
 
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, fsm, expstrat);
+
+/*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+localized_search::localized_search(crfootbot::footbot_saa_subsystem* saa,
+                                   rmath::rng* rng)
+    : foraging_expstrat(saa, rng),
+      ER_CLIENT_INIT("fordyca.fsm.expstrat.localized_search"),
+      m_vfsm(saa, rng),
+      m_crw(saa, rng) {}
 
 /*******************************************************************************
  * Member Functions
@@ -43,41 +55,41 @@ void localized_search::task_execute(void) {
 } /* task_execute() */
 
 /*******************************************************************************
- * Collision Metrics
+ * Interference Metrics
  ******************************************************************************/
-bool localized_search::in_collision_avoidance(void) const {
-  return (m_vfsm.task_running() && m_vfsm.in_collision_avoidance()) ||
-         (m_crw.task_running() && m_crw.in_collision_avoidance());
-} /* in_collision_avoidance() */
+bool localized_search::exp_interference(void) const {
+  return (m_vfsm.task_running() && m_vfsm.exp_interference()) ||
+         (m_crw.task_running() && m_crw.exp_interference());
+} /* exp_interference() */
 
-bool localized_search::entered_collision_avoidance(void) const {
-  return (m_vfsm.task_running() && m_vfsm.entered_collision_avoidance()) ||
-         (m_crw.task_running() && m_crw.entered_collision_avoidance());
-} /* entered_collision_avoidance() */
+bool localized_search::entered_interference(void) const {
+  return (m_vfsm.task_running() && m_vfsm.entered_interference()) ||
+         (m_crw.task_running() && m_crw.entered_interference());
+} /* entered_interference() */
 
-bool localized_search::exited_collision_avoidance(void) const {
-  return (m_vfsm.task_running() && m_vfsm.exited_collision_avoidance()) ||
-         (m_crw.task_running() && m_crw.exited_collision_avoidance());
-} /* exited_collision_avoidance() */
+bool localized_search::exited_interference(void) const {
+  return (m_vfsm.task_running() && m_vfsm.exited_interference()) ||
+         (m_crw.task_running() && m_crw.exited_interference());
+} /* exited_interference() */
 
-rtypes::timestep localized_search::collision_avoidance_duration(void) const {
+rtypes::timestep localized_search::interference_duration(void) const {
   if (m_vfsm.task_running()) {
-    return m_vfsm.collision_avoidance_duration();
+    return m_vfsm.interference_duration();
   } else if (m_crw.task_running()) {
-    return m_crw.collision_avoidance_duration();
+    return m_crw.interference_duration();
   } else {
     return rtypes::timestep(0);
   }
-} /* collision_avoidance_duration() */
+} /* interference_duration() */
 
-rmath::vector2z localized_search::avoidance_loc(void) const {
+rmath::vector3z localized_search::interference_loc3D(void) const {
   ER_ASSERT(m_vfsm.task_running() || m_crw.task_running(),
-            "In collision avoidance without running task?");
+            "In collision interference without running task?");
   if (m_vfsm.task_running()) {
-    return m_vfsm.avoidance_loc();
+    return m_vfsm.interference_loc3D();
   } else {
-    return m_crw.avoidance_loc();
+    return m_crw.interference_loc3D();
   }
-} /* collision_avoidance_duration() */
+} /* interference_loc3D() */
 
 NS_END(expstrat, fsm, fordyca);

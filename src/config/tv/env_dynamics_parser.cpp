@@ -40,6 +40,12 @@ void env_dynamics_parser::parse(const ticpp::Element& node) {
   ticpp::Element tvnode = node_get(node, kXMLRoot);
   m_config = std::make_unique<config_type>();
 
+  /* motion dynamics configured */
+  if (nullptr != tvnode.FirstChild("motion_throttle", false)) {
+    m_motion.parse(node_get(tvnode, "motion_throttle"));
+    auto config = m_motion.config_get<rct::config::xml::waveform_parser::config_type>();
+    m_config->rda.motion_throttle = *config;
+  }
   /* block dynamics configured */
   if (nullptr != tvnode.FirstChild("blocks", false)) {
     ticpp::Element bnode = node_get(tvnode, "blocks");
@@ -55,7 +61,7 @@ void env_dynamics_parser::parse(const ticpp::Element& node) {
       auto config =
           m_block_carry
               .config_get<rct::config::xml::waveform_parser::config_type>();
-      m_config->rda.motion_throttle = *config;
+      m_config->rda.block_carry_throttle = *config;
     }
   }
 

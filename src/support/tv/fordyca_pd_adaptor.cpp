@@ -25,8 +25,9 @@
 
 #include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/arena/operations/free_block_drop.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
-#include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca//controller/foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -36,20 +37,20 @@ NS_START(fordyca, support, tv);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-fordyca_pd_adaptor::fordyca_pd_adaptor(const ctv::config::population_dynamics_config* config,
-                                        cpal::argos_sm_adaptor* sm,
-                                        env_dynamics_type *envd,
-                                        carena::caching_arena_map* map,
-                                        rmath::rng* rng)
+fordyca_pd_adaptor::fordyca_pd_adaptor(
+    const ctv::config::population_dynamics_config* config,
+    cpal::argos_sm_adaptor* sm,
+    env_dynamics_type* envd,
+    carena::caching_arena_map* map,
+    rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.support.tv.fordyca_pd_adaptor"),
-      argos_pd_adaptor<cpal::argos_controller2D_adaptor>(config,
-                                                         sm,
-                                                         envd,
-                                                         rmath::vector2d(map->xrsize(),
-                                                                         map->yrsize()),
-                                                         rng),
-  m_map(map) {}
-
+      argos_pd_adaptor<cpal::argos_controller2D_adaptor>(
+          config,
+          sm,
+          envd,
+          rmath::vector2d(map->xrsize(), map->yrsize()),
+          rng),
+      m_map(map) {}
 
 /*******************************************************************************
  * Member Functions
@@ -75,9 +76,9 @@ void fordyca_pd_adaptor::pre_kill_cleanup(
      * dynamics are always applied AFTER all robots have had their control steps
      * run, we are in a non-concurrent context, so no reason to grab them.
      */
-    caops::free_block_drop_visitor<crepr::base_block2D> adrop_op(
+    caops::free_block_drop_visitor adrop_op(
         *it,
-        rmath::dvec2zvec(foraging->pos2D(), m_map->grid_resolution().v()),
+        rmath::dvec2zvec(foraging->rpos2D(), m_map->grid_resolution().v()),
         m_map->grid_resolution(),
         carena::arena_map_locking::ekALL_HELD);
 

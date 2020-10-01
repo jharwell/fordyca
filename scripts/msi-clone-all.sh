@@ -50,3 +50,6 @@ if [ -d sierra ]; then rm -rf sierra; fi
 git clone https://github.com/swarm-robotics/sierra.git
 cd sierra
 git checkout devel
+git submodule update --init --recursive --remote
+
+cd ..

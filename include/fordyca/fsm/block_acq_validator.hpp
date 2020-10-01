@@ -37,7 +37,7 @@ NS_START(fordyca);
 namespace ds {
 class dp_block_map;
 } /* namespace ds */
-namespace controller {
+namespace controller::cognitive {
 class block_sel_matrix;
 } /* namespace controller */
 
@@ -57,7 +57,7 @@ NS_START(fsm);
 class block_acq_validator : public rer::client<block_acq_validator> {
  public:
   block_acq_validator(const ds::dp_block_map* map,
-                      const controller::block_sel_matrix* matrix);
+                      const controller::cognitive::block_sel_matrix* matrix);
 
   block_acq_validator(const block_acq_validator& v) = delete;
   block_acq_validator& operator=(const block_acq_validator& v) = delete;
@@ -67,8 +67,8 @@ class block_acq_validator : public rer::client<block_acq_validator> {
 
  private:
   /* clang-format off */
-  const ds::dp_block_map* const              mc_map;
-  const controller::block_sel_matrix * const mc_matrix;
+  const ds::dp_block_map* const                         mc_map;
+  const controller::cognitive::block_sel_matrix * const mc_matrix;
   /* clang-format on */
 };
 

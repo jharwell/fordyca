@@ -25,19 +25,19 @@
 
 #include "cosm/arena/repr/base_cache.hpp"
 
-#include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_odpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_omdpo_controller.hpp"
-#include "fordyca/controller/dpo_perception_subsystem.hpp"
-#include "fordyca/controller/mdpo_perception_subsystem.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_dpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
+#include "fordyca/controller/cognitive/dpo_perception_subsystem.hpp"
+#include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
-#include "fordyca/tasks/depth2/cache_finisher.hpp"
-#include "fordyca/tasks/depth2/cache_starter.hpp"
+#include "fordyca/tasks/d2/cache_finisher.hpp"
+#include "fordyca/tasks/d2/cache_starter.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -66,7 +66,7 @@ void cache_proximity::dispatch_cache_interactor(
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void cache_proximity::visit(controller::depth2::birtd_dpo_controller& c) {
+void cache_proximity::visit(controller::cognitive::d2::birtd_dpo_controller& c) {
   c.ndc_pusht();
 
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
@@ -79,7 +79,7 @@ void cache_proximity::visit(controller::depth2::birtd_dpo_controller& c) {
   c.ndc_pop();
 } /* visit() */
 
-void cache_proximity::visit(controller::depth2::birtd_mdpo_controller& c) {
+void cache_proximity::visit(controller::cognitive::d2::birtd_mdpo_controller& c) {
   c.ndc_pusht();
 
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
@@ -92,7 +92,7 @@ void cache_proximity::visit(controller::depth2::birtd_mdpo_controller& c) {
   c.ndc_pop();
 } /* visit() */
 
-void cache_proximity::visit(controller::depth2::birtd_odpo_controller& c) {
+void cache_proximity::visit(controller::cognitive::d2::birtd_odpo_controller& c) {
   c.ndc_pusht();
 
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
@@ -105,7 +105,7 @@ void cache_proximity::visit(controller::depth2::birtd_odpo_controller& c) {
   c.ndc_pop();
 } /* visit() */
 
-void cache_proximity::visit(controller::depth2::birtd_omdpo_controller& c) {
+void cache_proximity::visit(controller::cognitive::d2::birtd_omdpo_controller& c) {
   c.ndc_pusht();
 
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
@@ -118,11 +118,11 @@ void cache_proximity::visit(controller::depth2::birtd_omdpo_controller& c) {
   c.ndc_pop();
 } /* visit() */
 
-void cache_proximity::visit(tasks::depth2::cache_finisher& task) {
+void cache_proximity::visit(tasks::d2::cache_finisher& task) {
   visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 
-void cache_proximity::visit(tasks::depth2::cache_starter& task) {
+void cache_proximity::visit(tasks::d2::cache_starter& task) {
   visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 

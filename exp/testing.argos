@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <birtd_dpo_controller id="ffc"
+    <bitd_dpo_controller id="ffc"
                           library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -31,7 +31,7 @@
         <footbot_light implementation="rot_z_only" show_rays="false">
         </footbot_light>
         <footbot_motor_ground implementation="rot_z_only" />
-        <range_and_bearing implementation="medium" medium="rab" />
+        <!-- <range_and_bearing implementation="medium" medium="rab" /> -->
         <colored_blob_omnidirectional_camera implementation="rot_z_only"
                                              medium="leds" />
         <battery implementation="default" />
@@ -44,8 +44,8 @@
             />
         <perception
             los_dim="0.4">
-          <grid resolution="0.2"
-                size="12, 6, 2"/>
+          <grid2D resolution="0.2"
+                dims="12, 6, 2"/>
           <pheromone rho="0.00001"
                      repeat_deposit="false"/>
         </perception>
@@ -149,8 +149,8 @@
         </cache_sel_matrix>
         <exploration
             block_strategy="CRW"
-            cache_strategy="ledtaxis_search"/>
-        <sensing_subsystem2D>
+            cache_strategy="utility_search"/>
+        <sensing_subsystemQ3D>
           <!-- -5pi/6 : 5pi/6 -->
           <proximity_sensor fov="-2.61:2.61"
                             delta="0.1" />
@@ -166,7 +166,7 @@
             <cache range="0.3:0.5"
                    consensus="3"/>
           </ground_sensor>
-        </sensing_subsystem2D>
+        </sensing_subsystemQ3D>
         <actuation_subsystem2D>
           <force_calculator>
             <avoidance_force lookahead="0.5"
@@ -187,7 +187,7 @@
                       max_speed="10.0" />
         </actuation_subsystem2D>
       </params>
-    </birtd_dpo_controller>
+    </bitd_dpo_controller>
 
   </controllers>
 
@@ -195,7 +195,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth2_loop_functions">
+                  label="depth1_loop_functions">
     <output
         output_root="output"
         output_dir="__current_date__">
@@ -225,6 +225,8 @@
             perception_mdpo="perception-mdpo"
             swarm_convergence="swarm-convergence"
             tv_population="tv-population"
+            block_distributor="block-distributor"
+            block_motion="block-motion"
             tv_environment="tv-environment"/>
 
         <create output_interval="10"
@@ -261,6 +263,14 @@
     <!-- </oracle_manager> -->
     <temporal_variance>
       <env_dynamics>
+        <motion_throttle>
+            <waveform
+                type="Sine"
+                frequency="10000"
+                amplitude="0.1"
+                offset="0.0"
+                phase="0"/>
+          </motion_throttle>
         <blocks>
           <manipulation_penalty>
             <waveform
@@ -272,7 +282,7 @@
           </manipulation_penalty>
           <carry_throttle>
             <waveform
-                type="Sine"
+                type="Null"
                 frequency="0.004"
                 amplitude="0.4"
                 offset="0.4"
@@ -291,39 +301,46 @@
         </caches>
       </env_dynamics>
       <population_dynamics
-          birth_lambda="0.0"
+          birth_mu="0.0"
           death_lambda="0.0"
-          malfunction_lambda="0.005"
-          max_size="16"
-          repair_mu="0.001"/>
+          malfunction_lambda="0.000"
+          max_size="00"
+          repair_mu="0.000"/>
     </temporal_variance>
 
     <arena_map>
-      <grid resolution="0.2"
-            size="12, 6, 2"/>
+      <grid2D resolution="0.2"
+              dims="12, 12, 2"/>
       <blocks>
+        <motion
+            policy="random_walk"
+            random_walk_prob="1.0"/>
         <distribution
-            dist_type="single_source">
+            dist_type="random">
+
           <!-- <redist_governor -->
-          <!--     trigger="Null" -->
+          <!--     trigger="timestep" -->
           <!--     recurrence_policy="multi" -->
-          <!--     timestep="500" -->
+          <!--     timestep="0" -->
           <!--     block_count="2"/> -->
-          <!-- <powerlaw -->
-          <!--     pwr_min="0" -->
-          <!--     pwr_max="3" -->
-          <!--     n_clusters="15" -->
-          <!--     /> -->
+
+          <powerlaw
+              pwr_min="2"
+              pwr_max="7"
+              n_clusters="10"
+              />
           <manifest
-              n_cube="10"
-              n_ramp="10"
+              n_cube="100"
+              n_ramp="0"
               unit_dim="0.2"
               />
         </distribution>
       </blocks>
-      <nest size="1.0, 4.0" center="6, 3" />
+      <nests>
+        <nest dims="2.4, 2.4" center="6, 6" />
+      </nests>
     </arena_map>
-    <caches dimension="0.8">
+    <caches dimension="1.0">
       <static enable="true"
               size="2"
               respawn_scale_factor="0.05"/>
@@ -333,33 +350,33 @@
                robot_drop_only="false"/>
     </caches>
 
-    <!--   <visualization robot_id="true" -->
-    <!--                  robot_los="true" -->
-    <!--                  robot_task="true" -->
-    <!--                  block_id="false" -->
-    <!--                  /> -->
+      <visualization robot_id="true"
+                     robot_los="true"
+                     robot_task="true"
+                     block_id="false"
+                     />
   </loop_functions>
 
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="12, 6, 10" center="6,3,5">
+  <arena size="12, 12, 10" center="6,6,5">
 
     <floor id="floor"
            source="loop_functions"
            pixels_per_meter="50" />
 
     <box id="wall_north" size="12,0.1,0.5" movable="false">
-      <body position="6,6.1,0" orientation="0,0,0" />
+      <body position="6,12.1,0" orientation="0,0,0" />
     </box>
     <box id="wall_south" size="12,0.1,0.5" movable="false">
       <body position="6,0,0" orientation="0,0,0" />
     </box>
-    <box id="wall_east" size="0.1,6,0.5" movable="false">
-      <body position="12,3,0" orientation="0,0,0" />
+    <box id="wall_east" size="0.1,12,0.5" movable="false">
+      <body position="12,6,0" orientation="0,0,0" />
     </box>
-    <box id="wall_west" size="0.1,6,0.5" movable="false">
-      <body position="0,3,0" orientation="0,0,0" />
+    <box id="wall_west" size="0.1,12,0.5" movable="false">
+      <body position="0,6,0" orientation="0,0,0" />
     </box>
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
@@ -408,7 +425,7 @@
   <!-- * Media * -->
   <!-- ********* -->
   <media>
-    <range_and_bearing id="rab" />
+    <!-- <range_and_bearing id="rab" /> -->
     <led id="leds" />
   </media>
 
@@ -416,24 +433,24 @@
   <!-- * Visualization * -->
   <!-- ****************** -->
   <!-- <visualization> -->
-  <!--   <qt-opengl autoplay="true"> -->
-  <!--      <frame_grabbing directory="frames" -->
-  <!--                      base_name="frame_" -->
-  <!--                      format="png" -->
-  <!--                      quality="100" -->
-  <!--                      headless_grabbing="true" -->
-  <!--                      headless_frame_size="1600x1200" -->
-  <!--                      /> -->
+  <!--   <qt-opengl autoplay="false"> -->
+  <!--      <!-\- <frame_grabbing directory="frames" -\-> -->
+  <!--      <!-\-                 base_name="frame_" -\-> -->
+  <!--      <!-\-                 format="png" -\-> -->
+  <!--      <!-\-                 quality="100" -\-> -->
+  <!--      <!-\-                 headless_grabbing="true" -\-> -->
+  <!--      <!-\-                 headless_frame_size="1600x1200" -\-> -->
+  <!--      <!-\-                 /> -\-> -->
   <!--     <camera> -->
   <!--       <placement idx="0" -->
-  <!--                  position="6,3,6" -->
-  <!--                  look_at="6,3,0" -->
+  <!--                  position="6,6,6" -->
+  <!--                  look_at="6,6,0" -->
   <!--                  lens_focal_length="20" -->
   <!--                  up="0,1,0" -->
   <!--                  /> -->
   <!--       <placement idx="1" -->
   <!--                  position="6,0,5" -->
-  <!--                  look_at="6,3,0" -->
+  <!--                  look_at="6,6,0" -->
   <!--                  lens_focal_length="20" -->
   <!--                  up="0,1,0" -->
   <!--                  /> -->

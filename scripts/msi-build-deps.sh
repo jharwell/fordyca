@@ -6,7 +6,8 @@
 # cloning script. MUST be run from a cluster node.
 #
 # $1 - The directory dependencies were cloned into.
-# $2 - The install prefix (things will be installed to the $MSICLUSTER directory
+# $2 - The install prefix (things which need to be built for a
+#      specific cluster will be installed to the $MSICLUSTER directory
 #      under here).
 # $3 - How many cores to use when building.
 #
@@ -42,4 +43,14 @@ cmake -DCMAKE_BUILD_TYPE=Release \
       -DARGOS_INSTALL_LDSOCONF=OFF \
       -DARGOS_WITH_LUA=OFF\
       ../src
+
 make -j $3 && make doc && make install
+
+cd ../..
+
+# Next pigz
+cd pigz
+make -j $3
+cp pigz unpigz $2/bin/
+
+cd ../..

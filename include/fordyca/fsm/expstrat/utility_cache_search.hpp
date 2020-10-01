@@ -58,9 +58,9 @@ class utility_cache_search : public localized_search {
                              c_params->dpo_store,
                              c_params->saa,
                              rng) {}
-  utility_cache_search(const controller::cache_sel_matrix* csel_matrix,
+  utility_cache_search(const controller::cognitive::cache_sel_matrix* csel_matrix,
                        const ds::dpo_store* store,
-                       crfootbot::footbot_saa_subsystem2D* saa,
+                       crfootbot::footbot_saa_subsystem* saa,
                        rmath::rng* rng)
       : localized_search(saa, rng),
         mc_matrix(csel_matrix),
@@ -71,10 +71,10 @@ class utility_cache_search : public localized_search {
   utility_cache_search& operator=(const utility_cache_search&) = delete;
 
   /* taskable overrides */
-  void task_start(const cta::taskable_argument*) override;
+  void task_start(cta::taskable_argument*) override;
 
   /* prototype overrides */
-  std::unique_ptr<foraging_expstrat> clone(void) const override {
+  std::unique_ptr<csexpstrat::base_expstrat> clone(void) const override {
     return std::make_unique<utility_cache_search>(mc_matrix,
                                                   mc_store,
                                                   saa(),
@@ -83,8 +83,8 @@ class utility_cache_search : public localized_search {
 
  private:
   /* clang-format off */
-  const controller::cache_sel_matrix* mc_matrix;
-  const ds::dpo_store*                mc_store;
+  const controller::cognitive::cache_sel_matrix* mc_matrix;
+  const ds::dpo_store*                           mc_store;
   /* clang-format on */
 };
 

@@ -22,8 +22,10 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
-#include "fordyca/metrics/blocks/block_manip_events.hpp"
+
 #include "cosm/controller/metrics/manipulation_metrics.hpp"
+
+#include "fordyca/metrics/blocks/block_manip_events.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -96,17 +98,25 @@ boost::optional<std::string> manipulation_metrics_collector::csv_line_build(void
 void manipulation_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const ccmetrics::manipulation_metrics&>(metrics);
-  m_interval.free_pickup_events += m.status(metrics::blocks::block_manip_events::ekFREE_PICKUP);
-  m_interval.free_pickup_penalty += m.penalty(metrics::blocks::block_manip_events::ekFREE_PICKUP).v();
+  m_interval.free_pickup_events +=
+      m.status(metrics::blocks::block_manip_events::ekFREE_PICKUP);
+  m_interval.free_pickup_penalty +=
+      m.penalty(metrics::blocks::block_manip_events::ekFREE_PICKUP).v();
 
-  m_interval.free_drop_events += m.status(metrics::blocks::block_manip_events::ekFREE_DROP);
-  m_interval.free_drop_penalty += m.penalty(metrics::blocks::block_manip_events::ekFREE_DROP).v();
+  m_interval.free_drop_events +=
+      m.status(metrics::blocks::block_manip_events::ekFREE_DROP);
+  m_interval.free_drop_penalty +=
+      m.penalty(metrics::blocks::block_manip_events::ekFREE_DROP).v();
 
-  m_interval.cache_pickup_events += m.status(metrics::blocks::block_manip_events::ekCACHE_PICKUP);
-  m_interval.cache_pickup_penalty += m.penalty(metrics::blocks::block_manip_events::ekCACHE_PICKUP).v();
+  m_interval.cache_pickup_events +=
+      m.status(metrics::blocks::block_manip_events::ekCACHE_PICKUP);
+  m_interval.cache_pickup_penalty +=
+      m.penalty(metrics::blocks::block_manip_events::ekCACHE_PICKUP).v();
 
-  m_interval.cache_drop_events += m.status(metrics::blocks::block_manip_events::ekCACHE_DROP);
-  m_interval.cache_drop_penalty += m.penalty(metrics::blocks::block_manip_events::ekCACHE_DROP).v();
+  m_interval.cache_drop_events +=
+      m.status(metrics::blocks::block_manip_events::ekCACHE_DROP);
+  m_interval.cache_drop_penalty +=
+      m.penalty(metrics::blocks::block_manip_events::ekCACHE_DROP).v();
 } /* collect() */
 
 void manipulation_metrics_collector::reset_after_interval(void) {

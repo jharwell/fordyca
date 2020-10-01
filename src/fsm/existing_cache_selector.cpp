@@ -25,7 +25,7 @@
 
 #include "cosm/arena/repr/base_cache.hpp"
 
-#include "fordyca/controller/cache_sel_matrix.hpp"
+#include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/fsm/cache_acq_validator.hpp"
 #include "fordyca/math/existing_cache_utility.hpp"
 
@@ -33,16 +33,16 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
-using cselm = controller::cache_sel_matrix;
+using cselm = controller::cognitive::cache_sel_matrix;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 existing_cache_selector::existing_cache_selector(
     bool is_pickup,
-    const controller::cache_sel_matrix* const matrix,
+    const controller::cognitive::cache_sel_matrix* const matrix,
     const ds::dp_cache_map* cache_map)
-    : ER_CLIENT_INIT("fordyca.fsm.depth1.existing_cache_selector"),
+    : ER_CLIENT_INIT("fordyca.fsm.existing_cache_selector"),
       mc_is_pickup(is_pickup),
       mc_matrix(matrix),
       mc_cache_map(cache_map) {}
@@ -61,20 +61,20 @@ const carepr::base_cache* existing_cache_selector::operator()(
   for (auto& c : existing_caches.const_values_range()) {
     fsm::cache_acq_validator validator(mc_cache_map, mc_matrix, mc_is_pickup);
 
-    if (!validator(c.ent()->rloc(), c.ent()->id(), t) ||
+    if (!validator(c.ent()->rcenter2D(), c.ent()->id(), t) ||
         cache_is_excluded(position, c.ent())) {
       continue;
     }
     math::existing_cache_utility u(
-        c.ent()->rloc(),
+        c.ent()->rcenter2D(),
         boost::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second));
 
     double utility = u.calc(position, c.density(), c.ent()->n_blocks());
     ER_ASSERT(utility > 0.0, "Bad utility calculation");
     ER_DEBUG("Utility for existing_cache%d@%s/%s, density=%f: %f",
              c.ent()->id().v(),
-             c.ent()->rloc().to_str().c_str(),
-             c.ent()->dloc().to_str().c_str(),
+             rcppsw::to_string(c.ent()->rcenter2D()).c_str(),
+             rcppsw::to_string(c.ent()->dcenter2D()).c_str(),
              c.density().v(),
              utility);
 
@@ -84,18 +84,16 @@ const carepr::base_cache* existing_cache_selector::operator()(
     }
   } /* for(existing_cache..) */
 
-  if (nullptr != best) {
-    ER_INFO("Best utility: existing_cache%d@%s/%s w/%zu blocks: %f",
+  ER_CHECKI(nullptr != best,
+            "Best utility: existing_cache%d@%s/%s w/%zu blocks: %f",
             best->id().v(),
-            best->rloc().to_str().c_str(),
-            best->dloc().to_str().c_str(),
+            rcppsw::to_string(best->rcenter2D()).c_str(),
+            rcppsw::to_string(best->dcenter2D()).c_str(),
             best->n_blocks(),
             max_utility);
-    return best;
-  } else {
-    ER_WARN("No best existing cache found: all known caches excluded!");
-    return best;
-  }
+  ER_CHECKW(nullptr != best,
+            "No best existing cache found: all known caches excluded!");
+  return best;
 } /* operator()() */
 
 bool existing_cache_selector::cache_is_excluded(
@@ -113,8 +111,8 @@ bool existing_cache_selector::cache_is_excluded(
   if (cache->contains_point2D(position)) {
     ER_DEBUG("Ignoring cache%d@%s/%s: robot@%s inside it",
              cache->id().v(),
-             cache->rloc().to_str().c_str(),
-             cache->dloc().to_str().c_str(),
+             rcppsw::to_string(cache->rcenter2D()).c_str(),
+             rcppsw::to_string(cache->dcenter2D()).c_str(),
              position.to_str().c_str());
     return true;
   }
@@ -133,8 +131,8 @@ bool existing_cache_selector::cache_is_excluded(
       })) {
     ER_DEBUG("Ignoring cache%d@%s/%s: On exception list",
              cache->id().v(),
-             cache->rloc().to_str().c_str(),
-             cache->dloc().to_str().c_str());
+             rcppsw::to_string(cache->rcenter2D()).c_str(),
+             rcppsw::to_string(cache->dcenter2D()).c_str());
     return true;
   }
 

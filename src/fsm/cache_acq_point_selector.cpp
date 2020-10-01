@@ -41,11 +41,11 @@ NS_START(fordyca, fsm);
  * Member Functions
  ******************************************************************************/
 rmath::vector2d cache_acq_point_selector::operator()(
-    const rmath::vector2d& robot_loc,
+    RCSW_UNUSED const rmath::vector2d& robot_loc,
     const carepr::base_cache* const cache,
     rmath::rng* rng) {
-  auto xspan = cache->xspan();
-  auto yspan = cache->yspan();
+  auto xspan = cache->xrspan();
+  auto yspan = cache->yrspan();
   auto xrange =
       rmath::ranged(xspan.lb() + m_arrival_tol, xspan.ub() - m_arrival_tol);
   auto yrange =
@@ -56,17 +56,17 @@ rmath::vector2d cache_acq_point_selector::operator()(
   ER_ASSERT(cache->contains_point2D(loc),
             "Cache%d@%s/%s with xspan=%s,yspan=%s does not contain %s",
             cache->id().v(),
-            cache->rloc().to_str().c_str(),
-            cache->dloc().to_str().c_str(),
-            cache->xspan().to_str().c_str(),
-            cache->yspan().to_str().c_str(),
-            loc.to_str().c_str());
+            rcppsw::to_string(cache->rcenter2D()).c_str(),
+            rcppsw::to_string(cache->dcenter2D()).c_str(),
+            rcppsw::to_string(cache->xrspan()).c_str(),
+            rcppsw::to_string(cache->yrspan()).c_str(),
+            rcppsw::to_string(loc).c_str());
   ER_INFO("Point=%s in cache%d: robot_loc=%s,xrange=%s,yrange=%s",
-          loc.to_str().c_str(),
+          rcppsw::to_string(loc).c_str(),
           cache->id().v(),
-          robot_loc.to_str().c_str(),
-          xrange.to_str().c_str(),
-          yrange.to_str().c_str());
+          rcppsw::to_string(robot_loc).c_str(),
+          rcppsw::to_string(xrange).c_str(),
+          rcppsw::to_string(yrange).c_str());
   return loc;
 } /* operator() */
 

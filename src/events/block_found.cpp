@@ -25,19 +25,19 @@
 
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/ds/operations/cell2D_empty.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 #include "cosm/repr/pheromone_density.hpp"
 
-#include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
-#include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
-#include "fordyca/controller/depth1/bitd_odpo_controller.hpp"
-#include "fordyca/controller/depth1/bitd_omdpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_odpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_omdpo_controller.hpp"
-#include "fordyca/controller/dpo_perception_subsystem.hpp"
-#include "fordyca/controller/mdpo_perception_subsystem.hpp"
+#include "fordyca/controller/cognitive/d1/bitd_dpo_controller.hpp"
+#include "fordyca/controller/cognitive/d1/bitd_mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/d1/bitd_odpo_controller.hpp"
+#include "fordyca/controller/cognitive/d1/bitd_omdpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_dpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
+#include "fordyca/controller/cognitive/dpo_perception_subsystem.hpp"
+#include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 
 /*******************************************************************************
@@ -49,9 +49,9 @@ using ds::occupancy_grid;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_found::block_found(crepr::base_block2D* block)
+block_found::block_found(crepr::base_block3D* block)
     : ER_CLIENT_INIT("fordyca.events.block_found"),
-      cell2D_op(block->dloc()),
+      cell2D_op(block->danchor2D()),
       m_block(block) {}
 
 /*******************************************************************************
@@ -64,7 +64,7 @@ void block_found::visit(ds::dpo_store& store) {
    */
   auto it = store.caches().values_range().begin();
   while (it != store.caches().values_range().end()) {
-    if (m_block->dloc() == it->ent()->dloc()) {
+    if (m_block->danchor2D() == it->ent()->dcenter2D()) {
       carepr::base_cache* tmp = (*it).ent();
       ++it;
       store.cache_remove(tmp);
@@ -84,8 +84,8 @@ void block_found::visit(ds::dpo_store& store) {
     if (!known->ent()->dloccmp(*m_block)) {
       ER_INFO("Removing block%d@%s: Moved to %s",
               known->ent()->id().v(),
-              known->ent()->dloc().to_str().c_str(),
-              m_block->dloc().to_str().c_str());
+              known->ent()->danchor2D().to_str().c_str(),
+              m_block->danchor2D().to_str().c_str());
       store.block_remove(known->ent());
       density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
     } else { /* block has not moved */
@@ -107,7 +107,7 @@ void block_found::visit(ds::dpo_store& store) {
   }
 
   store.block_update(
-      repr::dpo_entity<crepr::base_block2D>(m_block->clone(), density));
+      repr::dpo_entity<crepr::base_block3D>(m_block->clone(), density));
 } /* visit() */
 
 /*******************************************************************************
@@ -160,7 +160,7 @@ void block_found::visit(ds::dpo_semantic_map& map) {
    * the one we just found that actually resides there are not the same, we need
    * to reset the density for the cell, and start a new decay count.
    */
-  if (cell.state_has_block() && cell.block2D()->id() != m_block->id()) {
+  if (cell.state_has_block() && cell.block3D()->id() != m_block->id()) {
     density.reset();
   }
 
@@ -169,11 +169,11 @@ void block_found::visit(ds::dpo_semantic_map& map) {
   ER_ASSERT(cell.state_has_block(),
             "Cell@%s not in HAS_BLOCK",
             cell.loc().to_str().c_str());
-  ER_ASSERT(cell.block2D()->id() == m_block->id(),
+  ER_ASSERT(cell.block3D()->id() == m_block->id(),
             "Block for cell@%s ID mismatch: %d/%d",
             cell.loc().to_str().c_str(),
             m_block->id().v(),
-            cell.block2D()->id().v());
+            cell.block3D()->id().v());
 } /* visit() */
 
 void block_found::pheromone_update(ds::dpo_semantic_map& map) {
@@ -197,21 +197,21 @@ void block_found::pheromone_update(ds::dpo_semantic_map& map) {
    * ONLY if the underlying DPO store actually changed do we update what block
    * the cell points to. If we do it unconditionally, we are left
    * with dangling references as a result of mixing unique_ptr and raw ptr. See
-   * #229.
+   * FORDYCA#229.
    */
   auto res = map.store()->block_update(
-      repr::dpo_entity<crepr::base_block2D>(m_block->clone(), density));
+      repr::dpo_entity<crepr::base_block3D>(m_block->clone(), density));
   if (res.status) {
-    if (ds::dpo_store::update_status::kBLOCK_MOVED == res.reason) {
+    if (ds::dpo_store::update_status::ekBLOCK_MOVED == res.reason) {
       ER_DEBUG("Updating cell@%s: Block%d moved %s -> %s",
                res.old_loc.to_str().c_str(),
                m_block->id().v(),
                res.old_loc.to_str().c_str(),
-               m_block->dloc().to_str().c_str());
+               m_block->danchor2D().to_str().c_str());
       cdops::cell2D_empty_visitor op(res.old_loc);
       op.visit(map.access<occupancy_grid::kCell>(res.old_loc));
     } else {
-      ER_ASSERT(ds::dpo_store::update_status::kNEW_BLOCK_ADDED == res.reason,
+      ER_ASSERT(ds::dpo_store::update_status::ekNEW_BLOCK_ADDED == res.reason,
                 "Bad reason for DPO store update: %d",
                 res.reason);
     }
@@ -228,7 +228,7 @@ void block_found::pheromone_update(ds::dpo_semantic_map& map) {
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void block_found::visit(controller::depth2::birtd_mdpo_controller& c) {
+void block_found::visit(controller::cognitive::d2::birtd_mdpo_controller& c) {
   c.ndc_pusht();
 
   visit(*c.mdpo_perception()->map());
@@ -236,7 +236,7 @@ void block_found::visit(controller::depth2::birtd_mdpo_controller& c) {
   c.ndc_pop();
 } /* visit() */
 
-void block_found::visit(controller::depth2::birtd_dpo_controller& c) {
+void block_found::visit(controller::cognitive::d2::birtd_dpo_controller& c) {
   c.ndc_pusht();
 
   visit(*c.dpo_perception()->dpo_store());
@@ -244,7 +244,7 @@ void block_found::visit(controller::depth2::birtd_dpo_controller& c) {
   c.ndc_pop();
 } /* visit() */
 
-void block_found::visit(controller::depth2::birtd_omdpo_controller& c) {
+void block_found::visit(controller::cognitive::d2::birtd_omdpo_controller& c) {
   c.ndc_pusht();
 
   visit(*c.mdpo_perception()->map());
@@ -252,7 +252,7 @@ void block_found::visit(controller::depth2::birtd_omdpo_controller& c) {
   c.ndc_pop();
 } /* visit() */
 
-void block_found::visit(controller::depth2::birtd_odpo_controller& c) {
+void block_found::visit(controller::cognitive::d2::birtd_odpo_controller& c) {
   c.ndc_pusht();
 
   visit(*c.dpo_perception()->dpo_store());

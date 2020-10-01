@@ -25,23 +25,23 @@
 
 #include <numeric>
 
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
-#include "fordyca/controller/block_sel_matrix.hpp"
+#include "fordyca/controller/cognitive/block_sel_matrix.hpp"
 #include "fordyca/ds/dp_block_map.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, fsm);
-using bselm = controller::block_sel_matrix;
+using bselm = controller::cognitive::block_sel_matrix;
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 block_acq_validator::block_acq_validator(
     const ds::dp_block_map* map,
-    const controller::block_sel_matrix* matrix)
+    const controller::cognitive::block_sel_matrix* matrix)
     : ER_CLIENT_INIT("fordyca.fsm.block_acq_validator"),
       mc_map(map),
       mc_matrix(matrix) {}
@@ -75,7 +75,7 @@ bool block_acq_validator::operator()(const rmath::vector2d& loc,
                           range.end(),
                           rmath::vector2d(),
                           [&](rmath::vector2d& sum, const auto& bent) {
-                            return sum + bent.ent()->rloc();
+                            return sum + bent.ent()->ranchor2D();
                           }) /
           boost::size(range);
 

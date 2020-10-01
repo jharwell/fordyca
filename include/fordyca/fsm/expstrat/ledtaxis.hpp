@@ -27,7 +27,6 @@
 #include <memory>
 
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
-#include "cosm/fsm/collision_tracker.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,7 +52,7 @@ class ledtaxis : public foraging_expstrat,
       : ledtaxis(c_params->saa,
                  c_params->ledtaxis_target,
                  rng) {}
-  ledtaxis(crfootbot::footbot_saa_subsystem2D* saa,
+  ledtaxis(crfootbot::footbot_saa_subsystem* saa,
            const rutils::color& target,
            rmath::rng* rng);
 
@@ -62,7 +61,7 @@ class ledtaxis : public foraging_expstrat,
   ledtaxis& operator=(const ledtaxis&) = delete;
 
   /* taskable overrides */
-  void task_start(const cta::taskable_argument*) override final {
+  void task_start(cta::taskable_argument*) override final {
     m_task_running = true;
   }
 
@@ -78,7 +77,7 @@ class ledtaxis : public foraging_expstrat,
   void task_execute(void) override final;
 
   /* prototype overrides */
-  std::unique_ptr<foraging_expstrat> clone(void) const override {
+  std::unique_ptr<csexpstrat::base_expstrat> clone(void) const override {
     return nullptr; /* Should not be a top level explore behavior */
   }
 
@@ -92,18 +91,9 @@ class ledtaxis : public foraging_expstrat,
   static constexpr double kARRIVAL_TOL = 1.0;
 
   /* clang-format off */
-  mutable bool             m_task_running{false};
-  cfsm::collision_tracker m_tracker;
-  rutils::color            m_target;
+  mutable bool            m_task_running{false};
+  rutils::color           m_target;
   /* clang-format on */
-
- public:
-  /* collision metrics */
-  RCPPSW_DECLDEF_OVERRIDE_WRAP(in_collision_avoidance, m_tracker, const)
-  RCPPSW_DECLDEF_OVERRIDE_WRAP(entered_collision_avoidance, m_tracker, const)
-  RCPPSW_DECLDEF_OVERRIDE_WRAP(exited_collision_avoidance, m_tracker, const)
-  RCPPSW_DECLDEF_OVERRIDE_WRAP(collision_avoidance_duration, m_tracker, const)
-  RCPPSW_DECLDEF_OVERRIDE_WRAP(avoidance_loc, m_tracker, const)
 };
 
 NS_END(expstrat, fsm, fordyca);

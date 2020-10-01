@@ -19,5 +19,9 @@ if [ -d argos3 ]; then rm -rf argos3; fi
 git clone https://github.com/swarm-robotics/argos3.git
 cd argos3
 git checkout devel
-
 cd ..
+
+# Next, pigz, because it takes FOREVER to tar/untar things with serial
+# implementations
+if [ -d pigz ]; then rm -rf pigz; fi
+git clone https://github.com/madler/pigz.git

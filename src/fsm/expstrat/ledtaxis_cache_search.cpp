@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/fsm/expstrat/ledtaxis_cache_search.hpp"
 
-#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 /*******************************************************************************
@@ -63,7 +63,7 @@ void ledtaxis_cache_search::task_execute(void) {
   m_crw.task_execute();
 } /* task_execute() */
 
-void ledtaxis_cache_search::task_start(const cta::taskable_argument*) {
+void ledtaxis_cache_search::task_start(cta::taskable_argument*) {
   saa()->sensing()->blobs()->enable();
   m_taxis.task_start(nullptr);
 } /* task_start() */
@@ -75,41 +75,41 @@ void ledtaxis_cache_search::task_reset(void) {
 } /* task_reset() */
 
 /*******************************************************************************
- * Collision Metrics
+ * Interference Metrics
  ******************************************************************************/
-bool ledtaxis_cache_search::in_collision_avoidance(void) const {
-  return (m_taxis.task_running() && m_taxis.in_collision_avoidance()) ||
-         (m_crw.task_running() && m_crw.in_collision_avoidance());
-} /* in_collision_avoidance() */
+bool ledtaxis_cache_search::exp_interference(void) const {
+  return (m_taxis.task_running() && m_taxis.exp_interference()) ||
+         (m_crw.task_running() && m_crw.exp_interference());
+} /* exp_interference() */
 
-bool ledtaxis_cache_search::entered_collision_avoidance(void) const {
-  return (m_taxis.task_running() && m_taxis.entered_collision_avoidance()) ||
-         (m_crw.task_running() && m_crw.entered_collision_avoidance());
-} /* entered_collision_avoidance() */
+bool ledtaxis_cache_search::entered_interference(void) const {
+  return (m_taxis.task_running() && m_taxis.entered_interference()) ||
+         (m_crw.task_running() && m_crw.entered_interference());
+} /* entered_interference() */
 
-bool ledtaxis_cache_search::exited_collision_avoidance(void) const {
-  return (m_taxis.task_running() && m_taxis.exited_collision_avoidance()) ||
-         (m_crw.task_running() && m_crw.exited_collision_avoidance());
-} /* exited_collision_avoidance() */
+bool ledtaxis_cache_search::exited_interference(void) const {
+  return (m_taxis.task_running() && m_taxis.exited_interference()) ||
+         (m_crw.task_running() && m_crw.exited_interference());
+} /* exited_interference() */
 
-rtypes::timestep ledtaxis_cache_search::collision_avoidance_duration(void) const {
+rtypes::timestep ledtaxis_cache_search::interference_duration(void) const {
   if (m_taxis.task_running()) {
-    return m_taxis.collision_avoidance_duration();
+    return m_taxis.interference_duration();
   } else if (m_crw.task_running()) {
-    return m_crw.collision_avoidance_duration();
+    return m_crw.interference_duration();
   } else {
     return rtypes::timestep(0);
   }
-} /* collision_avoidance_duration() */
+} /* interference_duration() */
 
-rmath::vector2z ledtaxis_cache_search::avoidance_loc(void) const {
+rmath::vector3z ledtaxis_cache_search::interference_loc3D(void) const {
   ER_ASSERT(m_taxis.task_running() || m_crw.task_running(),
-            "In collision avoidance without running task?");
+            "In collision interference without running task?");
   if (m_taxis.task_running()) {
-    return m_taxis.avoidance_loc();
+    return m_taxis.interference_loc3D();
   } else {
-    return m_crw.avoidance_loc();
+    return m_crw.interference_loc3D();
   }
-} /* collision_avoidance_duration() */
+} /* interference_loc3D() */
 
 NS_END(expstrat, fsm, fordyca);

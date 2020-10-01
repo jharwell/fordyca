@@ -25,12 +25,12 @@
 
 #include "cosm/arena/repr/base_cache.hpp"
 
-#include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_odpo_controller.hpp"
-#include "fordyca/controller/depth2/birtd_omdpo_controller.hpp"
-#include "fordyca/controller/dpo_perception_subsystem.hpp"
-#include "fordyca/controller/mdpo_perception_subsystem.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_dpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
+#include "fordyca/controller/cognitive/dpo_perception_subsystem.hpp"
+#include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cell2D_empty.hpp"
 
@@ -45,7 +45,7 @@ using ds::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 cache_found::cache_found(carepr::base_cache* cache)
-    : cell2D_op(cache->dloc()),
+    : cell2D_op(cache->dcenter2D()),
       ER_CLIENT_INIT("fordyca.events.cache_found"),
       m_cache(cache) {}
 
@@ -65,8 +65,8 @@ void cache_found::visit(ds::dpo_store& store) {
    */
   auto it = store.blocks().values_range().begin();
   while (it != store.blocks().values_range().end()) {
-    if (m_cache->contains_point2D(it->ent()->rloc())) {
-      crepr::base_block2D* tmp = (*it).ent();
+    if (m_cache->contains_point2D(it->ent()->rcenter2D())) {
+      crepr::base_block3D* tmp = (*it).ent();
       ++it;
       ER_TRACE("Remove block%d hidden behind cache%d",
                tmp->id().v(),
@@ -126,7 +126,7 @@ void cache_found::visit(cfsm::cell2D_fsm& fsm) {
    * after the cell that refers to it is update (this class does said update)).
    *
    * As such, we need to make sure that we ALWAYS put the cell in the correct
-   * state by sending it enough block drops. (see #323).
+   * state by sending it enough block drops. (see FORDYCA#323).
    */
   for (size_t i = fsm.block_count();
        i < std::max(base_cache::kMinBlocks, m_cache->n_blocks());
@@ -164,9 +164,9 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
    * created. When we return to the arena and find a new cache there, we are
    * tracking blocks that no longer exist in our perception.
    */
-  std::list<crepr::base_block2D*> rms;
+  std::list<crepr::base_block3D*> rms;
   for (auto&& b : map.blocks().values_range()) {
-    if (m_cache->contains_point2D(b.ent()->rloc())) {
+    if (m_cache->contains_point2D(b.ent()->rcenter2D())) {
       ER_TRACE("Remove block%d hidden behind cache%d",
                b.ent()->id().v(),
                m_cache->id().v());
@@ -175,8 +175,8 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
   } /* for(&&b..) */
 
   for (auto&& b : rms) {
-    cdops::cell2D_empty_visitor op(b->dloc());
-    op.visit(map.access<occupancy_grid::kCell>(b->dloc()));
+    cdops::cell2D_empty_visitor op(b->danchor2D());
+    op.visit(map.access<occupancy_grid::kCell>(b->danchor2D()));
     map.block_remove(b);
   } /* for(&&b..) */
 
@@ -189,7 +189,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
    * kind of cell entity.
    */
   if (cell.state_has_block()) {
-    map.block_remove(cell.block2D());
+    map.block_remove(cell.block3D());
   }
 
   /*
@@ -234,7 +234,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void cache_found::visit(controller::depth2::birtd_mdpo_controller& c) {
+void cache_found::visit(controller::cognitive::d2::birtd_mdpo_controller& c) {
   c.ndc_pusht();
 
   visit(*c.mdpo_perception()->map());
@@ -242,7 +242,7 @@ void cache_found::visit(controller::depth2::birtd_mdpo_controller& c) {
   c.ndc_pop();
 } /* visit() */
 
-void cache_found::visit(controller::depth2::birtd_dpo_controller& c) {
+void cache_found::visit(controller::cognitive::d2::birtd_dpo_controller& c) {
   c.ndc_pusht();
 
   visit(*c.dpo_perception()->dpo_store());
@@ -250,7 +250,7 @@ void cache_found::visit(controller::depth2::birtd_dpo_controller& c) {
   c.ndc_pop();
 } /* visit() */
 
-void cache_found::visit(controller::depth2::birtd_omdpo_controller& c) {
+void cache_found::visit(controller::cognitive::d2::birtd_omdpo_controller& c) {
   c.ndc_pusht();
 
   visit(*c.mdpo_perception()->map());
@@ -258,7 +258,7 @@ void cache_found::visit(controller::depth2::birtd_omdpo_controller& c) {
   c.ndc_pop();
 } /* visit() */
 
-void cache_found::visit(controller::depth2::birtd_odpo_controller& c) {
+void cache_found::visit(controller::cognitive::d2::birtd_odpo_controller& c) {
   c.ndc_pusht();
 
   visit(*c.dpo_perception()->dpo_store());

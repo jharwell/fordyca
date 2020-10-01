@@ -49,6 +49,7 @@ void cache_sel_matrix_parser::parse(const ticpp::Element& node) {
   XML_PARSE_ATTR(cnode, m_config, nest_prox_dist);
   XML_PARSE_ATTR(cnode, m_config, site_xrange);
   XML_PARSE_ATTR(cnode, m_config, site_yrange);
+  XML_PARSE_ATTR_DFLT(cnode, m_config, strict_constraints, true);
 } /* parse() */
 
 bool cache_sel_matrix_parser::validate(void) const {

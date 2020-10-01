@@ -31,7 +31,7 @@
 #include "rcppsw/patterns/visitor/visitor.hpp"
 
 #include "cosm/ds/operations/cell2D_op.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
@@ -40,7 +40,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace fordyca::controller {
+namespace fordyca::controller::cognitive {
 class block_sel_matrix;
 } /* namespace fordyca::controller */
 
@@ -71,19 +71,16 @@ class robot_free_block_drop : public rer::client<robot_free_block_drop>,
   struct visit_typelist_impl {
     using inherited = cdops::cell2D_op::visit_typelist;
     using controllers = boost::mpl::joint_view<
-        boost::mpl::joint_view<controller::depth0::typelist,
-                               controller::depth1::typelist>,
-        controller::depth2::typelist>;
+        boost::mpl::joint_view<controller::d0::typelist,
+                               controller::d1::typelist>,
+        controller::d2::typelist>;
 
     using others = rmpl::typelist<
-        /* depth0 */
+        /* d0 */
         fsm::block_to_goal_fsm,
-        ds::dpo_semantic_map,
-        /* depth2 */
-        tasks::depth2::cache_starter,
-        tasks::depth2::cache_finisher,
-        fsm::block_to_goal_fsm,
-        ds::dpo_semantic_map>;
+        /* d2 */
+        tasks::d2::cache_starter,
+        tasks::d2::cache_finisher>;
 
     using value = boost::mpl::joint_view<
         boost::mpl::joint_view<controllers::type, others::type>,
@@ -98,24 +95,19 @@ class robot_free_block_drop : public rer::client<robot_free_block_drop>,
   robot_free_block_drop(const robot_free_block_drop& op) = delete;
   robot_free_block_drop& operator=(const robot_free_block_drop& op) = delete;
 
-  /* depth1 */
-  void visit(controller::depth1::bitd_dpo_controller&) {}
-  void visit(controller::depth1::bitd_mdpo_controller&) {}
-  void visit(controller::depth1::bitd_odpo_controller&) {}
-  void visit(controller::depth1::bitd_omdpo_controller&) {}
+  /* d1 */
+  void visit(controller::cognitive::d1::bitd_dpo_controller&) {}
+  void visit(controller::cognitive::d1::bitd_mdpo_controller&) {}
+  void visit(controller::cognitive::d1::bitd_odpo_controller&) {}
+  void visit(controller::cognitive::d1::bitd_omdpo_controller&) {}
 
-  /* depth2 */
-  void visit(controller::depth2::birtd_dpo_controller&);
-  void visit(controller::depth2::birtd_mdpo_controller&);
-  void visit(controller::depth2::birtd_odpo_controller&);
-  void visit(controller::depth2::birtd_omdpo_controller&);
-  void visit(tasks::depth2::cache_starter&);
-  void visit(tasks::depth2::cache_finisher&);
-
-  /**
-   * \brief Get the handle on the block that has been dropped.
-   */
-  std::shared_ptr<crepr::base_block2D> block(void) const { return m_block; }
+  /* d2 */
+  void visit(controller::cognitive::d2::birtd_dpo_controller&);
+  void visit(controller::cognitive::d2::birtd_mdpo_controller&);
+  void visit(controller::cognitive::d2::birtd_odpo_controller&);
+  void visit(controller::cognitive::d2::birtd_omdpo_controller&);
+  void visit(tasks::d2::cache_starter&);
+  void visit(tasks::d2::cache_finisher&);
 
  protected:
   /**
@@ -123,24 +115,20 @@ class robot_free_block_drop : public rer::client<robot_free_block_drop>,
    * \param coord The discrete coordinates of the cell to drop the block in.
    * \param resolution The resolution of the arena map.
    */
-  robot_free_block_drop(std::unique_ptr<crepr::base_block2D> block,
+  robot_free_block_drop(std::unique_ptr<crepr::base_block3D> block,
                         const rmath::vector2z& coord,
                         const rtypes::discretize_ratio& resolution);
 
  private:
-  void visit(fsm::block_to_goal_fsm&);
-  void visit(ds::dpo_semantic_map& map);
-  void visit(class cds::cell2D& cell);
-  void visit(cfsm::cell2D_fsm& fsm);
-  void visit(crepr::base_block2D& block);
+  void visit(fsm::block_to_goal_fsm& fsm);
 
   bool dispatch_free_block_interactor(tasks::base_foraging_task* task,
-                                      controller::block_sel_matrix* bsel_matrix);
+                                      controller::cognitive::block_sel_matrix* bsel_matrix);
 
   /* clang-format off */
   const rtypes::discretize_ratio       mc_resolution;
 
-  std::shared_ptr<crepr::base_block2D> m_block;
+  std::unique_ptr<crepr::base_block3D> m_block;
   /* clang-format on */
 };
 

@@ -26,11 +26,14 @@
 #include <boost/mpl/for_each.hpp>
 
 #include "rcppsw/mpl/typelist.hpp"
+#include "rcppsw/utils/maskable_enum.hpp"
 
-#include "cosm/pal/argos_convergence_calculator.hpp"
 #include "cosm/metrics/collector_registerer.hpp"
+#include "cosm/pal/argos_convergence_calculator.hpp"
+#include "cosm/arena/caching_arena_map.hpp"
+#include "cosm/foraging/block_dist/base_distributor.hpp"
 
-#include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca//controller/foraging_controller.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
 #include "fordyca/metrics/tv/env_dynamics_metrics_collector.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
@@ -52,12 +55,12 @@ NS_END(detail);
  ******************************************************************************/
 fordyca_metrics_aggregator::fordyca_metrics_aggregator(
     const cmconfig::metrics_config* const mconfig,
-    const cdconfig::grid_config* const gconfig,
+    const cdconfig::grid2D_config* const gconfig,
     const std::string& output_root)
     : ER_CLIENT_INIT("fordyca.metrics.aggregator"),
       base_metrics_aggregator(mconfig, output_root) {
   /* register collectors from base class */
-  auto dims2D = rmath::dvec2zvec(gconfig->upper, gconfig->resolution.v());
+  auto dims2D = rmath::dvec2zvec(gconfig->dims, gconfig->resolution.v());
   register_with_arena_dims2D(mconfig, dims2D);
 
   /* register collectors common to all of FORDYCA */
@@ -72,8 +75,7 @@ fordyca_metrics_aggregator::fordyca_metrics_aggregator(
        rmetrics::output_mode::ekAPPEND},
   };
 
-  cmetrics::collector_registerer<> registerer(
-      mconfig, creatable_set, this);
+  cmetrics::collector_registerer<> registerer(mconfig, creatable_set, this);
   boost::mpl::for_each<detail::collector_typelist>(registerer);
   reset_all();
 }
@@ -90,10 +92,12 @@ void fordyca_metrics_aggregator::collect_from_loop(
   collect("tv::environment",
           *loop->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>());
 
-  if (loop->tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>()) {
+  if (nullptr !=
+      loop->tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>()) {
     collect("tv::population",
             *loop->tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>());
   }
+  collect_from_arena(loop->arena_map());
 } /* collect_from_loop() */
 
 NS_END(metrics, fordyca);

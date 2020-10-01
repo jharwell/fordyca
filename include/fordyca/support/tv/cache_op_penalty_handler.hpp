@@ -26,11 +26,11 @@
  ******************************************************************************/
 #include <string>
 
-#include "fordyca/fsm/block_transporter.hpp"
+#include "cosm/tv/temporal_penalty_handler.hpp"
+
 #include "fordyca/support/tv/cache_op_filter.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
-#include "cosm/tv/temporal_penalty_handler.hpp"
-#include "fordyca/support/utils/event_utils.hpp"
+#include "fordyca/support/tv/cache_op_penalty_id_calculator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,7 +56,8 @@ class cache_op_penalty_handler final
                            const std::string& name)
       : temporal_penalty_handler(config, name),
         ER_CLIENT_INIT("fordyca.support.tv.cache_op_penalty_handler"),
-        m_map(map) {}
+        m_map(map),
+        m_filter(m_map) {}
 
   ~cache_op_penalty_handler(void) override = default;
   cache_op_penalty_handler& operator=(const cache_op_penalty_handler& other) =
@@ -77,17 +78,23 @@ class cache_op_penalty_handler final
    *            applied).
    * \param t The current timestep.
   */
-  template<typename TControllerType>
-  op_filter_status penalty_init(const TControllerType& controller,
+  template<typename TController>
+  op_filter_status penalty_init(const TController& controller,
                                 cache_op_src src,
                                 const rtypes::timestep& t) {
     /*
-     * If the robot has not acquired a cache, or thinks it has but actually has
-     * not, nothing to do.
+     * Check if we have satisfied the conditions for a cache operation, which
+     * involves querying the area map.
+     *
+     * NO LOCKING IS PERFORMED.
+     *
+     * There really can't be any locking here, because if there was, the
+     * simulation would get REALLY slow for large swarms, because every robot
+     * has to make this check every timestep.
      */
-    auto filter = cache_op_filter<TControllerType>(m_map)(controller, src);
-    if (filter != op_filter_status::ekSATISFIED) {
-      return filter;
+    auto filter = m_filter(controller, src);
+    if (filter.status != op_filter_status::ekSATISFIED) {
+      return filter.status;
     }
 
     ER_ASSERT(!is_serving_penalty(controller),
@@ -95,12 +102,11 @@ class cache_op_penalty_handler final
               controller.GetId().c_str());
 
     rtypes::timestep orig_duration = penalty_calc(t);
-    auto id = utils::robot_on_cache(controller, *m_map);
-    ER_ASSERT(rtypes::constants::kNoUUID != id,
-              "%s not in cache?",
-              controller.GetId().c_str());
-
-    RCSW_UNUSED auto duration = penalty_add(&controller, id, orig_duration, t);
+    rtypes::type_uuid id = m_id_calc(src, filter);
+    rtypes::timestep RCSW_UNUSED duration = penalty_add(&controller,
+                                                        id,
+                                                        orig_duration,
+                                                        t);
     ER_INFO("%s: cache%d start=%u, penalty=%u, adjusted penalty=%u src=%d",
             controller.GetId().c_str(),
             id.v(),
@@ -109,12 +115,15 @@ class cache_op_penalty_handler final
             duration.v(),
             static_cast<int>(src));
 
-    return filter;
+    return filter.status;
   }
 
  private:
   /* clang-format off */
-  carena::caching_arena_map* const m_map;
+  carena::caching_arena_map*     m_map;
+
+  cache_op_filter                m_filter;
+  cache_op_penalty_id_calculator m_id_calc{};
   /* clang-format on */
 };
 NS_END(tv, support, fordyca);

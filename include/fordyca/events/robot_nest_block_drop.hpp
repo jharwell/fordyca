@@ -30,7 +30,7 @@
 #include "rcppsw/patterns/visitor/visitor.hpp"
 #include "rcppsw/types/timestep.hpp"
 
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
@@ -54,16 +54,16 @@ class robot_nest_block_drop : public rer::client<robot_nest_block_drop> {
  private:
   struct visit_typelist_impl {
     using controllers = boost::mpl::joint_view<
-        boost::mpl::joint_view<controller::depth0::typelist,
-                               controller::depth1::typelist>,
-        controller::depth2::typelist>;
+        boost::mpl::joint_view<controller::d0::typelist,
+                               controller::d1::typelist>,
+        controller::d2::typelist>;
 
-    using fsms = rmpl::typelist<fsm::depth0::crw_fsm,
-                                fsm::depth0::dpo_fsm,
-                                fsm::depth0::free_block_to_nest_fsm,
-                                fsm::depth1::cached_block_to_nest_fsm>;
+    using fsms = rmpl::typelist<fsm::d0::crw_fsm,
+                                fsm::d0::dpo_fsm,
+                                fsm::d0::free_block_to_nest_fsm,
+                                fsm::d1::cached_block_to_nest_fsm>;
     using tasks =
-        rmpl::typelist<tasks::depth0::generalist, tasks::depth1::collector>;
+        rmpl::typelist<tasks::d0::generalist, tasks::d1::collector>;
 
     using value = boost::mpl::joint_view<
         boost::mpl::joint_view<controllers::type, tasks::type>,
@@ -80,7 +80,7 @@ class robot_nest_block_drop : public rer::client<robot_nest_block_drop> {
    *              the arena.
    * \param t Current timestep.
    */
-  robot_nest_block_drop(crepr::base_block2D* block, const rtypes::timestep& t);
+  robot_nest_block_drop(crepr::base_block3D* block, const rtypes::timestep& t);
 
   ~robot_nest_block_drop(void) override = default;
 
@@ -88,38 +88,38 @@ class robot_nest_block_drop : public rer::client<robot_nest_block_drop> {
   robot_nest_block_drop& operator=(const robot_nest_block_drop& op) = delete;
 
   /* Depth0 DPO/MDPO foraging */
-  void visit(controller::depth0::crw_controller& controller);
-  void visit(controller::depth0::dpo_controller& controller);
-  void visit(controller::depth0::mdpo_controller& controller);
-  void visit(controller::depth0::odpo_controller& controller);
-  void visit(controller::depth0::omdpo_controller& controller);
+  void visit(controller::reactive::d0::crw_controller& controller);
+  void visit(controller::cognitive::d0::dpo_controller& controller);
+  void visit(controller::cognitive::d0::mdpo_controller& controller);
+  void visit(controller::cognitive::d0::odpo_controller& controller);
+  void visit(controller::cognitive::d0::omdpo_controller& controller);
 
   /* Depth1 foraging */
-  void visit(controller::depth1::bitd_dpo_controller& controller);
-  void visit(controller::depth1::bitd_mdpo_controller& controller);
-  void visit(controller::depth1::bitd_odpo_controller& controller);
-  void visit(controller::depth1::bitd_omdpo_controller& controller);
-  void visit(tasks::depth1::collector& task);
-  void visit(tasks::depth0::generalist& task);
+  void visit(controller::cognitive::d1::bitd_dpo_controller& controller);
+  void visit(controller::cognitive::d1::bitd_mdpo_controller& controller);
+  void visit(controller::cognitive::d1::bitd_odpo_controller& controller);
+  void visit(controller::cognitive::d1::bitd_omdpo_controller& controller);
+  void visit(tasks::d1::collector& task);
+  void visit(tasks::d0::generalist& task);
 
-  /* depth2 foraging */
-  void visit(controller::depth2::birtd_dpo_controller& controller);
-  void visit(controller::depth2::birtd_mdpo_controller& controller);
-  void visit(controller::depth2::birtd_odpo_controller& controller);
-  void visit(controller::depth2::birtd_omdpo_controller& controller);
+  /* d2 foraging */
+  void visit(controller::cognitive::d2::birtd_dpo_controller& controller);
+  void visit(controller::cognitive::d2::birtd_mdpo_controller& controller);
+  void visit(controller::cognitive::d2::birtd_odpo_controller& controller);
+  void visit(controller::cognitive::d2::birtd_omdpo_controller& controller);
 
  private:
-  void visit(fsm::depth0::free_block_to_nest_fsm& fsm);
-  void visit(fsm::depth1::cached_block_to_nest_fsm& fsm);
-  void visit(fsm::depth0::dpo_fsm& fsm);
-  void visit(fsm::depth0::crw_fsm& fsm);
+  void visit(fsm::d0::free_block_to_nest_fsm& fsm);
+  void visit(fsm::d1::cached_block_to_nest_fsm& fsm);
+  void visit(fsm::d0::dpo_fsm& fsm);
+  void visit(fsm::d0::crw_fsm& fsm);
 
   void dispatch_nest_interactor(tasks::base_foraging_task* task);
 
   /* clang-format off */
   const rtypes::timestep mc_timestep;
 
-  crepr::base_block2D*   m_block;
+  crepr::base_block3D*   m_block;
   /* clang-format on */
 };
 

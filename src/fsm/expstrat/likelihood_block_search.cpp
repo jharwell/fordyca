@@ -23,9 +23,10 @@
  ******************************************************************************/
 #include "fordyca/fsm/expstrat/likelihood_block_search.hpp"
 
+#include "cosm/spatial/fsm/point_argument.hpp"
+
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
-#include "fordyca/tasks/argument.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -35,9 +36,9 @@ NS_START(fordyca, fsm, expstrat);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void likelihood_block_search::task_start(const cta::taskable_argument*) {
+void likelihood_block_search::task_start(cta::taskable_argument*) {
   if (auto loc = mc_store->last_block_loc()) {
-    tasks::vector_argument v(kBLOCK_ARRIVAL_TOL, *loc);
+    csfsm::point_argument v(kBLOCK_ARRIVAL_TOL, *loc);
     localized_search::task_start(&v);
   } else {
     localized_search::task_start(nullptr);

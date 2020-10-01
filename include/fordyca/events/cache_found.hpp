@@ -62,7 +62,7 @@ class cache_found : public cdops::cell2D_op, public rer::client<cache_found> {
   struct visit_typelist_impl {
     using inherited = cell2D_op::visit_typelist;
     using others = rmpl::typelist<ds::dpo_store, ds::dpo_semantic_map>;
-    using controllers = controller::depth2::typelist;
+    using controllers = controller::d2::typelist;
     using value = boost::mpl::joint_view<
         boost::mpl::joint_view<controllers::type, others::type>,
         inherited::type>;
@@ -85,11 +85,11 @@ class cache_found : public cdops::cell2D_op, public rer::client<cache_found> {
   void visit(ds::dpo_semantic_map& map);
   void visit(cfsm::cell2D_fsm& fsm);
 
-  /* depth2 foraging */
-  void visit(controller::depth2::birtd_dpo_controller& controller);
-  void visit(controller::depth2::birtd_mdpo_controller& c);
-  void visit(controller::depth2::birtd_odpo_controller& controller);
-  void visit(controller::depth2::birtd_omdpo_controller& c);
+  /* d2 foraging */
+  void visit(controller::cognitive::d2::birtd_dpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_mdpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_odpo_controller& c);
+  void visit(controller::cognitive::d2::birtd_omdpo_controller& c);
 
  private:
   /* clang-format off */
@@ -97,21 +97,15 @@ class cache_found : public cdops::cell2D_op, public rer::client<cache_found> {
   /* clang-format on */
 };
 
+NS_END(detail);
+
 /**
  * \brief We use the precise visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using cache_found_visitor_impl =
-    rpvisitor::precise_visitor<detail::cache_found,
-                               detail::cache_found::visit_typelist>;
-
-NS_END(detail);
-
-class cache_found_visitor : public detail::cache_found_visitor_impl {
-  using detail::cache_found_visitor_impl::cache_found_visitor_impl;
-};
+using cache_found_visitor = rpvisitor::filtered_visitor<detail::cache_found>;
 
 NS_END(events, fordyca);
 

@@ -31,9 +31,7 @@
 
 #include "cosm/tv/temporal_penalty_handler.hpp"
 
-#include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/support/tv/block_op_filter.hpp"
-#include "fordyca/support/utils/loop_utils.hpp"
 #include "fordyca/support/tv/block_op_penalty_id_calculator.hpp"
 
 /*******************************************************************************
@@ -60,9 +58,9 @@ class block_op_penalty_handler final : public ctv::temporal_penalty_handler,
                            const std::string& name)
       : temporal_penalty_handler(config, name),
         ER_CLIENT_INIT("fordyca.support.tv.block_op_penalty_handler"),
-        mc_map(map),
-        m_filter(mc_map),
-        m_id_calc(mc_map) {}
+        m_map(map),
+        m_filter(m_map),
+        m_id_calc(m_map) {}
 
   ~block_op_penalty_handler(void) override = default;
   block_op_penalty_handler& operator=(const block_op_penalty_handler& other) =
@@ -74,7 +72,7 @@ class block_op_penalty_handler final : public ctv::temporal_penalty_handler,
    * trying to drop/pickup a block. If so, create a \ref temporal_penalty object
    * and associate it with the robot.
    *
-   * \tparam TControllerType The type of the controller. Must be a template
+   * \tparam TController The type of the controller. Must be a template
    * parameter, rather than \ref controller::foraging_controller, because of the
    * goal acquisition determination done by \ref block_op_filter.
    *
@@ -85,25 +83,49 @@ class block_op_penalty_handler final : public ctv::temporal_penalty_handler,
    * \param prox_dist The minimum distance that the cache site needs to be from
    *                  all caches in the arena.
    */
-  template<typename TControllerType>
-  op_filter_status penalty_init(const TControllerType& controller,
+  template<typename TController>
+  op_filter_status penalty_init(const TController& controller,
                                 const rtypes::timestep& t,
                                 block_op_src src,
                                 boost::optional<rtypes::spatial_dist> cache_prox) {
+    /*
+     * Check if we have satisfied the conditions for a block operation, which
+     * involves querying the area map.
+     *
+     * NO LOCKING IS PERFORMED.
+     *
+     * There really can't be any locking here, because if there was, the
+     * simulation would get REALLY slow for large swarms, because every robot
+     * has to make this check every timestep. This makes the resulting block ID
+     * we get on some successful operations potentially invalid; that's OK, as
+     * validity is thoroughly checked after the penalty is served before
+     * executing the action.
+     *
+     * See FORDYCA#668.
+     */
     auto filter = m_filter(controller, src, cache_prox);
-    if (filter != op_filter_status::ekSATISFIED) {
-      return filter;
+    if (filter.status != op_filter_status::ekSATISFIED) {
+      return filter.status;
     }
     ER_ASSERT(!is_serving_penalty(controller),
               "%s already serving block penalty?",
               controller.GetId().c_str());
 
-    rtypes::type_uuid id = m_id_calc(controller, src);
+    /*
+     * Because NO LOCKING IS PERFORMED around the first check and this one, we
+     * may no longer meet the conditions for free block pickup, and the ID we
+     * already have of the block we are on/might be on might not be valid
+     * anymore.
+     *
+     * See FORDYCA#668.
+     */
+    rtypes::type_uuid id = m_id_calc(controller, src, filter);
+
     rtypes::timestep orig_duration = penalty_calc(t);
-    auto duration RCSW_UNUSED = penalty_add(&controller,
-                                            id,
-                                            orig_duration,
-                                            t);
+    rtypes::timestep RCSW_UNUSED duration = penalty_add(&controller,
+                                                        id,
+                                                        orig_duration,
+                                                        t);
 
     ER_INFO("%s: block%d start=%u, penalty=%u, adjusted penalty=%u src=%d",
             controller.GetId().c_str(),
@@ -113,15 +135,15 @@ class block_op_penalty_handler final : public ctv::temporal_penalty_handler,
             duration.v(),
             static_cast<int>(src));
 
-    return filter;
+    return filter.status;
   }
 
  private:
   /* clang-format off */
-  const carena::caching_arena_map* const mc_map;
+  carena::caching_arena_map*     m_map;
 
-  block_op_filter                        m_filter;
-  block_op_penalty_id_calculator         m_id_calc;
+  block_op_filter                m_filter;
+  block_op_penalty_id_calculator m_id_calc;
   /* clang-format on */
 };
 NS_END(tv, support, fordyca);

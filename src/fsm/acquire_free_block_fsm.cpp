@@ -23,12 +23,12 @@
  ******************************************************************************/
 #include "fordyca/fsm/acquire_free_block_fsm.hpp"
 
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/base_block3D.hpp"
 #include "cosm/robots/footbot/footbot_actuation_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
-#include "fordyca/controller/block_selector.hpp"
+#include "fordyca/controller/cognitive/block_selector.hpp"
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/block_acq_validator.hpp"
@@ -45,8 +45,8 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 acquire_free_block_fsm::acquire_free_block_fsm(
     const fsm_ro_params* c_params,
-    crfootbot::footbot_saa_subsystem2D* saa,
-    std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
+    crfootbot::footbot_saa_subsystem* saa,
+    std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_free_block"),
       acquire_goal_fsm(
@@ -85,7 +85,7 @@ acquire_free_block_fsm::acquire_free_block_fsm(
 /*******************************************************************************
  * Non-Member Functions
  ******************************************************************************/
-cfsm::metrics::goal_acq_metrics::goal_type acquire_free_block_fsm::acq_goal_internal(
+csmetrics::goal_acq_metrics::goal_type acquire_free_block_fsm::acq_goal_internal(
     void) {
   return fsm::to_goal_type(foraging_acq_goal::ekBLOCK);
 } /* acq_goal_internal() */
@@ -113,13 +113,13 @@ bool acquire_free_block_fsm::block_acquired_cb(bool explore_result) const {
   }
 } /* block_acquired_cb() */
 
-boost::optional<cfsm::acquire_goal_fsm::candidate_type> acquire_free_block_fsm::
+boost::optional<csfsm::acquire_goal_fsm::candidate_type> acquire_free_block_fsm::
     block_select(void) const {
-  controller::block_selector selector(mc_matrix);
+  controller::cognitive::block_selector selector(mc_matrix);
 
-  if (auto best = selector(mc_store->blocks(), saa()->sensing()->position())) {
+  if (auto best = selector(mc_store->blocks(), saa()->sensing()->rpos2D())) {
     return boost::make_optional(acquire_goal_fsm::candidate_type(
-        best->rloc(), kBLOCK_ARRIVAL_TOL, best->id()));
+        best->rcenter2D(), kBLOCK_ARRIVAL_TOL, best->id()));
   } else {
     return boost::optional<acquire_goal_fsm::candidate_type>();
   }

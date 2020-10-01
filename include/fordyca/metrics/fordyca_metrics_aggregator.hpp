@@ -26,9 +26,9 @@
  ******************************************************************************/
 #include <string>
 
+#include "cosm/ds/config/grid2D_config.hpp"
 #include "cosm/metrics/base_metrics_aggregator.hpp"
 #include "cosm/metrics/config/metrics_config.hpp"
-#include "cosm/ds/config/grid_config.hpp"
 
 #include "fordyca/fordyca.hpp"
 
@@ -61,7 +61,7 @@ class fordyca_metrics_aggregator
       public cmetrics::base_metrics_aggregator {
  public:
   fordyca_metrics_aggregator(const cmconfig::metrics_config* mconfig,
-                             const cdconfig::grid_config* const gconfig,
+                             const cdconfig::grid2D_config* gconfig,
                              const std::string& output_root);
   ~fordyca_metrics_aggregator(void) override = default;
 

@@ -30,7 +30,8 @@
 #include "rcppsw/math/vector2.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/subsystem/perception/config/pheromone_config.hpp"
+#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/ds/dp_block_map.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
@@ -39,11 +40,7 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca);
-namespace config { namespace perception {
-struct pheromone_config;
-}} // namespace config::perception
-NS_START(ds);
+NS_START(fordyca, ds);
 
 /*******************************************************************************
  * Class Definitions
@@ -64,11 +61,11 @@ class dpo_store final : public rer::client<dpo_store> {
   using dpo_entity = repr::dpo_entity<T>;
 
   enum update_status {
-    kNO_CHANGE,
-    kNEW_BLOCK_ADDED,
-    kBLOCK_MOVED,
-    kNEW_CACHE_ADDED,
-    kCACHE_UPDATED /* # blocks can change */
+    ekNO_CHANGE,
+    ekNEW_BLOCK_ADDED,
+    ekBLOCK_MOVED,
+    ekNEW_CACHE_ADDED,
+    ekCACHE_UPDATED /* # blocks can change */
   };
 
   /**
@@ -82,7 +79,7 @@ class dpo_store final : public rer::client<dpo_store> {
 
   struct update_res_t {
     bool status{false};
-    update_status reason{kNO_CHANGE};
+    update_status reason{ekNO_CHANGE};
     rmath::vector2z old_loc{};
   };
 
@@ -92,7 +89,7 @@ class dpo_store final : public rer::client<dpo_store> {
    */
   static constexpr double kNRD_MAX_PHEROMONE = 1.0;
 
-  explicit dpo_store(const config::perception::pheromone_config* config);
+  explicit dpo_store(const cspconfig::pheromone_config* config);
 
   /**
    * \brief Get all blocks the robot is currently aware of, and their
@@ -119,15 +116,15 @@ class dpo_store final : public rer::client<dpo_store> {
 
   void clear_all(void);
 
-  bool contains(const crepr::base_block2D* block) const RCSW_PURE;
+  bool contains(const crepr::base_block3D* block) const RCSW_PURE;
   bool contains(const carepr::base_cache* cache) const;
 
   const dp_cache_map::value_type* find(const carepr::base_cache* cache) const;
   dp_cache_map::value_type* find(const carepr::base_cache* cache);
 
   const dp_block_map::value_type* find(
-      const crepr::base_block2D* block) const RCSW_PURE;
-  dp_block_map::value_type* find(const crepr::base_block2D* block) RCSW_PURE;
+      const crepr::base_block3D* block) const RCSW_PURE;
+  dp_block_map::value_type* find(const crepr::base_block3D* block) RCSW_PURE;
 
   /**
    * \brief Update the known caches set with the new cache.
@@ -149,7 +146,7 @@ class dpo_store final : public rer::client<dpo_store> {
    *
    * \return \c TRUE if a block was added, and \c FALSE otherwise.
    */
-  update_res_t block_update(dpo_entity<crepr::base_block2D> block_in);
+  update_res_t block_update(dpo_entity<crepr::base_block3D> block_in);
 
   /**
    * \brief Remove a cache from the set of of known caches.
@@ -162,7 +159,7 @@ class dpo_store final : public rer::client<dpo_store> {
    *
    * \return \c TRUE if a block was removed, \c FALSE otherwise.
    */
-  bool block_remove(crepr::base_block2D* victim);
+  bool block_remove(crepr::base_block3D* victim);
 
   double pheromone_rho(void) const { return mc_pheromone_rho; }
 

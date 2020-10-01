@@ -27,13 +27,14 @@
 #include <string>
 #include <boost/optional.hpp>
 
-#include "fordyca/fsm/block_transporter.hpp"
-#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
+#include "cosm/spatial/metrics/goal_acq_metrics.hpp"
+#include "cosm/arena/caching_arena_map.hpp"
+
 #include "fordyca/support/tv/block_op_src.hpp"
-#include "fordyca/support/utils/event_utils.hpp"
-#include "fordyca/support/tv/op_filter_status.hpp"
+#include "fordyca/support/tv/op_filter_result.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/fsm/foraging_transport_goal.hpp"
+#include "fordyca/support/cache_prox_checker.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -72,8 +73,8 @@ class block_op_filter : public rer::client<block_op_filter> {
    * \return (\c TRUE, penalty_status) iff the controller should be filtered out
    * and the reason why. (\c FALSE, -1) otherwise.
    */
-  template <typename TControllerType>
-  op_filter_status operator()(const TControllerType& controller,
+  template <typename TController>
+  op_filter_result operator()(const TController& controller,
                               block_op_src src,
                               boost::optional<rtypes::spatial_dist> cache_prox) {
     /*
@@ -98,38 +99,59 @@ class block_op_filter : public rer::client<block_op_filter> {
       default:
         ER_FATAL_SENTINEL("Unhandled penalty type %d", static_cast<int>(src));
     } /* switch() */
-    return op_filter_status{};
+    return op_filter_result{};
   }
 
  private:
   /**
    * \brief Filter out spurious penalty initializations for free block pickup
    * (i.e. controller not ready/not intending to pickup a free block).
-   *
    */
-  template <typename TControllerType>
-  op_filter_status free_pickup_filter(const TControllerType& controller) const {
-    auto block_id = utils::robot_on_block(controller, *mc_map);
+  template <typename TController>
+  op_filter_result free_pickup_filter(const TController& controller) const {
+    op_filter_result result;
     if (!(controller.goal_acquired() &&
           fsm::foraging_acq_goal::ekBLOCK == controller.acquisition_goal())) {
-      return op_filter_status::ekROBOT_INTERNAL_UNREADY;
-    } else if (rtypes::constants::kNoUUID == block_id) {
-      return op_filter_status::ekROBOT_NOT_ON_BLOCK;
+      result.status = op_filter_status::ekROBOT_INTERNAL_UNREADY;
+    } else {
+      /*
+       * OK to lock around this calculation, because relatively few robots will
+       * have the correct internal state for a free block pickup each timestep,
+       * and we don't need exclusive access to the arena map at this point--only
+       * a guarantee that the blocks/caches arrays will not be modified while we
+       * are checking them.
+       */
+      mc_map->lock_rd(mc_map->cache_mtx());
+      mc_map->lock_rd(mc_map->block_mtx());
+      auto block_id = mc_map->robot_on_block(controller.rpos2D(),
+                                            controller.entity_acquired_id());
+      mc_map->unlock_rd(mc_map->block_mtx());
+      mc_map->unlock_rd(mc_map->cache_mtx());
+
+      if (rtypes::constants::kNoUUID == block_id) {
+        result.status = op_filter_status::ekROBOT_NOT_ON_BLOCK;
+      } else {
+        result.status = op_filter_status::ekSATISFIED;
+        result.id = block_id;
+      }
     }
-    return op_filter_status::ekSATISFIED;
+     return result;
   }
 
   /**
    * \brief Filter out spurious penalty initializations for nest block drop
    * (i.e. controller not ready/not intending to drop a block in the nest).
    */
-  template <typename TControllerType>
-  op_filter_status nest_drop_filter(const TControllerType& controller) const {
+  template <typename TController>
+  op_filter_result nest_drop_filter(const TController& controller) const {
+    op_filter_result result;
     if (!(controller.in_nest() && controller.goal_acquired() &&
           fsm::foraging_transport_goal::ekNEST == controller.block_transport_goal())) {
-      return op_filter_status::ekROBOT_INTERNAL_UNREADY;
+      result.status = op_filter_status::ekROBOT_INTERNAL_UNREADY;
+    } else {
+      result.status = op_filter_status::ekSATISFIED;
     }
-    return op_filter_status::ekSATISFIED;
+    return result;
   }
 
   /**
@@ -137,22 +159,26 @@ class block_op_filter : public rer::client<block_op_filter> {
    * (i.e. controller not ready/not intending to drop a block), or another
    * block/cache is too close.
    */
-  template <typename TControllerType>
-  op_filter_status cache_site_drop_filter(const TControllerType& controller,
+  template <typename TController>
+  op_filter_result cache_site_drop_filter(const TController& controller,
                                           const rtypes::spatial_dist& cache_prox) const {
+    op_filter_result result;
     if (!(controller.goal_acquired() &&
           fsm::foraging_acq_goal::ekCACHE_SITE == controller.acquisition_goal() &&
           fsm::foraging_transport_goal::ekCACHE_SITE == controller.block_transport_goal())) {
-      return op_filter_status::ekROBOT_INTERNAL_UNREADY;
+      result.status = op_filter_status::ekROBOT_INTERNAL_UNREADY;
+    } else {
+      cache_prox_checker checker(mc_map, cache_prox);
+      auto prox = checker.check(controller);
+
+      if (rtypes::constants::kNoUUID != prox.id) {
+        result.status = op_filter_status::ekCACHE_PROXIMITY;
+      } else {
+        result.status = op_filter_status::ekSATISFIED;
+      }
     }
-    auto cache_id = utils::new_cache_cache_proximity(controller,
-                                                     *mc_map,
-                                                     cache_prox)
-                   .entity_id;
-    if (rtypes::constants::kNoUUID != cache_id) {
-      return op_filter_status::ekCACHE_PROXIMITY;
-    }
-    return op_filter_status::ekSATISFIED;
+
+    return result;
   }
 
   /**
@@ -160,27 +186,29 @@ class block_op_filter : public rer::client<block_op_filter> {
    * (i.e. controller not ready/not intending to drop a block), or
    * is too close to another cache to do a free block drop at the chosen site.
    */
-  template <typename TControllerType>
-  op_filter_status new_cache_drop_filter(const TControllerType& controller,
+  template <typename TController>
+  op_filter_result new_cache_drop_filter(const TController& controller,
                                          const rtypes::spatial_dist& cache_prox) const {
+    op_filter_result result;
     if (!(controller.goal_acquired() &&
           fsm::foraging_acq_goal::ekNEW_CACHE == controller.acquisition_goal() &&
           fsm::foraging_transport_goal::ekNEW_CACHE == controller.block_transport_goal())) {
-      return op_filter_status::ekROBOT_INTERNAL_UNREADY;
-    }
+      result.status = op_filter_status::ekROBOT_INTERNAL_UNREADY;
+    } else {
+      cache_prox_checker checker(mc_map, cache_prox);
+      auto prox = checker.check(controller);
 
-    auto cache_id = utils::new_cache_cache_proximity(controller,
-                                                    *mc_map,
-                                                    cache_prox)
-                    .entity_id;
-    if (rtypes::constants::kNoUUID != cache_id) {
-      return op_filter_status::ekCACHE_PROXIMITY;
+      if (rtypes::constants::kNoUUID != prox.id) {
+        result.status = op_filter_status::ekCACHE_PROXIMITY;
+      } else {
+        result.status = op_filter_status::ekSATISFIED;
+      }
     }
-    return op_filter_status::ekSATISFIED;
+    return result;
   }
 
   /* clang-format off */
-  const carena::caching_arena_map* const mc_map;
+  const carena::caching_arena_map* mc_map;
   /* clang-format on */
 };
 NS_END(tv, support, fordyca);

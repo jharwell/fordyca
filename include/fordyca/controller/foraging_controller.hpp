@@ -30,20 +30,26 @@
 
 #include "cosm/controller/block_carrying_controller.hpp"
 #include "cosm/controller/irv_recipient_controller.hpp"
+#include "cosm/controller/manip_event_recorder.hpp"
 #include "cosm/metrics/config/output_config.hpp"
 #include "cosm/pal/argos_controller2D_adaptor.hpp"
 #include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
+#include "cosm/fsm/block_transporter.hpp"
 
-#include "cosm/controller/manip_event_recorder.hpp"
-#include "fordyca/metrics/blocks/block_manip_events.hpp"
 #include "fordyca/fordyca.hpp"
+#include "fordyca/metrics/blocks/block_manip_events.hpp"
+#include "fordyca/fsm/foraging_transport_goal.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace fordyca::controller::cognitive {
+class foraging_perception_subsystem;
+} /* namespace fordyca::controller */
+
 namespace cosm::subsystem::config {
 struct actuation_subsystem2D_config;
-struct sensing_subsystem2D_config;
+struct sensing_subsystemQ3D_config;
 } // namespace cosm::subsystem::config
 namespace cosm::steer2D::config {
 struct force_calculator_config;
@@ -59,12 +65,11 @@ namespace rcppsw::math::config {
 struct rng_config;
 } // namespace rcppsw::math::config
 
-namespace cosm::foraging::repr {
-class foraging_los;
-} /* namespace cosm::foraging::repr */
+namespace fordyca::repr {
+class forager_los;
+} /* namespace fordyca::repr */
 
 NS_START(fordyca, controller);
-class base_perception_subsystem;
 
 /*******************************************************************************
  * Class Definitions
@@ -81,10 +86,12 @@ class base_perception_subsystem;
  */
 class foraging_controller : public cpal::argos_controller2D_adaptor,
                             public ccontroller::block_carrying_controller,
+                            public cfsm::block_transporter<fsm::foraging_transport_goal>,
                             public ccontroller::irv_recipient_controller,
                             public rer::client<foraging_controller> {
  public:
-  using block_manip_recorder_type = ccontroller::manip_event_recorder<metrics::blocks::block_manip_events::ekMAX_EVENTS>;
+  using block_manip_recorder_type = ccontroller::manip_event_recorder<
+      metrics::blocks::block_manip_events::ekMAX_EVENTS>;
 
   foraging_controller(void) RCSW_COLD;
   ~foraging_controller(void) override RCSW_COLD;
@@ -108,7 +115,7 @@ class foraging_controller : public cpal::argos_controller2D_adaptor,
    * \brief By default controllers have no perception subsystem, and are
    * basically blind centipedes.
    */
-  virtual const base_perception_subsystem* perception(void) const {
+  virtual const cognitive::foraging_perception_subsystem* perception(void) const {
     return nullptr;
   }
 
@@ -116,7 +123,7 @@ class foraging_controller : public cpal::argos_controller2D_adaptor,
    * \brief By default controllers have no perception subsystem, and are
    * basically blind centipedes.
    */
-  virtual base_perception_subsystem* perception(void) { return nullptr; }
+  virtual cognitive::foraging_perception_subsystem* perception(void) { return nullptr; }
 
   /**
    * \brief If \c TRUE, the robot is currently at least most of the way in the
@@ -132,13 +139,13 @@ class foraging_controller : public cpal::argos_controller2D_adaptor,
   }
 
  protected:
-  class crfootbot::footbot_saa_subsystem2D* saa(void) RCSW_PURE;
-  const class crfootbot::footbot_saa_subsystem2D* saa(void) const RCSW_PURE;
+  class crfootbot::footbot_saa_subsystem* saa(void) RCSW_PURE;
+  const class crfootbot::footbot_saa_subsystem* saa(void) const RCSW_PURE;
 
  private:
   void saa_init(
       const csubsystem::config::actuation_subsystem2D_config* actuation_p,
-      const csubsystem::config::sensing_subsystem2D_config* sensing_p);
+      const csubsystem::config::sensing_subsystemQ3D_config* sensing_p);
   void output_init(const cmconfig::output_config* outputp);
 
   /* clang-format off */

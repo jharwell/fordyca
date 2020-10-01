@@ -24,18 +24,21 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "cosm/fsm/expstrat/base_expstrat.hpp"
-#include "fordyca/fordyca.hpp"
+#include "cosm/spatial/expstrat/base_expstrat.hpp"
 #include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
-#include "rcppsw/patterns/prototype/clonable.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::subsystem {
+class saa_subsystemQ3D;
+} /* namespace cosm::subsystem */
+
 NS_START(fordyca);
 
-namespace controller {
+namespace controller::cognitive {
 class cache_sel_matrix;
 class block_sel_matrix;
 } /* namespace controller */
@@ -53,48 +56,38 @@ NS_START(fsm, expstrat);
  * \class foraging_expstrat
  * \ingroup fsm expstrat
  *
- * \brief Base class for different exploration behaviors that controller can
+ * \brief Base class for different exploration behaviors that controllers can
  * exhibit when looking for stuff.
  */
-class foraging_expstrat : public cfsm::expstrat::base_expstrat,
-                          public rpprototype::clonable<foraging_expstrat> {
+class foraging_expstrat : public csexpstrat::base_expstrat {
  public:
-  foraging_expstrat(crfootbot::footbot_saa_subsystem2D* saa,
-                    rmath::rng* rng) :
-      base_expstrat(saa),
-      m_rng(rng) {}
-
   struct params {
-    params(crfootbot::footbot_saa_subsystem2D* const saa_in,
-           const controller::block_sel_matrix *const bsel_matrix_in,
-           const controller::cache_sel_matrix *const csel_matrix_in,
+    params(crfootbot::footbot_saa_subsystem* const saa_in,
+           const controller::cognitive::block_sel_matrix *const bsel_matrix_in,
+           const controller::cognitive::cache_sel_matrix *const csel_matrix_in,
            const ds::dpo_store *const dpo_store_in,
-           const rutils::color& ledtaxis_target_in = rutils::color())
+           const rutils::color& ledtaxis_target_in)
         : saa(saa_in),
           bsel_matrix(bsel_matrix_in),
           csel_matrix(csel_matrix_in),
-        dpo_store(dpo_store_in),
-        ledtaxis_target(ledtaxis_target_in) {}
+          dpo_store(dpo_store_in),
+          ledtaxis_target(ledtaxis_target_in) {}
 
-    crfootbot::footbot_saa_subsystem2D* saa;
-    const controller::block_sel_matrix *bsel_matrix;
-    const controller::cache_sel_matrix *csel_matrix;
+    crfootbot::footbot_saa_subsystem* saa;
+    const controller::cognitive::block_sel_matrix *bsel_matrix;
+    const controller::cognitive::cache_sel_matrix *csel_matrix;
     const ds::dpo_store *dpo_store;
     rutils::color ledtaxis_target;
   };
+
+  foraging_expstrat(crfootbot::footbot_saa_subsystem* saa, rmath::rng* rng);
+
   foraging_expstrat(const foraging_expstrat&) = delete;
   foraging_expstrat& operator=(const foraging_expstrat&) = delete;
 
  protected:
-  crfootbot::footbot_saa_subsystem2D* saa(void) const RCSW_PURE;
-  crfootbot::footbot_saa_subsystem2D* saa(void) RCSW_PURE;
-  rmath::rng* rng(void) { return m_rng; }
-  rmath::rng* rng(void) const { return m_rng; }
-
- private:
-  /* clang-format off */
-  rmath::rng* m_rng;
-  /* clang-format on */
+  crfootbot::footbot_saa_subsystem* saa(void) const RCSW_PURE;
+  crfootbot::footbot_saa_subsystem* saa(void) RCSW_PURE;
 };
 
 NS_END(expstrat, fsm, fordyca);

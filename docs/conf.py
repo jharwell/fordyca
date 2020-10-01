@@ -20,7 +20,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
-
+sys.path.insert(0, os.path.abspath('_ext'))
 
 # -- General configuration ------------------------------------------------
 
@@ -36,6 +36,7 @@ extensions = ['sphinx.ext.intersphinx',
               'sphinx.ext.coverage',
               'sphinx.ext.mathjax',
               'sphinx.ext.ifconfig',
+              'xref',
               'sphinx_rtd_theme']
 
 # Add any paths that contain templates here, relative to this directory.
@@ -106,8 +107,11 @@ exhale_args = {
 }
 
 xref_links = {
-    "COSM": ("COSM", "https://cosm.readthedocs.io"),
-    "SILICON": ("SILICON", "https://silicon.readthedocs.io")
+    "COSM": ("COSM", "https://swarm-robotics-cosm.readthedocs.io"),
+    "SILICON": ("SILICON", "https://swarm-robotics-silicon.readthedocs.io"),
+    "SIERRA": ("SIERRA", "https://swarm-robotics-sierra.readthedocs.io"),
+    "LIBRA": ("LIBRA", "https://swarm-robotics-libra.readthedocs.io")
+
 }
 
 # -- Options for HTML output ----------------------------------------------

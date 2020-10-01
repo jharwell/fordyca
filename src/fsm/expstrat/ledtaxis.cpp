@@ -24,7 +24,7 @@
 #include "fordyca/fsm/expstrat/ledtaxis.hpp"
 
 #include "cosm/arena/repr/light_type_index.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,12 +34,11 @@ NS_START(fordyca, fsm, expstrat);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-ledtaxis::ledtaxis(crfootbot::footbot_saa_subsystem2D* saa,
+ledtaxis::ledtaxis(crfootbot::footbot_saa_subsystem* saa,
                    const rutils::color& target,
                    rmath::rng* rng)
     : foraging_expstrat(saa, rng),
       ER_CLIENT_INIT("fordyca.fsm.expstrat.ledtaxis"),
-      m_tracker(saa->sensing()),
       m_target(target) {}
 
 /*******************************************************************************
@@ -49,7 +48,7 @@ void ledtaxis::task_execute(void) {
   saa()->steer_force2D().accum(saa()->steer_force2D().wander(rng()));
 
   if (auto obs = saa()->sensing()->proximity()->avg_prox_obj()) {
-    m_tracker.ca_enter();
+    inta_tracker()->inta_enter();
 
     ER_DEBUG("Found threatening obstacle: %s@%f [%f]",
              obs->to_str().c_str(),
@@ -59,7 +58,7 @@ void ledtaxis::task_execute(void) {
     saa()->steer_force2D().accum(saa()->steer_force2D().avoidance(*obs));
 
   } else {
-    m_tracker.ca_exit();
+    inta_tracker()->inta_exit();
 
     ER_DEBUG("No threatening obstacle found");
     saa()->actuation()->leds()->set_color(-1, rutils::color::kMAGENTA);

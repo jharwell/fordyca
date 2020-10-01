@@ -31,6 +31,7 @@
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/support/tv/block_op_src.hpp"
+#include "fordyca/support/tv/op_filter_result.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -66,7 +67,8 @@ class block_op_penalty_id_calculator : public rer::client<block_op_penalty_id_ca
   const block_op_penalty_id_calculator& operator=(const block_op_penalty_id_calculator&) = delete;
 
   rtypes::type_uuid operator()(const controller::foraging_controller& controller,
-                               block_op_src src) const;
+                               block_op_src src,
+                               op_filter_result filter) const;
 
  private:
   /* clang-formatoff */

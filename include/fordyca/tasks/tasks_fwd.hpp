@@ -31,19 +31,19 @@
  ******************************************************************************/
 NS_START(fordyca, tasks);
 class base_foraging_task;
-namespace depth0 {
+namespace d0 {
 class generalist;
 }
-namespace depth1 {
+namespace d1 {
 class collector;
 class harvester;
-} // namespace depth1
-namespace depth2 {
+} // namespace d1
+namespace d2 {
 class cache_starter;
 class cache_finisher;
 class cache_transferer;
 class cache_collector;
-} // namespace depth2
+} // namespace d2
 
 NS_END(fordyca, tasks);
 

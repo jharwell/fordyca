@@ -11,6 +11,6 @@
 cd $1/fordyca/build
 cmake -DCMAKE_BUILD_TYPE=OPT\
       -DLIBRA_ER=NONE\
-      -DLIBRA_BUILD_FOR=MSI\
+      -DCOSM_BUILD_FOR=MSI\
       ..
 make -j $2

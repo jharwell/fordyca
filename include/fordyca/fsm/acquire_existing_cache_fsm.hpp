@@ -31,7 +31,7 @@
 #include "rcppsw/math/rng.hpp"
 #include "rcppsw/types/type_uuid.hpp"
 
-#include "cosm/fsm/acquire_goal_fsm.hpp"
+#include "cosm/spatial/fsm/acquire_goal_fsm.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
@@ -40,12 +40,12 @@
  * Namespaces
  ******************************************************************************/
 namespace cosm::robots::footbot {
-class footbot_saa_subsystem2D;
+class footbot_saa_subsystem;
 } /* namespace cosm::robots::footbot */
 
 NS_START(fordyca);
 
-namespace controller {
+namespace controller::cognitive {
 class cache_sel_matrix;
 }
 namespace repr {
@@ -66,22 +66,22 @@ class foraging_expstrat;
  ******************************************************************************/
 /**
  * \class acquire_existing_cache_fsm
- * \ingroup fsm depth1
+ * \ingroup fsm d1
  *
  * \brief Acquire an existing cache within the arena. Once such a cache has been
  * acquired (always by vectoring), it signals that it has completed its task.
  */
 class acquire_existing_cache_fsm
     : public rer::client<acquire_existing_cache_fsm>,
-      public cfsm::acquire_goal_fsm {
+      public csfsm::acquire_goal_fsm {
  public:
   /**
    * \param for_pickup Are we acquiring a cache for pickup or block drop?
    */
   acquire_existing_cache_fsm(
       const fsm_ro_params* c_params,
-      crfootbot::footbot_saa_subsystem2D* saa,
-      std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
+      crfootbot::footbot_saa_subsystem* saa,
+      std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
       rmath::rng* rng,
       bool for_pickup);
 
@@ -97,7 +97,7 @@ class acquire_existing_cache_fsm
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  static cfsm::metrics::goal_acq_metrics::goal_type acq_goal_internal(void)
+  static csmetrics::goal_acq_metrics::goal_type acq_goal_internal(void)
       RCSW_CONST;
 
   boost::optional<acquire_goal_fsm::candidate_type> existing_cache_select(void);
@@ -115,9 +115,9 @@ class acquire_existing_cache_fsm
    */
   static constexpr double kFOOTBOT_CACHE_ACQ_FACTOR = 0.2;
 
-  const bool                                mc_for_pickup;
-  const controller::cache_sel_matrix* const mc_matrix;
-  const ds::dpo_store*                const mc_store;
+  const bool                                           mc_for_pickup;
+  const controller::cognitive::cache_sel_matrix* const mc_matrix;
+  const ds::dpo_store*                const            mc_store;
   /* clang-format on */
 };
 

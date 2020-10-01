@@ -27,16 +27,16 @@
 
 #include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/arena/config/arena_map_config.hpp"
-#include "cosm/pal/argos_convergence_calculator.hpp"
+#include "cosm/foraging/oracle/foraging_oracle.hpp"
 #include "cosm/metrics/config/output_config.hpp"
 #include "cosm/oracle/config/aggregate_oracle_config.hpp"
-#include "cosm/foraging/oracle/foraging_oracle.hpp"
 #include "cosm/oracle/tasking_oracle.hpp"
+#include "cosm/pal/argos_convergence_calculator.hpp"
 #include "cosm/pal/argos_swarm_iterator.hpp"
 #include "cosm/vis/config/visualization_config.hpp"
 
 #include "fordyca/config/tv/tv_manager_config.hpp"
-#include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca//controller/foraging_controller.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/support/tv/fordyca_pd_adaptor.hpp"
 
@@ -61,12 +61,7 @@ base_loop_functions::~base_loop_functions(void) = default;
  ******************************************************************************/
 void base_loop_functions::init(ticpp::Element& node) {
   /* parse simulation input file */
-  m_config.parse_all(node);
-
-  if (!m_config.validate_all()) {
-    ER_FATAL_SENTINEL("Not all parameters were validated");
-    std::exit(EXIT_FAILURE);
-  }
+  config_parse(node);
 
   /* initialize RNG */
   rng_init(config()->config_get<rmath::config::rng_config>());
@@ -77,11 +72,13 @@ void base_loop_functions::init(ticpp::Element& node) {
   /* initialize arena map and distribute blocks */
   auto* aconfig = config()->config_get<caconfig::arena_map_config>();
   auto* vconfig = config()->config_get<cvconfig::visualization_config>();
-  arena_map_init<carena::caching_arena_map>(aconfig, vconfig);
+  arena_map_create<carena::caching_arena_map>(aconfig);
+  if (!delay_arena_map_init()) {
+    arena_map_init(vconfig);
+  }
 
   /* initialize convergence calculations */
-  convergence_init(
-      config()->config_get<cconvergence::config::convergence_config>());
+  convergence_init(config()->config_get<cconvconfig::convergence_config>());
 
   /* initialize temporal variance injection */
   tv_init(config()->config_get<config::tv::tv_manager_config>());
@@ -90,8 +87,17 @@ void base_loop_functions::init(ticpp::Element& node) {
   oracle_init(config()->config_get<coconfig::aggregate_oracle_config>());
 } /* init() */
 
+void base_loop_functions::config_parse(ticpp::Element& node) {
+  m_config.parse_all(node);
+
+  if (!m_config.validate_all()) {
+    ER_FATAL_SENTINEL("Not all parameters were validated");
+    std::exit(EXIT_FAILURE);
+  }
+} /* config_parse() */
+
 void base_loop_functions::convergence_init(
-    const ccconfig::convergence_config* const config) {
+    const cconvconfig::convergence_config* const config) {
   if (nullptr == config) {
     return;
   }
@@ -106,17 +112,13 @@ void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
    * We unconditionally create environmental dynamics because they are used to
    * generate the 1 timestep penalties for robot-arena interactions even when
    * they are disabled, and trying to figure out how to get things to work if
-   * they are omitted is waaayyyy too much work. See #621 too.
+   * they are omitted is waaayyyy too much work. See FORDYCA#621 too.
    */
-  auto envd = std::make_unique<tv::env_dynamics>(
-      &tvp->env_dynamics, this, arena_map());
+  auto envd =
+      std::make_unique<tv::env_dynamics>(&tvp->env_dynamics, this, arena_map());
 
   auto popd = std::make_unique<tv::fordyca_pd_adaptor>(
-      &tvp->population_dynamics,
-      this,
-      envd.get(),
-      arena_map(),
-      rng());
+      &tvp->population_dynamics, this, envd.get(), arena_map(), rng());
 
   m_tv_manager =
       std::make_unique<tv::tv_manager>(std::move(envd), std::move(popd));
@@ -167,12 +169,20 @@ void base_loop_functions::oracle_init(
  * ARGoS Hooks
  ******************************************************************************/
 void base_loop_functions::pre_step(void) {
+  auto t = rtypes::timestep(GetSpace().GetSimulationClock());
+
+  /* update the arena map, which MIGHT require a redraw of the floor */
+  auto status = arena_map()->update(t);
+  if (carena::update_status::ekBLOCK_MOTION == status) {
+    floor()->SetChanged();
+  }
+
   /*
    * Needs to be before robot controllers are run, so they run with the correct
    * throttling/are subjected to the correct penalties, etc.
    */
   if (nullptr != m_tv_manager) {
-    m_tv_manager->update(rtypes::timestep(GetSpace().GetSimulationClock()));
+    m_tv_manager->update(t);
   }
 
   if (nullptr != oracle()) {
@@ -191,8 +201,17 @@ void base_loop_functions::post_step(void) {
 } /* post_step() */
 
 void base_loop_functions::reset(void) {
-  arena_map()->distribute_all_blocks();
+  arena_map()->initialize(this);
 } /* reset() */
 
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+const carena::caching_arena_map* base_loop_functions::arena_map(void) const {
+  return static_cast<const carena::caching_arena_map*>(argos_sm_adaptor::arena_map());
+}
+carena::caching_arena_map* base_loop_functions::arena_map(void) {
+  return static_cast<carena::caching_arena_map*>(argos_sm_adaptor::arena_map());
+}
 
 NS_END(support, fordyca);

@@ -140,9 +140,9 @@ class dpo_map {
   /* clang-format on */
 
  public:
-  RCPPSW_DECLDEF_WRAP(size, mc_obj_ref, const)
-  RCPPSW_DECLDEF_WRAP(empty, mc_obj_ref, const)
-  RCPPSW_DECLDEF_WRAP(clear, m_obj)
+  RCPPSW_WRAP_DECLDEF(size, mc_obj_ref, const)
+  RCPPSW_WRAP_DECLDEF(empty, mc_obj_ref, const)
+  RCPPSW_WRAP_DECLDEF(clear, m_obj)
 
   /**
    * \brief Iterate over mutable values of the map.

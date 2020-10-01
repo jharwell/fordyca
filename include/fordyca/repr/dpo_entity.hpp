@@ -58,7 +58,7 @@ class dpo_entity {
 
   /**
    * \brief Compare two entities for equality. We must explicitly invoke
-   * operator== on the object managed by the shared_ptr, otherwise we get only
+   * operator== on the object managed by the unique_ptr, otherwise we get only
    * pointer comparison, which is NOT what we want.
    */
   bool operator==(const dpo_entity<T>& other) const {

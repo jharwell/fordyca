@@ -26,10 +26,19 @@
     <priority value ="info" />
   </category>
   <category name="cosm.robots.footbot" >
+    <!-- <priority value ="debug" /> -->
+  </category>
+  <category name="cosm.tv.population_dynamics" >
     <priority value ="info" />
   </category>
-    <category name="cosm.tv.population_dynamics" >
-    <priority value ="info" />
+  <category name="cosm.foraging.block_dist.powerlaw" >
+    <priority value ="trace" />
+  </category>
+  <category name="cosm.foraging.block_dist.powerlaw_cluster_placer" >
+    <priority value ="debug" />
+  </category>
+  <category name="cosm.foraging.block_dist.multi_cluster" >
+    <priority value ="debug" />
   </category>
   <category name="fordyca.controller" >
     <priority value ="info" />
@@ -53,32 +62,35 @@
     <priority value ="debug" />
   </category>
   <category name="fordyca.support.depth1.static_cache_manager" >
-    <priority value ="trace" />
+    <priority value ="debug" />
   </category>
     <category name="fordyca.tasks.depth2.cache_starter" >
     <priority value ="info" />
   </category>
   <category name="fordyca.support.depth2.cache_center_calculator" >
-    <priority value ="trace" />
+    <priority value ="debug" />
   </category>
   <category name="fordyca.support.base_cache_creator" >
     <priority value ="trace" />
   </category>
   <category name="fordyca.fsm.depth0.free_block_to_nest" >
-    <priority value ="trace" />
+    <priority value ="info" />
+  </category>
+  <category name="fordyca.fsm.existing_cache_selector" >
+    <priority value ="info" />
   </category>
 
   <category name="fordyca.controller.dpo_perception" >
     <priority value ="info" />
   </category>
   <category name="fordyca.controller.metrics.collector_registerer" >
-    <priority value ="trace" />
+    <priority value ="info" />
   </category>
   <category name="fordyca.controller.oracular_info_receptor" >
     <priority value ="info" />
   </category>
   <category name="fordyca.support.tasking_oracle" >
-    <priority value ="trace" />
+    <priority value ="info" />
   </category>
 
   <category name="fordyca.ds.arena_map" >
