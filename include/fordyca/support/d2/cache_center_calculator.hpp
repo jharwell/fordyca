@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH2_CACHE_CENTER_CALCULATOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH2_CACHE_CENTER_CALCULATOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_D2_CACHE_CENTER_CALCULATOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_D2_CACHE_CENTER_CALCULATOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -155,4 +155,4 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
 };
 NS_END(d2, support, fordyca);
 
-#endif // INCLUDE_FORDYCA_SUPPORT_DEPTH2_CACHE_CENTER_CALCULATOR_HPP_
+#endif // INCLUDE_FORDYCA_SUPPORT_D2_CACHE_CENTER_CALCULATOR_HPP_

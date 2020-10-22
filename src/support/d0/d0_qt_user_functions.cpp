@@ -1,5 +1,5 @@
 /**
- * \file depth0_qt_user_functions.cpp
+ * \file d0_qt_user_functions.cpp
  *
  * \copyright 2017 John Harwell, All rights reserved.
  *
@@ -24,7 +24,7 @@
 #include "rcppsw/common/common.hpp"
 RCPPSW_WARNING_DISABLE_PUSH()
 RCPPSW_WARNING_DISABLE_OVERLOADED_VIRTUAL()
-#include "fordyca/support/d0/depth0_qt_user_functions.hpp"
+#include "fordyca/support/d0/d0_qt_user_functions.hpp"
 RCPPSW_WARNING_DISABLE_POP()
 
 #include <argos3/core/simulator/entity/controllable_entity.h>
@@ -44,15 +44,15 @@ NS_START(fordyca, support, d0);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-depth0_qt_user_functions::depth0_qt_user_functions(void) {
-  RegisterUserFunction<depth0_qt_user_functions, argos::CFootBotEntity>(
-      &depth0_qt_user_functions::Draw);
+d0_qt_user_functions::d0_qt_user_functions(void) {
+  RegisterUserFunction<d0_qt_user_functions, argos::CFootBotEntity>(
+      &d0_qt_user_functions::Draw);
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void depth0_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
+void d0_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
   auto* mdpo = dynamic_cast<const controller::cognitive::d0::mdpo_controller*>(
       &c_entity.GetControllableEntity().GetController());
   auto* base = dynamic_cast<const controller::foraging_controller*>(
@@ -87,8 +87,8 @@ RCPPSW_WARNING_DISABLE_PUSH()
 RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
 RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
 RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
-REGISTER_QTOPENGL_USER_FUNCTIONS(depth0_qt_user_functions,
-                                 "depth0_qt_user_functions"); // NOLINT
+REGISTER_QTOPENGL_USER_FUNCTIONS(d0_qt_user_functions,
+                                 "d0_qt_user_functions"); // NOLINT
 RCPPSW_WARNING_DISABLE_POP()
 
 NS_END(d0, support, fordyca);

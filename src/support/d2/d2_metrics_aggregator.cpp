@@ -1,5 +1,5 @@
 /**
- * \file depth2_metrics_aggregator.cpp
+ * \file d2_metrics_aggregator.cpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/d2/depth2_metrics_aggregator.hpp"
+#include "fordyca/support/d2/d2_metrics_aggregator.hpp"
 
 #include <boost/mpl/for_each.hpp>
 
@@ -54,12 +54,12 @@ using task2 = tasks::d2::foraging_task;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-depth2_metrics_aggregator::depth2_metrics_aggregator(
+d2_metrics_aggregator::d2_metrics_aggregator(
     const cmconfig::metrics_config* const mconfig,
     const cdconfig::grid2D_config* const gconfig,
     const std::string& output_root,
     size_t n_block_clusters)
-    : depth1_metrics_aggregator(mconfig, gconfig, output_root, n_block_clusters),
+    : d1_metrics_aggregator(mconfig, gconfig, output_root, n_block_clusters),
       ER_CLIENT_INIT("fordyca.support.d2.metrics_aggregator") {
   register_standard(mconfig);
 
@@ -73,7 +73,7 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void depth2_metrics_aggregator::task_start_cb(
+void d2_metrics_aggregator::task_start_cb(
     RCSW_UNUSED const cta::polled_task* const task,
     const cta::ds::bi_tab* const tab) {
   /* Not using stochastic nbhd policy */
@@ -91,13 +91,13 @@ void depth2_metrics_aggregator::task_start_cb(
   }
 } /* task_start_cb() */
 
-void depth2_metrics_aggregator::task_finish_or_abort_cb(
+void d2_metrics_aggregator::task_finish_or_abort_cb(
     const cta::polled_task* const task) {
   collect("tasks::execution::" + task->name(),
           dynamic_cast<const ctametrics::execution_metrics&>(*task));
 } /* task_finish_or_abort_cb() */
 
-void depth2_metrics_aggregator::register_standard(
+void d2_metrics_aggregator::register_standard(
     const cmconfig::metrics_config* const mconfig) {
   using collector_typelist = rmpl::typelist<
       rmpl::identity<ctametrics::bi_tab_metrics_collector>,

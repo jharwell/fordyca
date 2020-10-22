@@ -1,5 +1,5 @@
 /**
- * \file depth1_qt_user_functions.cpp
+ * \file d1_qt_user_functions.cpp
  *
  * \copyright 2017 John Harwell, All rights reserved.
  *
@@ -25,7 +25,7 @@
 
 RCPPSW_WARNING_DISABLE_PUSH()
 RCPPSW_WARNING_DISABLE_OVERLOADED_VIRTUAL()
-#include "fordyca/support/d1/depth1_qt_user_functions.hpp"
+#include "fordyca/support/d1/d1_qt_user_functions.hpp"
 RCPPSW_WARNING_DISABLE_POP()
 #include "cosm/vis/task_visualizer.hpp"
 
@@ -41,16 +41,16 @@ namespace controller = controller::cognitive::d1;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-depth1_qt_user_functions::depth1_qt_user_functions(void) {
-  RegisterUserFunction<depth1_qt_user_functions, argos::CFootBotEntity>(
-      &depth1_qt_user_functions::Draw);
+d1_qt_user_functions::d1_qt_user_functions(void) {
+  RegisterUserFunction<d1_qt_user_functions, argos::CFootBotEntity>(
+      &d1_qt_user_functions::Draw);
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void depth1_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
-  depth0_qt_user_functions::Draw(c_entity);
+void d1_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
+  d0_qt_user_functions::Draw(c_entity);
 
   auto& controller = dynamic_cast<controller::bitd_dpo_controller&>(
       c_entity.GetControllableEntity().GetController());
@@ -68,8 +68,8 @@ RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
 RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
 RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 
-REGISTER_QTOPENGL_USER_FUNCTIONS(depth1_qt_user_functions,
-                                 "depth1_qt_user_functions");
+REGISTER_QTOPENGL_USER_FUNCTIONS(d1_qt_user_functions,
+                                 "d1_qt_user_functions");
 RCPPSW_WARNING_DISABLE_POP()
 
 NS_END(support, fordyca, d1);

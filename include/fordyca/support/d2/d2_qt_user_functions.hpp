@@ -1,5 +1,5 @@
 /**
- * \file depth2_qt_user_functions.cpp
+ * \file d2_qt_user_functions.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -17,16 +17,13 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
+#ifndef INCLUDE_FORDYCA_SUPPORT_D2_D2_QT_USER_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_D2_D2_QT_USER_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
-
-RCPPSW_WARNING_DISABLE_PUSH()
-RCPPSW_WARNING_DISABLE_OVERLOADED_VIRTUAL()
-#include "fordyca/support/d2/depth2_qt_user_functions.hpp"
-RCPPSW_WARNING_DISABLE_POP()
+#include "fordyca/support/d1/d1_qt_user_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,19 +31,22 @@ RCPPSW_WARNING_DISABLE_POP()
 NS_START(fordyca, support, d2);
 
 /*******************************************************************************
- * Member Functions
+ * Classes
  ******************************************************************************/
+/**
+ * \class d2_qt_user_functions
+ * \ingroup support d2
+ *
+ * \brief Contains hooks for Qt to draw the visualizations related to depth 2
+ * task decomposition:
+ *
+ */
+class d2_qt_user_functions : public d1::d1_qt_user_functions {
+ public:
+  d2_qt_user_functions(void) = default;
+  ~d2_qt_user_functions(void) override = default;
+};
 
-using namespace argos; // NOLINT
+NS_END(d2, support, fordyca);
 
-RCPPSW_WARNING_DISABLE_PUSH()
-RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
-RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
-RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
-
-REGISTER_QTOPENGL_USER_FUNCTIONS(depth2_qt_user_functions,
-                                 "depth2_qt_user_functions");
-
-RCPPSW_WARNING_DISABLE_POP()
-
-NS_END(support, fordyca, d2);
+#endif /* INCLUDE_FORDYCA_SUPPORT_D2_D2_QT_USER_FUNCTIONS_HPP_ */

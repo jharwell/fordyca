@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_ROBOT_CONFIGURER_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_ROBOT_CONFIGURER_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_D1_ROBOT_CONFIGURER_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_D1_ROBOT_CONFIGURER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -31,7 +31,7 @@
 #include "cosm/vis/config/visualization_config.hpp"
 #include "cosm/foraging/oracle/foraging_oracle.hpp"
 
-#include "fordyca/support/d1/depth1_metrics_aggregator.hpp"
+#include "fordyca/support/d1/d1_metrics_aggregator.hpp"
 #include "fordyca/controller/cognitive/oracular_info_receptor.hpp"
 
 /*******************************************************************************
@@ -130,4 +130,4 @@ class robot_configurer {
 
 NS_END(d1, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_ROBOT_CONFIGURER_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_D1_ROBOT_CONFIGURER_HPP_ */

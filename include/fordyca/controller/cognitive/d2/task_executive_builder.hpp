@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_DEPTH2_TASK_EXECUTIVE_BUILDER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_DEPTH2_TASK_EXECUTIVE_BUILDER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_TASK_EXECUTIVE_BUILDER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_TASK_EXECUTIVE_BUILDER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -84,4 +84,4 @@ class task_executive_builder : public d1::task_executive_builder,
 
 NS_END(cognitive, d2, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_DEPTH2_TASK_EXECUTIVE_BUILDER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_TASK_EXECUTIVE_BUILDER_HPP_ */

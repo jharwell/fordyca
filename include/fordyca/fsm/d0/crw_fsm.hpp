@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_DEPTH0_CRW_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_DEPTH0_CRW_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_D0_CRW_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_D0_CRW_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -168,4 +168,4 @@ class crw_fsm final : public csfsm::util_hfsm,
 
 NS_END(d0, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_DEPTH0_CRW_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_D0_CRW_FSM_HPP_ */

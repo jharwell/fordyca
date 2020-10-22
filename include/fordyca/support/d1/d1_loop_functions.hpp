@@ -1,5 +1,5 @@
 /**
- * \file depth1_loop_functions.hpp
+ * \file d1_loop_functions.hpp
  *
  * \copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_DEPTH1_LOOP_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_DEPTH1_LOOP_FUNCTIONS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_D1_D1_LOOP_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_D1_D1_LOOP_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -32,7 +32,7 @@
 #include "cosm/controller/operations/robot_los_update.hpp"
 #include "cosm/controller/operations/task_id_extract.hpp"
 
-#include "fordyca/support/d0/depth0_loop_functions.hpp"
+#include "fordyca/support/d0/d0_loop_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,7 +45,7 @@ NS_START(fordyca);
 namespace config { namespace caches { struct caches_config; }}
 
 NS_START(support, d1);
-class depth1_metrics_aggregator;
+class d1_metrics_aggregator;
 class static_cache_manager;
 
 template<typename TController, typename TArenaMap>
@@ -65,7 +65,7 @@ using d1_subtask_status_map_type =
  * Classes
  ******************************************************************************/
 /**
- * \class depth1_loop_functions
+ * \class d1_loop_functions
  * \ingroup support d1
  *
  * \brief The loop functions for depth 1 foraging.
@@ -74,11 +74,11 @@ using d1_subtask_status_map_type =
  * potential usage of static caches (pickup, drop, etc.), along with the d0
  * operations relating to blocks.
  */
-class depth1_loop_functions : public d0::depth0_loop_functions,
-                              public rer::client<depth1_loop_functions> {
+class d1_loop_functions : public d0::d0_loop_functions,
+                              public rer::client<d1_loop_functions> {
  public:
-  depth1_loop_functions(void) RCSW_COLD;
-  ~depth1_loop_functions(void) override RCSW_COLD;
+  d1_loop_functions(void) RCSW_COLD;
+  ~d1_loop_functions(void) override RCSW_COLD;
 
   /* swarm manager overrides */
   void init(ticpp::Element& node) override RCSW_COLD;
@@ -119,7 +119,7 @@ class depth1_loop_functions : public d0::depth0_loop_functions,
   using metric_extractor_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::d1::typelist,
                               ccops::metrics_extract,
-                              depth1_metrics_aggregator>::type>;
+                              d1_metrics_aggregator>::type>;
 
   /**
    * \brief These are friend classes because they are basically just pieces of
@@ -208,7 +208,7 @@ class depth1_loop_functions : public d0::depth0_loop_functions,
   std::unique_ptr<task_extractor_map_type>            m_task_extractor_map;
   std::unique_ptr<detail::d1_subtask_status_map_type> m_subtask_status_map;
 
-  std::unique_ptr<depth1_metrics_aggregator>          m_metrics_agg;
+  std::unique_ptr<d1_metrics_aggregator>          m_metrics_agg;
   std::unique_ptr<static_cache_manager>               m_cache_manager;
   cache_counts                                        m_cache_counts{};
   /* clang-format on */
@@ -216,4 +216,4 @@ class depth1_loop_functions : public d0::depth0_loop_functions,
 
 NS_END(d1, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_DEPTH1_LOOP_FUNCTIONS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_D1_D1_LOOP_FUNCTIONS_HPP_ */

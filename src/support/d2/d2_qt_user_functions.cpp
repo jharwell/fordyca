@@ -1,5 +1,5 @@
 /**
- * \file depth0_metrics_aggregator.hpp
+ * \file d2_qt_user_functions.cpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,46 +18,35 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_DEPTH0_METRICS_AGGREGATOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_DEPTH0_METRICS_AGGREGATOR_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
+#include "rcppsw/common/common.hpp"
 
-#include "fordyca/metrics/fordyca_metrics_aggregator.hpp"
+RCPPSW_WARNING_DISABLE_PUSH()
+RCPPSW_WARNING_DISABLE_OVERLOADED_VIRTUAL()
+#include "fordyca/support/d2/d2_qt_user_functions.hpp"
+RCPPSW_WARNING_DISABLE_POP()
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, d0);
+NS_START(fordyca, support, d2);
 
 /*******************************************************************************
- * Class Definitions
+ * Member Functions
  ******************************************************************************/
-/**
- * \class depth0_metrics_aggregator
- * \ingroup support d0
- *
- * \brief Aggregates and metrics metric collection for d0 foraging. That
- * includes:
- *
- * - FSM distance/block acquisition metrics
- */
 
-class depth0_metrics_aggregator : public metrics::fordyca_metrics_aggregator,
-                                  public rer::client<depth0_metrics_aggregator> {
- public:
-  depth0_metrics_aggregator(const cmconfig::metrics_config* mconfig,
-                            const cdconfig::grid2D_config* gconfig,
-                            const std::string& output_root,
-                            size_t n_block_clusters);
+using namespace argos; // NOLINT
 
-  template<class T>
-  void collect_from_controller(const T* controller);
-};
+RCPPSW_WARNING_DISABLE_PUSH()
+RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
+RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
+RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 
-NS_END(d0, support, fordyca);
+REGISTER_QTOPENGL_USER_FUNCTIONS(d2_qt_user_functions,
+                                 "d2_qt_user_functions");
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_DEPTH0_METRICS_AGGREGATOR_HPP_ */
+RCPPSW_WARNING_DISABLE_POP()
+
+NS_END(support, fordyca, d2);

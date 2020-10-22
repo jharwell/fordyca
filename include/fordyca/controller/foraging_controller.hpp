@@ -111,6 +111,12 @@ class foraging_controller : public cpal::argos_controller2D_adaptor,
   /* block carrying controller overrides */
   bool block_detected(void) const override;
 
+  /* movement metrics */
+  rtypes::spatial_dist ts_distance(
+      const csmetrics::movement_category& category) const override;
+  rmath::vector3d ts_velocity(
+      const csmetrics::movement_category& category) const override;
+
   /**
    * \brief By default controllers have no perception subsystem, and are
    * basically blind centipedes.

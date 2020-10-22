@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_STATIC_CACHE_LOCS_CALCULATOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_STATIC_CACHE_LOCS_CALCULATOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_D1_STATIC_CACHE_LOCS_CALCULATOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_D1_STATIC_CACHE_LOCS_CALCULATOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -82,4 +82,4 @@ class static_cache_locs_calculator : public rer::client<static_cache_locs_calcul
 
 NS_END(d1, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_STATIC_CACHE_LOCS_CALCULATOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_D1_STATIC_CACHE_LOCS_CALCULATOR_HPP_ */

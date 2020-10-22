@@ -1,5 +1,5 @@
 /**
- * \file depth2_loop_functions.cpp
+ * \file d2_loop_functions.cpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -29,7 +29,7 @@
  * they do it's 100% OK to crash with an exception.
  */
 #define BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT
-#include "fordyca/support/d2/depth2_loop_functions.hpp"
+#include "fordyca/support/d2/d2_loop_functions.hpp"
 
 #include <boost/mpl/for_each.hpp>
 
@@ -52,7 +52,7 @@
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
-#include "fordyca/support/d2/depth2_metrics_aggregator.hpp"
+#include "fordyca/support/d2/d2_metrics_aggregator.hpp"
 #include "fordyca/support/d2/dynamic_cache_manager.hpp"
 #include "fordyca/support/d2/robot_arena_interactor.hpp"
 #include "fordyca/support/d2/robot_configurer.hpp"
@@ -71,7 +71,7 @@ NS_START(detail);
 using configurer_map_type =
     rds::type_map<rmpl::typelist_wrap_apply<controller::d2::typelist,
                                             robot_configurer,
-                                            depth2_metrics_aggregator>::type>;
+                                            d2_metrics_aggregator>::type>;
 
 /**
  * \struct functor_maps_initializer
@@ -83,7 +83,7 @@ using configurer_map_type =
  */
 struct functor_maps_initializer : public boost::static_visitor<void> {
   RCSW_COLD functor_maps_initializer(configurer_map_type* const cmap,
-                                     depth2_loop_functions* const lf_in)
+                                     d2_loop_functions* const lf_in)
 
       : lf(lf_in), config_map(cmap) {}
   template <typename T>
@@ -100,13 +100,13 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
         robot_arena_interactor<T, carena::caching_arena_map>(p));
     lf->m_metric_extractor_map->emplace(
         typeid(controller),
-        ccops::metrics_extract<T, depth2_metrics_aggregator>(
+        ccops::metrics_extract<T, d2_metrics_aggregator>(
             lf->m_metrics_agg.get()));
     lf->m_task_extractor_map->emplace(typeid(controller),
                                       ccops::task_id_extract<T>());
     config_map->emplace(
         typeid(controller),
-        robot_configurer<T, depth2_metrics_aggregator>(
+        robot_configurer<T, d2_metrics_aggregator>(
             lf->config()->config_get<cvconfig::visualization_config>(),
             lf->oracle(),
             lf->m_metrics_agg.get()));
@@ -119,7 +119,7 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
   }
 
   /* clang-format off */
-  depth2_loop_functions * const      lf;
+  d2_loop_functions * const  lf;
   configurer_map_type* const config_map;
   /* clang-format on */
 };
@@ -129,7 +129,7 @@ NS_END(detail);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-depth2_loop_functions::depth2_loop_functions(void)
+d2_loop_functions::d2_loop_functions(void)
     : ER_CLIENT_INIT("fordyca.loop.d2"),
       m_metrics_agg(nullptr),
       m_cache_manager(nullptr),
@@ -138,12 +138,12 @@ depth2_loop_functions::depth2_loop_functions(void)
       m_los_update_map(nullptr),
       m_task_extractor_map(nullptr) {}
 
-depth2_loop_functions::~depth2_loop_functions(void) = default;
+d2_loop_functions::~d2_loop_functions(void) = default;
 
 /*******************************************************************************
  * Initialization Functions
  ******************************************************************************/
-void depth2_loop_functions::init(ticpp::Element& node) {
+void d2_loop_functions::init(ticpp::Element& node) {
   ndc_push();
   ER_INFO("Initializing...");
 
@@ -154,16 +154,16 @@ void depth2_loop_functions::init(ticpp::Element& node) {
   ndc_pop();
 } /* init() */
 
-void depth2_loop_functions::shared_init(ticpp::Element& node) {
-  depth1_loop_functions::shared_init(node);
+void d2_loop_functions::shared_init(ticpp::Element& node) {
+  d1_loop_functions::shared_init(node);
 } /* shared_init() */
 
-void depth2_loop_functions::private_init(void) {
+void d2_loop_functions::private_init(void) {
   /* initialize stat collecting */
   auto* output = config()->config_get<cmconfig::output_config>();
   auto* arena = config()->config_get<caconfig::arena_map_config>();
 
-  m_metrics_agg = std::make_unique<depth2_metrics_aggregator>(&output->metrics,
+  m_metrics_agg = std::make_unique<d2_metrics_aggregator>(&output->metrics,
                                                               &arena->grid,
                                                               output_root(),
                                                               arena_map()->block_distributor()->block_clusters().size());
@@ -180,7 +180,7 @@ void depth2_loop_functions::private_init(void) {
    */
   if (nullptr != conv_calculator()) {
     conv_calculator()->task_dist_entropy_init(
-        std::bind(&depth2_loop_functions::robot_tasks_extract,
+        std::bind(&d2_loop_functions::robot_tasks_extract,
                   this,
                   std::placeholders::_1));
   }
@@ -209,7 +209,7 @@ void depth2_loop_functions::private_init(void) {
 
     auto applicator = ccops::applicator<controller::foraging_controller,
                                         robot_configurer,
-                                        depth2_metrics_aggregator>(controller);
+                                        d2_metrics_aggregator>(controller);
     boost::apply_visitor(applicator, config_map.at(controller->type_index()));
   };
 
@@ -224,7 +224,7 @@ void depth2_loop_functions::private_init(void) {
       this, cb, kARGoSRobotType);
 } /* private_init() */
 
-void depth2_loop_functions::cache_handling_init(
+void d2_loop_functions::cache_handling_init(
     const config::caches::caches_config* const cachep) {
   ER_ASSERT(nullptr != cachep && cachep->dynamic.enable,
             "FATAL: Caches not enabled in d2 loop functions");
@@ -237,7 +237,7 @@ void depth2_loop_functions::cache_handling_init(
 /*******************************************************************************
  * Convergence Calculations Callbacks
  ******************************************************************************/
-std::vector<int> depth2_loop_functions::robot_tasks_extract(uint) const {
+std::vector<int> d2_loop_functions::robot_tasks_extract(uint) const {
   std::vector<int> v;
   auto cb = [&](auto* controller) {
     auto it = m_task_extractor_map->find(controller->type_index());
@@ -261,7 +261,7 @@ std::vector<int> depth2_loop_functions::robot_tasks_extract(uint) const {
 /*******************************************************************************
  * ARGoS Hooks
  ******************************************************************************/
-void depth2_loop_functions::pre_step() {
+void d2_loop_functions::pre_step() {
   ndc_push();
   base_loop_functions::pre_step();
   ndc_pop();
@@ -275,7 +275,7 @@ void depth2_loop_functions::pre_step() {
   cpal::argos_swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
 } /* pre_step() */
 
-void depth2_loop_functions::post_step(void) {
+void d2_loop_functions::post_step(void) {
   ndc_push();
   base_loop_functions::post_step();
   ndc_pop();
@@ -357,7 +357,7 @@ void depth2_loop_functions::post_step(void) {
   ndc_pop();
 } /* post_step() */
 
-void depth2_loop_functions::reset(void) {
+void d2_loop_functions::reset(void) {
   ndc_push();
   base_loop_functions::reset();
   m_metrics_agg->reset_all();
@@ -365,7 +365,7 @@ void depth2_loop_functions::reset(void) {
   ndc_pop();
 }
 
-void depth2_loop_functions::destroy(void) {
+void d2_loop_functions::destroy(void) {
   if (nullptr != m_metrics_agg) {
     m_metrics_agg->finalize_all();
   }
@@ -374,7 +374,7 @@ void depth2_loop_functions::destroy(void) {
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-void depth2_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
+void d2_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
   auto controller = dynamic_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
 
@@ -401,7 +401,7 @@ void depth2_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
                        m_los_update_map->at(controller->type_index()));
 } /* robot_pre_step() */
 
-void depth2_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
+void d2_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
   auto controller = dynamic_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
 
@@ -455,7 +455,7 @@ void depth2_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
   /* get stats from this robot before its state changes */
   auto mapplicator = ccops::applicator<controller::foraging_controller,
                                        ccops::metrics_extract,
-                                       depth2_metrics_aggregator>(controller);
+                                       d2_metrics_aggregator>(controller);
 
   auto it2 = m_metric_extractor_map->find(controller->type_index());
   ER_ASSERT(m_metric_extractor_map->end() != it2,
@@ -468,7 +468,7 @@ void depth2_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
   controller->block_manip_recorder()->reset();
 } /* robot_post_step() */
 
-bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
+bool d2_loop_functions::cache_creation_handle(bool on_drop) {
   auto* cachep = config()->config_get<config::caches::caches_config>();
   /*
    * If dynamic cache creation is configured to occur only upon a robot dropping
@@ -498,7 +498,7 @@ RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
 RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
 RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 
-REGISTER_LOOP_FUNCTIONS(depth2_loop_functions, "depth2_loop_functions");
+REGISTER_LOOP_FUNCTIONS(d2_loop_functions, "d2_loop_functions");
 
 RCPPSW_WARNING_DISABLE_POP()
 

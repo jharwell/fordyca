@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONFIG_DEPTH0_CRW_CONTROLLER_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_CONFIG_DEPTH0_CRW_CONTROLLER_REPOSITORY_HPP_
+#ifndef INCLUDE_FORDYCA_CONFIG_D0_CRW_CONTROLLER_REPOSITORY_HPP_
+#define INCLUDE_FORDYCA_CONFIG_D0_CRW_CONTROLLER_REPOSITORY_HPP_
 
 /*******************************************************************************
  * Includes
@@ -48,4 +48,4 @@ class crw_controller_repository: public foraging_controller_repository {
 
 NS_END(config, fordyca, d0);
 
-#endif /* INCLUDE_FORDYCA_CONFIG_DEPTH0_CRW_CONTROLLER_REPOSITORY_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONFIG_D0_CRW_CONTROLLER_REPOSITORY_HPP_ */

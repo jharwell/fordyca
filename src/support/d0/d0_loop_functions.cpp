@@ -1,5 +1,5 @@
 /**
- * \file depth0_loop_functions.cpp
+ * \file d0_loop_functions.cpp
  *
  * \copyright 2017 John Harwell, All rights reserved.
  *
@@ -29,7 +29,7 @@
  * they do it's 100% OK to crash with an exception.
  */
 #define BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT
-#include "fordyca/support/d0/depth0_loop_functions.hpp"
+#include "fordyca/support/d0/d0_loop_functions.hpp"
 
 #include <boost/mpl/for_each.hpp>
 
@@ -49,7 +49,7 @@
 #include "fordyca/controller/cognitive/d0/omdpo_controller.hpp"
 #include "fordyca/controller/cognitive/foraging_perception_subsystem.hpp"
 #include "fordyca/repr/forager_los.hpp"
-#include "fordyca/support/d0/depth0_metrics_aggregator.hpp"
+#include "fordyca/support/d0/d0_metrics_aggregator.hpp"
 #include "fordyca/support/d0/robot_arena_interactor.hpp"
 #include "fordyca/support/d0/robot_configurer.hpp"
 #include "fordyca/support/d0/robot_configurer_applicator.hpp"
@@ -76,7 +76,7 @@ NS_START(detail);
  */
 struct functor_maps_initializer {
   RCSW_COLD functor_maps_initializer(configurer_map_type* const cmap,
-                                     depth0_loop_functions* const lf_in)
+                                     d0_loop_functions* const lf_in)
 
       : lf(lf_in), config_map(cmap) {}
   template <typename T>
@@ -90,7 +90,7 @@ struct functor_maps_initializer {
             lf->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>()));
     lf->m_metrics_map->emplace(
         typeid(controller),
-        ccops::metrics_extract<T, depth0_metrics_aggregator>(
+        ccops::metrics_extract<T, d0_metrics_aggregator>(
             lf->m_metrics_agg.get()));
     config_map->emplace(
         typeid(controller),
@@ -106,7 +106,7 @@ struct functor_maps_initializer {
   }
 
   /* clang-format off */
-  depth0_loop_functions * const lf;
+  d0_loop_functions * const lf;
   configurer_map_type* const    config_map;
   /* clang-format on */
 };
@@ -116,19 +116,19 @@ NS_END(detail);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-depth0_loop_functions::depth0_loop_functions(void)
+d0_loop_functions::d0_loop_functions(void)
     : ER_CLIENT_INIT("fordyca.loop.d0"),
       m_metrics_agg(nullptr),
       m_interactor_map(nullptr),
       m_metrics_map(nullptr),
       m_los_update_map(nullptr) {}
 
-depth0_loop_functions::~depth0_loop_functions(void) = default;
+d0_loop_functions::~d0_loop_functions(void) = default;
 
 /*******************************************************************************
  * Initialization Functions
  ******************************************************************************/
-void depth0_loop_functions::init(ticpp::Element& node) {
+void d0_loop_functions::init(ticpp::Element& node) {
   ndc_push();
   ER_INFO("Initializing...");
 
@@ -139,15 +139,15 @@ void depth0_loop_functions::init(ticpp::Element& node) {
   ndc_pop();
 } /* init() */
 
-void depth0_loop_functions::shared_init(ticpp::Element& node) {
+void d0_loop_functions::shared_init(ticpp::Element& node) {
   base_loop_functions::init(node);
 } /* shared_init() */
 
-void depth0_loop_functions::private_init(void) {
+void d0_loop_functions::private_init(void) {
   /* initialize output and metrics collection */
   auto* output = config()->config_get<cmconfig::output_config>();
   auto* arena = config()->config_get<caconfig::arena_map_config>();
-  m_metrics_agg = std::make_unique<depth0_metrics_aggregator>(&output->metrics,
+  m_metrics_agg = std::make_unique<d0_metrics_aggregator>(&output->metrics,
                                                               &arena->grid,
                                                               output_root(),
                                                               arena_map()->block_distributor()->block_clusters().size());
@@ -194,7 +194,7 @@ void depth0_loop_functions::private_init(void) {
 /*******************************************************************************
  * ARGoS Hooks
  ******************************************************************************/
-void depth0_loop_functions::pre_step(void) {
+void d0_loop_functions::pre_step(void) {
   ndc_push();
   base_loop_functions::pre_step();
   ndc_pop();
@@ -208,7 +208,7 @@ void depth0_loop_functions::pre_step(void) {
   cpal::argos_swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
 } /* pre_step() */
 
-void depth0_loop_functions::post_step(void) {
+void d0_loop_functions::post_step(void) {
   ndc_push();
   base_loop_functions::post_step();
   ndc_pop();
@@ -251,13 +251,13 @@ void depth0_loop_functions::post_step(void) {
   ndc_pop();
 } /* post_step() */
 
-void depth0_loop_functions::destroy(void) {
+void d0_loop_functions::destroy(void) {
   if (nullptr != m_metrics_agg) {
     m_metrics_agg->finalize_all();
   }
 } /* destroy() */
 
-void depth0_loop_functions::reset(void) {
+void d0_loop_functions::reset(void) {
   ndc_push();
   base_loop_functions::reset();
   m_metrics_agg->reset_all();
@@ -267,7 +267,7 @@ void depth0_loop_functions::reset(void) {
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-void depth0_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
+void d0_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
   auto* controller = static_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
 
@@ -290,7 +290,7 @@ void depth0_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
                        m_los_update_map->at(controller->type_index()));
 } /* robot_pre_step() */
 
-void depth0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
+void d0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
   auto controller = static_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
   /*
@@ -332,7 +332,7 @@ void depth0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
    */
   auto mapplicator = ccops::applicator<controller::foraging_controller,
                                        ccops::metrics_extract,
-                                       depth0_metrics_aggregator>(controller);
+                                       d0_metrics_aggregator>(controller);
   boost::apply_visitor(mapplicator, m_metrics_map->at(controller->type_index()));
 
   controller->block_manip_recorder()->reset();
@@ -345,7 +345,7 @@ RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
 RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
 RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 
-REGISTER_LOOP_FUNCTIONS(depth0_loop_functions, "depth0_loop_functions");
+REGISTER_LOOP_FUNCTIONS(d0_loop_functions, "d0_loop_functions");
 
 RCPPSW_WARNING_DISABLE_POP()
 

@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_DEPTH2_ACQUIRE_NEW_CACHE_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_DEPTH2_ACQUIRE_NEW_CACHE_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_D2_ACQUIRE_NEW_CACHE_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_D2_ACQUIRE_NEW_CACHE_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -89,4 +89,4 @@ class acquire_new_cache_fsm final : public rer::client<acquire_new_cache_fsm>,
 
 NS_END(d2, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_DEPTH2_ACQUIRE_NEW_CACHE_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_D2_ACQUIRE_NEW_CACHE_FSM_HPP_ */

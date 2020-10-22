@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_DEPTH1_HARVESTER_HPP_
-#define INCLUDE_FORDYCA_TASKS_DEPTH1_HARVESTER_HPP_
+#ifndef INCLUDE_FORDYCA_TASKS_D1_HARVESTER_HPP_
+#define INCLUDE_FORDYCA_TASKS_D1_HARVESTER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -103,4 +103,4 @@ class harvester final : public foraging_task,
 
 NS_END(d1, tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_TASKS_DEPTH1_HARVESTER_HPP_ */
+#endif /* INCLUDE_FORDYCA_TASKS_D1_HARVESTER_HPP_ */

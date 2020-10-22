@@ -1,5 +1,5 @@
 /**
- * \file depth0_metrics_aggregator.cpp
+ * \file d0_metrics_aggregator.cpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/d0/depth0_metrics_aggregator.hpp"
+#include "fordyca/support/d0/d0_metrics_aggregator.hpp"
 
 #include <boost/mpl/for_each.hpp>
 
@@ -61,7 +61,7 @@ NS_END(detail);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-depth0_metrics_aggregator::depth0_metrics_aggregator(
+d0_metrics_aggregator::d0_metrics_aggregator(
     const cmconfig::metrics_config* const mconfig,
     const cdconfig::grid2D_config* const gconfig,
     const std::string& output_root,
@@ -88,14 +88,14 @@ depth0_metrics_aggregator::depth0_metrics_aggregator(
  * Member Functions
  ******************************************************************************/
 template <class T>
-void depth0_metrics_aggregator::collect_from_controller(
+void d0_metrics_aggregator::collect_from_controller(
     const T* const controller) {
   base_metrics_aggregator::collect_from_controller(controller);
 
   /*
    * All d0 controllers provide these.
    */
-  collect("fsm::movement", *controller);
+  collect("spatial::movement", *controller);
   collect("fsm::interference_counts", *controller->fsm());
   collect("blocks::acq_counts", *controller);
   collect("blocks::manipulation", *controller->block_manip_recorder());
@@ -154,15 +154,15 @@ void depth0_metrics_aggregator::collect_from_controller(
 /*******************************************************************************
  * Template Instantiations
  ******************************************************************************/
-template void depth0_metrics_aggregator::collect_from_controller(
+template void d0_metrics_aggregator::collect_from_controller(
     const controller::reactive::d0::crw_controller* const c);
-template void depth0_metrics_aggregator::collect_from_controller(
+template void d0_metrics_aggregator::collect_from_controller(
     const controller::cognitive::d0::dpo_controller* const c);
-template void depth0_metrics_aggregator::collect_from_controller(
+template void d0_metrics_aggregator::collect_from_controller(
     const controller::cognitive::d0::mdpo_controller* const c);
-template void depth0_metrics_aggregator::collect_from_controller(
+template void d0_metrics_aggregator::collect_from_controller(
     const controller::cognitive::d0::odpo_controller* const c);
-template void depth0_metrics_aggregator::collect_from_controller(
+template void d0_metrics_aggregator::collect_from_controller(
     const controller::cognitive::d0::omdpo_controller* const c);
 
 NS_END(d0, support, fordyca);

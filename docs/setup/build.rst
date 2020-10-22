@@ -37,21 +37,25 @@ run from anywhere), with the following arguments:
 
 - 1st arg: The root directory for the project (all repos will be cloned/built
   in here, and it **must** be an absolute path).
-- 2nd arg: ``YES`` if you want to install ARGoS system wide (you probably do)
-  and ``NO`` otherwise.
-- 3rd arg: Location ARGoS should be installed into.
-- 4th arg: The # of cores to use when building ARGoS/FORDYCA (should be set to
+- 2nd arg: ``YES`` if you have sudo access and want to install the system
+  packages that FORDYCA requires, and ``NO`` otherwise.
+- 3rd arg: ``YES`` if you want to install ARGoS system wide (you probably do)
+  and ``NO`` otherwise. `If you say` ``YES`` `then it is assumed you have sudo
+  access`.
+- 4th arg: Location ARGoS should be installed into (can be a system dir, or
+  somewhere in your home dir if you don't have sudo access).
+- 5th arg: The # of cores to use when building ARGoS/FORDYCA (should be set to
   # cores on your machine).
 
 For example::
 
-  ./bootstrap.sh $HOME/research YES /usr/local 2 > output.txt 2>&1
+  ./bootstrap.sh $HOME/research YES YES /usr/local 2 > output.txt 2>&1
 
-To build the code under ``~/research`` on a 2 core machine and install ARGoS
-system-wide. The ``> output.txt 2>&1`` part is important to capture the output
-of running the script so that if there are errors it is easier to track them
-down (the script generates a LOT of output, which usually overflows terminal
-ringbuffers).
+Will install system packages, to build the code under ``~/research`` on a 2 core
+machine and install ARGoS system-wide. The ``> output.txt 2>&1`` part is
+important to capture the output of running the script so that if there are
+errors it is easier to track them down (the script generates a LOT of output,
+which usually overflows terminal ringbuffers).
 
 The script is configured such that it will stop if any command fails. So if the
 script makes it all the way through and you see a ``BOOTSTRAP SUCCESS!`` line at
@@ -71,16 +75,15 @@ one ``bootstrap.sh`` uses for you. Something like the following, run from the
 
   cmake -DCMAKE_C_COMPILER=gcc-9 \
   -DCMAKE_CXX_COMPILER=g++-9 \
+  -DCMAKE_BUILD_TYPE=OPT \
+  -DLIBRA_ER=NONE \
   -DWITH_FOOTBOT_BATTERY=NO \
   -DWITH_FOOTBOT_RAB=NO \
   -DWITH_FOOTBOT_LEDS=NO \
-  -DCMAKE_BUILD_TYPE=OPT \
-  -DLIBRA_ER=NONE \
   \..
 
 To get an idea of what some of the non-project specific options mean, head over
-to the `libra <https://github.com/swarm-robotics/libra/tree/devel/README.md>`_
-repo and look at the README.
+to the :xref:`LIBRA` docs.
 
 ``WITH_FOOTBOT_BATTERY``, ``WITH_FOOTBOT_RAB``, ``WITH_FOOTBOT_LEDS`` are things
 that are only needed if you are running experiments which utilize those

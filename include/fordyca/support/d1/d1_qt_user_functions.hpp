@@ -1,7 +1,7 @@
 /**
- * \file depth2_qt_user_functions.hpp
+ * \file d1_qt_user_functions.hpp
  *
- * \copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -17,36 +17,39 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH2_DEPTH2_QT_USER_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH2_DEPTH2_QT_USER_FUNCTIONS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_D1_D1_QT_USER_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_D1_D1_QT_USER_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/d1/depth1_qt_user_functions.hpp"
+#include "fordyca/support/d0/d0_qt_user_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, d2);
+NS_START(fordyca, support, d1);
 
 /*******************************************************************************
  * Classes
  ******************************************************************************/
 /**
- * \class depth2_qt_user_functions
- * \ingroup support d2
+ * \class d1_qt_user_functions
+ * \ingroup support d1
  *
- * \brief Contains hooks for Qt to draw the visualizations related to depth 2
+ * \brief Contains hooks for Qt to draw the visualizations related to depth 1
  * task decomposition:
  *
+ * - Task name
  */
-class depth2_qt_user_functions : public d1::depth1_qt_user_functions {
+class d1_qt_user_functions : public d0::d0_qt_user_functions {
  public:
-  depth2_qt_user_functions(void) = default;
-  ~depth2_qt_user_functions(void) override = default;
+  d1_qt_user_functions(void);
+  ~d1_qt_user_functions(void) override = default;
+
+  void Draw(argos::CFootBotEntity& c_entity);
 };
 
-NS_END(d2, support, fordyca);
+NS_END(d1, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH2_DEPTH2_QT_USER_FUNCTIONS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_D1_D1_QT_USER_FUNCTIONS_HPP_ */

@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_DEPTH2_CACHE_TRANSFERER_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_DEPTH2_CACHE_TRANSFERER_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_D2_CACHE_TRANSFERER_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_D2_CACHE_TRANSFERER_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -85,4 +85,4 @@ class cache_transferer_fsm final : public block_to_goal_fsm {
 
 NS_END(d2, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_DEPTH2_CACHE_TRANSFERER_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_D2_CACHE_TRANSFERER_FSM_HPP_ */

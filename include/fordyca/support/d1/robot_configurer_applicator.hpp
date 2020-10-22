@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_ROBOT_CONFIGURER_ADAPTOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_ROBOT_CONFIGURER_ADAPTOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_D1_ROBOT_CONFIGURER_ADAPTOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_D1_ROBOT_CONFIGURER_ADAPTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -33,13 +33,13 @@
 NS_START(fordyca, support, d1);
 template<class Controller, class Aggregator>
 class robot_configurer;
-class depth1_metrics_aggregator;
+class d1_metrics_aggregator;
 
 NS_START(detail);
 using configurer_map_type = rds::type_map<
    rmpl::typelist_wrap_apply<controller::cognitive::d1::typelist,
                              robot_configurer,
-                             depth1_metrics_aggregator>::type>;
+                             d1_metrics_aggregator>::type>;
 
 /*******************************************************************************
  * Class Definitions
@@ -73,4 +73,4 @@ class robot_configurer_adaptor {
 
 NS_END(detail, d1, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_ROBOT_CONFIGURER_ADAPTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_D1_ROBOT_CONFIGURER_ADAPTOR_HPP_ */

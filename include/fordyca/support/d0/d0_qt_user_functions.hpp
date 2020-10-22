@@ -1,5 +1,5 @@
 /**
- * \file depth1_qt_user_functions.hpp
+ * \file d0_qt_user_functions.hpp
  *
  * \copyright 2017 John Harwell, All rights reserved.
  *
@@ -17,39 +17,51 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_DEPTH1_QT_USER_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_DEPTH1_QT_USER_FUNCTIONS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_D0_D0_QT_USER_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_D0_D0_QT_USER_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/d0/depth0_qt_user_functions.hpp"
+#include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_user_functions.h>
+#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, d1);
+NS_START(fordyca, support, d0);
 
 /*******************************************************************************
  * Classes
  ******************************************************************************/
 /**
- * \class depth1_qt_user_functions
- * \ingroup support d1
+ * \class d0_qt_user_functions
+ * \ingroup support d0
  *
- * \brief Contains hooks for Qt to draw the visualizations related to depth 1
- * task decomposition:
- *
- * - Task name
+ * \brief Contains hooks for Qt to draw the robot's LOS if so configured.
  */
-class depth1_qt_user_functions : public d0::depth0_qt_user_functions {
+class d0_qt_user_functions : public argos::CQTOpenGLUserFunctions {
  public:
-  depth1_qt_user_functions(void);
-  ~depth1_qt_user_functions(void) override = default;
+  /**
+   * \brief How far above the center of the robot to draw the carried block (if
+   * the robot is carrying a block)
+   */
+  static constexpr double kBLOCK_VIS_OFFSET = 0.3;
+
+  /**
+   * \brief How far above the center of the robot to draw text (robot id, task,
+   * etc.)
+   */
+  static constexpr double kTEXT_VIS_OFFSET = 0.5;
+
+  d0_qt_user_functions(void);
+
+  ~d0_qt_user_functions(void) override = default;
 
   void Draw(argos::CFootBotEntity& c_entity);
 };
 
-NS_END(d1, support, fordyca);
+NS_END(d0, fordyca, support);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_DEPTH1_QT_USER_FUNCTIONS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_D0_D0_QT_USER_FUNCTIONS_HPP_ */

@@ -134,7 +134,8 @@ HFSM_STATE_DEFINE(crw_fsm, wait_for_block_drop, rpfsm::event_data* data) {
  * Metrics
  ******************************************************************************/
 crw_fsm::exp_status crw_fsm::is_exploring_for_goal(void) const {
-  return exp_status{current_state() == ekST_ACQUIRE_BLOCK, true};
+  return exp_status{ekST_ACQUIRE_BLOCK == current_state() ||
+        ekST_LEAVING_NEST == current_state(), true};
 } /* is_exploring_for_goal() */
 
 bool crw_fsm::goal_acquired(void) const {

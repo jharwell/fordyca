@@ -1,5 +1,5 @@
 /**
- * \file depth1_metrics_aggregator.cpp
+ * \file d1_metrics_aggregator.cpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/d1/depth1_metrics_aggregator.hpp"
+#include "fordyca/support/d1/d1_metrics_aggregator.hpp"
 
 #include <boost/mpl/for_each.hpp>
 #include <vector>
@@ -39,7 +39,6 @@
 #include "cosm/spatial/metrics/goal_acq_locs2D_metrics_collector.hpp"
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 #include "cosm/spatial/metrics/goal_acq_metrics_collector.hpp"
-#include "cosm/spatial/metrics/movement_metrics.hpp"
 #include "cosm/metrics/collector_registerer.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tab.hpp"
@@ -66,12 +65,12 @@ using task1 = tasks::d1::foraging_task;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-depth1_metrics_aggregator::depth1_metrics_aggregator(
+d1_metrics_aggregator::d1_metrics_aggregator(
     const cmconfig::metrics_config* const mconfig,
     const cdconfig::grid2D_config* const gconfig,
     const std::string& output_root,
     size_t n_block_clusters)
-    : depth0_metrics_aggregator(mconfig,
+    : d0_metrics_aggregator(mconfig,
                                 gconfig,
                                 output_root,
                                 n_block_clusters),
@@ -88,7 +87,7 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void depth1_metrics_aggregator::collect_from_cache(
+void d1_metrics_aggregator::collect_from_cache(
     const carepr::arena_cache* const cache) {
   auto util_m =
       dynamic_cast<const cametrics::caches::utilization_metrics*>(cache);
@@ -97,12 +96,12 @@ void depth1_metrics_aggregator::collect_from_cache(
   collect("caches::locations", *loc_m);
 } /* collect_from_cache() */
 
-void depth1_metrics_aggregator::collect_from_cache_manager(
+void d1_metrics_aggregator::collect_from_cache_manager(
     const support::base_cache_manager* const manager) {
   collect("caches::lifecycle", *manager);
 } /* collect_from_cache() */
 
-void depth1_metrics_aggregator::task_finish_or_abort_cb(
+void d1_metrics_aggregator::task_finish_or_abort_cb(
     const cta::polled_task* const task) {
   /*
    * Both d1 and d2 metrics aggregators are registered on the same
@@ -116,7 +115,7 @@ void depth1_metrics_aggregator::task_finish_or_abort_cb(
           dynamic_cast<const ctametrics::execution_metrics&>(*task));
 } /* task_finish_or_abort_cb() */
 
-void depth1_metrics_aggregator::task_start_cb(const cta::polled_task* const,
+void d1_metrics_aggregator::task_start_cb(const cta::polled_task* const,
                                               const cta::ds::bi_tab* const tab) {
   /* Not using stochastic nbhd policy */
   if (nullptr == tab) {
@@ -133,7 +132,7 @@ void depth1_metrics_aggregator::task_start_cb(const cta::polled_task* const,
   collect("tasks::tab::generalist", *tab);
 } /* task_start_cb() */
 
-void depth1_metrics_aggregator::register_standard(
+void d1_metrics_aggregator::register_standard(
     const cmconfig::metrics_config* mconfig) {
   using collector_typelist = rmpl::typelist<
       rmpl::identity<csmetrics::goal_acq_metrics_collector>,
@@ -174,7 +173,7 @@ void depth1_metrics_aggregator::register_standard(
   boost::mpl::for_each<collector_typelist>(registerer);
 } /* register_standard() */
 
-void depth1_metrics_aggregator::register_with_decomp_depth(
+void d1_metrics_aggregator::register_with_decomp_depth(
     const cmconfig::metrics_config* const mconfig,
     size_t depth) {
   using collector_typelist =
@@ -191,7 +190,7 @@ void depth1_metrics_aggregator::register_with_decomp_depth(
   boost::mpl::for_each<collector_typelist>(registerer);
 } /* register_with_decomp_depth() */
 
-void depth1_metrics_aggregator::register_with_arena_dims2D(
+void d1_metrics_aggregator::register_with_arena_dims2D(
     const cmconfig::metrics_config* const mconfig,
     const rmath::vector2z& dims) {
   using collector_typelist = rmpl::typelist<

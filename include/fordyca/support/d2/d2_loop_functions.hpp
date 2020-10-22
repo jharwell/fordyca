@@ -1,5 +1,5 @@
 /**
- * \file depth2_loop_functions.hpp
+ * \file d2_loop_functions.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH2_DEPTH2_LOOP_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH2_DEPTH2_LOOP_FUNCTIONS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_D2_D2_LOOP_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_D2_D2_LOOP_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,13 +29,13 @@
 
 #include "cosm/controller/operations/task_id_extract.hpp"
 
-#include "fordyca/support/d1/depth1_loop_functions.hpp"
+#include "fordyca/support/d1/d1_loop_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, d2);
-class depth2_metrics_aggregator;
+class d2_metrics_aggregator;
 class dynamic_cache_manager;
 template<typename TController, typename TArenaMap>
 class robot_arena_interactor;
@@ -48,7 +48,7 @@ struct functor_maps_initializer;
  * Classes
  ******************************************************************************/
 /**
- * \class depth2_loop_functions
+ * \class d2_loop_functions
  * \ingroup support d2
  *
  * \brief The loop functions for depth 2 foraging.
@@ -56,11 +56,11 @@ struct functor_maps_initializer;
  * Handles all operations robots perform relating to dynamic caches: pickup,
  * drop, creation, depletion, etc.
  */
-class depth2_loop_functions final : public d1::depth1_loop_functions,
-                                    public rer::client<depth2_loop_functions> {
+class d2_loop_functions final : public d1::d1_loop_functions,
+                                    public rer::client<d2_loop_functions> {
  public:
-  depth2_loop_functions(void) RCSW_COLD;
-  ~depth2_loop_functions(void) override RCSW_COLD;
+  d2_loop_functions(void) RCSW_COLD;
+  ~d2_loop_functions(void) override RCSW_COLD;
 
   /* swarm manager overrides */
   void init(ticpp::Element& node) override RCSW_COLD;
@@ -94,7 +94,7 @@ class depth2_loop_functions final : public d1::depth1_loop_functions,
   using metric_extractor_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::d2::typelist,
                               ccops::metrics_extract,
-                              depth2_metrics_aggregator>::type>;
+                              d2_metrics_aggregator>::type>;
 
   /**
    * \brief These are friend classes because they are basically just pieces of
@@ -153,7 +153,7 @@ class depth2_loop_functions final : public d1::depth1_loop_functions,
   std::mutex                                 m_dynamic_cache_mtx{};
   bool                                       m_dynamic_cache_create{false};
 
-  std::unique_ptr<depth2_metrics_aggregator> m_metrics_agg;
+  std::unique_ptr<d2_metrics_aggregator> m_metrics_agg;
   std::unique_ptr<dynamic_cache_manager>     m_cache_manager;
   std::unique_ptr<interactor_map_type>       m_interactor_map;
   std::unique_ptr<metric_extractor_map_type> m_metric_extractor_map;
@@ -164,4 +164,4 @@ class depth2_loop_functions final : public d1::depth1_loop_functions,
 
 NS_END(d2, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH2_DEPTH2_LOOP_FUNCTIONS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_D2_D2_LOOP_FUNCTIONS_HPP_ */

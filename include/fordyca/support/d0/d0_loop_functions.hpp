@@ -1,5 +1,5 @@
 /**
- * \file depth0_loop_functions.hpp
+ * \file d0_loop_functions.hpp
  *
  * \copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_DEPTH0_LOOP_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_DEPTH0_LOOP_FUNCTIONS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_D0_D0_LOOP_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_D0_D0_LOOP_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -47,7 +47,7 @@ NS_START(fordyca, support, d0);
 namespace detail {
 struct functor_maps_initializer;
 } /* namespace detail */
-class depth0_metrics_aggregator;
+class d0_metrics_aggregator;
 
 template<typename Controller, typename TArenaMap>
 class robot_arena_interactor;
@@ -56,7 +56,7 @@ class robot_arena_interactor;
  * Classes
  ******************************************************************************/
 /**
- * \class depth0_loop_functions
+ * \class d0_loop_functions
  * \ingroup support d0
  *
  * \brief Contains the simulation support functions for d0 foraging, such
@@ -65,11 +65,11 @@ class robot_arena_interactor;
  * - Metric collection from robots
  * - Robot arena interactions
  */
-class depth0_loop_functions : public base_loop_functions,
-                              public rer::client<depth0_loop_functions> {
+class d0_loop_functions : public base_loop_functions,
+                              public rer::client<d0_loop_functions> {
  public:
-  depth0_loop_functions(void) RCSW_COLD;
-  ~depth0_loop_functions(void) override RCSW_COLD;
+  d0_loop_functions(void) RCSW_COLD;
+  ~d0_loop_functions(void) override RCSW_COLD;
 
   /* swarm manager overrides */
   void init(ticpp::Element& node) override RCSW_COLD;
@@ -101,7 +101,7 @@ private:
   using metric_extraction_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::d0::typelist,
                               ccops::metrics_extract,
-                              depth0_metrics_aggregator>::type>;
+                              d0_metrics_aggregator>::type>;
   /**
    * \brief These are friend classes because they are basically just pieces of
    * the loop functions pulled out for increased clarity/modularity, and are not
@@ -142,7 +142,7 @@ private:
   void robot_post_step(argos::CFootBotEntity& robot);
 
   /* clang-format off */
-  std::unique_ptr<depth0_metrics_aggregator>  m_metrics_agg;
+  std::unique_ptr<d0_metrics_aggregator>  m_metrics_agg;
   std::unique_ptr<interactor_map_type>        m_interactor_map;
   std::unique_ptr<metric_extraction_map_type> m_metrics_map;
   std::unique_ptr<los_updater_map_type>       m_los_update_map;
@@ -151,4 +151,4 @@ private:
 
 NS_END(d0, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_DEPTH0_LOOP_FUNCTIONS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_D0_D0_LOOP_FUNCTIONS_HPP_ */

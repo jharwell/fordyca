@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_ROBOT_CONFIGURER_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_ROBOT_CONFIGURER_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_D0_ROBOT_CONFIGURER_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_D0_ROBOT_CONFIGURER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -84,4 +84,4 @@ class robot_configurer : public boost::static_visitor<void> {
 
 NS_END(d0, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_ROBOT_CONFIGURER_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_D0_ROBOT_CONFIGURER_HPP_ */

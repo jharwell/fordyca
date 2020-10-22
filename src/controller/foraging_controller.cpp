@@ -238,4 +238,32 @@ const class crfootbot::footbot_saa_subsystem* foraging_controller::saa(
   return static_cast<const crfootbot::footbot_saa_subsystem*>(
       base_controller2D::saa());
 }
+
+/*******************************************************************************
+ * Movement Metrics
+ ******************************************************************************/
+rtypes::spatial_dist foraging_controller::ts_distance(
+    const csmetrics::movement_category& category) const {
+  if (csmetrics::movement_category::ekALL == category) {
+    return ts_distance_impl();
+  } else if (csmetrics::movement_category::ekHOMING == category) {
+    if (fsm::foraging_transport_goal::ekNEST == block_transport_goal()) {
+      return ts_distance_impl();
+    }
+  }
+  return rtypes::spatial_dist(0);
+} /* ts_distance() */
+
+rmath::vector3d foraging_controller::ts_velocity(
+    const csmetrics::movement_category& category) const {
+  if (csmetrics::movement_category::ekALL == category) {
+    return ts_velocity_impl();
+  } else if (csmetrics::movement_category::ekHOMING == category) {
+    if (fsm::foraging_transport_goal::ekNEST == block_transport_goal()) {
+      return ts_velocity_impl();
+    }
+  }
+  return {};
+} /* ts_velocity() */
+
 NS_END(controller, fordyca);

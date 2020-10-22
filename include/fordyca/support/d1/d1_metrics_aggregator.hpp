@@ -1,5 +1,5 @@
 /**
- * \file depth1_metrics_aggregator.hpp
+ * \file d1_metrics_aggregator.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_DEPTH1_METRICS_AGGREGATOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_DEPTH1_METRICS_AGGREGATOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_D1_D1_METRICS_AGGREGATOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_D1_D1_METRICS_AGGREGATOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -33,7 +33,7 @@
 #include "cosm/ta/metrics/bi_tdgraph_metrics.hpp"
 #include "cosm/ta/polled_task.hpp"
 
-#include "fordyca/support/d0/depth0_metrics_aggregator.hpp"
+#include "fordyca/support/d0/d0_metrics_aggregator.hpp"
 #include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
 #include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
 #include "fordyca//controller/foraging_controller.hpp"
@@ -61,11 +61,11 @@ NS_START(support, d1);
  * Class Definitions
  ******************************************************************************/
 /**
- * \class depth1_metrics_aggregator
+ * \class d1_metrics_aggregator
  * \ingroup support d1
  *
  * \brief Aggregates and metrics collection for d1 foraging. That
- * includes everything from \ref depth0_metrics_aggregator, and also:
+ * includes everything from \ref d0_metrics_aggregator, and also:
  *
  * - FSM cache acquisition metrics
  * - Cache utilization metrics
@@ -74,10 +74,10 @@ NS_START(support, d1);
  * - Task execution metrics (per task)
  * - TAB metrics (rooted at generalist)
  */
-class depth1_metrics_aggregator : public d0::depth0_metrics_aggregator,
-                                  public rer::client<depth1_metrics_aggregator> {
+class d1_metrics_aggregator : public d0::d0_metrics_aggregator,
+                                  public rer::client<d1_metrics_aggregator> {
  public:
-  depth1_metrics_aggregator(const cmconfig::metrics_config* mconfig,
+  d1_metrics_aggregator(const cmconfig::metrics_config* mconfig,
                             const cdconfig::grid2D_config* gconfig,
                             const std::string& output_root,
                             size_t n_block_clusters);
@@ -255,4 +255,4 @@ class depth1_metrics_aggregator : public d0::depth0_metrics_aggregator,
 
 NS_END(d1, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_DEPTH1_METRICS_AGGREGATOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_D1_D1_METRICS_AGGREGATOR_HPP_ */

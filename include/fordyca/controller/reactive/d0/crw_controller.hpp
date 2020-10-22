@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_REACTIVE_DEPTH0_CRW_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_REACTIVE_DEPTH0_CRW_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_REACTIVE_D0_CRW_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_REACTIVE_D0_CRW_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -88,4 +88,4 @@ class crw_controller : public foraging_controller,
 
 NS_END(d0, reactive, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_REACTIVE_DEPTH0_CRW_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_REACTIVE_D0_CRW_CONTROLLER_HPP_ */

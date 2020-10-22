@@ -1,7 +1,7 @@
 /**
- * \file depth0_qt_user_functions.hpp
+ * \file d0_metrics_aggregator.hpp
  *
- * \copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -17,15 +17,16 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_DEPTH0_QT_USER_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_DEPTH0_QT_USER_FUNCTIONS_HPP_
+
+#ifndef INCLUDE_FORDYCA_SUPPORT_D0_D0_METRICS_AGGREGATOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_D0_D0_METRICS_AGGREGATOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_user_functions.h>
-#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
-#include "fordyca/fordyca.hpp"
+#include <string>
+
+#include "fordyca/metrics/fordyca_metrics_aggregator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,35 +34,30 @@
 NS_START(fordyca, support, d0);
 
 /*******************************************************************************
- * Classes
+ * Class Definitions
  ******************************************************************************/
 /**
- * \class depth0_qt_user_functions
+ * \class d0_metrics_aggregator
  * \ingroup support d0
  *
- * \brief Contains hooks for Qt to draw the robot's LOS if so configured.
+ * \brief Aggregates and metrics metric collection for d0 foraging. That
+ * includes:
+ *
+ * - FSM distance/block acquisition metrics
  */
-class depth0_qt_user_functions : public argos::CQTOpenGLUserFunctions {
+
+class d0_metrics_aggregator : public metrics::fordyca_metrics_aggregator,
+                                  public rer::client<d0_metrics_aggregator> {
  public:
-  /**
-   * \brief How far above the center of the robot to draw the carried block (if
-   * the robot is carrying a block)
-   */
-  static constexpr double kBLOCK_VIS_OFFSET = 0.3;
+  d0_metrics_aggregator(const cmconfig::metrics_config* mconfig,
+                            const cdconfig::grid2D_config* gconfig,
+                            const std::string& output_root,
+                            size_t n_block_clusters);
 
-  /**
-   * \brief How far above the center of the robot to draw text (robot id, task,
-   * etc.)
-   */
-  static constexpr double kTEXT_VIS_OFFSET = 0.5;
-
-  depth0_qt_user_functions(void);
-
-  ~depth0_qt_user_functions(void) override = default;
-
-  void Draw(argos::CFootBotEntity& c_entity);
+  template<class T>
+  void collect_from_controller(const T* controller);
 };
 
-NS_END(d0, fordyca, support);
+NS_END(d0, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_DEPTH0_QT_USER_FUNCTIONS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_D0_D0_METRICS_AGGREGATOR_HPP_ */

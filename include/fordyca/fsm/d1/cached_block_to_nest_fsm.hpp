@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_DEPTH1_CACHED_BLOCK_TO_NEST_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_DEPTH1_CACHED_BLOCK_TO_NEST_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_D1_CACHED_BLOCK_TO_NEST_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_D1_CACHED_BLOCK_TO_NEST_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -216,4 +216,4 @@ class cached_block_to_nest_fsm final : public csfsm::util_hfsm,
 
 NS_END(d1, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_DEPTH1_CACHED_BLOCK_TO_NEST_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_D1_CACHED_BLOCK_TO_NEST_FSM_HPP_ */
