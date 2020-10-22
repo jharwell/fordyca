@@ -91,6 +91,10 @@ class acquire_existing_cache_fsm
   acquire_existing_cache_fsm& operator=(const acquire_existing_cache_fsm&) =
       delete;
 
+  const controller::cognitive::cache_sel_matrix* matrix(void) const {
+    return mc_matrix;
+  }
+
  private:
   using acq_loc_type = std::pair<rtypes::type_uuid, rmath::vector2d>;
 
@@ -117,7 +121,7 @@ class acquire_existing_cache_fsm
 
   const bool                                           mc_for_pickup;
   const controller::cognitive::cache_sel_matrix* const mc_matrix;
-  const ds::dpo_store*                const            mc_store;
+  const ds::dpo_store*                           const mc_store;
   /* clang-format on */
 };
 

@@ -213,12 +213,6 @@ void depth1_loop_functions::private_init(void) {
   auto* arena = config()->config_get<caconfig::arena_map_config>();
 
 
-  m_metrics_agg = std::make_unique<depth1_metrics_aggregator>(&output->metrics,
-                                                              &arena->grid,
-                                                              output_root());
-  /* this starts at 0, and ARGoS starts at 1, so sync up */
-  m_metrics_agg->timestep_inc_all();
-
   /* initialize cache handling and create initial cache */
   cache_handling_init(
       config()->config_get<config::caches::caches_config>(),
@@ -232,6 +226,14 @@ void depth1_loop_functions::private_init(void) {
   if (delay_arena_map_init()) {
     arena_map_init(vconfig);
   }
+
+  m_metrics_agg = std::make_unique<depth1_metrics_aggregator>(&output->metrics,
+                                                              &arena->grid,
+                                                              output_root(),
+                                                              arena_map()->block_distributor()->block_clusters().size());
+  /* this starts at 0, and ARGoS starts at 1, so sync up */
+  m_metrics_agg->timestep_inc_all();
+
 
   /*
    * Initialize convergence calculations to include task distribution (if
@@ -417,14 +419,14 @@ void depth1_loop_functions::post_step(void) {
   m_cache_counts.n_harvesters = 0;
   m_cache_counts.n_collectors = 0;
 
-  /* Update block distribution status */
+  /* update arena map */
   auto* collector =
       m_metrics_agg->get<cfmetrics::block_transport_metrics_collector>(
           "blocks::transport");
-  arena_map()->redist_governor()->update(
-      rtypes::timestep(GetSpace().GetSimulationClock()),
-      collector->cum_transported(),
-      nullptr != conv_calculator() ? conv_calculator()->converged() : false);
+
+  arena_map()->post_step_update(rtypes::timestep(GetSpace().GetSimulationClock()),
+                                collector->cum_transported(),
+                                nullptr != conv_calculator() ? conv_calculator()->converged() : false);
 
   /* Collect metrics from/about existing caches */
   for (auto* c : arena_map()->caches()) {

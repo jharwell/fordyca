@@ -51,7 +51,8 @@ class depth0_metrics_aggregator : public metrics::fordyca_metrics_aggregator,
  public:
   depth0_metrics_aggregator(const cmconfig::metrics_config* mconfig,
                             const cdconfig::grid2D_config* gconfig,
-                            const std::string& output_root);
+                            const std::string& output_root,
+                            size_t n_block_clusters);
 
   template<class T>
   void collect_from_controller(const T* controller);

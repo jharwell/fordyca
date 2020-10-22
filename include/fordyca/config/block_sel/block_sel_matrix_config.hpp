@@ -46,7 +46,6 @@ NS_START(fordyca, config, block_sel);
  * \brief XML parameters for the \ref block_sel_matrix
  */
 struct block_sel_matrix_config final : public rconfig::base_config {
-  rmath::vector2d nest{};
   block_priority_config priorities {};
   block_pickup_policy_config pickup_policy{};
 };

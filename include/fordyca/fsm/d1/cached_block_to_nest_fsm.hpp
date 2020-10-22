@@ -174,7 +174,7 @@ class cached_block_to_nest_fsm final : public csfsm::util_hfsm,
   /* inherited states */
   HFSM_STATE_INHERIT(csfsm::util_hfsm,
                      transport_to_nest,
-                     rpfsm::event_data);
+                     nest_transport_data);
   HFSM_STATE_INHERIT(csfsm::util_hfsm,
                      leaving_nest,
                      rpfsm::event_data);
@@ -209,6 +209,7 @@ class cached_block_to_nest_fsm final : public csfsm::util_hfsm,
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 
   /* clang-format off */
+  const rmath::vector2d      mc_nest_loc;
   acquire_existing_cache_fsm m_cache_fsm;
   /* clang-format on */
 };

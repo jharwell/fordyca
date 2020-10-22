@@ -83,7 +83,8 @@ class block_sel_matrix : public std::map<std::string, block_sel_variant> {
   static constexpr char kPickupPolicyClusterProx[] = "cluster_proximity";
 
   explicit block_sel_matrix(
-      const config::block_sel::block_sel_matrix_config* config);
+      const config::block_sel::block_sel_matrix_config* config,
+      const rmath::vector2d& nest_loc);
 
   /**
    * \brief Add a block to the exception list, disqualifying it from being

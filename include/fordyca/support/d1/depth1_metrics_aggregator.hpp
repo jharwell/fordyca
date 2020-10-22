@@ -79,7 +79,8 @@ class depth1_metrics_aggregator : public d0::depth0_metrics_aggregator,
  public:
   depth1_metrics_aggregator(const cmconfig::metrics_config* mconfig,
                             const cdconfig::grid2D_config* gconfig,
-                            const std::string& output_root);
+                            const std::string& output_root,
+                            size_t n_block_clusters);
 
   /**
    * \brief Collect metrics from a finished or aborted task.

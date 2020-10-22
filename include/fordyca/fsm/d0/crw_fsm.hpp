@@ -37,6 +37,7 @@
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/fsm/foraging_transport_goal.hpp"
+#include "fordyca/fsm/fsm_ro_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -68,6 +69,7 @@ class crw_fsm final : public csfsm::util_hfsm,
  public:
   crw_fsm(crfootbot::footbot_saa_subsystem* saa,
           std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+          const rmath::vector2d& nest_loc,
           rmath::rng* rng);
 
   crw_fsm(const crw_fsm&) = delete;
@@ -124,8 +126,9 @@ class crw_fsm final : public csfsm::util_hfsm,
   };
 
   /* inherited states */
-  HFSM_STATE_INHERIT(csfsm::util_hfsm, transport_to_nest,
-                     rpfsm::event_data);
+  HFSM_STATE_INHERIT(csfsm::util_hfsm,
+                     transport_to_nest,
+                     nest_transport_data);
   HFSM_STATE_INHERIT(csfsm::util_hfsm, leaving_nest,
                      rpfsm::event_data);
 
@@ -156,6 +159,8 @@ class crw_fsm final : public csfsm::util_hfsm,
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 
   /* clang-format off */
+  const rmath::vector2d       mc_nest_loc;
+
   bool                        m_task_finished{false};
   csfsm::explore_for_goal_fsm m_explore_fsm;
   /* clang-format on */

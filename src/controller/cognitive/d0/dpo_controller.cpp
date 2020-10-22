@@ -31,6 +31,7 @@
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+#include "cosm/repr/config/nest_config.hpp"
 
 #include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
 #include "fordyca/config/d0/dpo_controller_repository.hpp"
@@ -123,12 +124,14 @@ void dpo_controller::shared_init(
       config_repo.config_get<cspconfig::perception_config>();
   auto* block_matrix =
       config_repo.config_get<config::block_sel::block_sel_matrix_config>();
+  auto* nest = config_repo.config_get<crepr::config::nest_config>();
 
   /* DPO perception subsystem */
   m_perception = std::make_unique<dpo_perception_subsystem>(perception);
 
   /* block selection matrix */
-  m_block_sel_matrix = std::make_unique<class block_sel_matrix>(block_matrix);
+  m_block_sel_matrix = std::make_unique<class block_sel_matrix>(block_matrix,
+                                                                nest->center);
 } /* shared_init() */
 
 void dpo_controller::private_init(

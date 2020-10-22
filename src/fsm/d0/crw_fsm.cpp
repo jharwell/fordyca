@@ -40,6 +40,7 @@ NS_START(fordyca, fsm, d0);
  ******************************************************************************/
 crw_fsm::crw_fsm(crfootbot::footbot_saa_subsystem* const saa,
                  std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+                 const rmath::vector2d& nest_loc,
                  rmath::rng* rng)
     : util_hfsm(saa, rng, ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.d0.crw"),
@@ -68,6 +69,7 @@ crw_fsm::crw_fsm(crfootbot::footbot_saa_subsystem* const saa,
                                                         nullptr,
                                                         &entry_wait_for_signal,
                                                         nullptr)),
+      mc_nest_loc(nest_loc),
       m_explore_fsm(saa,
                     std::move(exp_behavior),
                     rng,
@@ -109,7 +111,8 @@ HFSM_STATE_DEFINE(crw_fsm, wait_for_block_pickup, rpfsm::event_data* data) {
   if (fsm::foraging_signal::ekBLOCK_PICKUP == data->signal()) {
     m_explore_fsm.task_reset();
     ER_INFO("Block pickup signal received");
-    internal_event(ekST_TRANSPORT_TO_NEST);
+    internal_event(ekST_TRANSPORT_TO_NEST,
+                   std::make_unique<nest_transport_data>(mc_nest_loc));
   } else if (fsm::foraging_signal::ekBLOCK_VANISHED == data->signal()) {
     m_explore_fsm.task_reset();
     internal_event(ekST_ACQUIRE_BLOCK);
@@ -203,7 +206,14 @@ void crw_fsm::init(void) {
 
 void crw_fsm::run(void) {
   m_task_finished = false;
-  inject_event(fsm::foraging_signal::ekRUN, rpfsm::event_type::ekNORMAL);
+  if (event_data_hold()) {
+    auto* data = event_data();
+    data->signal(fsm::foraging_signal::ekRUN);
+    data->type(rpfsm::event_type::ekNORMAL);
+    inject_event(event_data_release());
+  } else {
+    inject_event(fsm::foraging_signal::ekRUN, rpfsm::event_type::ekNORMAL);
+  }
 } /* run() */
 
 bool crw_fsm::block_detected(void) const {

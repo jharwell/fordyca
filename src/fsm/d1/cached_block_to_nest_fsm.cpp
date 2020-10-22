@@ -28,11 +28,14 @@
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
+#include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm, d1);
+
+using csel_matrix = controller::cognitive::cache_sel_matrix;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -71,6 +74,7 @@ cached_block_to_nest_fsm::cached_block_to_nest_fsm(
                                                         &entry_leaving_nest,
                                                         nullptr),
                             HFSM_STATE_MAP_ENTRY_EX(&finished)),
+      mc_nest_loc(boost::get<rmath::vector2d>(c_params->csel_matrix->find(csel_matrix::kNestLoc)->second)),
       m_cache_fsm(c_params, saa, std::move(exp_behavior), rng, true) {}
 
 HFSM_STATE_DEFINE(cached_block_to_nest_fsm, start, rpfsm::event_data* data) {
@@ -104,7 +108,8 @@ HFSM_STATE_DEFINE(cached_block_to_nest_fsm,
                   rpfsm::event_data* data) {
   if (fsm::foraging_signal::ekBLOCK_PICKUP == data->signal()) {
     m_cache_fsm.task_reset();
-    internal_event(ekST_TRANSPORT_TO_NEST);
+    internal_event(ekST_TRANSPORT_TO_NEST,
+                   std::make_unique<nest_transport_data>(mc_nest_loc));
   } else if (fsm::foraging_signal::ekCACHE_VANISHED == data->signal()) {
     m_cache_fsm.task_reset();
     internal_event(ekST_ACQUIRE_BLOCK);

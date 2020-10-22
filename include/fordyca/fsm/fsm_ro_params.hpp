@@ -27,6 +27,7 @@
 #include <memory>
 
 #include "rcppsw/common/common.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 #include "fordyca/config/exploration_config.hpp"
 #include "fordyca/fordyca.hpp"

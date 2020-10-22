@@ -56,12 +56,14 @@ NS_END(detail);
 fordyca_metrics_aggregator::fordyca_metrics_aggregator(
     const cmconfig::metrics_config* const mconfig,
     const cdconfig::grid2D_config* const gconfig,
-    const std::string& output_root)
+    const std::string& output_root,
+    size_t n_block_clusters)
     : ER_CLIENT_INIT("fordyca.metrics.aggregator"),
       base_metrics_aggregator(mconfig, output_root) {
   /* register collectors from base class */
   auto dims2D = rmath::dvec2zvec(gconfig->dims, gconfig->resolution.v());
   register_with_arena_dims2D(mconfig, dims2D);
+  register_with_n_block_clusters(mconfig, n_block_clusters);
 
   /* register collectors common to all of FORDYCA */
   cmetrics::collector_registerer<>::creatable_set creatable_set = {

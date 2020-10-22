@@ -53,7 +53,8 @@ class depth2_metrics_aggregator final : public d1::depth1_metrics_aggregator,
  public:
   depth2_metrics_aggregator(const cmconfig::metrics_config* mconfig,
                             const cdconfig::grid2D_config* gconfig,
-                            const std::string& output_root);
+                            const std::string& output_root,
+                            size_t n_block_clusters);
 
   void task_start_cb(const cta::polled_task* task,
                      const cta::ds::bi_tab* tab);

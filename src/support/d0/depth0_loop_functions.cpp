@@ -40,6 +40,7 @@
 #include "cosm/interactors/applicator.hpp"
 #include "cosm/pal/argos_convergence_calculator.hpp"
 #include "cosm/pal/argos_swarm_iterator.hpp"
+#include "cosm/foraging/block_dist/base_distributor.hpp"
 
 #include "fordyca/controller/reactive/d0/crw_controller.hpp"
 #include "fordyca/controller/cognitive/d0/dpo_controller.hpp"
@@ -148,7 +149,9 @@ void depth0_loop_functions::private_init(void) {
   auto* arena = config()->config_get<caconfig::arena_map_config>();
   m_metrics_agg = std::make_unique<depth0_metrics_aggregator>(&output->metrics,
                                                               &arena->grid,
-                                                              output_root());
+                                                              output_root(),
+                                                              arena_map()->block_distributor()->block_clusters().size());
+
   /* this starts at 0, and ARGoS starts at 1, so sync up */
   m_metrics_agg->timestep_inc_all();
 
@@ -219,14 +222,15 @@ void depth0_loop_functions::post_step(void) {
   cpal::argos_swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
 
   ndc_push();
-  /* Update block distribution status */
+
   auto* collector =
       m_metrics_agg->get<cfmetrics::block_transport_metrics_collector>(
           "blocks::transport");
-  arena_map()->redist_governor()->update(
-      rtypes::timestep(GetSpace().GetSimulationClock()),
-      collector->cum_transported(),
-      nullptr != conv_calculator() ? conv_calculator()->converged() : false);
+
+  /* update arena map */
+  arena_map()->post_step_update(rtypes::timestep(GetSpace().GetSimulationClock()),
+                                collector->cum_transported(),
+                                nullptr != conv_calculator() ? conv_calculator()->converged() : false);
 
   /* Collect metrics from loop functions */
   m_metrics_agg->collect_from_loop(this);

@@ -33,6 +33,7 @@
 #include "cosm/subsystem/config/sensing_subsystemQ3D_config.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
+#include "cosm/repr/config/nest_config.hpp"
 
 #include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
 #include "fordyca/config/cache_sel/cache_sel_matrix_config.hpp"
@@ -109,12 +110,11 @@ void bitd_dpo_controller::shared_init(
 
   auto* cache_mat =
       config_repo.config_get<config::cache_sel::cache_sel_matrix_config>();
-  auto* block_mat =
-      config_repo.config_get<config::block_sel::block_sel_matrix_config>();
+  auto* nest = config_repo.config_get<crepr::config::nest_config>();
 
   /* cache selection matrix */
   m_cache_sel_matrix =
-      std::make_unique<cognitive::cache_sel_matrix>(cache_mat, block_mat->nest);
+      std::make_unique<cognitive::cache_sel_matrix>(cache_mat, nest->center);
 
   /*
    * Cache detection via ground sensors. This is *NOT* enabled by the

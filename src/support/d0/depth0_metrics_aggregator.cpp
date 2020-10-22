@@ -64,8 +64,9 @@ NS_END(detail);
 depth0_metrics_aggregator::depth0_metrics_aggregator(
     const cmconfig::metrics_config* const mconfig,
     const cdconfig::grid2D_config* const gconfig,
-    const std::string& output_root)
-    : fordyca_metrics_aggregator(mconfig, gconfig, output_root),
+    const std::string& output_root,
+    size_t n_block_clusters)
+    : fordyca_metrics_aggregator(mconfig, gconfig, output_root, n_block_clusters),
       ER_CLIENT_INIT("fordyca.support.d0.d0_aggregator") {
   cmetrics::collector_registerer<>::creatable_set creatable_set = {
       {typeid(metrics::perception::mdpo_perception_metrics_collector),

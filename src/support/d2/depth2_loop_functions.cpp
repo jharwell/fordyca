@@ -165,7 +165,8 @@ void depth2_loop_functions::private_init(void) {
 
   m_metrics_agg = std::make_unique<depth2_metrics_aggregator>(&output->metrics,
                                                               &arena->grid,
-                                                              output_root());
+                                                              output_root(),
+                                                              arena_map()->block_distributor()->block_clusters().size());
   /* this starts at 0, and ARGoS starts at 1, so sync up */
   m_metrics_agg->timestep_inc_all();
 
@@ -300,10 +301,17 @@ void depth2_loop_functions::post_step(void) {
     m_dynamic_cache_create = false;
   }
 
-  /* Update block distribution status */
+  /* update arena map */
   auto* collector =
       m_metrics_agg->get<cfmetrics::block_transport_metrics_collector>(
           "blocks::transport");
+
+  arena_map()->post_step_update(rtypes::timestep(GetSpace().GetSimulationClock()),
+                                collector->cum_transported(),
+                                nullptr != conv_calculator() ? conv_calculator()->converged() : false);
+
+  /* Update block distribution status */
+
   arena_map()->redist_governor()->update(
       rtypes::timestep(GetSpace().GetSimulationClock()),
       collector->cum_transported(),

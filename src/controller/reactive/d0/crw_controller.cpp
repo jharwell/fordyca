@@ -28,9 +28,11 @@
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/repr/config/nest_config.hpp"
 
 #include "fordyca/fsm/d0/crw_fsm.hpp"
 #include "fordyca/fsm/expstrat/block_factory.hpp"
+#include "fordyca/config/foraging_controller_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,15 +55,26 @@ void crw_controller::init(ticpp::Element& node) {
   ndc_push();
   ER_INFO("Initializing...");
 
+  config::foraging_controller_repository repo;
+  repo.parse_all(node);
+
+  if (!repo.validate_all()) {
+    ER_FATAL_SENTINEL("Not all parameters were validated");
+    std::exit(EXIT_FAILURE);
+  }
+
   fsm::expstrat::foraging_expstrat::params p(saa(),
                                              nullptr,
                                              nullptr,
                                              nullptr,
                                              rutils::color());
+  auto* nest = repo.config_get<crepr::config::nest_config>();
+
   m_fsm = std::make_unique<fsm::d0::crw_fsm>(
       saa(),
       fsm::expstrat::block_factory().create(
           fsm::expstrat::block_factory::kCRW, &p, rng()),
+      nest->center,
       rng());
   /* Set CRW FSM supervision */
   supervisor()->supervisee_update(m_fsm.get());

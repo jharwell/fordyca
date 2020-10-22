@@ -128,8 +128,9 @@ class free_block_to_nest_fsm final : public csfsm::util_hfsm,
   /* inherited states */
   HFSM_STATE_INHERIT(csfsm::util_hfsm, leaving_nest,
                      rpfsm::event_data);
-  HFSM_STATE_INHERIT(csfsm::util_hfsm, transport_to_nest,
-                     rpfsm::event_data);
+  HFSM_STATE_INHERIT(csfsm::util_hfsm,
+                     transport_to_nest,
+                     nest_transport_data);
   HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_wait_for_signal);
   HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_transport_to_nest);
   HFSM_EXIT_INHERIT(csfsm::util_hfsm, exit_transport_to_nest);
@@ -160,6 +161,7 @@ class free_block_to_nest_fsm final : public csfsm::util_hfsm,
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 
   /* clang-format off */
+  const rmath::vector2d  mc_nest_loc;
   acquire_free_block_fsm m_block_fsm;
   /* clang-format on */
 };

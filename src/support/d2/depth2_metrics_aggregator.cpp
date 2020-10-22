@@ -57,8 +57,9 @@ using task2 = tasks::d2::foraging_task;
 depth2_metrics_aggregator::depth2_metrics_aggregator(
     const cmconfig::metrics_config* const mconfig,
     const cdconfig::grid2D_config* const gconfig,
-    const std::string& output_root)
-    : depth1_metrics_aggregator(mconfig, gconfig, output_root),
+    const std::string& output_root,
+    size_t n_block_clusters)
+    : depth1_metrics_aggregator(mconfig, gconfig, output_root, n_block_clusters),
       ER_CLIENT_INIT("fordyca.support.d2.metrics_aggregator") {
   register_standard(mconfig);
 

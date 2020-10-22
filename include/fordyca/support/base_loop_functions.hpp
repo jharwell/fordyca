@@ -173,11 +173,11 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
   void oracle_init(const coconfig::aggregate_oracle_config* oraclep) RCSW_COLD;
 
   /* clang-format off */
-  bool                                         m_delay_arena_map_init{false};
-  config::loop_function_repository             m_config{};
-  std::unique_ptr<tv::tv_manager>              m_tv_manager;
-  std::unique_ptr<convergence_calculator_type> m_conv_calc;
-  std::unique_ptr<cforacle::foraging_oracle>   m_oracle;
+  bool                                                 m_delay_arena_map_init{false};
+  config::loop_function_repository                     m_config{};
+  std::unique_ptr<tv::tv_manager>                      m_tv_manager;
+  std::unique_ptr<convergence_calculator_type>         m_conv_calc;
+  std::unique_ptr<cforacle::foraging_oracle>           m_oracle;
   /* clang-format on */
 };
 
