@@ -140,7 +140,7 @@ dpo_store::update_res_t dpo_store::block_update(
        */
       rmath::vector2z old_loc = it1->ent()->danchor2D();
       m_blocks.obj_add({block_in.ent()->id(), std::move(block_in)});
-      RCSW_UNUSED rtypes::type_uuid id = block_in.ent()->id();
+      RCPPSW_UNUSED rtypes::type_uuid id = block_in.ent()->id();
       ER_TRACE("Add block%d@%s (n_blocks=%zu)",
                id.v(),
                block_in.ent()->danchor2D().to_str().c_str(),

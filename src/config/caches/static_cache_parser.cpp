@@ -53,8 +53,8 @@ bool static_cache_parser::validate(void) const {
     return true;
   }
 
-  RCSW_CHECK(m_config->size > 0);
-  RCSW_CHECK(m_config->respawn_scale_factor > 0);
+  RCPPSW_CHECK(m_config->size > 0);
+  RCPPSW_CHECK(m_config->respawn_scale_factor > 0);
   return true;
 
 error:

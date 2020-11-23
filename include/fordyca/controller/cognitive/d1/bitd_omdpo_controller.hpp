@@ -53,14 +53,14 @@ class bitd_omdpo_controller : public d1::bitd_mdpo_controller,
  public:
   using bitd_dpo_controller::perception;
 
-  bitd_omdpo_controller(void) RCSW_COLD;
-  ~bitd_omdpo_controller(void) override RCSW_COLD;
+  bitd_omdpo_controller(void) RCPPSW_COLD;
+  ~bitd_omdpo_controller(void) override RCPPSW_COLD;
 
   /* foraging_controller overrides */
   void control_step(void) override;
   std::type_index type_index(void) const override { return {typeid(*this)}; }
 
-  void oracle_init(std::unique_ptr<oracular_info_receptor> receptor) RCSW_COLD;
+  void oracle_init(std::unique_ptr<oracular_info_receptor> receptor) RCPPSW_COLD;
 
  private:
   /* clang-format off */

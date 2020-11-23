@@ -63,8 +63,8 @@ class dpo_perception_subsystem final
   ~dpo_perception_subsystem(void) override;
 
   /* DPO perception metrics */
-  uint n_known_blocks(void) const override RCSW_PURE;
-  uint n_known_caches(void) const override RCSW_PURE;
+  uint n_known_blocks(void) const override RCPPSW_PURE;
+  uint n_known_caches(void) const override RCPPSW_PURE;
   crepr::pheromone_density avg_block_density(void) const override;
   crepr::pheromone_density avg_cache_density(void) const override;
 

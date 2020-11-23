@@ -83,9 +83,9 @@ class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
   static csmetrics::goal_acq_metrics::goal_type acq_goal_internal(void)
-      RCSW_CONST;
+      RCPPSW_CONST;
   boost::optional<acquire_goal_fsm::candidate_type> block_select(void) const;
-  bool candidates_exist(void) const RCSW_PURE;
+  bool candidates_exist(void) const RCPPSW_PURE;
   bool block_exploration_term_cb(void) const;
   bool block_acquired_cb(bool explore_result) const;
   bool block_acq_valid(const rmath::vector2d& loc,

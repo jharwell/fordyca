@@ -27,9 +27,12 @@
 #include <string>
 #include <list>
 #include <atomic>
+#include <vector>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
+
 #include "fordyca/fordyca.hpp"
+#include "fordyca/metrics/blocks/block_manip_events.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -63,6 +66,10 @@ class manipulation_metrics_collector final : public rmetrics::base_metrics_colle
   void reset_after_interval(void) override;
 
  private:
+  std::list<std::string> csv_header_cols(void) const override;
+
+  boost::optional<std::string> csv_line_build(void) override;
+
   /**
    * \brief Container for holding collected statistics. Must be atomic so counts
    * are valid in parallel metric collection contexts. Ideally the penalties
@@ -70,23 +77,14 @@ class manipulation_metrics_collector final : public rmetrics::base_metrics_colle
    * std::atomic requirements.
    */
   struct stats {
-    std::atomic_uint free_pickup_events{0};
-    std::atomic_uint free_drop_events{0};
-    std::atomic_uint free_pickup_penalty{0};
-    std::atomic_uint free_drop_penalty{0};
-
-    std::atomic_uint cache_pickup_events{0};
-    std::atomic_uint cache_drop_events{0};
-    std::atomic_uint cache_pickup_penalty{0};
-    std::atomic_uint cache_drop_penalty{0};
+    std::atomic_size_t events{0};
+    std::atomic_size_t penalties{0};
   };
 
-  std::list<std::string> csv_header_cols(void) const override;
-
-  boost::optional<std::string> csv_line_build(void) override;
 
   /* clang-format off */
-  struct stats m_interval{};
+  std::vector<stats> m_interval{block_manip_events::ekMAX_EVENTS};
+  std::vector<stats> m_cum{block_manip_events::ekMAX_EVENTS};
   /* clang-format on */
 };
 

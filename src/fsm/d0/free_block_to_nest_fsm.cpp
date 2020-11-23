@@ -47,33 +47,33 @@ free_block_to_nest_fsm::free_block_to_nest_fsm(
     rmath::rng* rng)
     : util_hfsm(saa, rng, ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.d0.free_block_to_nest"),
-      HFSM_CONSTRUCT_STATE(leaving_nest, &start),
-      HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
-      HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
-      HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
-      HFSM_CONSTRUCT_STATE(wait_for_pickup, hfsm::top_state()),
-      HFSM_CONSTRUCT_STATE(wait_for_drop, hfsm::top_state()),
-      HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-      HFSM_DEFINE_STATE_MAP(mc_state_map,
-                            HFSM_STATE_MAP_ENTRY_EX(&start),
-                            HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
-                            HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_pickup,
+      RCPPSW_HFSM_CONSTRUCT_STATE(leaving_nest, &start),
+      RCPPSW_HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
+      RCPPSW_HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
+      RCPPSW_HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
+      RCPPSW_HFSM_CONSTRUCT_STATE(wait_for_pickup, hfsm::top_state()),
+      RCPPSW_HFSM_CONSTRUCT_STATE(wait_for_drop, hfsm::top_state()),
+      RCPPSW_HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
+      RCPPSW_HFSM_DEFINE_STATE_MAP(mc_state_map,
+                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&start),
+                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
+                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_pickup,
                                                         nullptr,
                                                         &entry_wait_for_signal,
                                                         nullptr),
-                            HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_drop,
+                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_drop,
                                                         nullptr,
                                                         &entry_wait_for_signal,
                                                         nullptr),
-                            HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
+                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
                                                         nullptr,
                                                         &entry_transport_to_nest,
                                                         &exit_transport_to_nest),
-                            HFSM_STATE_MAP_ENTRY_EX(&finished)),
+                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&finished)),
       mc_nest_loc(boost::get<rmath::vector2d>(c_params->bsel_matrix->find(bsel_matrix::kNestLoc)->second)),
       m_block_fsm(c_params, saa, std::move(exp_behavior), rng) {}
 
-HFSM_STATE_DEFINE(free_block_to_nest_fsm, start, rpfsm::event_data* data) {
+RCPPSW_HFSM_STATE_DEFINE(free_block_to_nest_fsm, start, rpfsm::event_data* data) {
   /* first time running FSM */
   if (rpfsm::event_type::ekNORMAL == data->type()) {
     internal_event(ekST_ACQUIRE_BLOCK);
@@ -89,7 +89,7 @@ HFSM_STATE_DEFINE(free_block_to_nest_fsm, start, rpfsm::event_data* data) {
   return fsm::foraging_signal::ekHANDLED;
 }
 
-HFSM_STATE_DEFINE_ND(free_block_to_nest_fsm, acquire_block) {
+RCPPSW_HFSM_STATE_DEFINE_ND(free_block_to_nest_fsm, acquire_block) {
   if (m_block_fsm.task_finished()) {
     internal_event(ekST_WAIT_FOR_PICKUP);
   } else {
@@ -97,7 +97,7 @@ HFSM_STATE_DEFINE_ND(free_block_to_nest_fsm, acquire_block) {
   }
   return fsm::foraging_signal::ekHANDLED;
 }
-HFSM_STATE_DEFINE(free_block_to_nest_fsm,
+RCPPSW_HFSM_STATE_DEFINE(free_block_to_nest_fsm,
                   wait_for_pickup,
                   rpfsm::event_data* data) {
   /**
@@ -120,7 +120,7 @@ HFSM_STATE_DEFINE(free_block_to_nest_fsm,
   }
   return fsm::foraging_signal::ekHANDLED;
 }
-HFSM_STATE_DEFINE(free_block_to_nest_fsm,
+RCPPSW_HFSM_STATE_DEFINE(free_block_to_nest_fsm,
                   wait_for_drop,
                   rpfsm::event_data* data) {
   if (fsm::foraging_signal::ekBLOCK_DROP == data->signal()) {
@@ -130,7 +130,7 @@ HFSM_STATE_DEFINE(free_block_to_nest_fsm,
   return fsm::foraging_signal::ekHANDLED;
 }
 
-RCSW_CONST FSM_STATE_DEFINE_ND(free_block_to_nest_fsm, finished) {
+RCPPSW_CONST RCPPSW_HFSM_STATE_DEFINE_ND(free_block_to_nest_fsm, finished) {
   return fsm::foraging_signal::ekHANDLED;
 }
 

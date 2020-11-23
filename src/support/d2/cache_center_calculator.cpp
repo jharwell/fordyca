@@ -228,7 +228,7 @@ boost::optional<rmath::vector2d> cache_center_calculator::deconflict_loc_entity(
     const crepr::entity2D* ent,
     const rmath::vector2d& c_center,
     rmath::rng* rng) const {
-  RCSW_UNUSED auto dcenter = rmath::dvec2zvec(c_center, m_grid->resolution().v());
+  RCPPSW_UNUSED auto dcenter = rmath::dvec2zvec(c_center, m_grid->resolution().v());
   auto exc_xspan = ent->xrspan();
   auto exc_yspan = ent->yrspan();
   auto newc_xspan = crepr::entity2D::xrspan(c_center, mc_cache_dim);

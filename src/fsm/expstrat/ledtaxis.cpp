@@ -52,7 +52,7 @@ void ledtaxis::task_execute(void) {
 
     ER_DEBUG("Found threatening obstacle: %s@%f [%f]",
              obs->to_str().c_str(),
-             obs->angle().value(),
+             obs->angle().v(),
              obs->length());
     saa()->actuation()->leds()->set_color(-1, rutils::color::kRED);
     saa()->steer_force2D().accum(saa()->steer_force2D().avoidance(*obs));

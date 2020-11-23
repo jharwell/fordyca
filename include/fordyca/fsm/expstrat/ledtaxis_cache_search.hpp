@@ -92,11 +92,11 @@ class ledtaxis_cache_search : public foraging_expstrat,
   void task_execute(void) override final;
 
   /* interference metrics */
-  bool exp_interference(void) const override final RCSW_PURE;
-  bool entered_interference(void) const override final RCSW_PURE;
-  bool exited_interference(void) const override final RCSW_PURE;
+  bool exp_interference(void) const override final RCPPSW_PURE;
+  bool entered_interference(void) const override final RCPPSW_PURE;
+  bool exited_interference(void) const override final RCPPSW_PURE;
   rtypes::timestep interference_duration(void) const override final;
-  rmath::vector3z interference_loc3D(void) const override final RCSW_PURE;
+  rmath::vector3z interference_loc3D(void) const override final RCPPSW_PURE;
 
   /* prototype overrides */
   std::unique_ptr<csexpstrat::base_expstrat> clone(void) const override {

@@ -96,7 +96,7 @@ bool cache_acq_validator::pickup_policy_validate(const carepr::base_cache* cache
       mc_csel_matrix->find(cselm::kPickupPolicy)->second);
 
   if (cselm::kPickupPolicyTime == config.policy && t < config.timestep) {
-    ER_WARN("Cache%d invalid for acquisition: policy=%s, %u < %u",
+    ER_WARN("Cache%d invalid for acquisition: policy=%s, %zu < %zu",
             cache->id().v(),
             config.policy.c_str(),
             t.v(),

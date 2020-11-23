@@ -1,29 +1,30 @@
+.. _ln-local-runtime:
+
 Local Runtime Setup
 ===================
 
 If you have not successfully completed :ref:`ln-build` part of the setup, do
 that first. These steps will not work otherwise.
 
-After successful compilation, follow these steps to run a basic foraging
-scenario on your local laptop.
+After successful compilation, follow these steps to setup the FORDYCA runtime
+environment and run a basic foraging scenario on your local laptop.
 
 #. Set the ``ARGOS_PLUGIN_PATH`` variable to contain (1) the path to the
    directory containing the ``libfordyca.so`` file, (2) the path to the ARGoS
    libraries. On bash, that is::
 
-     export ARGOS_PLUGIN_PATH=/usr/local/lib/argos3/lib:$HOME/git/fordyca/build/lib
+     export ARGOS_PLUGIN_PATH=/opt/local/lib/argos3/lib:$HOME/research/fordyca/build/lib
 
-   Assuming you have installed ARGoS to ``/usr/local`` and have cloned/built
-   FORDYCA under ``$HOME/git``. If your paths are different, modify the above
-   paths accordingly. Note that you need BOTH of these terms in the path,
-   because this defines the ENTIRE search space for argos to look for libraries
-   (including its own core libraries).
+   Assuming that you passed ``--prefix=/opt/local --rroot=$HOME/research`` to
+   the `bootstrap.sh` script when you built FORDYCA. If your paths are
+   different, modify the above paths accordingly. Note that you need BOTH of
+   these terms in the path, because this defines the ENTIRE search space for
+   argos to look for libraries (including its own core libraries).
 
-#. If you have installed ARGoS to a non-system path (i.e. something other than
-   ``/usr/local`` or ``/usr``), you will also need to update *system* dynamic
-   library search paths so the OS can find the libraries that the ARGoS
-   executable requires. If you installed it to a system path, then you can skip
-   this step. On bash::
+#. Update the *system* dynamic library search paths so the OS can find the
+   libraries that the ARGoS executable requires (supposedly ARGoS will do this
+   for you when you install it via ldconfig, but many people still have trouble
+   with it). On bash::
 
      export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/local/lib/argos3
 
@@ -35,10 +36,10 @@ scenario on your local laptop.
    the path to the log4cxx configuration file, which tells FORDYCA which classes
    should have logging turned on, and how verbose to be. On bash that is::
 
-     export LOG4CXX_CONFIGURATION=$HOME/git/fordyca/log4cxx.xml
+     export LOG4CXX_CONFIGURATION=$HOME/research/fordyca/log4cxx.xml
 
-   Assuming you have cloned and built FORDYCA in ``$HOME/git``. If you cloned
-   and built it somewhere else, then update the above path accordingly.
+   Assuming you have cloned and built FORDYCA in ``$HOME/research``. If you
+   cloned and built it somewhere else, then update the above path accordingly.
 
 #. cd to the ROOT of the FORDYCA repo, and run the demo experiment::
 

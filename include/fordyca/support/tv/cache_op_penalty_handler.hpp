@@ -103,11 +103,11 @@ class cache_op_penalty_handler final
 
     rtypes::timestep orig_duration = penalty_calc(t);
     rtypes::type_uuid id = m_id_calc(src, filter);
-    rtypes::timestep RCSW_UNUSED duration = penalty_add(&controller,
+    rtypes::timestep RCPPSW_UNUSED duration = penalty_add(&controller,
                                                         id,
                                                         orig_duration,
                                                         t);
-    ER_INFO("%s: cache%d start=%u, penalty=%u, adjusted penalty=%u src=%d",
+    ER_INFO("%s: cache%d start=%zu, penalty=%zu, adjusted penalty=%zu src=%d",
             controller.GetId().c_str(),
             id.v(),
             t.v(),

@@ -58,16 +58,16 @@ NS_START(d0);
 class mdpo_controller : public dpo_controller,
                         public rer::client<mdpo_controller> {
  public:
-  mdpo_controller(void) RCSW_COLD;
-  ~mdpo_controller(void) override RCSW_COLD;
+  mdpo_controller(void) RCPPSW_COLD;
+  ~mdpo_controller(void) override RCPPSW_COLD;
 
   /* foraging_controller overrides */
-  void init(ticpp::Element& node) override RCSW_COLD;
+  void init(ticpp::Element& node) override RCPPSW_COLD;
   void control_step(void) override;
   std::type_index type_index(void) const override {return typeid(*this); }
 
-  mdpo_perception_subsystem* mdpo_perception(void) RCSW_PURE;
-  const mdpo_perception_subsystem* mdpo_perception(void) const RCSW_PURE;
+  mdpo_perception_subsystem* mdpo_perception(void) RCPPSW_PURE;
+  const mdpo_perception_subsystem* mdpo_perception(void) const RCPPSW_PURE;
 
   /**
    * \brief Initialization that derived classes may also need to perform, if the
@@ -76,7 +76,7 @@ class mdpo_controller : public dpo_controller,
    * - MDPO perception subsystem (\ref mdpo_perception_subsystem)
    * - Block selection matrix (\ref block_sel_matrix)
    */
-  void shared_init(const config::d0::mdpo_controller_repository& config_repo) RCSW_COLD;
+  void shared_init(const config::d0::mdpo_controller_repository& config_repo) RCPPSW_COLD;
 
  private:
   /**
@@ -86,7 +86,7 @@ class mdpo_controller : public dpo_controller,
    *
    * Called after \ref shared_init() in \ref init().
    */
-  void private_init(const config::d0::mdpo_controller_repository& config_repo) RCSW_COLD;
+  void private_init(const config::d0::mdpo_controller_repository& config_repo) RCPPSW_COLD;
 };
 
 NS_END(cognitive, d0, controller, fordyca);

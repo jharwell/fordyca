@@ -122,13 +122,13 @@ class dpo_fsm final : public csfsm::util_hfsm,
 
  private:
   /* inherited states */
-  HFSM_STATE_INHERIT(csfsm::util_hfsm, leaving_nest,
+  RCPPSW_HFSM_STATE_INHERIT(csfsm::util_hfsm, leaving_nest,
                      rpfsm::event_data);
-  HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_leaving_nest);
+  RCPPSW_HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_leaving_nest);
 
   /* foraging states */
-  HFSM_STATE_DECLARE(dpo_fsm, start, rpfsm::event_data);
-  HFSM_STATE_DECLARE(dpo_fsm, block_to_nest, rpfsm::event_data);
+  RCPPSW_HFSM_STATE_DECLARE(dpo_fsm, start, rpfsm::event_data);
+  RCPPSW_HFSM_STATE_DECLARE(dpo_fsm, block_to_nest, rpfsm::event_data);
 
   /**
    * \brief Defines the state map for the FSM.
@@ -136,11 +136,11 @@ class dpo_fsm final : public csfsm::util_hfsm,
    * Note that the order of the states in the map MUST match the order of the
    * states in \enum fsm_states, or things will not work correctly.
    */
-  HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
+  RCPPSW_HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   return &mc_state_map[index];
   }
 
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
+  RCPPSW_HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 
   /* clang-format off */
   bool                   m_task_finished{false};

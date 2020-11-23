@@ -52,13 +52,15 @@ std::list<std::string> lifecycle_metrics_collector::csv_header_cols(void) const 
     "int_created",
     "int_depleted",
     "int_discarded",
+
     "int_avg_created",
     "int_avg_depleted",
     "int_avg_discarded",
+    "int_avg_depletion_age",
+
     "cum_avg_created",
     "cum_avg_depleted",
     "cum_avg_discarded",
-    "int_avg_depletion_age",
     "cum_avg_depletion_age"
       /* clang-format on */
   };
@@ -77,19 +79,22 @@ boost::optional<std::string> lifecycle_metrics_collector::csv_line_build(void) {
   }
   std::string line;
 
+  /* raw metrics */
   line += rcppsw::to_string(m_stats.int_created) + separator();
   line += rcppsw::to_string(m_stats.int_depleted) + separator();
   line += rcppsw::to_string(m_stats.int_discarded) + separator();
 
+  /* interval averages */
   line += csv_entry_intavg(m_stats.int_created);
   line += csv_entry_intavg(m_stats.int_depleted);
   line += csv_entry_intavg(m_stats.int_discarded);
+  line += csv_entry_domavg(m_stats.int_depletion_sum.v(), m_stats.int_depleted);
 
+  /* cumulative averages */
   line += csv_entry_tsavg(m_stats.cum_created);
   line += csv_entry_tsavg(m_stats.cum_depleted);
   line += csv_entry_tsavg(m_stats.cum_discarded);
 
-  line += csv_entry_domavg(m_stats.int_depletion_sum.v(), m_stats.int_depleted);
   line += csv_entry_domavg(m_stats.cum_depletion_sum.v(),
                            m_stats.cum_depleted,
                            true);

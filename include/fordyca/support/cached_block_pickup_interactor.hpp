@@ -282,7 +282,7 @@ class cached_block_pickup_interactor
               "Out of order cache penalty handling");
     auto* task = dynamic_cast<const events::existing_cache_interactor*>(
         controller.current_task());
-    RCSW_UNUSED auto* polled = dynamic_cast<const cta::polled_task*>(
+    RCPPSW_UNUSED auto* polled = dynamic_cast<const cta::polled_task*>(
         controller.current_task());
     ER_CHECK(nullptr != task,
               "Non-cache interface task '%s'!",

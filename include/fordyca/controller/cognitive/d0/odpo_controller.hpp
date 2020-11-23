@@ -47,14 +47,14 @@ NS_START(d0);
 class odpo_controller : public dpo_controller,
                         public rer::client<odpo_controller> {
  public:
-  odpo_controller(void) RCSW_COLD;
-  ~odpo_controller(void) override RCSW_COLD;
+  odpo_controller(void) RCPPSW_COLD;
+  ~odpo_controller(void) override RCPPSW_COLD;
 
   /* foraging_controller overrides */
   void control_step(void) override;
   std::type_index type_index(void) const override { return typeid(*this); }
 
-  void oracle_init(std::unique_ptr<oracular_info_receptor> receptor) RCSW_COLD;
+  void oracle_init(std::unique_ptr<oracular_info_receptor> receptor) RCPPSW_COLD;
 
  private:
   /* clang-format off */

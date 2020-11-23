@@ -83,13 +83,13 @@ class generalist final : public foraging_task {
 
   void task_start(cta::taskable_argument* const) override {}
 
-  rtypes::timestep current_time(void) const override RCSW_PURE;
+  rtypes::timestep current_time(void) const override RCPPSW_PURE;
   rtypes::timestep interface_time_calc(size_t,
                                        const rtypes::timestep&) override {
     return rtypes::timestep(0);
   }
   void active_interface_update(int) override {}
-  double abort_prob_calc(void) override RCSW_PURE;
+  double abort_prob_calc(void) override RCPPSW_PURE;
 };
 
 NS_END(d0, tasks, fordyca);

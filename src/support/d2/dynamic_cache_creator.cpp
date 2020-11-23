@@ -170,7 +170,7 @@ dynamic_cache_creator::cache_i_result dynamic_cache_creator::cache_i_create(
 } /* cache_i_create() */
 
 bool dynamic_cache_creator::cache_i_verify(
-    const carepr::arena_cache* cache,
+    RCPPSW_UNUSED const carepr::arena_cache* cache,
     const cads::acache_vectorro& c_caches,
     const cds::block3D_vectorno& c_all_blocks,
     const cfds::block3D_cluster_vector& c_clusters) const {
@@ -226,7 +226,7 @@ cds::block3D_htno dynamic_cache_creator::absorb_blocks_calc(
   std::copy_if(c_absorbable_blocks.begin(),
                c_absorbable_blocks.end(),
                std::inserter(absorb_blocks, absorb_blocks.begin()),
-               [&](const auto& pair) RCSW_PURE {
+               [&](const auto& pair) RCPPSW_PURE {
                  auto * block = pair.second;
                  auto status = checker::placement2D(
                      c_center - cache_dim / 2.0,

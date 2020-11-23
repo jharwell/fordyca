@@ -67,10 +67,10 @@ class foraging_task
   static constexpr char kCacheTransfererName[] = "Cache Transferer";
   static constexpr char kCacheCollectorName[] = "Cache Collector";
 
-  static bool task_in_d2(const polled_task* task) RCSW_PURE;
+  static bool task_in_d2(const polled_task* task) RCPPSW_PURE;
 
   /* task overrides */
-  rtypes::timestep current_time(void) const override RCSW_PURE;
+  rtypes::timestep current_time(void) const override RCPPSW_PURE;
 };
 
 NS_END(d2, tasks, fordyca);

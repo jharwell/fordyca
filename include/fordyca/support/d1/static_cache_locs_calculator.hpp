@@ -77,7 +77,7 @@ class static_cache_locs_calculator : public rer::client<static_cache_locs_calcul
 
   std::vector<rmath::vector2d> operator()(
       const carena::caching_arena_map* arena_map,
-      const cfconfig::block_dist_config* distp) RCSW_COLD;
+      const cfconfig::block_dist_config* distp) RCPPSW_COLD;
 };
 
 NS_END(d1, support, fordyca);

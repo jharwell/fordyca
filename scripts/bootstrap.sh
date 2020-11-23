@@ -7,39 +7,73 @@
 # - Build and install ARGoS from source
 # - Set up dependent repositories
 # - Compile main project
-#
-# Assumes sudo privileges
-#
-# $1 - The root directory for all repos for the project
-# $2 - Install system packages? [YES/NO]
-# $3 - Should ARGoS be installed system-wide? [YES/NO]
-# $4 - The root directory for ARGoS installation
-# $5 - # cores to use when compiling
 
-if [ "$#" -ne 5 ]; then
-    echo "FATAL: Wrong number of cmdline arguments supplied--see docs at https://swarm-robotics-fordyca.readthedocs.io/en/latest."
-    echo "Usage: ./bootstrap.sh <repo dir> <YES/NO> <YES/NO> <ARGoS install dir> <# cores>"
-    exit
-fi
+usage() {
+    cat << EOF >&2
+Usage: $0 --prefix [/usr/local|$HOME/<dir>] [--rroot <dir>] [--cores <n_cores>] [--nosyspkgs ] [--opt] [-h|--help]
 
-repo_root=$1
-install_sys_pkgs=$2
-argos_sys_install=$3
-argos_install_dir=$4
-n_cores=$5
+--prefix <dir>: The directory to install ARGoS and other project dependencies
+                to. To install ARGoS systemwide (and therefore not have to set
+                LD_LIBRARY_PATH), pass '/usr/local' (no quotes); this will
+                require sudo access. If you are going to be modifying ARGoS at
+                all, then you should not use '/usr/local'. Default=$HOME/.local.
+
+--rroot <dir>: The root directory for all repos for the project. All github
+               repos will be cloned/built in here. Default=$HOME/research.
+
+--cores: The # cores to use when compiling. Default=$(nproc).
+
+--nosyspkgs: If passed, then do not install system packages (requires sudo
+             access). Default=YES (install system packages).
+
+--opt: Perform an optimized build of FORDYCA. Default=NO.
+
+-h|--help: Show this message.
+EOF
+    exit 1
+}
+
+repo_root=$HOME/research
+install_sys_pkgs="YES"
+prefix=$HOME/.local
+n_cores=$(nproc)
+build_type="DEV"
+options=$(getopt -o h --long prefix:,rroot:,cores:,nosyspkgs,opt  -n "BOOTSTRAP" -- "$@")
+if [ $? != 0 ]; then usage; exit 1; fi
+
+eval set -- "$options"
+while true; do
+    case "$1" in
+        -h|--help) usage;;
+        --prefix) prefix=$2; shift;;
+        --rroot) repo_root=$2; shift;;
+        --cores) n_cores=$2; shift;;
+        --nosyspkgs) install_sys_pkgs="NO";;
+        --opt) build_type="OPT";;
+        --) break;;
+        *) break;;
+    esac
+    shift;
+done
+
+echo -e "********************************************************************************"
+echo -e "BOOTSTRAP START:\n"
+echo -e "PREFIX=$prefix\nREPO_ROOT=$repo_root\nN_CORES=$n_cores\nSYSPKGS=$install_sys_pkgs\nBUILD_TYPE=$build_type\n"
+echo -e "********************************************************************************"
 
 mkdir -p $repo_root && cd $repo_root
 
 # Install system packages
 if [ "YES" = "$install_sys_pkgs" ]; then
     fordyca_pkgs=(qtbase5-dev libnlopt-dev libnlopt-cxx-dev libfreeimageplus-dev
-                  freeglut3-dev libeigen3-dev libudev-dev liblua5.3-dev pip3)
+                  freeglut3-dev libeigen3-dev libudev-dev liblua5.3-dev pip3 npm)
     rcppsw_pkgs=(libboost-all-dev liblog4cxx-dev catch ccache python3-pip)
-    libra_pkgs=(make cmake git nodejs npm graphviz doxygen cppcheck cmake make gcc-9 g++-9 
+    libra_pkgs=(make cmake git nodejs npm graphviz doxygen cppcheck cmake make gcc-9 g++-9
                 libclang-9-dev clang-tools-9 clang-format-9 clang-tidy-9)
+    sierra_pkgs=(pip3)
 
     # Install packages (must be loop to ignore ones that don't exist)
-    for pkg in "${libra_pkgs[@]}" "${rcppsw_pkgs[@]}" "${fordyca_pkgs[@]}"
+    for pkg in "${libra_pkgs[@]}" "${rcppsw_pkgs[@]}" "${fordyca_pkgs[@]}" "${sierra_pkgs[@]}"
     do
         sudo apt-get -my install $pkg
     done
@@ -47,6 +81,7 @@ fi
 
 # Install python packages for user
 python_pkgs=(cpplint breathe)
+pip3 install --user --upgrade pip
 pip3 install --user  "${python_pkgs[@]}"
 
 # Exit when any command after this fails. Can't be before the package installs,
@@ -56,6 +91,12 @@ pip3 install --user  "${python_pkgs[@]}"
 set -e
 
 # Install ARGoS
+if [ "/usr/local" = "$prefix" ]; then
+    argos_sys_install="YES"
+else
+    argos_sys_install="NO"
+fi;
+
 if [ -d argos3 ]; then rm -rf argos3; fi
 git clone https://github.com/swarm-robotics/argos3.git
 cd argos3
@@ -72,7 +113,7 @@ cmake -DCMAKE_BUILD_TYPE=Release \
       -DARGOS_USE_DOUBLE=ON\
       -DARGOS_DOCUMENTATION=ON\
       -DARGOS_INSTALL_LDSOCONF=$argos_sys_install \
-      -DCMAKE_INSTALL_PREFIX=$argos_install_dir \
+      -DCMAKE_INSTALL_PREFIX=$prefix \
 	  ../src
 make -j $n_cores
 make doc
@@ -118,11 +159,20 @@ rm -rf ext/cosm
 ln -s $repo_root/cosm ext/cosm
 
 # Build FORDYCA and documentation
+if [ "OPT" = "$build_type" ]; then
+    er="NONE"
+else
+    er="ALL"
+fi;
+
 mkdir -p build && cd build
+
 cmake \
     -DCMAKE_C_COMPILER=gcc-9\
     -DCMAKE_CXX_COMPILER=g++-9\
-    -DCOSM_PROJECT_DEPS_PREFIX=$argos_install_dir\
+    -DCMAKE_BUILD_TYPE=$build_type\
+    -DCOSM_PROJECT_DEPS_PREFIX=$prefix\
+    -DLIBRA_ER="$er"\
     ..
 make -j $n_cores
 make documentation
@@ -134,13 +184,13 @@ if [ -d sierra ]; then rm -rf sierra; fi
 git clone https://github.com/swarm-robotics/sierra.git
 cd sierra
 git checkout devel
+pip3 install --user -r requirements/common.txt
 cd ..
 
 if [ -d sierra-plugin-fordyca ]; then rm -rf sierra-plugin-fordyca; fi
 git clone https://github.com/swarm-robotics/sierra-plugin-fordyca.git
 cd sierra-plugin-fordyca
 git checkout devel
-
 cd ..
 
 ln -s $repo_root/sierra-plugin-fordyca sierra/projects/fordyca
@@ -152,4 +202,6 @@ if [ "$YES" = "$argos_sys_install" ]; then
 fi;
 
 # Made it!
-echo "Bootstrap successful!"
+echo -e "********************************************************************************"
+echo -e "BOOTSTRAP SUCCESS!"
+echo -e "********************************************************************************"

@@ -104,7 +104,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
       const cads::acache_vectorro& c_caches,
       const cds::block3D_vectorno& c_free_blocks,
       const cfds::block3D_cluster_vector& c_clusters,
-      const cads::nest_vectorro& c_nests) const RCSW_PURE;
+      const cads::nest_vectorro& c_nests) const RCPPSW_PURE;
 
  protected:
   const cds::arena_grid* grid(void) const { return m_grid; }
@@ -129,7 +129,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
   rtypes::spatial_dist cache_dim(void) const { return mc_cache_dim; }
 
  private:
-  bool sanity_check_internal_consistency(const carepr::arena_cache* cache) const RCSW_PURE;
+  bool sanity_check_internal_consistency(const carepr::arena_cache* cache) const RCPPSW_PURE;
   bool sanity_check_cross_consistency(const cads::acache_vectorro& c_caches) const;
   bool sanity_check_cache_overlap(const cads::acache_vectorro& c_caches) const;
   bool sanity_check_free_block_overlap(const carepr::arena_cache* cache,

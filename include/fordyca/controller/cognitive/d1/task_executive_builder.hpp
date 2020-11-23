@@ -75,46 +75,46 @@ class task_executive_builder : public rer::client<task_executive_builder> {
   task_executive_builder(const controller::cognitive::block_sel_matrix* bsel_matrix,
                       const controller::cognitive::cache_sel_matrix* csel_matrix,
                       crfootbot::footbot_saa_subsystem* saa,
-                      foraging_perception_subsystem* perception) RCSW_COLD;
+                      foraging_perception_subsystem* perception) RCPPSW_COLD;
 
-  ~task_executive_builder(void) override RCSW_COLD;
+  ~task_executive_builder(void) override RCPPSW_COLD;
   task_executive_builder& operator=(const task_executive_builder&) = delete;
   task_executive_builder(const task_executive_builder&) = delete;
 
-  RCSW_COLD std::unique_ptr<cta::bi_tdgraph_executive>
+  RCPPSW_COLD std::unique_ptr<cta::bi_tdgraph_executive>
   operator()(const config::d1::controller_repository& config_repo,
-             rmath::rng* rng) RCSW_COLD;
+             rmath::rng* rng) RCPPSW_COLD;
 
  protected:
   using tasking_map = std::map<std::string, cta::polled_task*>;
 
-  RCSW_COLD const foraging_perception_subsystem* perception(void) const { return m_perception; }
-  RCSW_COLD foraging_perception_subsystem* perception(void) { return m_perception; }
+  RCPPSW_COLD const foraging_perception_subsystem* perception(void) const { return m_perception; }
+  RCPPSW_COLD foraging_perception_subsystem* perception(void) { return m_perception; }
 
-  RCSW_COLD crfootbot::footbot_saa_subsystem* saa(void) const {
+  RCPPSW_COLD crfootbot::footbot_saa_subsystem* saa(void) const {
     return m_saa;
   }
 
-  RCSW_COLD const cognitive::block_sel_matrix* block_sel_matrix(void) const {
+  RCPPSW_COLD const cognitive::block_sel_matrix* block_sel_matrix(void) const {
     return mc_bsel_matrix;
   }
 
-  RCSW_COLD const cognitive::cache_sel_matrix* cache_sel_matrix(void) const {
+  RCPPSW_COLD const cognitive::cache_sel_matrix* cache_sel_matrix(void) const {
     return mc_csel_matrix;
   }
 
-  RCSW_COLD tasking_map d1_tasks_create(
+  RCPPSW_COLD tasking_map d1_tasks_create(
       const config::d1::controller_repository& config_repo,
       cta::ds::bi_tdgraph* graph,
       rmath::rng* rng);
 
-  RCSW_COLD void d1_exec_est_init(
+  RCPPSW_COLD void d1_exec_est_init(
       const config::d1::controller_repository& config_repo,
       const tasking_map& map,
       cta::ds::bi_tdgraph* graph,
       rmath::rng* rng);
 
-  RCSW_COLD void d1_subtasks_init(
+  RCPPSW_COLD void d1_subtasks_init(
       const tasking_map& map,
       cta::ds::bi_tdgraph* graph,
       rmath::rng* rng);

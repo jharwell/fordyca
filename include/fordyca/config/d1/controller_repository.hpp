@@ -43,7 +43,7 @@ NS_START(fordyca, config, d1);
  */
 class controller_repository: public d0::mdpo_controller_repository {
  public:
-  controller_repository(void) RCSW_COLD;
+  controller_repository(void) RCPPSW_COLD;
 };
 
 NS_END(d1, config, fordyca);

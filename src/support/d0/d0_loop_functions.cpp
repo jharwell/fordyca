@@ -75,12 +75,12 @@ NS_START(detail);
  * initialization and simulation.
  */
 struct functor_maps_initializer {
-  RCSW_COLD functor_maps_initializer(configurer_map_type* const cmap,
+  RCPPSW_COLD functor_maps_initializer(configurer_map_type* const cmap,
                                      d0_loop_functions* const lf_in)
 
       : lf(lf_in), config_map(cmap) {}
   template <typename T>
-  RCSW_COLD void operator()(const T& controller) const {
+  RCPPSW_COLD void operator()(const T& controller) const {
     lf->m_interactor_map->emplace(
         typeid(controller),
         robot_arena_interactor<T, carena::caching_arena_map>(

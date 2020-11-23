@@ -71,12 +71,12 @@ class block_to_existing_cache_fsm final : public block_to_goal_fsm {
   block_to_existing_cache_fsm& operator=(const block_to_existing_cache_fsm&) = delete;
 
   /* goal acquisition metrics */
-  csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
-  bool goal_acquired(void) const override RCSW_PURE;
+  csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCPPSW_PURE;
+  bool goal_acquired(void) const override RCPPSW_PURE;
   rtypes::type_uuid entity_acquired_id(void) const override;
 
   /* block transportation */
-  foraging_transport_goal block_transport_goal(void) const override RCSW_PURE;
+  foraging_transport_goal block_transport_goal(void) const override RCPPSW_PURE;
 
  private:
   /* clang-format off */

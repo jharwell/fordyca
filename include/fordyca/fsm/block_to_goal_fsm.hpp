@@ -87,17 +87,17 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
   void task_reset(void) override { init(); }
 
   /* collision metrics */
-  bool exp_interference(void) const override final RCSW_PURE;
-  bool entered_interference(void) const override final RCSW_PURE;
-  bool exited_interference(void) const override final RCSW_PURE;
+  bool exp_interference(void) const override final RCPPSW_PURE;
+  bool entered_interference(void) const override final RCPPSW_PURE;
+  bool exited_interference(void) const override final RCPPSW_PURE;
   rtypes::timestep interference_duration(
-      void) const override final RCSW_PURE;
-  rmath::vector3z interference_loc3D(void) const override final RCSW_PURE;
+      void) const override final RCPPSW_PURE;
+  rmath::vector3z interference_loc3D(void) const override final RCPPSW_PURE;
 
   /* goal acquisition metrics */
-  bool is_vectoring_to_goal(void) const override final RCSW_PURE;
-  exp_status is_exploring_for_goal(void) const override final RCSW_PURE;
-  bool goal_acquired(void) const override RCSW_PURE;
+  bool is_vectoring_to_goal(void) const override final RCPPSW_PURE;
+  exp_status is_exploring_for_goal(void) const override final RCPPSW_PURE;
+  bool goal_acquired(void) const override RCPPSW_PURE;
   csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override;
   rmath::vector3z acquisition_loc3D(void) const override final;
   rmath::vector3z explore_loc3D(void) const override final;
@@ -143,15 +143,15 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
 
  private:
   /* inherited states */
-  HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_wait_for_signal);
+  RCPPSW_HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_wait_for_signal);
 
   /* block to goal states */
-  HFSM_STATE_DECLARE(block_to_goal_fsm, start, rpfsm::event_data);
-  HFSM_STATE_DECLARE_ND(block_to_goal_fsm, acquire_block);
-  HFSM_STATE_DECLARE(block_to_goal_fsm, wait_for_block_pickup, rpfsm::event_data);
-  HFSM_STATE_DECLARE_ND(block_to_goal_fsm, transport_to_goal);
-  HFSM_STATE_DECLARE(block_to_goal_fsm, wait_for_block_drop, rpfsm::event_data);
-  HFSM_STATE_DECLARE_ND(block_to_goal_fsm, finished);
+  RCPPSW_HFSM_STATE_DECLARE(block_to_goal_fsm, start, rpfsm::event_data);
+  RCPPSW_HFSM_STATE_DECLARE_ND(block_to_goal_fsm, acquire_block);
+  RCPPSW_HFSM_STATE_DECLARE(block_to_goal_fsm, wait_for_block_pickup, rpfsm::event_data);
+  RCPPSW_HFSM_STATE_DECLARE_ND(block_to_goal_fsm, transport_to_goal);
+  RCPPSW_HFSM_STATE_DECLARE(block_to_goal_fsm, wait_for_block_drop, rpfsm::event_data);
+  RCPPSW_HFSM_STATE_DECLARE_ND(block_to_goal_fsm, finished);
 
   /**
    * \brief Defines the state map for the FSM.
@@ -159,11 +159,11 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
    * Note that the order of the states in the map MUST match the order of the
    * states in \enum fsm_states, or things will not work correctly.
    */
-  HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
+  RCPPSW_HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
     return &mc_state_map[index];
   }
 
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
+  RCPPSW_HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 
   /* clang-format off */
   csfsm::acquire_goal_fsm* const  m_goal_fsm;

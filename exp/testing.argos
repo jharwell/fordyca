@@ -209,6 +209,7 @@
             cache_acq_counts="cache-acq-counts"
             cache_utilization="cache-utilization"
             cache_lifecycle="cache-lifecycle"
+            fsm_interference_counts="fsm-interference-counts"
             cache_site_selection="cache-site-selection"
             task_execution_generalist="task-execution-generalist"
             task_execution_collector="task-execution-collector"
@@ -443,20 +444,6 @@
   <!--      <!-\-                 headless_grabbing="true" -\-> -->
   <!--      <!-\-                 headless_frame_size="1600x1200" -\-> -->
   <!--      <!-\-                 /> -\-> -->
-  <!--     <camera> -->
-  <!--       <placement idx="0" -->
-  <!--                  position="6,6,6" -->
-  <!--                  look_at="6,6,0" -->
-  <!--                  lens_focal_length="20" -->
-  <!--                  up="0,1,0" -->
-  <!--                  /> -->
-  <!--       <placement idx="1" -->
-  <!--                  position="6,0,5" -->
-  <!--                  look_at="6,6,0" -->
-  <!--                  lens_focal_length="20" -->
-  <!--                  up="0,1,0" -->
-  <!--                  /> -->
-  <!--     </camera> -->
   <!--     <user_functions label="d0_qt_user_functions" /> -->
   <!--   </qt-opengl> -->
   <!-- </visualization> -->

@@ -64,7 +64,7 @@ d2_metrics_aggregator::d2_metrics_aggregator(
   register_standard(mconfig);
 
   /* Overwrite d1; we have a deeper decomposition now */
-  collector_remove("tasks::distribution");
+  collector_unregister("tasks::distribution");
   register_with_decomp_depth(mconfig, 2);
 
   reset_all();
@@ -74,7 +74,7 @@ d2_metrics_aggregator::d2_metrics_aggregator(
  * Member Functions
  ******************************************************************************/
 void d2_metrics_aggregator::task_start_cb(
-    RCSW_UNUSED const cta::polled_task* const task,
+    RCPPSW_UNUSED const cta::polled_task* const task,
     const cta::ds::bi_tab* const tab) {
   /* Not using stochastic nbhd policy */
   if (nullptr == tab) {

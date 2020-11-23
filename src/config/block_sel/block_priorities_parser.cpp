@@ -48,8 +48,8 @@ bool block_priorities_parser::validate(void) const {
     return true;
   }
 
-  RCSW_CHECK(m_config->cube >= 1.0);
-  RCSW_CHECK(m_config->ramp >= 1.0);
+  RCPPSW_CHECK(m_config->cube >= 1.0);
+  RCPPSW_CHECK(m_config->ramp >= 1.0);
   return true;
 
 error:

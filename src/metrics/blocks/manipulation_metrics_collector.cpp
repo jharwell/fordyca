@@ -57,7 +57,16 @@ std::list<std::string> manipulation_metrics_collector::csv_header_cols(
     "int_avg_cache_pickup_events",
     "int_avg_cache_drop_events",
     "int_avg_cache_pickup_penalty",
-    "int_avg_cache_drop_penalty"
+    "int_avg_cache_drop_penalty",
+
+    "cum_avg_free_pickup_events",
+    "cum_avg_free_drop_events",
+    "cum_avg_free_pickup_penalty",
+    "cum_avg_free_drop_penalty",
+    "cum_avg_cache_pickup_events",
+    "cum_avg_cache_drop_events",
+    "cum_avg_cache_pickup_penalty",
+    "cum_avg_cache_drop_penalty"
       /* clang-format on */
   };
   merged.splice(merged.end(), cols);
@@ -75,21 +84,39 @@ boost::optional<std::string> manipulation_metrics_collector::csv_line_build(void
   }
   std::string line;
 
-  line += csv_entry_intavg(m_interval.free_pickup_events);
-  line += csv_entry_intavg(m_interval.free_drop_events);
+  /* interval averages */
+  line += csv_entry_intavg(m_interval[block_manip_events::ekFREE_PICKUP].events);
+  line += csv_entry_intavg(m_interval[block_manip_events::ekFREE_DROP].events);
 
-  line += csv_entry_domavg(m_interval.free_pickup_penalty,
-                           m_interval.free_pickup_events);
-  line += csv_entry_domavg(m_interval.free_drop_penalty,
-                           m_interval.free_drop_events);
+  line += csv_entry_domavg(m_interval[block_manip_events::ekFREE_PICKUP].penalties,
+                           m_interval[block_manip_events::ekFREE_PICKUP].events);
+  line += csv_entry_domavg(m_interval[block_manip_events::ekFREE_DROP].penalties,
+                           m_interval[block_manip_events::ekFREE_DROP].events);
 
-  line += csv_entry_intavg(m_interval.cache_pickup_events);
-  line += csv_entry_intavg(m_interval.cache_drop_events);
+  line += csv_entry_intavg(m_interval[block_manip_events::ekCACHE_PICKUP].events);
+  line += csv_entry_intavg(m_interval[block_manip_events::ekCACHE_DROP].events);
 
-  line += csv_entry_domavg(m_interval.cache_pickup_penalty,
-                           m_interval.cache_pickup_events);
-  line += csv_entry_domavg(m_interval.cache_drop_penalty,
-                           m_interval.cache_drop_events,
+  line += csv_entry_domavg(m_interval[block_manip_events::ekCACHE_PICKUP].penalties,
+                           m_interval[block_manip_events::ekCACHE_PICKUP].events);
+  line += csv_entry_domavg(m_interval[block_manip_events::ekCACHE_DROP].penalties,
+                           m_interval[block_manip_events::ekCACHE_DROP].events);
+
+  /* cumulative averages */
+  line += csv_entry_tsavg(m_cum[block_manip_events::ekFREE_PICKUP].events);
+  line += csv_entry_tsavg(m_cum[block_manip_events::ekFREE_DROP].events);
+
+  line += csv_entry_domavg(m_cum[block_manip_events::ekFREE_PICKUP].penalties,
+                           m_cum[block_manip_events::ekFREE_PICKUP].events);
+  line += csv_entry_domavg(m_cum[block_manip_events::ekFREE_DROP].penalties,
+                           m_cum[block_manip_events::ekFREE_DROP].events);
+
+  line += csv_entry_tsavg(m_cum[block_manip_events::ekCACHE_PICKUP].events);
+  line += csv_entry_tsavg(m_cum[block_manip_events::ekCACHE_DROP].events);
+
+  line += csv_entry_domavg(m_cum[block_manip_events::ekCACHE_PICKUP].penalties,
+                           m_cum[block_manip_events::ekCACHE_PICKUP].events);
+  line += csv_entry_domavg(m_cum[block_manip_events::ekCACHE_DROP].penalties,
+                           m_cum[block_manip_events::ekCACHE_DROP].events,
                            true);
 
   return boost::make_optional(line);
@@ -98,37 +125,21 @@ boost::optional<std::string> manipulation_metrics_collector::csv_line_build(void
 void manipulation_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const ccmetrics::manipulation_metrics&>(metrics);
-  m_interval.free_pickup_events +=
-      m.status(metrics::blocks::block_manip_events::ekFREE_PICKUP);
-  m_interval.free_pickup_penalty +=
-      m.penalty(metrics::blocks::block_manip_events::ekFREE_PICKUP).v();
 
-  m_interval.free_drop_events +=
-      m.status(metrics::blocks::block_manip_events::ekFREE_DROP);
-  m_interval.free_drop_penalty +=
-      m.penalty(metrics::blocks::block_manip_events::ekFREE_DROP).v();
+  for (uint i = 0; i < block_manip_events::ekMAX_EVENTS; ++i) {
+    m_interval[i].events += m.status(i);
+    m_interval[i].penalties += m.penalty(i).v();
 
-  m_interval.cache_pickup_events +=
-      m.status(metrics::blocks::block_manip_events::ekCACHE_PICKUP);
-  m_interval.cache_pickup_penalty +=
-      m.penalty(metrics::blocks::block_manip_events::ekCACHE_PICKUP).v();
-
-  m_interval.cache_drop_events +=
-      m.status(metrics::blocks::block_manip_events::ekCACHE_DROP);
-  m_interval.cache_drop_penalty +=
-      m.penalty(metrics::blocks::block_manip_events::ekCACHE_DROP).v();
+    m_cum[i].events += m.status(i);
+    m_cum[i].penalties += m.penalty(i).v();
+  } /* for(i..) */
 } /* collect() */
 
 void manipulation_metrics_collector::reset_after_interval(void) {
-  m_interval.free_pickup_events = 0;
-  m_interval.free_drop_events = 0;
-  m_interval.free_pickup_penalty = 0;
-  m_interval.free_drop_penalty = 0;
-
-  m_interval.cache_pickup_events = 0;
-  m_interval.cache_drop_events = 0;
-  m_interval.cache_pickup_penalty = 0;
-  m_interval.cache_drop_penalty = 0;
+  for (auto& e : m_interval) {
+    std::atomic_init(&e.events, 0UL);
+    std::atomic_init(&e.penalties, 0UL);
+  } /* for(e..) */
 } /* reset_after_interval() */
 
 NS_END(blocks, metrics, fordyca);

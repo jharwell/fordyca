@@ -116,15 +116,15 @@ class dpo_store final : public rer::client<dpo_store> {
 
   void clear_all(void);
 
-  bool contains(const crepr::base_block3D* block) const RCSW_PURE;
+  bool contains(const crepr::base_block3D* block) const RCPPSW_PURE;
   bool contains(const carepr::base_cache* cache) const;
 
   const dp_cache_map::value_type* find(const carepr::base_cache* cache) const;
   dp_cache_map::value_type* find(const carepr::base_cache* cache);
 
   const dp_block_map::value_type* find(
-      const crepr::base_block3D* block) const RCSW_PURE;
-  dp_block_map::value_type* find(const crepr::base_block3D* block) RCSW_PURE;
+      const crepr::base_block3D* block) const RCPPSW_PURE;
+  dp_block_map::value_type* find(const crepr::base_block3D* block) RCPPSW_PURE;
 
   /**
    * \brief Update the known caches set with the new cache.

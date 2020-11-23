@@ -55,28 +55,28 @@ class task_executive_builder : public d1::task_executive_builder,
   task_executive_builder(const controller::cognitive::block_sel_matrix* bsel_matrix,
                       const controller::cognitive::cache_sel_matrix* csel_matrix,
                       crfootbot::footbot_saa_subsystem* saa,
-                      foraging_perception_subsystem* perception) RCSW_COLD;
-  ~task_executive_builder(void) override RCSW_COLD;
+                      foraging_perception_subsystem* perception) RCPPSW_COLD;
+  ~task_executive_builder(void) override RCPPSW_COLD;
 
-  RCSW_COLD std::unique_ptr<cta::bi_tdgraph_executive>
+  RCPPSW_COLD std::unique_ptr<cta::bi_tdgraph_executive>
   operator()(const config::d2::controller_repository& config_repo,
-             rmath::rng* rng) RCSW_COLD;
+             rmath::rng* rng) RCPPSW_COLD;
 
   using d1::task_executive_builder::tasking_map;
 
  protected:
-  RCSW_COLD tasking_map d2_tasks_create(
+  RCPPSW_COLD tasking_map d2_tasks_create(
       const config::d2::controller_repository& config_repo,
       cta::ds::bi_tdgraph* graph,
-      rmath::rng* rng) RCSW_COLD;
+      rmath::rng* rng) RCPPSW_COLD;
 
-  RCSW_COLD void d2_exec_est_init(
+  RCPPSW_COLD void d2_exec_est_init(
       const config::d2::controller_repository& config_repo,
       const tasking_map& map,
       cta::ds::bi_tdgraph* graph,
-      rmath::rng* rng) RCSW_COLD;
+      rmath::rng* rng) RCPPSW_COLD;
 
-  RCSW_COLD void d2_subtasks_init(
+  RCPPSW_COLD void d2_subtasks_init(
       const tasking_map& map,
       cta::ds::bi_tdgraph* graph,
       rmath::rng* rng);

@@ -51,13 +51,13 @@ NS_START(controller, reactive, d0);
 class crw_controller : public foraging_controller,
                        public rer::client<crw_controller> {
  public:
-  crw_controller(void) RCSW_COLD;
-  ~crw_controller(void) override RCSW_COLD;
+  crw_controller(void) RCPPSW_COLD;
+  ~crw_controller(void) override RCPPSW_COLD;
 
   /* foraging_controller overrides */
-  void init(ticpp::Element& node) override RCSW_COLD;
+  void init(ticpp::Element& node) override RCPPSW_COLD;
   void control_step(void) override;
-  void reset(void) override RCSW_COLD;
+  void reset(void) override RCPPSW_COLD;
   std::type_index type_index(void) const override { return typeid(*this); }
 
   /* goal acquisition metrics */

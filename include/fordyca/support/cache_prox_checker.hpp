@@ -110,7 +110,7 @@ class cache_prox_checker: public rer::client<cache_prox_checker> {
 
   template<typename TController>
   bool check_and_notify(TController& controller,
-                        RCSW_UNUSED const std::string& drop_dest) const {
+                        RCPPSW_UNUSED const std::string& drop_dest) const {
     mc_map->lock_rd(mc_map->cache_mtx());
 
     /*

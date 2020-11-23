@@ -42,13 +42,13 @@ dpo_fsm::dpo_fsm(const fsm_ro_params* params,
                  rmath::rng* rng)
     : util_hfsm(saa, rng, ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.d0.dpo"),
-      HFSM_CONSTRUCT_STATE(leaving_nest, &start),
-      HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
-      HFSM_CONSTRUCT_STATE(block_to_nest, hfsm::top_state()),
-      HFSM_DEFINE_STATE_MAP(mc_state_map,
-                            HFSM_STATE_MAP_ENTRY_EX(&start),
-                            HFSM_STATE_MAP_ENTRY_EX(&block_to_nest),
-                            HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest,
+      RCPPSW_HFSM_CONSTRUCT_STATE(leaving_nest, &start),
+      RCPPSW_HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
+      RCPPSW_HFSM_CONSTRUCT_STATE(block_to_nest, hfsm::top_state()),
+      RCPPSW_HFSM_DEFINE_STATE_MAP(mc_state_map,
+                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&start),
+                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&block_to_nest),
+                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest,
                                                         nullptr,
                                                         &entry_leaving_nest,
                                                         nullptr)),
@@ -56,7 +56,7 @@ dpo_fsm::dpo_fsm(const fsm_ro_params* params,
   hfsm::change_parent(ekST_LEAVING_NEST, &start);
 }
 
-HFSM_STATE_DEFINE(dpo_fsm, start, rpfsm::event_data* data) {
+RCPPSW_HFSM_STATE_DEFINE(dpo_fsm, start, rpfsm::event_data* data) {
   /* first time running FSM */
   if (rpfsm::event_type::ekNORMAL == data->type()) {
     internal_event(ekST_BLOCK_TO_NEST);
@@ -72,7 +72,7 @@ HFSM_STATE_DEFINE(dpo_fsm, start, rpfsm::event_data* data) {
   return fsm::foraging_signal::ekHANDLED;
 }
 
-HFSM_STATE_DEFINE(dpo_fsm, block_to_nest, rpfsm::event_data* data) {
+RCPPSW_HFSM_STATE_DEFINE(dpo_fsm, block_to_nest, rpfsm::event_data* data) {
   if (nullptr != data && fsm::foraging_signal::ekRUN != data->signal() &&
       rpfsm::event_signal::ekIGNORED != data->signal()) {
     m_block_fsm.inject_event(data->signal(), rpfsm::event_type::ekNORMAL);

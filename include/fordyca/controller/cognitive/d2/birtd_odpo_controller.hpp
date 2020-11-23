@@ -51,14 +51,14 @@ NS_START(d2);
 class birtd_odpo_controller : public d2::birtd_dpo_controller,
                             public rer::client<birtd_odpo_controller> {
  public:
-  birtd_odpo_controller(void) RCSW_COLD;
-  ~birtd_odpo_controller(void) override RCSW_COLD;
+  birtd_odpo_controller(void) RCPPSW_COLD;
+  ~birtd_odpo_controller(void) override RCPPSW_COLD;
 
   /* foraging_controller overrides */
   void control_step(void) override;
   std::type_index type_index(void) const override { return {typeid(*this)}; }
 
-  void oracle_init(std::unique_ptr<oracular_info_receptor> receptor) RCSW_COLD;
+  void oracle_init(std::unique_ptr<oracular_info_receptor> receptor) RCPPSW_COLD;
 
  private:
   /* clang-format off */

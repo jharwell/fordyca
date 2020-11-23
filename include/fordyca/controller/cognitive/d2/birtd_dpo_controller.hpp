@@ -52,10 +52,10 @@ NS_START(fordyca, controller, cognitive, d2);
 class birtd_dpo_controller : public d1::bitd_dpo_controller,
                              public rer::client<birtd_dpo_controller> {
  public:
-  birtd_dpo_controller(void) RCSW_COLD;
+  birtd_dpo_controller(void) RCPPSW_COLD;
 
   /* foraging_controller overrides */
-  void init(ticpp::Element& node) override RCSW_COLD;
+  void init(ticpp::Element& node) override RCPPSW_COLD;
   void control_step(void) override;
   std::type_index type_index(void) const override { return typeid(*this); }
 
@@ -73,7 +73,7 @@ class birtd_dpo_controller : public d1::bitd_dpo_controller,
    */
   void task_start_cb(cta::polled_task* task,
                      const cta::ds::bi_tab*);
-  void private_init(const config::d2::controller_repository& config_repo) RCSW_COLD;
+  void private_init(const config::d2::controller_repository& config_repo) RCPPSW_COLD;
 
 
   /* clang-format off */

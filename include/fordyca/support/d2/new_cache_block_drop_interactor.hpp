@@ -157,7 +157,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
     auto acq_goal = controller.current_task()->acquisition_goal();
     auto* task = dynamic_cast<const events::dynamic_cache_interactor*>(
         controller.current_task());
-    RCSW_UNUSED auto* polled = dynamic_cast<const cta::polled_task*>(
+    RCPPSW_UNUSED auto* polled = dynamic_cast<const cta::polled_task*>(
         controller.current_task());
 
     ER_CHECK(penalty.controller() == &controller,

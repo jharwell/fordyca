@@ -54,8 +54,8 @@ bool dynamic_cache_parser::validate(void) const {
   if (!is_parsed() || (is_parsed() && !m_config->enable)) {
     return true;
   }
-  RCSW_CHECK(m_config->min_dist > 0);
-  RCSW_CHECK(m_config->min_blocks > 0);
+  RCPPSW_CHECK(m_config->min_dist > 0);
+  RCPPSW_CHECK(m_config->min_blocks > 0);
   return true;
 
 error:

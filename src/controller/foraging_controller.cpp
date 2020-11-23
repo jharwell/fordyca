@@ -250,6 +250,11 @@ rtypes::spatial_dist foraging_controller::ts_distance(
     if (fsm::foraging_transport_goal::ekNEST == block_transport_goal()) {
       return ts_distance_impl();
     }
+  } else if (csmetrics::movement_category::ekEXPLORING == category) {
+    auto status = is_exploring_for_goal();
+    if (status.is_exploring && status.is_true) {
+      return ts_distance_impl();
+    }
   }
   return rtypes::spatial_dist(0);
 } /* ts_distance() */
@@ -260,6 +265,11 @@ rmath::vector3d foraging_controller::ts_velocity(
     return ts_velocity_impl();
   } else if (csmetrics::movement_category::ekHOMING == category) {
     if (fsm::foraging_transport_goal::ekNEST == block_transport_goal()) {
+      return ts_velocity_impl();
+    }
+  } else if (csmetrics::movement_category::ekEXPLORING == category) {
+    auto status = is_exploring_for_goal();
+    if (status.is_exploring && status.is_true) {
       return ts_velocity_impl();
     }
   }

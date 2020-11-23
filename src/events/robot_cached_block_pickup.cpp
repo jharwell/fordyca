@@ -168,7 +168,7 @@ void robot_cached_block_pickup::visit(ds::dpo_store& store) {
             pcache->ent()->n_blocks());
 
   } else {
-    RCSW_UNUSED rtypes::type_uuid id = pcache->ent()->id();
+    RCPPSW_UNUSED rtypes::type_uuid id = pcache->ent()->id();
     pcache->ent()->block_remove(block());
     store.cache_remove(pcache->ent());
     ER_INFO("DPO Store: fb%u: block%d from cache%d@%s [depleted]",
@@ -211,7 +211,7 @@ void robot_cached_block_pickup::visit(ds::dpo_semantic_map& map) {
             cell.cache()->n_blocks());
 
   } else {
-    RCSW_UNUSED rtypes::type_uuid id = cell.cache()->id();
+    RCPPSW_UNUSED rtypes::type_uuid id = cell.cache()->id();
     cell.cache()->block_remove(block());
 
     map.cache_remove(cell.cache());

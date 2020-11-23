@@ -77,15 +77,15 @@ using d1_subtask_status_map_type =
 class d1_loop_functions : public d0::d0_loop_functions,
                               public rer::client<d1_loop_functions> {
  public:
-  d1_loop_functions(void) RCSW_COLD;
-  ~d1_loop_functions(void) override RCSW_COLD;
+  d1_loop_functions(void) RCPPSW_COLD;
+  ~d1_loop_functions(void) override RCPPSW_COLD;
 
   /* swarm manager overrides */
-  void init(ticpp::Element& node) override RCSW_COLD;
+  void init(ticpp::Element& node) override RCPPSW_COLD;
   void pre_step() override;
   void post_step() override;
-  void reset(void) override RCSW_COLD;
-  void destroy(void) override RCSW_COLD;
+  void reset(void) override RCPPSW_COLD;
+  void destroy(void) override RCPPSW_COLD;
 
  protected:
   /**
@@ -96,7 +96,7 @@ class d1_loop_functions : public d0::d0_loop_functions,
    * - Enable task distribution entropy calculations
    * - Tasking oracle
    */
-  void shared_init(ticpp::Element& node) RCSW_COLD;
+  void shared_init(ticpp::Element& node) RCPPSW_COLD;
 
  private:
   struct cache_counts {
@@ -140,18 +140,18 @@ class d1_loop_functions : public d0::d0_loop_functions,
    * - Static cache handling/management.
    * - Tasking oracle.
    */
-  void private_init(void) RCSW_COLD;
+  void private_init(void) RCPPSW_COLD;
 
   /**
    * \brief Initialize static cache handling/management:
    */
   void cache_handling_init(const config::caches::caches_config *cachep,
-                           const cfconfig::block_dist_config* distp) RCSW_COLD;
+                           const cfconfig::block_dist_config* distp) RCPPSW_COLD;
 
   /**
    * \brief Initialize all oracles.
    */
-  void oracle_init(void) RCSW_COLD;
+  void oracle_init(void) RCPPSW_COLD;
 
   /**
    * \brief Process a single robot on a timestep, before running its controller:
@@ -192,7 +192,7 @@ class d1_loop_functions : public d0::d0_loop_functions,
    * timestep (or on previous timesteps and have not been re-created yet, for
    * whatever reason).
    */
-  bool caches_depleted(void) const RCSW_PURE;
+  bool caches_depleted(void) const RCPPSW_PURE;
 
   /**
    * \brief Collect task counts from controllers on timesteps one or more static

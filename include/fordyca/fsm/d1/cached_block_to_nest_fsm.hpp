@@ -102,24 +102,24 @@ class cached_block_to_nest_fsm final : public csfsm::util_hfsm,
   void task_start(cta::taskable_argument*) override {}
 
   /* collision metrics */
-  bool exp_interference(void) const override RCSW_PURE;
-  bool entered_interference(void) const override RCSW_PURE;
-  bool exited_interference(void) const override RCSW_PURE;
-  rtypes::timestep interference_duration(void) const override RCSW_PURE;
+  bool exp_interference(void) const override RCPPSW_PURE;
+  bool entered_interference(void) const override RCPPSW_PURE;
+  bool exited_interference(void) const override RCPPSW_PURE;
+  rtypes::timestep interference_duration(void) const override RCPPSW_PURE;
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, interference_loc3D, const);
 
   /* goal acquisition metrics */
-  bool goal_acquired(void) const override RCSW_PURE;
+  bool goal_acquired(void) const override RCPPSW_PURE;
   RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, acquisition_loc3D, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, explore_loc3D, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, vector_loc3D, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid, entity_acquired_id, const);
-  csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
+  csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCPPSW_PURE;
 
   /* block transportation */
-  foraging_transport_goal block_transport_goal(void) const override RCSW_PURE;
+  foraging_transport_goal block_transport_goal(void) const override RCPPSW_PURE;
 
   /**
    * \brief Reset the FSM
@@ -172,29 +172,29 @@ class cached_block_to_nest_fsm final : public csfsm::util_hfsm,
   static constexpr uint kPICKUP_TIMEOUT = 100;
 
   /* inherited states */
-  HFSM_STATE_INHERIT(csfsm::util_hfsm,
+  RCPPSW_HFSM_STATE_INHERIT(csfsm::util_hfsm,
                      transport_to_nest,
                      nest_transport_data);
-  HFSM_STATE_INHERIT(csfsm::util_hfsm,
+  RCPPSW_HFSM_STATE_INHERIT(csfsm::util_hfsm,
                      leaving_nest,
                      rpfsm::event_data);
 
-  HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_transport_to_nest);
-  HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_leaving_nest);
-  HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_wait_for_signal);
+  RCPPSW_HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_transport_to_nest);
+  RCPPSW_HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_leaving_nest);
+  RCPPSW_HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_wait_for_signal);
 
-  HFSM_EXIT_INHERIT(csfsm::util_hfsm, exit_transport_to_nest);
+  RCPPSW_HFSM_EXIT_INHERIT(csfsm::util_hfsm, exit_transport_to_nest);
 
   /* foraging states */
-  HFSM_STATE_DECLARE(cached_block_to_nest_fsm, start, rpfsm::event_data);
-  HFSM_STATE_DECLARE_ND(cached_block_to_nest_fsm, acquire_block);
-  HFSM_STATE_DECLARE(cached_block_to_nest_fsm,
+  RCPPSW_HFSM_STATE_DECLARE(cached_block_to_nest_fsm, start, rpfsm::event_data);
+  RCPPSW_HFSM_STATE_DECLARE_ND(cached_block_to_nest_fsm, acquire_block);
+  RCPPSW_HFSM_STATE_DECLARE(cached_block_to_nest_fsm,
                      wait_for_pickup,
                      rpfsm::event_data);
-  HFSM_STATE_DECLARE(cached_block_to_nest_fsm,
+  RCPPSW_HFSM_STATE_DECLARE(cached_block_to_nest_fsm,
                      wait_for_drop,
                      rpfsm::event_data);
-  HFSM_STATE_DECLARE_ND(cached_block_to_nest_fsm, finished);
+  RCPPSW_HFSM_STATE_DECLARE_ND(cached_block_to_nest_fsm, finished);
 
   /**
    * \brief Defines the state map for the FSM.
@@ -202,11 +202,11 @@ class cached_block_to_nest_fsm final : public csfsm::util_hfsm,
    * Note that the order of the states in the map MUST match the order of the
    * states in \enum fsm_states, or things will not work correctly.
    */
-  HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
+  RCPPSW_HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
     return &mc_state_map[index];
   }
 
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
+  RCPPSW_HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 
   /* clang-format off */
   const rmath::vector2d      mc_nest_loc;

@@ -28,7 +28,7 @@ set(${target}_CHECK_LANGUAGE "CXX")
 # Support libraries
 add_subdirectory(ext/cosm)
 
-if (${COSM_WITH_VIS})
+if ("${COSM_WITH_VIS}")
   set(CMAKE_AUTOMOC ON)
   find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui)
   set(CMAKE_AUTOMOC OFF)
@@ -40,9 +40,9 @@ endif()
 if (NOT ${COSM_WITH_VIS})
     list(REMOVE_ITEM ${target}_ROOT_SRC
     ${${target}_SRC_PATH}/support/los_visualizer.cpp
-    ${${target}_SRC_PATH}/support/depth0/depth0_qt_user_functions.cpp
-    ${${target}_SRC_PATH}/support/depth1/depth1_qt_user_functions.cpp
-    ${${target}_SRC_PATH}/support/depth2/depth2_qt_user_functions.cpp)
+    ${${target}_SRC_PATH}/support/d0/d0_qt_user_functions.cpp
+    ${${target}_SRC_PATH}/support/d1/d1_qt_user_functions.cpp
+    ${${target}_SRC_PATH}/support/d2/d2_qt_user_functions.cpp)
 endif()
 
 ################################################################################

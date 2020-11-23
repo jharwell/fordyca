@@ -50,7 +50,6 @@ compile_commands.json
 build
 docs/html
 docs/latex
-ext/rcppsw
 ext/cosm
 node_modules
 

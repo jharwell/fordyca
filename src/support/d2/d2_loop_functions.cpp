@@ -82,12 +82,12 @@ using configurer_map_type =
  * initialization and simulation.
  */
 struct functor_maps_initializer : public boost::static_visitor<void> {
-  RCSW_COLD functor_maps_initializer(configurer_map_type* const cmap,
+  RCPPSW_COLD functor_maps_initializer(configurer_map_type* const cmap,
                                      d2_loop_functions* const lf_in)
 
       : lf(lf_in), config_map(cmap) {}
   template <typename T>
-  RCSW_COLD void operator()(const T& controller) const {
+  RCPPSW_COLD void operator()(const T& controller) const {
     typename robot_arena_interactor<T, carena::caching_arena_map>::params p{
         lf->arena_map(),
         lf->m_metrics_agg.get(),

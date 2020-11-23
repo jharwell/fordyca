@@ -46,29 +46,29 @@ block_to_goal_fsm::block_to_goal_fsm(csfsm::acquire_goal_fsm* const goal_fsm,
                                      rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.block_to_goal"),
       util_hfsm(saa, rng, ekST_MAX_STATES),
-      HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
-      HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
-      HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
-      HFSM_CONSTRUCT_STATE(transport_to_goal, hfsm::top_state()),
-      HFSM_CONSTRUCT_STATE(wait_for_block_drop, hfsm::top_state()),
-      HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-      HFSM_DEFINE_STATE_MAP(mc_state_map,
-                            HFSM_STATE_MAP_ENTRY_EX(&start),
-                            HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
-                            HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
+      RCPPSW_HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
+      RCPPSW_HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
+      RCPPSW_HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
+      RCPPSW_HFSM_CONSTRUCT_STATE(transport_to_goal, hfsm::top_state()),
+      RCPPSW_HFSM_CONSTRUCT_STATE(wait_for_block_drop, hfsm::top_state()),
+      RCPPSW_HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
+      RCPPSW_HFSM_DEFINE_STATE_MAP(mc_state_map,
+                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&start),
+                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
+                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
                                                         nullptr,
                                                         &entry_wait_for_signal,
                                                         nullptr),
-                            HFSM_STATE_MAP_ENTRY_EX(&transport_to_goal),
-                            HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_drop,
+                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&transport_to_goal),
+                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_drop,
                                                         nullptr,
                                                         &entry_wait_for_signal,
                                                         nullptr),
-                            HFSM_STATE_MAP_ENTRY_EX(&finished)),
+                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&finished)),
       m_goal_fsm(goal_fsm),
       m_block_fsm(block_fsm) {}
 
-HFSM_STATE_DEFINE(block_to_goal_fsm, start, rpfsm::event_data* data) {
+RCPPSW_HFSM_STATE_DEFINE(block_to_goal_fsm, start, rpfsm::event_data* data) {
   if (rpfsm::event_type::ekNORMAL == data->type()) {
     if (fsm::foraging_signal::ekACQUIRE_FREE_BLOCK == data->signal() ||
         fsm::foraging_signal::ekACQUIRE_CACHED_BLOCK == data->signal()) {
@@ -81,7 +81,7 @@ HFSM_STATE_DEFINE(block_to_goal_fsm, start, rpfsm::event_data* data) {
   }
   return fsm::foraging_signal::ekHANDLED;
 }
-HFSM_STATE_DEFINE_ND(block_to_goal_fsm, acquire_block) {
+RCPPSW_HFSM_STATE_DEFINE_ND(block_to_goal_fsm, acquire_block) {
   if (m_block_fsm->task_finished()) {
     internal_event(ekST_WAIT_FOR_BLOCK_PICKUP);
   } else {
@@ -90,7 +90,7 @@ HFSM_STATE_DEFINE_ND(block_to_goal_fsm, acquire_block) {
   return fsm::foraging_signal::ekHANDLED;
 }
 
-HFSM_STATE_DEFINE_ND(block_to_goal_fsm, transport_to_goal) {
+RCPPSW_HFSM_STATE_DEFINE_ND(block_to_goal_fsm, transport_to_goal) {
   if (m_goal_fsm->task_finished()) {
     m_goal_fsm->task_reset();
     saa()->actuation()->actuator<ckin2D::governed_diff_drive>()->reset();
@@ -101,7 +101,7 @@ HFSM_STATE_DEFINE_ND(block_to_goal_fsm, transport_to_goal) {
   return fsm::foraging_signal::ekHANDLED;
 }
 
-HFSM_STATE_DEFINE(block_to_goal_fsm,
+RCPPSW_HFSM_STATE_DEFINE(block_to_goal_fsm,
                   wait_for_block_pickup,
                   rpfsm::event_data* data) {
   if (fsm::foraging_signal::ekBLOCK_PICKUP == data->signal()) {
@@ -129,7 +129,7 @@ HFSM_STATE_DEFINE(block_to_goal_fsm,
   return fsm::foraging_signal::ekHANDLED;
 }
 
-HFSM_STATE_DEFINE(block_to_goal_fsm,
+RCPPSW_HFSM_STATE_DEFINE(block_to_goal_fsm,
                   wait_for_block_drop,
                   rpfsm::event_data* data) {
   saa()->actuation()->actuator<ckin2D::governed_diff_drive>()->reset();
@@ -156,7 +156,7 @@ HFSM_STATE_DEFINE(block_to_goal_fsm,
   return fsm::foraging_signal::ekHANDLED;
 }
 
-RCSW_CONST HFSM_STATE_DEFINE_ND(block_to_goal_fsm, finished) {
+RCPPSW_CONST RCPPSW_HFSM_STATE_DEFINE_ND(block_to_goal_fsm, finished) {
   return fsm::foraging_signal::ekHANDLED;
 }
 

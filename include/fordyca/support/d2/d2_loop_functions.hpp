@@ -59,15 +59,15 @@ struct functor_maps_initializer;
 class d2_loop_functions final : public d1::d1_loop_functions,
                                     public rer::client<d2_loop_functions> {
  public:
-  d2_loop_functions(void) RCSW_COLD;
-  ~d2_loop_functions(void) override RCSW_COLD;
+  d2_loop_functions(void) RCPPSW_COLD;
+  ~d2_loop_functions(void) override RCPPSW_COLD;
 
   /* swarm manager overrides */
-  void init(ticpp::Element& node) override RCSW_COLD;
+  void init(ticpp::Element& node) override RCPPSW_COLD;
   void pre_step() override;
   void post_step() override;
-  void reset(void) override RCSW_COLD;
-  void destroy(void) override RCSW_COLD;
+  void reset(void) override RCPPSW_COLD;
+  void destroy(void) override RCPPSW_COLD;
 
   /**
    * \brief Initialize d2 support to be shared with derived classes
@@ -75,7 +75,7 @@ class d2_loop_functions final : public d1::d1_loop_functions,
    * - All d1 shared initialization
    * - Depth2 metric collection
    */
-  void shared_init(ticpp::Element& node) RCSW_COLD;
+  void shared_init(ticpp::Element& node) RCPPSW_COLD;
 
  private:
   using interactor_map_type = rds::type_map<
@@ -106,9 +106,9 @@ class d2_loop_functions final : public d1::d1_loop_functions,
    */
   friend detail::functor_maps_initializer;
 
-  void private_init(void) RCSW_COLD;
+  void private_init(void) RCPPSW_COLD;
 
-  void cache_handling_init(const config::caches::caches_config* cachep) RCSW_COLD;
+  void cache_handling_init(const config::caches::caches_config* cachep) RCPPSW_COLD;
 
   /**
    * \brief Handle creation of dynamic caches during initialization, reset, or

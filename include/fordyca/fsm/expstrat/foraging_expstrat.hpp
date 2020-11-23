@@ -86,8 +86,8 @@ class foraging_expstrat : public csexpstrat::base_expstrat {
   foraging_expstrat& operator=(const foraging_expstrat&) = delete;
 
  protected:
-  crfootbot::footbot_saa_subsystem* saa(void) const RCSW_PURE;
-  crfootbot::footbot_saa_subsystem* saa(void) RCSW_PURE;
+  crfootbot::footbot_saa_subsystem* saa(void) const RCPPSW_PURE;
+  crfootbot::footbot_saa_subsystem* saa(void) RCPPSW_PURE;
 };
 
 NS_END(expstrat, fsm, fordyca);

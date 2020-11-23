@@ -56,10 +56,10 @@ bool cache_sel_matrix_parser::validate(void) const {
   if (!is_parsed()) {
     return true;
   }
-  RCSW_CHECK(m_pickup_policy.validate());
-  RCSW_CHECK(m_config->cache_prox_dist > 0.0);
-  RCSW_CHECK(m_config->block_prox_dist > 0.0);
-  RCSW_CHECK(m_config->nest_prox_dist > 0.0);
+  RCPPSW_CHECK(m_pickup_policy.validate());
+  RCPPSW_CHECK(m_config->cache_prox_dist > 0.0);
+  RCPPSW_CHECK(m_config->block_prox_dist > 0.0);
+  RCPPSW_CHECK(m_config->nest_prox_dist > 0.0);
   return true;
 
 error:

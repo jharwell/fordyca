@@ -41,7 +41,7 @@ NS_START(fordyca, fsm);
  * Member Functions
  ******************************************************************************/
 rmath::vector2d cache_acq_point_selector::operator()(
-    RCSW_UNUSED const rmath::vector2d& robot_loc,
+    RCPPSW_UNUSED const rmath::vector2d& robot_loc,
     const carepr::base_cache* const cache,
     rmath::rng* rng) {
   auto xspan = cache->xrspan();

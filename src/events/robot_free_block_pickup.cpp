@@ -73,7 +73,7 @@ robot_free_block_pickup::robot_free_block_pickup(crepr::base_block3D* block,
  ******************************************************************************/
 void robot_free_block_pickup::dispatch_robot_free_block_interactor(
     tasks::base_foraging_task* const task) {
-  auto* polled RCSW_UNUSED = dynamic_cast<cta::polled_task*>(task);
+  auto* polled RCPPSW_UNUSED = dynamic_cast<cta::polled_task*>(task);
   auto* interactor = dynamic_cast<events::free_block_interactor*>(task);
   ER_ASSERT(nullptr != interactor,
             "Non free block interactor task %s causing free block pickup",

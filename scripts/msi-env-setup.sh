@@ -3,8 +3,8 @@
 # Do not try to run this script somewhere other than on MSI, as it probably
 # will not work.
 
-GINIROOT=/home/gini
-SWARMROOT=$GINIROOT/shared/swarm
+export GINIROOT=/home/gini
+export SWARMROOT=$GINIROOT/shared/swarm
 
 # Load modules
 module load cmake/3.10.2
@@ -24,11 +24,11 @@ export CXX=g++
 # I should NOT have to do this, but the MSI help staff have not been helpful on
 # this at all.
 if lscpu | grep -q AuthenticAMD; then
-    export MSICLUSTER=mangi
-    echo "Environment: MSI Mangi, AMD EPYC"
+    export MSIARCH=amd
+    echo "Environment: AMD EPYC"
 else
-    export MSICLUSTER=mesabi
-    echo "Environment: MSI Mesabi, Intel Xeon"
+    export MSIARCH=intel
+    echo "Environment: Intel Xeon"
 fi
 
 # Add argos to our path

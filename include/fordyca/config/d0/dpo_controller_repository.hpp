@@ -43,7 +43,7 @@ NS_START(fordyca, config, d0);
  */
 class dpo_controller_repository: public foraging_controller_repository {
  public:
-  dpo_controller_repository(void) RCSW_COLD;
+  dpo_controller_repository(void) RCPPSW_COLD;
 };
 
 NS_END(d0, config, fordyca);

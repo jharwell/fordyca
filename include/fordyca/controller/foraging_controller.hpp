@@ -93,15 +93,15 @@ class foraging_controller : public cpal::argos_controller2D_adaptor,
   using block_manip_recorder_type = ccontroller::manip_event_recorder<
       metrics::blocks::block_manip_events::ekMAX_EVENTS>;
 
-  foraging_controller(void) RCSW_COLD;
-  ~foraging_controller(void) override RCSW_COLD;
+  foraging_controller(void) RCPPSW_COLD;
+  ~foraging_controller(void) override RCPPSW_COLD;
 
   foraging_controller(const foraging_controller&) = delete;
   foraging_controller& operator=(const foraging_controller&) = delete;
 
   /* foraging_controller2D overrides */
-  void init(ticpp::Element& node) override RCSW_COLD;
-  void reset(void) override RCSW_COLD;
+  void init(ticpp::Element& node) override RCPPSW_COLD;
+  void reset(void) override RCPPSW_COLD;
   rtypes::type_uuid entity_id(void) const override final;
 
   /* rda_recipient_controller overrides */
@@ -145,8 +145,8 @@ class foraging_controller : public cpal::argos_controller2D_adaptor,
   }
 
  protected:
-  class crfootbot::footbot_saa_subsystem* saa(void) RCSW_PURE;
-  const class crfootbot::footbot_saa_subsystem* saa(void) const RCSW_PURE;
+  class crfootbot::footbot_saa_subsystem* saa(void) RCPPSW_PURE;
+  const class crfootbot::footbot_saa_subsystem* saa(void) const RCPPSW_PURE;
 
  private:
   void saa_init(
