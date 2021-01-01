@@ -34,14 +34,12 @@
 #include "cosm/pal/argos_convergence_calculator.hpp"
 #include "cosm/pal/argos_swarm_iterator.hpp"
 #include "cosm/vis/config/visualization_config.hpp"
-#include "cosm/foraging/metrics/block_transport_metrics_collector.hpp"
-#include "cosm/pal/argos_convergence_calculator.hpp"
 
-#include "fordyca/config/tv/tv_manager_config.hpp"
 #include "fordyca//controller/foraging_controller.hpp"
+#include "fordyca/config/tv/tv_manager_config.hpp"
+#include "fordyca/metrics/fordyca_metrics_aggregator.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/support/tv/fordyca_pd_adaptor.hpp"
-#include "fordyca/metrics/fordyca_metrics_aggregator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -211,7 +209,8 @@ void base_loop_functions::reset(void) {
  * Member Functions
  ******************************************************************************/
 const carena::caching_arena_map* base_loop_functions::arena_map(void) const {
-  return static_cast<const carena::caching_arena_map*>(argos_sm_adaptor::arena_map());
+  return static_cast<const carena::caching_arena_map*>(
+      argos_sm_adaptor::arena_map());
 }
 carena::caching_arena_map* base_loop_functions::arena_map(void) {
   return static_cast<carena::caching_arena_map*>(argos_sm_adaptor::arena_map());

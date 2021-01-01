@@ -30,8 +30,8 @@
 #include "rcppsw/math/vector2.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/subsystem/perception/config/pheromone_config.hpp"
 #include "cosm/repr/base_block3D.hpp"
+#include "cosm/subsystem/perception/config/pheromone_config.hpp"
 
 #include "fordyca/ds/dp_block_map.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
@@ -78,8 +78,8 @@ class dpo_store final : public rer::client<dpo_store> {
    */
 
   struct update_res_t {
-    bool status{false};
-    update_status reason{ekNO_CHANGE};
+    bool status{ false };
+    update_status reason{ ekNO_CHANGE };
     rmath::vector2z old_loc{};
   };
 
@@ -122,8 +122,8 @@ class dpo_store final : public rer::client<dpo_store> {
   const dp_cache_map::value_type* find(const carepr::base_cache* cache) const;
   dp_cache_map::value_type* find(const carepr::base_cache* cache);
 
-  const dp_block_map::value_type* find(
-      const crepr::base_block3D* block) const RCPPSW_PURE;
+  const dp_block_map::value_type*
+  find(const crepr::base_block3D* block) const RCPPSW_PURE;
   dp_block_map::value_type* find(const crepr::base_block3D* block) RCPPSW_PURE;
 
   /**

@@ -46,11 +46,12 @@ NS_START(fordyca, support);
  * timestep.
  */
 template <typename TController, typename TControllerSpecMap>
-class task_abort_interactor :
-    public cinteractors::base_task_abort<TController, TControllerSpecMap> {
+class task_abort_interactor
+    : public cinteractors::base_task_abort<TController, TControllerSpecMap> {
  public:
-  using typename cinteractors::base_task_abort<TController,
-                                               TControllerSpecMap>::arena_map_type;
+  using
+      typename cinteractors::base_task_abort<TController,
+                                             TControllerSpecMap>::arena_map_type;
   using typename cinteractors::base_task_abort<TController,
                                                TControllerSpecMap>::envd_type;
 
@@ -61,17 +62,16 @@ class task_abort_interactor :
                                                                        envd,
                                                                        floor) {}
 
-
   task_abort_interactor(task_abort_interactor&&) = default;
 
   /* not copy assignable/constructible by default */
-  task_abort_interactor(const task_abort_interactor& ) = delete;
+  task_abort_interactor(const task_abort_interactor&) = delete;
   task_abort_interactor& operator=(const task_abort_interactor&) = delete;
 
   bool robot_task_aborted(const TController& controller) const override {
     return (nullptr != controller.current_task() &&
             tasks::task_status::ekABORT_PENDING == controller.task_status());
-    }
+  }
 };
 
 NS_END(support, fordyca);

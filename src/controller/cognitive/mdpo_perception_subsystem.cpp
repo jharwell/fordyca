@@ -147,7 +147,7 @@ void mdpo_perception_subsystem::process_los_blocks(
         e.visit(*m_map);
       }
     } /* for(j..) */
-  }   /* for(i..) */
+  } /* for(i..) */
 
   for (auto* block : c_los->blocks()) {
     ER_ASSERT(!block->is_out_of_sight(),
@@ -208,7 +208,7 @@ void mdpo_perception_subsystem::process_los_caches(
         map()->cache_remove(cache);
       }
     } /* for(j..) */
-  }   /* for(i..) */
+  } /* for(i..) */
 
   for (auto& cache : los_caches) {
     /*
@@ -262,7 +262,7 @@ void mdpo_perception_subsystem::update_cell_stats(
         m_cell_stats[cfsm::cell2D_state::ekST_HAS_CACHE]++;
       }
     } /* for(j..) */
-  }   /* for(i..) */
+  } /* for(i..) */
 } /* update_cell_stats() */
 
 ds::dpo_store* mdpo_perception_subsystem::dpo_store(void) {

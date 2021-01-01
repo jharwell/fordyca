@@ -72,9 +72,9 @@ double collector::abort_prob_calc(void) {
   }
 } /* abort_prob_calc() */
 
-rtypes::timestep collector::interface_time_calc(
-    size_t interface,
-    const rtypes::timestep& start_time) {
+rtypes::timestep
+collector::interface_time_calc(size_t interface,
+                               const rtypes::timestep& start_time) {
   ER_ASSERT(0 == interface, "Bad interface ID: %zu", interface);
   return current_time() - start_time;
 } /* interface_time_calc() */
@@ -115,60 +115,69 @@ void collector::accept(events::detail::cache_vanished& visitor) {
 }
 
 /*******************************************************************************
- * FSM Metrics
+ * Block Acquisition Metrics
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEF(collector,
-                         is_exploring_for_goal,
-                         *static_cast<fsm::d1::cached_block_to_nest_fsm*>(
-                             polled_task::mechanism()),
-                         const);
-RCPPSW_WRAP_OVERRIDE_DEF(collector,
-                         is_vectoring_to_goal,
-                         *static_cast<fsm::d1::cached_block_to_nest_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    collector,
+    is_exploring_for_goal,
+    *static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism()),
+    const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    collector,
+    is_vectoring_to_goal,
+    *static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(collector,
-                         goal_acquired,
-                         *static_cast<fsm::d1::cached_block_to_nest_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    collector,
+    goal_acquired,
+    *static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(collector,
-                         acquisition_goal,
-                         *static_cast<fsm::d1::cached_block_to_nest_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    collector,
+    acquisition_goal,
+    *static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(collector,
-                         block_transport_goal,
-                         *static_cast<fsm::d1::cached_block_to_nest_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    collector,
+    block_transport_goal,
+    *static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(collector,
-                         acquisition_loc3D,
-                         *static_cast<fsm::d1::cached_block_to_nest_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    collector,
+    acquisition_loc3D,
+    *static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(collector,
-                         vector_loc3D,
-                         *static_cast<fsm::d1::cached_block_to_nest_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    collector,
+    vector_loc3D,
+    *static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(collector,
-                         explore_loc3D,
-                         *static_cast<fsm::d1::cached_block_to_nest_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    collector,
+    explore_loc3D,
+    *static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(collector,
-                         entity_acquired_id,
-                         *static_cast<fsm::d1::cached_block_to_nest_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    collector,
+    entity_acquired_id,
+    *static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism()),
+    const);
+
+/*******************************************************************************
+ * Block Transport Metrics
+ ******************************************************************************/
+RCPPSW_WRAP_OVERRIDE_DEF(
+    collector,
+    is_phototaxiing_to_goal,
+    *static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism()),
+    const);
 
 /*******************************************************************************
  * Task Metrics

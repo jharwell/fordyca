@@ -57,7 +57,7 @@ bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
                   block->danchor2D().to_str().c_str());
       }
     } /* for(&block..) */
-  }   /* for(&cache..) */
+  } /* for(&cache..) */
 
   /*
    * Verify that for each cell that contained a cache in the LOS:
@@ -137,7 +137,7 @@ bool los_proc_verify::operator()(const ds::dpo_semantic_map* const c_map) const 
         }
       }
     } /* for(j..) */
-  }   /* for(i..) */
+  } /* for(i..) */
   return true;
 } /* operator()() */
 

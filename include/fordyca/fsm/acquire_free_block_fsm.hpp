@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include <memory>
 
-#include "cosm/spatial/fsm/acquire_goal_fsm.hpp"
 #include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
+#include "cosm/spatial/fsm/acquire_goal_fsm.hpp"
 #include "cosm/ta/taskable.hpp"
 
 #include "fordyca/controller/cognitive/block_sel_matrix.hpp"
@@ -67,23 +67,22 @@ NS_START(fsm);
 class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
                                public csfsm::acquire_goal_fsm {
  public:
-  acquire_free_block_fsm(
-      const fsm_ro_params* c_params,
-      crfootbot::footbot_saa_subsystem* saa,
-      std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
-      rmath::rng* rng);
+  acquire_free_block_fsm(const fsm_ro_params* c_params,
+                         crfootbot::footbot_saa_subsystem* saa,
+                         std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+                         rmath::rng* rng);
 
   ~acquire_free_block_fsm(void) override = default;
 
-  acquire_free_block_fsm(const acquire_free_block_fsm& fsm) = delete;
-  acquire_free_block_fsm& operator=(const acquire_free_block_fsm& fsm) = delete;
+  acquire_free_block_fsm(const acquire_free_block_fsm&) = delete;
+  acquire_free_block_fsm& operator=(const acquire_free_block_fsm&) = delete;
 
  private:
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  static csmetrics::goal_acq_metrics::goal_type acq_goal_internal(void)
-      RCPPSW_CONST;
+  static csmetrics::goal_acq_metrics::goal_type
+  acq_goal_internal(void) RCPPSW_CONST;
   boost::optional<acquire_goal_fsm::candidate_type> block_select(void) const;
   bool candidates_exist(void) const RCPPSW_PURE;
   bool block_exploration_term_cb(void) const;

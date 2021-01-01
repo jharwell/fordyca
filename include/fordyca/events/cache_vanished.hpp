@@ -51,14 +51,13 @@ NS_START(fordyca, events, detail);
 class cache_vanished : public rer::client<cache_vanished> {
  private:
   struct visit_typelist_impl {
-    using controllers =
-        boost::mpl::joint_view<controller::d1::typelist::type,
-                               controller::d2::typelist::type>;
+    using controllers = boost::mpl::joint_view<controller::d1::typelist::type,
+                                               controller::d2::typelist::type>;
     using tasks = rmpl::typelist<tasks::d1::collector,
                                  tasks::d1::harvester,
                                  tasks::d2::cache_transferer>;
-    using fsms = rmpl::typelist<fsm::block_to_goal_fsm,
-                                fsm::d1::cached_block_to_nest_fsm>;
+    using fsms =
+        rmpl::typelist<fsm::block_to_goal_fsm, fsm::d1::cached_block_to_nest_fsm>;
     using value =
         boost::mpl::joint_view<boost::mpl::joint_view<tasks::type, fsms::type>,
                                controllers::type>;
@@ -105,7 +104,8 @@ NS_END(detail);
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using cache_vanished_visitor = rpvisitor::filtered_visitor<detail::cache_vanished>;
+using cache_vanished_visitor =
+    rpvisitor::filtered_visitor<detail::cache_vanished>;
 
 NS_END(events, fordyca);
 

@@ -51,7 +51,7 @@ class dpo_semantic_map;
 
 namespace fordyca::controller::cognitive {
 class cache_sel_matrix;
-} // namespace fordyca::controller
+} // namespace fordyca::controller::cognitive
 
 NS_START(fordyca, events, detail);
 
@@ -70,8 +70,8 @@ class robot_cache_block_drop : public rer::client<robot_cache_block_drop>,
  private:
   struct visit_typelist_impl {
     using inherited = cdops::cell2D_op::visit_typelist;
-    using controllers = boost::mpl::joint_view<controller::d1::typelist,
-                                               controller::d2::typelist>;
+    using controllers =
+        boost::mpl::joint_view<controller::d1::typelist, controller::d2::typelist>;
 
     using others = rmpl::typelist<
         /* d1 */
@@ -154,7 +154,8 @@ NS_END(detail);
 class robot_cache_block_drop_visitor
     : public detail::robot_cache_block_drop_visitor_impl {
  public:
-  using detail::robot_cache_block_drop_visitor_impl::robot_cache_block_drop_visitor_impl;
+  using detail::robot_cache_block_drop_visitor_impl::
+      robot_cache_block_drop_visitor_impl;
 };
 
 NS_END(events, fordyca);

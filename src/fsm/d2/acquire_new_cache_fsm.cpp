@@ -69,15 +69,14 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
                             std::placeholders::_1)),
 
               /* new caches never acquired via exploration */
-              RCPPSW_STRUCT_DOT_INITIALIZER(explore_term_cb,
-                                            std::bind([](void) noexcept {
-                                              return false;
-                                            })),
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  explore_term_cb,
+                  std::bind([](void) noexcept { return false; })),
               RCPPSW_STRUCT_DOT_INITIALIZER(goal_valid_cb,
                                             [](const rmath::vector2d&,
                                                const rtypes::type_uuid&) {
                                               return true;
-                                            })}),
+                                            }) }),
       mc_matrix(c_params->csel_matrix),
       mc_store(c_params->store) {}
 
@@ -88,8 +87,8 @@ bool acquire_new_cache_fsm::candidates_exist(void) const {
   return !mc_store->blocks().empty();
 } /* candidates_exsti() */
 
-boost::optional<csfsm::acquire_goal_fsm::candidate_type> acquire_new_cache_fsm::
-    cache_select(void) const {
+boost::optional<csfsm::acquire_goal_fsm::candidate_type>
+acquire_new_cache_fsm::cache_select(void) const {
   controller::cognitive::d2::new_cache_selector selector(mc_matrix);
 
   /* A "new" cache is the same as a single block  */
@@ -126,8 +125,8 @@ bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-csmetrics::goal_acq_metrics::goal_type acquire_new_cache_fsm::
-    acquisition_goal_internal(void) const {
+csmetrics::goal_acq_metrics::goal_type
+acquire_new_cache_fsm::acquisition_goal_internal(void) const {
   return fsm::to_goal_type(foraging_acq_goal::ekNEW_CACHE);
 } /* acquisition_goal() */
 

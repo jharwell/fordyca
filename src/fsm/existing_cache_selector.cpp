@@ -50,10 +50,10 @@ existing_cache_selector::existing_cache_selector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-const carepr::base_cache* existing_cache_selector::operator()(
-    const ds::dp_cache_map& existing_caches,
-    const rmath::vector2d& position,
-    const rtypes::timestep& t) {
+const carepr::base_cache*
+existing_cache_selector::operator()(const ds::dp_cache_map& existing_caches,
+                                    const rmath::vector2d& position,
+                                    const rtypes::timestep& t) {
   const carepr::base_cache* best = nullptr;
   ER_ASSERT(!existing_caches.empty(), "No known existing caches");
 

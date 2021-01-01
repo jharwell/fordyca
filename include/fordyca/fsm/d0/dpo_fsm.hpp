@@ -25,8 +25,10 @@
  * Includes
  ******************************************************************************/
 #include <memory>
+
 #include "cosm/spatial/fsm/util_hfsm.hpp"
 #include "cosm/fsm/block_transporter.hpp"
+#include "cosm/fsm/metrics/block_transporter_metrics.hpp"
 
 #include "fordyca/fsm/d0/free_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
@@ -59,6 +61,7 @@ NS_START(fsm, d0);
 class dpo_fsm final : public csfsm::util_hfsm,
                       public rer::client<dpo_fsm>,
                       public csmetrics::goal_acq_metrics,
+                      public cfsm::metrics::block_transporter_metrics,
                       public cfsm::block_transporter<foraging_transport_goal>,
                       public cta::taskable {
  public:
@@ -104,6 +107,7 @@ class dpo_fsm final : public csfsm::util_hfsm,
   RCPPSW_WRAP_OVERRIDE_DECL(foraging_transport_goal,
                             block_transport_goal,
                             const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, is_phototaxiing_to_goal, const);
 
   void init(void) override;
 

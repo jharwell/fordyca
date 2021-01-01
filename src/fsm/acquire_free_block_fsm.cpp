@@ -78,24 +78,16 @@ acquire_free_block_fsm::acquire_free_block_fsm(
                   std::bind(&acquire_free_block_fsm::block_acq_valid,
                             this,
                             std::placeholders::_1,
-                            std::placeholders::_2))}),
+                            std::placeholders::_2)) }),
       mc_matrix(c_params->bsel_matrix),
       mc_store(c_params->store) {}
-
-/*******************************************************************************
- * Non-Member Functions
- ******************************************************************************/
-csmetrics::goal_acq_metrics::goal_type acquire_free_block_fsm::acq_goal_internal(
-    void) {
-  return fsm::to_goal_type(foraging_acq_goal::ekBLOCK);
-} /* acq_goal_internal() */
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 bool acquire_free_block_fsm::block_exploration_term_cb(void) const {
-  return saa()->sensing()->sensor<chal::sensors::ground_sensor>()->detect(
-      "block");
+  return saa()->sensing()->sensor<chal::sensors::ground_sensor>()->detect("bloc"
+                                                                          "k");
 } /* block_exploration_term_cb() */
 
 bool acquire_free_block_fsm::block_acquired_cb(bool explore_result) const {
@@ -104,8 +96,8 @@ bool acquire_free_block_fsm::block_acquired_cb(bool explore_result) const {
               "No block detected after successful exploration?");
     return true;
   } else {
-    if (saa()->sensing()->sensor<chal::sensors::ground_sensor>()->detect(
-            "block")) {
+    if (saa()->sensing()->sensor<chal::sensors::ground_sensor>()->detect("bloc"
+                                                                         "k")) {
       return true;
     }
     ER_WARN("Robot arrived at goal, but no block was detected.");
@@ -113,8 +105,8 @@ bool acquire_free_block_fsm::block_acquired_cb(bool explore_result) const {
   }
 } /* block_acquired_cb() */
 
-boost::optional<csfsm::acquire_goal_fsm::candidate_type> acquire_free_block_fsm::
-    block_select(void) const {
+boost::optional<csfsm::acquire_goal_fsm::candidate_type>
+acquire_free_block_fsm::block_select(void) const {
   controller::cognitive::block_selector selector(mc_matrix);
 
   if (auto best = selector(mc_store->blocks(), saa()->sensing()->rpos2D())) {
@@ -133,5 +125,13 @@ bool acquire_free_block_fsm::block_acq_valid(const rmath::vector2d& loc,
                                              const rtypes::type_uuid& id) const {
   return block_acq_validator(&mc_store->blocks(), mc_matrix)(loc, id);
 } /* block_acq_valid() */
+
+/*******************************************************************************
+ * Non-Member Functions
+ ******************************************************************************/
+csmetrics::goal_acq_metrics::goal_type
+acquire_free_block_fsm::acq_goal_internal(void) {
+  return fsm::to_goal_type(foraging_acq_goal::ekBLOCK);
+} /* acq_goal_internal() */
 
 NS_END(controller, fordyca);

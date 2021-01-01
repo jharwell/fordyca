@@ -29,6 +29,7 @@
 #include "cosm/ta/taskable.hpp"
 #include "cosm/fsm/block_transporter.hpp"
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
+#include "cosm/fsm/metrics/block_transporter_metrics.hpp"
 
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
@@ -73,6 +74,7 @@ class cached_block_to_nest_fsm final : public csfsm::util_hfsm,
                                        public rer::client<cached_block_to_nest_fsm>,
                                        public csmetrics::goal_acq_metrics,
                                        public cfsm::block_transporter<foraging_transport_goal>,
+                                       public cfsm::metrics::block_transporter_metrics,
                                        public cta::taskable {
  public:
   cached_block_to_nest_fsm(
@@ -120,6 +122,7 @@ class cached_block_to_nest_fsm final : public csfsm::util_hfsm,
 
   /* block transportation */
   foraging_transport_goal block_transport_goal(void) const override RCPPSW_PURE;
+  bool is_phototaxiing_to_goal(void) const override RCPPSW_PURE;
 
   /**
    * \brief Reset the FSM

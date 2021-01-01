@@ -79,10 +79,9 @@ void robot_cached_block_pickup::dispatch_d1_cache_interactor(
     tasks::base_foraging_task* const task) {
   auto* interactor = dynamic_cast<events::existing_cache_interactor*>(task);
   std::string task_name = dynamic_cast<cta::logical_task*>(task)->name();
-  ER_ASSERT(
-      nullptr != task,
-      "Non existing cache interactor task '%s' causing cached block pickup",
-      task_name.c_str());
+  ER_ASSERT(nullptr != task,
+            "Non existing cache interactor task '%s' causing cached block pickup",
+            task_name.c_str());
   interactor->accept(*this);
   ER_INFO("Picked up block%d from cache%d,task='%s'",
           block()->id().v(),
@@ -108,7 +107,7 @@ bool robot_cached_block_pickup::dispatch_d2_cache_interactor(
             rcppsw::to_string(mc_cache->dcenter2D()).c_str(),
             polled->name().c_str());
     csel_matrix->sel_exception_add(
-        {mc_cache->id(), controller::cognitive::cache_sel_exception::ekDROP});
+        { mc_cache->id(), controller::cognitive::cache_sel_exception::ekDROP });
     ret = true;
   }
   interactor->accept(*this);

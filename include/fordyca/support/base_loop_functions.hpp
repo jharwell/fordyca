@@ -123,13 +123,9 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
 
  protected:
   tv::tv_manager* tv_manager(void) { return m_tv_manager.get(); }
-  const config::loop_function_repository* config(void) const {
-    return &m_config;
-  }
+  const config::loop_function_repository* config(void) const { return &m_config; }
   config::loop_function_repository* config(void) { return &m_config; }
-  convergence_calculator_type* conv_calculator(void) {
-    return m_conv_calc.get();
-  }
+  convergence_calculator_type* conv_calculator(void) { return m_conv_calc.get(); }
   cforacle::foraging_oracle* oracle(void) { return m_oracle.get(); }
   carena::caching_arena_map* arena_map(void) RCPPSW_PURE;
   void config_parse(ticpp::Element& node) RCPPSW_COLD;
@@ -149,7 +145,8 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
    *
    * \param config Parsed convergence parameters.
    */
-  void convergence_init(const cconvconfig::convergence_config* config) RCPPSW_COLD;
+  void
+  convergence_init(const cconvconfig::convergence_config* config) RCPPSW_COLD;
 
   /**
    * \brief Initialize temporal variance handling.

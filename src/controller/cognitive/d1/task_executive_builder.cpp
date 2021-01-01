@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/arena/repr/light_type_index.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
@@ -34,7 +35,6 @@
 #include "cosm/ta/config/task_alloc_config.hpp"
 #include "cosm/ta/config/task_executive_config.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
-#include "cosm/arena/repr/light_type_index.hpp"
 
 #include "fordyca/config/d1/controller_repository.hpp"
 #include "fordyca/config/exploration_config.hpp"
@@ -84,24 +84,18 @@ task_executive_builder::tasking_map task_executive_builder::d1_tasks_create(
   fsm::expstrat::block_factory block_factory;
   fsm::expstrat::cache_factory cache_factory;
   auto cache_color = carepr::light_type_index()[carepr::light_type_index::kCache];
-  fsm::expstrat::foraging_expstrat::params expstrat_cachep(saa(),
-                                                           nullptr,
-                                                           mc_csel_matrix,
-                                                           m_perception->dpo_store(),
-                                                           cache_color);
-  fsm::expstrat::foraging_expstrat::params expstrat_blockp(saa(),
-                                                           nullptr,
-                                                           mc_csel_matrix,
-                                                           m_perception->dpo_store(),
-                                                           rutils::color());
+  fsm::expstrat::foraging_expstrat::params expstrat_cachep(
+      saa(), nullptr, mc_csel_matrix, m_perception->dpo_store(), cache_color);
+  fsm::expstrat::foraging_expstrat::params expstrat_blockp(
+      saa(), nullptr, mc_csel_matrix, m_perception->dpo_store(), rutils::color());
 
   ER_ASSERT(nullptr != mc_bsel_matrix, "NULL block selection matrix");
   ER_ASSERT(nullptr != mc_csel_matrix, "NULL cache selection matrix");
 
-  fsm::fsm_ro_params params = {.bsel_matrix = block_sel_matrix(),
-                               .csel_matrix = mc_csel_matrix,
-                               .store = m_perception->dpo_store(),
-                               .exp_config = *exp_config};
+  fsm::fsm_ro_params params = { .bsel_matrix = block_sel_matrix(),
+                                .csel_matrix = mc_csel_matrix,
+                                .store = m_perception->dpo_store(),
+                                .exp_config = *exp_config };
 
   auto generalist_fsm = std::make_unique<fsm::d0::free_block_to_nest_fsm>(
       &params,
@@ -115,20 +109,15 @@ task_executive_builder::tasking_map task_executive_builder::d1_tasks_create(
       rng);
 
   auto harvester_fsm =
-      std::make_unique<fsm::d1::block_to_existing_cache_fsm>(&params,
-                                                                 saa(),
-                                                                 rng);
+      std::make_unique<fsm::d1::block_to_existing_cache_fsm>(&params, saa(), rng);
 
-  auto collector =
-      std::make_unique<tasks::d1::collector>(task_config,
-                                                 std::move(collector_fsm));
+  auto collector = std::make_unique<tasks::d1::collector>(
+      task_config, std::move(collector_fsm));
 
-  auto harvester =
-      std::make_unique<tasks::d1::harvester>(task_config,
-                                                 std::move(harvester_fsm));
-  auto generalist =
-      std::make_unique<tasks::d0::generalist>(task_config,
-                                                  std::move(generalist_fsm));
+  auto harvester = std::make_unique<tasks::d1::harvester>(
+      task_config, std::move(harvester_fsm));
+  auto generalist = std::make_unique<tasks::d0::generalist>(
+      task_config, std::move(generalist_fsm));
   generalist->set_partitionable(true);
   generalist->set_atomic(false);
 
@@ -136,16 +125,14 @@ task_executive_builder::tasking_map task_executive_builder::d1_tasks_create(
   cta::ds::bi_tdgraph::vertex_vector children;
   children.push_back(std::move(harvester));
   children.push_back(std::move(collector));
-  graph->install_tab(tasks::d0::foraging_task::kGeneralistName,
-                     std::move(children),
-                     rng);
+  graph->install_tab(
+      tasks::d0::foraging_task::kGeneralistName, std::move(children), rng);
   return tasking_map{
-      {"generalist",
-       graph->find_vertex(tasks::d0::foraging_task::kGeneralistName)},
-      {"collector",
-       graph->find_vertex(tasks::d1::foraging_task::kCollectorName)},
-      {"harvester",
-       graph->find_vertex(tasks::d1::foraging_task::kHarvesterName)}};
+    { "generalist",
+      graph->find_vertex(tasks::d0::foraging_task::kGeneralistName) },
+    { "collector", graph->find_vertex(tasks::d1::foraging_task::kCollectorName) },
+    { "harvester", graph->find_vertex(tasks::d1::foraging_task::kHarvesterName) }
+  };
 } /* d1_tasks_create() */
 
 void task_executive_builder::d1_exec_est_init(
@@ -174,10 +161,8 @@ void task_executive_builder::d1_exec_est_init(
   rmath::rangeu g_bounds =
       task_config->exec_est.ranges.find("generalist")->second;
 
-  rmath::rangeu h_bounds =
-      task_config->exec_est.ranges.find("harvester")->second;
-  rmath::rangeu c_bounds =
-      task_config->exec_est.ranges.find("collector")->second;
+  rmath::rangeu h_bounds = task_config->exec_est.ranges.find("harvester")->second;
+  rmath::rangeu c_bounds = task_config->exec_est.ranges.find("collector")->second;
   ER_INFO("Seeding exec estimate for tasks: '%s'=%s '%s'=%s '%s'=%s",
           generalist->name().c_str(),
           g_bounds.to_str().c_str(),
@@ -190,10 +175,9 @@ void task_executive_builder::d1_exec_est_init(
   collector->exec_estimate_init(c_bounds, rng);
 } /* d1_exec_est_init() */
 
-void task_executive_builder::d1_subtasks_init(
-    const tasking_map& map,
-    cta::ds::bi_tdgraph* const graph,
-    rmath::rng* rng) {
+void task_executive_builder::d1_subtasks_init(const tasking_map& map,
+                                              cta::ds::bi_tdgraph* const graph,
+                                              rmath::rng* rng) {
   /*
    * Generalist is not partitionable in depth 0 initialization, so this has
    * not been done.

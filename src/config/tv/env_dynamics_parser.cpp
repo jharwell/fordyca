@@ -43,7 +43,8 @@ void env_dynamics_parser::parse(const ticpp::Element& node) {
   /* motion dynamics configured */
   if (nullptr != tvnode.FirstChild("motion_throttle", false)) {
     m_motion.parse(node_get(tvnode, "motion_throttle"));
-    auto config = m_motion.config_get<rct::config::xml::waveform_parser::config_type>();
+    auto config =
+        m_motion.config_get<rct::config::xml::waveform_parser::config_type>();
     m_config->rda.motion_throttle = *config;
   }
   /* block dynamics configured */

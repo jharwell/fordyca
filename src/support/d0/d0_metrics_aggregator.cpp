@@ -28,18 +28,18 @@
 #include "rcppsw/mpl/typelist.hpp"
 #include "rcppsw/utils/maskable_enum.hpp"
 
-#include "cosm/spatial/metrics/goal_acq_metrics.hpp"
-#include "cosm/spatial/metrics/movement_metrics.hpp"
 #include "cosm/metrics/collector_registerer.hpp"
 #include "cosm/repr/base_block3D.hpp"
+#include "cosm/spatial/metrics/goal_acq_metrics.hpp"
+#include "cosm/spatial/metrics/movement_metrics.hpp"
 
-#include "fordyca/controller/reactive/d0/crw_controller.hpp"
+#include "fordyca//controller/foraging_controller.hpp"
 #include "fordyca/controller/cognitive/d0/dpo_controller.hpp"
 #include "fordyca/controller/cognitive/d0/mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d0/odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d0/omdpo_controller.hpp"
-#include "fordyca//controller/foraging_controller.hpp"
 #include "fordyca/controller/cognitive/foraging_perception_subsystem.hpp"
+#include "fordyca/controller/reactive/d0/crw_controller.hpp"
 #include "fordyca/fsm/d0/crw_fsm.hpp"
 #include "fordyca/fsm/d0/dpo_fsm.hpp"
 #include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
@@ -69,14 +69,15 @@ d0_metrics_aggregator::d0_metrics_aggregator(
     : fordyca_metrics_aggregator(mconfig, gconfig, output_root, n_block_clusters),
       ER_CLIENT_INIT("fordyca.support.d0.d0_aggregator") {
   cmetrics::collector_registerer<>::creatable_set creatable_set = {
-      {typeid(metrics::perception::mdpo_perception_metrics_collector),
-       "perception_mdpo",
-       "perception::mdpo",
-       rmetrics::output_mode::ekAPPEND},
-      {typeid(metrics::perception::dpo_perception_metrics_collector),
-       "perception_dpo",
-       "perception::dpo",
-       rmetrics::output_mode::ekAPPEND}};
+    { typeid(metrics::perception::mdpo_perception_metrics_collector),
+      "perception_mdpo",
+      "perception::mdpo",
+      rmetrics::output_mode::ekAPPEND },
+    { typeid(metrics::perception::dpo_perception_metrics_collector),
+      "perception_dpo",
+      "perception::dpo",
+      rmetrics::output_mode::ekAPPEND }
+  };
 
   cmetrics::collector_registerer<> registerer(mconfig, creatable_set, this);
   boost::mpl::for_each<detail::collector_typelist>(registerer);
@@ -88,8 +89,7 @@ d0_metrics_aggregator::d0_metrics_aggregator(
  * Member Functions
  ******************************************************************************/
 template <class T>
-void d0_metrics_aggregator::collect_from_controller(
-    const T* const controller) {
+void d0_metrics_aggregator::collect_from_controller(const T* const controller) {
   base_metrics_aggregator::collect_from_controller(controller);
 
   /*
@@ -98,6 +98,7 @@ void d0_metrics_aggregator::collect_from_controller(
   collect("spatial::movement", *controller);
   collect("fsm::interference_counts", *controller->fsm());
   collect("blocks::acq_counts", *controller);
+  collect("blocks::transporter", *controller);
   collect("blocks::manipulation", *controller->block_manip_recorder());
 
   collect_if("fsm::interference_locs2D",

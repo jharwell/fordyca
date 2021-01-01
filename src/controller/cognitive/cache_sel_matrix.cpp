@@ -46,8 +46,7 @@ cache_sel_matrix::cache_sel_matrix(
   this->insert(std::make_pair(kSiteYRange, config->site_yrange));
   this->insert(
       std::make_pair(kPickupExceptions, std::vector<rtypes::type_uuid>()));
-  this->insert(
-      std::make_pair(kDropExceptions, std::vector<rtypes::type_uuid>()));
+  this->insert(std::make_pair(kDropExceptions, std::vector<rtypes::type_uuid>()));
   this->insert(std::make_pair(kPickupPolicy, config->pickup_policy));
   this->insert(std::make_pair(kStrictConstraints, config->strict_constraints));
 }

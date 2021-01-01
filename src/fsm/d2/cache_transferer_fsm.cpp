@@ -44,10 +44,10 @@ cache_transferer_fsm::cache_transferer_fsm(
       m_dest_cache_fsm(c_params, saa, exp_behavior->clone(), rng, false) {}
 
 /*******************************************************************************
- * FSM Metrics
+ * Block Acquisition Metrics
  ******************************************************************************/
-csmetrics::goal_acq_metrics::goal_type cache_transferer_fsm::acquisition_goal(
-    void) const {
+csmetrics::goal_acq_metrics::goal_type
+cache_transferer_fsm::acquisition_goal(void) const {
   if (ekST_START != current_state() && ekST_FINISHED != current_state()) {
     return fsm::to_goal_type(foraging_acq_goal::ekEXISTING_CACHE);
   }

@@ -89,6 +89,7 @@ class harvester final : public foraging_task,
   RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal,
                             block_transport_goal,
                             const);
+  bool is_phototaxiing_to_goal(void) const override { return false; }
 
   /* task metrics */
   bool task_at_interface(void) const override RCPPSW_PURE;

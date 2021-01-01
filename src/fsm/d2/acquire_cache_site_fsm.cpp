@@ -74,8 +74,9 @@ acquire_cache_site_fsm::acquire_cache_site_fsm(
                             this)),
               RCPPSW_STRUCT_DOT_INITIALIZER(
                   goal_valid_cb,
-                  [](const rmath::vector2d&,
-                     const rtypes::type_uuid&) noexcept { return true; })}),
+                  [](const rmath::vector2d&, const rtypes::type_uuid&) noexcept {
+                    return true;
+                  }) }),
       mc_matrix(c_params->csel_matrix),
       mc_store(c_params->store) {}
 
@@ -92,12 +93,11 @@ bool acquire_cache_site_fsm::site_exploration_term_cb(void) const {
   return false;
 } /* site_exploration_term_cb() */
 
-boost::optional<csfsm::acquire_goal_fsm::candidate_type> acquire_cache_site_fsm::
-    site_select(void) {
+boost::optional<csfsm::acquire_goal_fsm::candidate_type>
+acquire_cache_site_fsm::site_select(void) {
   auto selector = cache_site_selector(mc_matrix);
-  if (auto best = selector(mc_store->caches(),
-                           saa()->sensing()->rpos2D(),
-                           rng())) {
+  if (auto best =
+          selector(mc_store->caches(), saa()->sensing()->rpos2D(), rng())) {
     ER_INFO("Select cache site@%s for acquisition", best->to_str().c_str());
     m_sel_success = true;
     m_sel_exec = true;
@@ -112,8 +112,8 @@ boost::optional<csfsm::acquire_goal_fsm::candidate_type> acquire_cache_site_fsm:
   }
 } /* site_select() */
 
-csmetrics::goal_acq_metrics::goal_type acquire_cache_site_fsm::
-    acquisition_goal_internal(void) const {
+csmetrics::goal_acq_metrics::goal_type
+acquire_cache_site_fsm::acquisition_goal_internal(void) const {
   return fsm::to_goal_type(foraging_acq_goal::ekCACHE_SITE);
 } /* acquisition_goal_internal() */
 

@@ -43,9 +43,9 @@ block_selector::block_selector(const block_sel_matrix* const sel_matrix)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-const crepr::base_block3D* block_selector::operator()(
-    const ds::dp_block_map& blocks,
-    const rmath::vector2d& position) {
+const crepr::base_block3D*
+block_selector::operator()(const ds::dp_block_map& blocks,
+                           const rmath::vector2d& position) {
   double max_utility = 0.0;
   const crepr::base_block3D* best = nullptr;
 
@@ -66,9 +66,8 @@ const crepr::base_block3D* block_selector::operator()(
     rmath::vector2d nest_loc =
         boost::get<rmath::vector2d>(mc_matrix->find(bselm::kNestLoc)->second);
 
-    double utility =
-        math::block_utility(b.ent()->ranchor2D(),
-                            nest_loc)(position, b.density(), priority);
+    double utility = math::block_utility(b.ent()->ranchor2D(), nest_loc)(
+        position, b.density(), priority);
 
     ER_DEBUG("Utility for block%d@%s/%s, density=%f: %f",
              b.ent()->id().v(),
@@ -89,8 +88,7 @@ const crepr::base_block3D* block_selector::operator()(
             rcppsw::to_string(best->danchor2D()).c_str(),
             max_utility);
 
-  ER_CHECKW(nullptr != best,
-            "No best block found: all known blocks excluded!");
+  ER_CHECKW(nullptr != best, "No best block found: all known blocks excluded!");
   return best;
 } /* operator() */
 

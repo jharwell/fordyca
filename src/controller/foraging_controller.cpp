@@ -120,8 +120,8 @@ void foraging_controller::output_init(const cmconfig::output_config* outputp) {
   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.fsm"), dir + "/fsm.log");
   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.controller.saa"),
                  dir + "/saa.log");
-  ER_LOGFILE_SET(log4cxx::Logger::getLogger(
-                     "fordyca.controller.explore_behavior"),
+  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.controller.explore_"
+                                            "behavior"),
                  dir + "/saa.log");
 #endif
 } /* output_init() */
@@ -165,13 +165,14 @@ void foraging_controller::saa_init(
           saa_names::diff_steering_saa));
 
   auto sensors = csubsystem::sensing_subsystemQ3D::sensor_map{
-      csubsystem::sensing_subsystemQ3D::map_entry_create(rabs),
-      csubsystem::sensing_subsystemQ3D::map_entry_create(battery),
-      csubsystem::sensing_subsystemQ3D::map_entry_create(proximity),
-      csubsystem::sensing_subsystemQ3D::map_entry_create(blobs),
-      csubsystem::sensing_subsystemQ3D::map_entry_create(light),
-      csubsystem::sensing_subsystemQ3D::map_entry_create(ground),
-      csubsystem::sensing_subsystemQ3D::map_entry_create(diff_drives)};
+    csubsystem::sensing_subsystemQ3D::map_entry_create(rabs),
+    csubsystem::sensing_subsystemQ3D::map_entry_create(battery),
+    csubsystem::sensing_subsystemQ3D::map_entry_create(proximity),
+    csubsystem::sensing_subsystemQ3D::map_entry_create(blobs),
+    csubsystem::sensing_subsystemQ3D::map_entry_create(light),
+    csubsystem::sensing_subsystemQ3D::map_entry_create(ground),
+    csubsystem::sensing_subsystemQ3D::map_entry_create(diff_drives)
+  };
 
   auto diff_drivea = ckin2D::governed_diff_drive(
       &actuation_p->diff_drive,
@@ -196,15 +197,16 @@ void foraging_controller::saa_init(
 #endif /* FORDYCA_WITH_ROBOT_RABS */
 
   auto actuators = csubsystem::actuation_subsystem2D::actuator_map{
-      /*
+    /*
      * We put the governed differential drive in the actuator map twice because
      * some of the reusable components use the base class differential drive
      * instead of the governed version (no robust way to inform that we want to
      * use the governed version).
      */
-      csubsystem::actuation_subsystem2D::map_entry_create(diff_drivea),
-      csubsystem::actuation_subsystem2D::map_entry_create(leds),
-      csubsystem::actuation_subsystem2D::map_entry_create(raba)};
+    csubsystem::actuation_subsystem2D::map_entry_create(diff_drivea),
+    csubsystem::actuation_subsystem2D::map_entry_create(leds),
+    csubsystem::actuation_subsystem2D::map_entry_create(raba)
+  };
 
   base_controller2D::saa(std::make_unique<crfootbot::footbot_saa_subsystem>(
       position, sensors, actuators, &actuation_p->steering));
@@ -230,11 +232,10 @@ void foraging_controller::irv_init(const ctv::robot_dynamics_applicator* rda) {
 } /* irv_init() */
 
 class crfootbot::footbot_saa_subsystem* foraging_controller::saa(void) {
-  return static_cast<crfootbot::footbot_saa_subsystem*>(
-      base_controller2D::saa());
+  return static_cast<crfootbot::footbot_saa_subsystem*>(base_controller2D::saa());
 }
-const class crfootbot::footbot_saa_subsystem* foraging_controller::saa(
-    void) const {
+const class crfootbot::footbot_saa_subsystem*
+foraging_controller::saa(void) const {
   return static_cast<const crfootbot::footbot_saa_subsystem*>(
       base_controller2D::saa());
 }

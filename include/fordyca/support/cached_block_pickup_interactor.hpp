@@ -77,8 +77,8 @@ class cached_block_pickup_interactor
 
   /* Not copy-constructible/assignable by default. */
   cached_block_pickup_interactor(const cached_block_pickup_interactor&) = delete;
-  cached_block_pickup_interactor& operator=(
-      const cached_block_pickup_interactor&) = delete;
+  cached_block_pickup_interactor&
+  operator=(const cached_block_pickup_interactor&) = delete;
 
   /**
    * \brief The actual handling function for interactions.
@@ -86,7 +86,8 @@ class cached_block_pickup_interactor
    * \param controller The controller to handle interactions for.
    * \param t   The current timestepp.
    */
-  interactor_status operator()(TController& controller, const rtypes::timestep& t) {
+  interactor_status operator()(TController& controller,
+                               const rtypes::timestep& t) {
     interactor_status status = interactor_status::ekNO_EVENT;
     if (m_penalty_handler->is_serving_penalty(controller)) {
       if (m_penalty_handler->is_penalty_satisfied(controller, t)) {
@@ -95,9 +96,8 @@ class cached_block_pickup_interactor
         ER_ASSERT(post_process_check(controller), "Post-pickup check failed");
       }
     } else {
-      m_penalty_handler->penalty_init(controller,
-                                      tv::cache_op_src::ekEXISTING_CACHE_PICKUP,
-                                      t);
+      m_penalty_handler->penalty_init(
+          controller, tv::cache_op_src::ekEXISTING_CACHE_PICKUP, t);
     }
     return status;
   }
@@ -199,10 +199,10 @@ class cached_block_pickup_interactor
    * No need to lock arena map cache mutex--already holding it from parent
    * function.
    */
-  interactor_status execute_cached_block_pickup(
-      TController& controller,
-      const ctv::temporal_penalty& penalty,
-      const rtypes::timestep& t) {
+  interactor_status
+  execute_cached_block_pickup(TController& controller,
+                              const ctv::temporal_penalty& penalty,
+                              const rtypes::timestep& t) {
     auto real_it =
         std::find_if(m_map->caches().begin(),
                      m_map->caches().end(),
@@ -220,11 +220,8 @@ class cached_block_pickup_interactor
      */
     crepr::base_block3D* to_pickup = (*real_it)->block_select(m_loop->rng());
 
-    caops::cached_block_pickup_visitor arena_pickup(*real_it,
-                                                    to_pickup,
-                                                    m_loop,
-                                                    controller.entity_id(),
-                                                    t);
+    caops::cached_block_pickup_visitor arena_pickup(
+        *real_it, to_pickup, m_loop, controller.entity_id(), t);
     (*real_it)->penalty_served(penalty.penalty());
     controller.block_manip_recorder()->record(
         metrics::blocks::block_manip_events::ekCACHE_PICKUP, penalty.penalty());
@@ -248,10 +245,8 @@ class cached_block_pickup_interactor
       ER_ASSERT(zombie_it != m_map->zombie_caches().end(),
                 "Depleted cache%d is not a zombie?",
                 penalty.id().v());
-      events::robot_cached_block_pickup_visitor robot_zombie_pickup(zombie_it->get(),
-                                                                    to_pickup,
-                                                                    controller.entity_id(),
-                                                                    t);
+      events::robot_cached_block_pickup_visitor robot_zombie_pickup(
+          zombie_it->get(), to_pickup, controller.entity_id(), t);
 
       /* 2nd, visit the controller (depletion case) */
       robot_zombie_pickup.visit(controller);
@@ -265,10 +260,8 @@ class cached_block_pickup_interactor
       m_cache_manager->cache_depleted(t - (*zombie_it)->creation_ts());
       return interactor_status::ekCACHE_DEPLETION;
     } else {
-      events::robot_cached_block_pickup_visitor robot_real_pickup(*real_it,
-                                                                  to_pickup,
-                                                                  controller.entity_id(),
-                                                                  t);
+      events::robot_cached_block_pickup_visitor robot_real_pickup(
+          *real_it, to_pickup, controller.entity_id(), t);
 
       /* 2nd, visit the controller (normal case) */
       robot_real_pickup.visit(controller);
@@ -282,37 +275,38 @@ class cached_block_pickup_interactor
               "Out of order cache penalty handling");
     auto* task = dynamic_cast<const events::existing_cache_interactor*>(
         controller.current_task());
-    RCPPSW_UNUSED auto* polled = dynamic_cast<const cta::polled_task*>(
-        controller.current_task());
+    RCPPSW_UNUSED auto* polled =
+        dynamic_cast<const cta::polled_task*>(controller.current_task());
     ER_CHECK(nullptr != task,
-              "Non-cache interface task '%s'!",
-              polled->name().c_str());
+             "Non-cache interface task '%s'!",
+             polled->name().c_str());
     ER_CHECK(fsm::foraging_acq_goal::ekEXISTING_CACHE ==
-                  controller.current_task()->acquisition_goal(),
-              "Controller%d@%s/%s not waiting for cached block pickup",
-              controller.entity_id().v(),
-              rcppsw::to_string(controller.rpos2D()).c_str(),
-              rcppsw::to_string(controller.dpos2D()).c_str());
+                 controller.current_task()->acquisition_goal(),
+             "Controller%d@%s/%s not waiting for cached block pickup",
+             controller.entity_id().v(),
+             rcppsw::to_string(controller.rpos2D()).c_str(),
+             rcppsw::to_string(controller.dpos2D()).c_str());
     ER_CHECK(!controller.is_carrying_block(),
-              "Controller%d@%s/%s is already carrying block%d",
-              controller.entity_id().v(),
-              rcppsw::to_string(controller.rpos2D()).c_str(),
-              rcppsw::to_string(controller.dpos2D()).c_str(),
-              controller.block()->id().v());
+             "Controller%d@%s/%s is already carrying block%d",
+             controller.entity_id().v(),
+             rcppsw::to_string(controller.rpos2D()).c_str(),
+             rcppsw::to_string(controller.dpos2D()).c_str(),
+             controller.block()->id().v());
 
     return true;
 
- error:
+  error:
     return false;
   }
 
-bool post_process_check(const TController& controller) const {
+  bool post_process_check(const TController& controller) const {
     ER_CHECK(!m_penalty_handler->is_serving_penalty(controller),
-              "Multiple instances of same controller serving cached block pickup penalty");
+             "Multiple instances of same controller serving cached block "
+             "pickup penalty");
 
     return true;
 
- error:
+  error:
     return false;
   }
 

@@ -76,6 +76,7 @@ class generalist final : public foraging_task {
   RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal,
                             block_transport_goal,
                             const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, is_phototaxiing_to_goal, const);
 
   /* task metrics */
   bool task_at_interface(void) const override { return false; }

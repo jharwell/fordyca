@@ -26,11 +26,12 @@
  ******************************************************************************/
 #include "rcppsw/er/client.hpp"
 
-#include "cosm/spatial/metrics/goal_acq_metrics.hpp"
-#include "cosm/spatial/fsm/util_hfsm.hpp"
-#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
-#include "cosm/ta/taskable.hpp"
 #include "cosm/fsm/block_transporter.hpp"
+#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
+#include "cosm/spatial/fsm/util_hfsm.hpp"
+#include "cosm/spatial/metrics/goal_acq_metrics.hpp"
+#include "cosm/ta/taskable.hpp"
+#include "cosm/fsm/metrics/block_transporter_metrics.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/foraging_transport_goal.hpp"
@@ -60,11 +61,13 @@ class acquire_free_block_fsm;
  * or via random exploration), pickup the block and bring it to its chosen
  * goal. Once it has done that it will signal that its task is complete.
  */
-class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
-                          public csfsm::util_hfsm,
-                          public cta::taskable,
-                          public csmetrics::goal_acq_metrics,
-                          public cfsm::block_transporter<foraging_transport_goal> {
+class block_to_goal_fsm
+    : public rer::client<block_to_goal_fsm>,
+      public csfsm::util_hfsm,
+      public cta::taskable,
+      public csmetrics::goal_acq_metrics,
+      public cfsm::block_transporter<foraging_transport_goal>,
+      public cfsm::metrics::block_transporter_metrics {
  public:
   block_to_goal_fsm(csfsm::acquire_goal_fsm* goal_fsm,
                     csfsm::acquire_goal_fsm* block_fsm,
@@ -90,8 +93,7 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
   bool exp_interference(void) const override final RCPPSW_PURE;
   bool entered_interference(void) const override final RCPPSW_PURE;
   bool exited_interference(void) const override final RCPPSW_PURE;
-  rtypes::timestep interference_duration(
-      void) const override final RCPPSW_PURE;
+  rtypes::timestep interference_duration(void) const override final RCPPSW_PURE;
   rmath::vector3z interference_loc3D(void) const override final RCPPSW_PURE;
 
   /* goal acquisition metrics */
@@ -148,9 +150,13 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
   /* block to goal states */
   RCPPSW_HFSM_STATE_DECLARE(block_to_goal_fsm, start, rpfsm::event_data);
   RCPPSW_HFSM_STATE_DECLARE_ND(block_to_goal_fsm, acquire_block);
-  RCPPSW_HFSM_STATE_DECLARE(block_to_goal_fsm, wait_for_block_pickup, rpfsm::event_data);
+  RCPPSW_HFSM_STATE_DECLARE(block_to_goal_fsm,
+                            wait_for_block_pickup,
+                            rpfsm::event_data);
   RCPPSW_HFSM_STATE_DECLARE_ND(block_to_goal_fsm, transport_to_goal);
-  RCPPSW_HFSM_STATE_DECLARE(block_to_goal_fsm, wait_for_block_drop, rpfsm::event_data);
+  RCPPSW_HFSM_STATE_DECLARE(block_to_goal_fsm,
+                            wait_for_block_drop,
+                            rpfsm::event_data);
   RCPPSW_HFSM_STATE_DECLARE_ND(block_to_goal_fsm, finished);
 
   /**

@@ -38,7 +38,7 @@ install_sys_pkgs="YES"
 prefix=$HOME/.local
 n_cores=$(nproc)
 build_type="DEV"
-options=$(getopt -o h --long prefix:,rroot:,cores:,nosyspkgs,opt  -n "BOOTSTRAP" -- "$@")
+options=$(getopt -o h --long help,prefix:,rroot:,cores:,nosyspkgs,opt  -n "BOOTSTRAP" -- "$@")
 if [ $? != 0 ]; then usage; exit 1; fi
 
 eval set -- "$options"

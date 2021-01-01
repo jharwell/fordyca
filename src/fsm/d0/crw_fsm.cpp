@@ -26,8 +26,8 @@
 #include "cosm/robots/footbot/footbot_actuation_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
-
 #include "cosm/spatial/expstrat/base_expstrat.hpp"
+
 #include "fordyca/fsm/foraging_signal.hpp"
 
 /*******************************************************************************
@@ -50,25 +50,26 @@ crw_fsm::crw_fsm(crfootbot::footbot_saa_subsystem* const saa,
       RCPPSW_HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
       RCPPSW_HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
       RCPPSW_HFSM_CONSTRUCT_STATE(wait_for_block_drop, hfsm::top_state()),
-      RCPPSW_HFSM_DEFINE_STATE_MAP(mc_state_map,
-                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&start),
-                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
-                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
-                                                        nullptr,
-                                                        &entry_transport_to_nest,
-                                                        &exit_transport_to_nest),
-                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest,
-                                                        nullptr,
-                                                        &entry_leaving_nest,
-                                                        nullptr),
-                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
-                                                        nullptr,
-                                                        &entry_wait_for_signal,
-                                                        nullptr),
-                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_drop,
-                                                        nullptr,
-                                                        &entry_wait_for_signal,
-                                                        nullptr)),
+      RCPPSW_HFSM_DEFINE_STATE_MAP(
+          mc_state_map,
+          RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&start),
+          RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
+          RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
+                                             nullptr,
+                                             &entry_transport_to_nest,
+                                             &exit_transport_to_nest),
+          RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest,
+                                             nullptr,
+                                             &entry_leaving_nest,
+                                             nullptr),
+          RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
+                                             nullptr,
+                                             &entry_wait_for_signal,
+                                             nullptr),
+          RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_drop,
+                                             nullptr,
+                                             &entry_wait_for_signal,
+                                             nullptr)),
       mc_nest_loc(nest_loc),
       m_explore_fsm(saa,
                     std::move(exp_behavior),
@@ -108,7 +109,9 @@ RCPPSW_HFSM_STATE_DEFINE_ND(crw_fsm, acquire_block) {
   return fsm::foraging_signal::ekHANDLED;
 }
 
-RCPPSW_HFSM_STATE_DEFINE(crw_fsm, wait_for_block_pickup, rpfsm::event_data* data) {
+RCPPSW_HFSM_STATE_DEFINE(crw_fsm,
+                         wait_for_block_pickup,
+                         rpfsm::event_data* data) {
   if (fsm::foraging_signal::ekBLOCK_PICKUP == data->signal()) {
     m_explore_fsm.task_reset();
     ER_INFO("Block pickup signal received");
@@ -132,12 +135,12 @@ RCPPSW_HFSM_STATE_DEFINE(crw_fsm, wait_for_block_drop, rpfsm::event_data* data) 
 }
 
 /*******************************************************************************
- * Metrics
+ * Goal Acquisition Metrics
  ******************************************************************************/
 crw_fsm::exp_status crw_fsm::is_exploring_for_goal(void) const {
-  return exp_status{ekST_ACQUIRE_BLOCK == current_state() ||
-        ekST_LEAVING_NEST == current_state(),
-        true};
+  return exp_status{ ekST_ACQUIRE_BLOCK == current_state() ||
+                         ekST_LEAVING_NEST == current_state(),
+                     true };
 } /* is_exploring_for_goal() */
 
 bool crw_fsm::goal_acquired(void) const {
@@ -168,6 +171,13 @@ rtypes::type_uuid crw_fsm::entity_acquired_id(void) const {
 } /* entity_acquired_id() */
 
 /*******************************************************************************
+ * Block Transport Metrics
+ ******************************************************************************/
+bool crw_fsm::is_phototaxiing_to_goal(void) const {
+  return (foraging_transport_goal::ekNEST == block_transport_goal());
+} /* is_phototaxiing_to_goal() */
+
+/*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
 bool crw_fsm::exp_interference(void) const {
@@ -176,14 +186,12 @@ bool crw_fsm::exp_interference(void) const {
 } /* exp_interference() */
 
 bool crw_fsm::entered_interference(void) const {
-  return (m_explore_fsm.task_running() &&
-          m_explore_fsm.entered_interference()) ||
+  return (m_explore_fsm.task_running() && m_explore_fsm.entered_interference()) ||
          csfsm::util_hfsm::entered_interference();
 } /* entered_interference() */
 
 bool crw_fsm::exited_interference(void) const {
-  return (m_explore_fsm.task_running() &&
-          m_explore_fsm.exited_interference()) ||
+  return (m_explore_fsm.task_running() && m_explore_fsm.exited_interference()) ||
          csfsm::util_hfsm::exited_interference();
 } /* exited_interference() */
 
@@ -209,7 +217,7 @@ void crw_fsm::init(void) {
 
 void crw_fsm::run(void) {
   m_task_finished = false;
-  if (event_data_hold()) {
+  if (event_data_hold() && (nullptr != event_data())) {
     auto* data = event_data();
     data->signal(fsm::foraging_signal::ekRUN);
     data->type(rpfsm::event_type::ekNORMAL);
@@ -220,8 +228,8 @@ void crw_fsm::run(void) {
 } /* run() */
 
 bool crw_fsm::block_detected(void) const {
-  return saa()->sensing()->sensor<chal::sensors::ground_sensor>()->detect(
-      "block");
+  return saa()->sensing()->sensor<chal::sensors::ground_sensor>()->detect("bloc"
+                                                                          "k");
 } /* block_detected() */
 
 foraging_transport_goal crw_fsm::block_transport_goal(void) const {

@@ -85,6 +85,7 @@ class cache_starter final : public foraging_task,
   RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal,
                             block_transport_goal,
                             const);
+  bool is_phototaxiing_to_goal(void) const override { return false; }
 
   /* site selection metrics overrides */
   RCPPSW_WRAP_OVERRIDE_DECL(bool, site_select_exec, const);

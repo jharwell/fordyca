@@ -26,8 +26,9 @@
  ******************************************************************************/
 #include <memory>
 
-#include "fordyca//controller/foraging_controller.hpp"
 #include "rcppsw/patterns/fsm/base_fsm.hpp"
+
+#include "fordyca//controller/foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -76,6 +77,7 @@ class crw_controller : public foraging_controller,
   RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal,
                             block_transport_goal,
                             const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, is_phototaxiing_to_goal, const);
 
   const fsm::d0::crw_fsm* fsm(void) const { return m_fsm.get(); }
   fsm::d0::crw_fsm* fsm(void) { return m_fsm.get(); }

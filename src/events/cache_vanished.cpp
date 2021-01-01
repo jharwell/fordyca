@@ -57,17 +57,17 @@ void cache_vanished::dispatch_cache_interactor(
   ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", mc_cache_id.v());
 
   auto* interactor = dynamic_cast<events::existing_cache_interactor*>(task);
-  ER_ASSERT(
-      nullptr != interactor,
-      "Non existing cache interactor task %s received cache vanished event",
-      dynamic_cast<cta::logical_task*>(task)->name().c_str());
+  ER_ASSERT(nullptr != interactor,
+            "Non existing cache interactor task %s received cache vanished event",
+            dynamic_cast<cta::logical_task*>(task)->name().c_str());
   interactor->accept(*this);
 } /* dispatch_cache_interactor() */
 
 /*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
-void cache_vanished::visit(controller::cognitive::d1::bitd_dpo_controller& controller) {
+void cache_vanished::visit(
+    controller::cognitive::d1::bitd_dpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_cache_interactor(controller.current_task());
@@ -75,7 +75,8 @@ void cache_vanished::visit(controller::cognitive::d1::bitd_dpo_controller& contr
   controller.ndc_pop();
 } /* visit() */
 
-void cache_vanished::visit(controller::cognitive::d1::bitd_mdpo_controller& controller) {
+void cache_vanished::visit(
+    controller::cognitive::d1::bitd_mdpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_cache_interactor(controller.current_task());
@@ -83,7 +84,8 @@ void cache_vanished::visit(controller::cognitive::d1::bitd_mdpo_controller& cont
   controller.ndc_pop();
 } /* visit() */
 
-void cache_vanished::visit(controller::cognitive::d1::bitd_odpo_controller& controller) {
+void cache_vanished::visit(
+    controller::cognitive::d1::bitd_odpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_cache_interactor(controller.current_task());
@@ -91,7 +93,8 @@ void cache_vanished::visit(controller::cognitive::d1::bitd_odpo_controller& cont
   controller.ndc_pop();
 } /* visit() */
 
-void cache_vanished::visit(controller::cognitive::d1::bitd_omdpo_controller& controller) {
+void cache_vanished::visit(
+    controller::cognitive::d1::bitd_omdpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_cache_interactor(controller.current_task());
@@ -120,7 +123,8 @@ void cache_vanished::visit(fsm::block_to_goal_fsm& fsm) {
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void cache_vanished::visit(controller::cognitive::d2::birtd_dpo_controller& controller) {
+void cache_vanished::visit(
+    controller::cognitive::d2::birtd_dpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_cache_interactor(controller.current_task());
@@ -128,7 +132,8 @@ void cache_vanished::visit(controller::cognitive::d2::birtd_dpo_controller& cont
   controller.ndc_pop();
 } /* visit() */
 
-void cache_vanished::visit(controller::cognitive::d2::birtd_mdpo_controller& controller) {
+void cache_vanished::visit(
+    controller::cognitive::d2::birtd_mdpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_cache_interactor(controller.current_task());
@@ -136,7 +141,8 @@ void cache_vanished::visit(controller::cognitive::d2::birtd_mdpo_controller& con
   controller.ndc_pop();
 } /* visit() */
 
-void cache_vanished::visit(controller::cognitive::d2::birtd_odpo_controller& controller) {
+void cache_vanished::visit(
+    controller::cognitive::d2::birtd_odpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_cache_interactor(controller.current_task());

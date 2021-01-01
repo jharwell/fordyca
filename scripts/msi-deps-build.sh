@@ -6,7 +6,7 @@ usage() {
 Usage: $0 [--rroot <dir>] [--cores <n_cores>]
 
 --rroot <dir>: The root directory for all repos for the project. All github
-               repos will be cloned in here. Default=$HOME/research.
+               repos will be cloned in here. Default=$HOME/research/$MSIARCH.
 
 --cores: The # cores to use when compiling. Default=$(nproc).
 
@@ -24,8 +24,7 @@ if [ -z "${SWARMROOT}" ]; then
     . /home/gini/shared/swarm/bin/msi-env-setup.sh
 fi
 
-REPO_ROOT=$HOME/research
-install_sys_pkgs="YES"
+REPO_ROOT=$HOME/research/$MSIARCH
 N_CORES=$(nproc)
 options=$(getopt -o h --long rroot:,cores:,help  -n "DEPS BUILD" -- "$@")
 if [ $? != 0 ]; then usage; exit 1; fi
@@ -82,6 +81,7 @@ cmake -DCMAKE_BUILD_TYPE=Release \
       ../src
 
 make -j $N_CORES && make doc && make install
+ln -s $SWARMROOT/bin/argos3-$MSIARCH $SWARMROOT/$MSIARCH/bin/argos3
 
 cd ../..
 

@@ -85,19 +85,18 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
     return decoratee().access<Index>(i, j);
   }
   template <size_t Index>
-  const typename occupancy_grid::layer_value_type<Index>::value_type& access(
-      size_t i,
-      size_t j) const {
+  const typename occupancy_grid::layer_value_type<Index>::value_type&
+  access(size_t i, size_t j) const {
     return decoratee().access<Index>(i, j);
   }
   template <size_t Index>
-  typename occupancy_grid::layer_value_type<Index>::value_type& access(
-      const rmath::vector2z& d) {
+  typename occupancy_grid::layer_value_type<Index>::value_type&
+  access(const rmath::vector2z& d) {
     return decoratee().access<Index>(d);
   }
   template <size_t Index>
-  const typename occupancy_grid::layer_value_type<Index>::value_type& access(
-      const rmath::vector2z& d) const {
+  const typename occupancy_grid::layer_value_type<Index>::value_type&
+  access(const rmath::vector2z& d) const {
     return decoratee().access<Index>(d);
   }
 

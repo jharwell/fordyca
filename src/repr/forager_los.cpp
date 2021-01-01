@@ -42,12 +42,13 @@ cds::block3D_vectorno forager_los::blocks(void) const {
       const cds::cell2D& cell = access(i, j);
       if (cell.state_has_block() || cell.state_in_block_extent()) {
         ER_ASSERT(nullptr != cell.block3D(),
-                  "Cell@%s in HAS_BLOCK/BLOCK_EXTENT state, but does not have block",
+                  "Cell@%s in HAS_BLOCK/BLOCK_EXTENT state, but does not have "
+                  "block",
                   rcppsw::to_string(cell.loc()).c_str());
         blocks.push_back(static_cast<crepr::base_block3D*>(cell.entity()));
       }
     } /* for(j..) */
-  }   /* for(i..) */
+  } /* for(i..) */
   return blocks;
 } /* blocks() */
 
@@ -59,10 +60,10 @@ cads::bcache_vectorno forager_los::caches(void) const {
       const cds::cell2D& cell = access(i, j);
       if (cell.state_has_cache() || cell.state_in_cache_extent()) {
         auto cache = cell.cache();
-        ER_ASSERT(
-            nullptr != cache,
-            "Cell@%s in HAS_CACHE/CACHE_EXTENT state, but does not have cache",
-            cell.loc().to_str().c_str());
+        ER_ASSERT(nullptr != cache,
+                  "Cell@%s in HAS_CACHE/CACHE_EXTENT state, but does not have "
+                  "cache",
+                  cell.loc().to_str().c_str());
         ER_ASSERT(cache->n_blocks() >= carepr::base_cache::kMinBlocks,
                   "Cache%d@%s/%s has too few blocks (%zu < %zu)",
                   cache->id().v(),
@@ -81,7 +82,7 @@ cads::bcache_vectorno forager_los::caches(void) const {
         }
       }
     } /* for(j..) */
-  }   /* for(i..) */
+  } /* for(i..) */
 
   return caches;
 } /* caches() */

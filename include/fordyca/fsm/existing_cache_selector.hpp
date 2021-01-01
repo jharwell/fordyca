@@ -37,7 +37,7 @@ NS_START(fordyca);
 
 namespace controller::cognitive {
 class cache_sel_matrix;
-} /* namespace controller */
+} // namespace controller::cognitive
 
 NS_START(fsm);
 
@@ -59,8 +59,8 @@ class existing_cache_selector : public rer::client<existing_cache_selector> {
                           const ds::dp_cache_map* cache_map);
 
   ~existing_cache_selector(void) override = default;
-  existing_cache_selector& operator=(const existing_cache_selector& other) =
-      delete;
+  existing_cache_selector&
+  operator=(const existing_cache_selector& other) = delete;
   existing_cache_selector(const existing_cache_selector&) = delete;
 
   /**

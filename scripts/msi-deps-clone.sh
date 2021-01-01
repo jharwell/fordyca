@@ -4,7 +4,8 @@ usage() {
 Usage: $0 [--rroot <dir>]
 
 --rroot <dir>: The root directory for all repos for the project. All github
-               repos will be cloned/built in here. Default=$HOME/research.
+               repos will be cloned/built in here.
+               Default=$HOME/research/$MSIARCH.
 
 -h|--help: Show this message.
 
@@ -20,7 +21,7 @@ if [ -z "${SWARMROOT}" ]; then
     . /home/gini/shared/swarm/bin/msi-env-setup.sh
 fi
 
-REPO_ROOT=$HOME/research
+REPO_ROOT=$HOME/research/$MSIARCH
 options=$(getopt -o h --long rroot:,help  -n "DEPS CLONE" -- "$@")
 if [ $? != 0 ]; then usage; exit 1; fi
 

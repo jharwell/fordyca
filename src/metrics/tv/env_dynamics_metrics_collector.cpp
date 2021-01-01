@@ -42,21 +42,22 @@ env_dynamics_metrics_collector::env_dynamics_metrics_collector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<std::string> env_dynamics_metrics_collector::csv_header_cols(
-    void) const {
+std::list<std::string>
+env_dynamics_metrics_collector::csv_header_cols(void) const {
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
-      /* clang-format off */
+    /* clang-format off */
       "swarm_motion_throttle",
       "block_manip_penalty",
       "cache_usage_penalty"
-      /* clang-format on */
+    /* clang-format on */
   };
   merged.splice(merged.end(), cols);
   return merged;
 } /* csv_header_cols() */
 
-boost::optional<std::string> env_dynamics_metrics_collector::csv_line_build(void) {
+boost::optional<std::string>
+env_dynamics_metrics_collector::csv_line_build(void) {
   std::string line;
   line += rcppsw::to_string(m_avg_motion_throttle) + separator();
   line += rcppsw::to_string(m_block_manip_penalty) + separator();

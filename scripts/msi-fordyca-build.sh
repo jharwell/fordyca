@@ -4,7 +4,7 @@ usage() {
 Usage: $0 [--rroot <dir>] [--cores <n_cores>]
 
 --rroot <dir>: The root directory for all repos for the project.
-               Default=$HOME/research.
+               Default=$HOME/research/$MSIARCH.
 
 --cores: The # cores to use when compiling. Default=$(nproc).
 
@@ -20,7 +20,7 @@ if [ -z "${SWARMROOT}" ]; then
     . /home/gini/shared/swarm/bin/msi-env-setup.sh
 fi
 
-REPO_ROOT=$HOME/research
+REPO_ROOT=$HOME/research/$MSIARCH
 N_CORES=$(nproc)
 options=$(getopt -o h --long rroot:,cores:,help  -n "FORDYCA BUILD" -- "$@")
 if [ $? != 0 ]; then usage; exit 1; fi

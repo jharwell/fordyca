@@ -35,19 +35,19 @@
 
 #include "cosm/arena/config/arena_map_config.hpp"
 #include "cosm/controller/operations/applicator.hpp"
+#include "cosm/foraging/block_dist/base_distributor.hpp"
+#include "cosm/foraging/metrics/block_transportee_metrics_collector.hpp"
 #include "cosm/foraging/oracle/foraging_oracle.hpp"
-#include "cosm/foraging/metrics/block_transport_metrics_collector.hpp"
 #include "cosm/interactors/applicator.hpp"
 #include "cosm/pal/argos_convergence_calculator.hpp"
 #include "cosm/pal/argos_swarm_iterator.hpp"
-#include "cosm/foraging/block_dist/base_distributor.hpp"
 
-#include "fordyca/controller/reactive/d0/crw_controller.hpp"
 #include "fordyca/controller/cognitive/d0/dpo_controller.hpp"
 #include "fordyca/controller/cognitive/d0/mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d0/odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d0/omdpo_controller.hpp"
 #include "fordyca/controller/cognitive/foraging_perception_subsystem.hpp"
+#include "fordyca/controller/reactive/d0/crw_controller.hpp"
 #include "fordyca/repr/forager_los.hpp"
 #include "fordyca/support/d0/d0_metrics_aggregator.hpp"
 #include "fordyca/support/d0/robot_arena_interactor.hpp"
@@ -76,7 +76,7 @@ NS_START(detail);
  */
 struct functor_maps_initializer {
   RCPPSW_COLD functor_maps_initializer(configurer_map_type* const cmap,
-                                     d0_loop_functions* const lf_in)
+                                       d0_loop_functions* const lf_in)
 
       : lf(lf_in), config_map(cmap) {}
   template <typename T>
@@ -88,10 +88,9 @@ struct functor_maps_initializer {
             lf->m_metrics_agg.get(),
             lf->floor(),
             lf->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>()));
-    lf->m_metrics_map->emplace(
-        typeid(controller),
-        ccops::metrics_extract<T, d0_metrics_aggregator>(
-            lf->m_metrics_agg.get()));
+    lf->m_metrics_map->emplace(typeid(controller),
+                               ccops::metrics_extract<T, d0_metrics_aggregator>(
+                                   lf->m_metrics_agg.get()));
     config_map->emplace(
         typeid(controller),
         robot_configurer<T>(
@@ -147,10 +146,11 @@ void d0_loop_functions::private_init(void) {
   /* initialize output and metrics collection */
   auto* output = config()->config_get<cmconfig::output_config>();
   auto* arena = config()->config_get<caconfig::arena_map_config>();
-  m_metrics_agg = std::make_unique<d0_metrics_aggregator>(&output->metrics,
-                                                              &arena->grid,
-                                                              output_root(),
-                                                              arena_map()->block_distributor()->block_clusters().size());
+  m_metrics_agg = std::make_unique<d0_metrics_aggregator>(
+      &output->metrics,
+      &arena->grid,
+      output_root(),
+      arena_map()->block_distributor()->block_clusters().size());
 
   /* this starts at 0, and ARGoS starts at 1, so sync up */
   m_metrics_agg->timestep_inc_all();
@@ -224,13 +224,15 @@ void d0_loop_functions::post_step(void) {
   ndc_push();
 
   auto* collector =
-      m_metrics_agg->get<cfmetrics::block_transport_metrics_collector>(
-          "blocks::transport");
+      m_metrics_agg->get<cfmetrics::block_transportee_metrics_collector>("blocks::"
+                                                                       "transpor"
+                                                                       "ter");
 
   /* update arena map */
-  arena_map()->post_step_update(rtypes::timestep(GetSpace().GetSimulationClock()),
-                                collector->cum_transported(),
-                                nullptr != conv_calculator() ? conv_calculator()->converged() : false);
+  arena_map()->post_step_update(
+      rtypes::timestep(GetSpace().GetSimulationClock()),
+      collector->cum_transported(),
+      nullptr != conv_calculator() ? conv_calculator()->converged() : false);
 
   /* Collect metrics from loop functions */
   m_metrics_agg->collect_from_loop(this);
@@ -303,14 +305,12 @@ void d0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
             controller->GetId().c_str(),
             controller->type_index().name());
 
-  auto iapplicator =
-      cinteractors::applicator<controller::foraging_controller,
-                               d0::robot_arena_interactor,
-                               carena::caching_arena_map>(
-          controller, rtypes::timestep(GetSpace().GetSimulationClock()));
-  auto status =
-      boost::apply_visitor(iapplicator,
-                           m_interactor_map->at(controller->type_index()));
+  auto iapplicator = cinteractors::applicator<controller::foraging_controller,
+                                              d0::robot_arena_interactor,
+                                              carena::caching_arena_map>(
+      controller, rtypes::timestep(GetSpace().GetSimulationClock()));
+  auto status = boost::apply_visitor(
+      iapplicator, m_interactor_map->at(controller->type_index()));
 
   /*
    * The oracle does not necessarily have up-to-date information about all

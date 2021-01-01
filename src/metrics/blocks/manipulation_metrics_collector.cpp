@@ -45,11 +45,11 @@ manipulation_metrics_collector::manipulation_metrics_collector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<std::string> manipulation_metrics_collector::csv_header_cols(
-    void) const {
+std::list<std::string>
+manipulation_metrics_collector::csv_header_cols(void) const {
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
-      /* clang-format off */
+    /* clang-format off */
     "int_avg_free_pickup_events",
     "int_avg_free_drop_events",
     "int_avg_free_pickup_penalty",
@@ -67,7 +67,7 @@ std::list<std::string> manipulation_metrics_collector::csv_header_cols(
     "cum_avg_cache_drop_events",
     "cum_avg_cache_pickup_penalty",
     "cum_avg_cache_drop_penalty"
-      /* clang-format on */
+    /* clang-format on */
   };
   merged.splice(merged.end(), cols);
   return merged;
@@ -78,7 +78,8 @@ void manipulation_metrics_collector::reset(void) {
   reset_after_interval();
 } /* reset() */
 
-boost::optional<std::string> manipulation_metrics_collector::csv_line_build(void) {
+boost::optional<std::string>
+manipulation_metrics_collector::csv_line_build(void) {
   if (!(timestep() % interval() == 0)) {
     return boost::none;
   }
@@ -88,16 +89,18 @@ boost::optional<std::string> manipulation_metrics_collector::csv_line_build(void
   line += csv_entry_intavg(m_interval[block_manip_events::ekFREE_PICKUP].events);
   line += csv_entry_intavg(m_interval[block_manip_events::ekFREE_DROP].events);
 
-  line += csv_entry_domavg(m_interval[block_manip_events::ekFREE_PICKUP].penalties,
-                           m_interval[block_manip_events::ekFREE_PICKUP].events);
+  line +=
+      csv_entry_domavg(m_interval[block_manip_events::ekFREE_PICKUP].penalties,
+                       m_interval[block_manip_events::ekFREE_PICKUP].events);
   line += csv_entry_domavg(m_interval[block_manip_events::ekFREE_DROP].penalties,
                            m_interval[block_manip_events::ekFREE_DROP].events);
 
   line += csv_entry_intavg(m_interval[block_manip_events::ekCACHE_PICKUP].events);
   line += csv_entry_intavg(m_interval[block_manip_events::ekCACHE_DROP].events);
 
-  line += csv_entry_domavg(m_interval[block_manip_events::ekCACHE_PICKUP].penalties,
-                           m_interval[block_manip_events::ekCACHE_PICKUP].events);
+  line +=
+      csv_entry_domavg(m_interval[block_manip_events::ekCACHE_PICKUP].penalties,
+                       m_interval[block_manip_events::ekCACHE_PICKUP].events);
   line += csv_entry_domavg(m_interval[block_manip_events::ekCACHE_DROP].penalties,
                            m_interval[block_manip_events::ekCACHE_DROP].events);
 

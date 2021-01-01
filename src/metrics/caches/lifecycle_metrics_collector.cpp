@@ -48,7 +48,7 @@ lifecycle_metrics_collector::lifecycle_metrics_collector(
 std::list<std::string> lifecycle_metrics_collector::csv_header_cols(void) const {
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
-      /* clang-format off */
+    /* clang-format off */
     "int_created",
     "int_depleted",
     "int_discarded",
@@ -62,7 +62,7 @@ std::list<std::string> lifecycle_metrics_collector::csv_header_cols(void) const 
     "cum_avg_depleted",
     "cum_avg_discarded",
     "cum_avg_depletion_age"
-      /* clang-format on */
+    /* clang-format on */
   };
   merged.splice(merged.end(), cols);
   return merged;
@@ -95,9 +95,8 @@ boost::optional<std::string> lifecycle_metrics_collector::csv_line_build(void) {
   line += csv_entry_tsavg(m_stats.cum_depleted);
   line += csv_entry_tsavg(m_stats.cum_discarded);
 
-  line += csv_entry_domavg(m_stats.cum_depletion_sum.v(),
-                           m_stats.cum_depleted,
-                           true);
+  line +=
+      csv_entry_domavg(m_stats.cum_depletion_sum.v(), m_stats.cum_depleted, true);
   return boost::make_optional(line);
 } /* csv_line_build() */
 

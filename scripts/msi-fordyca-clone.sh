@@ -4,7 +4,8 @@ usage() {
 Usage: $0 [--rroot <dir>] [--bbranch <branch>] [--fbranch <branch>]
 
 --rroot <dir>: The root directory for all repos for the project. All github
-               repos will be cloned/built in here. Default=$HOME/research.
+               repos will be cloned/built in here.
+               Default=$HOME/research/$MSIARCH.
 
 --bbranch: The branch to checkout in all repos except the FORDYCA
            one. Default=devel.
@@ -25,7 +26,7 @@ if [ -z "${SWARMROOT}" ]; then
     . /home/gini/shared/swarm/bin/msi-env-setup.sh
 fi
 
-REPO_ROOT=$HOME/research
+REPO_ROOT=$HOME/research/$MSIARCH
 BASE_BRANCH=devel
 FORDYCA_BRANCH=devel
 
@@ -86,12 +87,22 @@ mkdir -p build
 
 cd ..
 
+# Clone FORDYCA SIERRA plugin
+if [ -d sierra-plugin-fordyca ]; then rm -rf sierra-plugin-fordyca; fi
+git clone https://github.com/swarm-robotics/sierra-plugin-fordyca.git
+cd sierra-plugin-fordyca
+git checkout $BASE_BRANCH
+git submodule update --init --recursive --remote
+
+cd ..
+
 # Clone SIERRA
 if [ -d sierra ]; then rm -rf sierra; fi
 git clone https://github.com/swarm-robotics/sierra.git
 cd sierra
 git checkout $BASE_BRANCH
 git submodule update --init --recursive --remote
+ln -s ../../sierra-plugin-fordyca projects/fordyca
 
 cd ..
 

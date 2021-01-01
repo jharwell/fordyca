@@ -24,13 +24,13 @@
 #include "fordyca/controller/cognitive/d2/task_executive_builder.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/arena/repr/light_type_index.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/ta/bi_tdgraph_allocator.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/config/task_alloc_config.hpp"
 #include "cosm/ta/config/task_executive_config.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
-#include "cosm/arena/repr/light_type_index.hpp"
 
 #include "fordyca/config/d2/controller_repository.hpp"
 #include "fordyca/config/exploration_config.hpp"
@@ -78,48 +78,42 @@ task_executive_builder::tasking_map task_executive_builder::d2_tasks_create(
 
   fsm::expstrat::block_factory block_factory;
   fsm::expstrat::cache_factory cache_factory;
-  fsm::expstrat::foraging_expstrat::params expstrat_cachep(saa(),
-                                                           nullptr,
-                                                           cache_sel_matrix(),
-                                                           perception()->dpo_store(),
-                                                           cache_color);
-  fsm::expstrat::foraging_expstrat::params expstrat_blockp(saa(),
-                                                           nullptr,
-                                                           cache_sel_matrix(),
-                                                           perception()->dpo_store(),
-                                                           rutils::color());
+  fsm::expstrat::foraging_expstrat::params expstrat_cachep(
+      saa(), nullptr, cache_sel_matrix(), perception()->dpo_store(), cache_color);
+  fsm::expstrat::foraging_expstrat::params expstrat_blockp(
+      saa(),
+      nullptr,
+      cache_sel_matrix(),
+      perception()->dpo_store(),
+      rutils::color());
 
-  fsm::fsm_ro_params params = {.bsel_matrix = block_sel_matrix(),
-                               .csel_matrix = cache_sel_matrix(),
-                               .store = perception()->dpo_store(),
-                               .exp_config = *exp_config};
-  auto cache_starter_fsm =
-      std::make_unique<fsm::d2::block_to_cache_site_fsm>(
-          &params,
-          saa(),
-          block_factory.create(exp_config->block_strategy, &expstrat_blockp, rng),
-          rng);
+  fsm::fsm_ro_params params = { .bsel_matrix = block_sel_matrix(),
+                                .csel_matrix = cache_sel_matrix(),
+                                .store = perception()->dpo_store(),
+                                .exp_config = *exp_config };
+  auto cache_starter_fsm = std::make_unique<fsm::d2::block_to_cache_site_fsm>(
+      &params,
+      saa(),
+      block_factory.create(exp_config->block_strategy, &expstrat_blockp, rng),
+      rng);
 
-  auto cache_finisher_fsm =
-      std::make_unique<fsm::d2::block_to_new_cache_fsm>(
-          &params,
-          saa(),
-          block_factory.create(exp_config->block_strategy, &expstrat_blockp, rng),
-          rng);
+  auto cache_finisher_fsm = std::make_unique<fsm::d2::block_to_new_cache_fsm>(
+      &params,
+      saa(),
+      block_factory.create(exp_config->block_strategy, &expstrat_blockp, rng),
+      rng);
 
-  auto cache_transferer_fsm =
-      std::make_unique<fsm::d2::cache_transferer_fsm>(
-          &params,
-          saa(),
-          cache_factory.create(exp_config->cache_strategy, &expstrat_cachep, rng),
-          rng);
+  auto cache_transferer_fsm = std::make_unique<fsm::d2::cache_transferer_fsm>(
+      &params,
+      saa(),
+      cache_factory.create(exp_config->cache_strategy, &expstrat_cachep, rng),
+      rng);
 
-  auto cache_collector_fsm =
-      std::make_unique<fsm::d1::cached_block_to_nest_fsm>(
-          &params,
-          saa(),
-          cache_factory.create(exp_config->cache_strategy, &expstrat_cachep, rng),
-          rng);
+  auto cache_collector_fsm = std::make_unique<fsm::d1::cached_block_to_nest_fsm>(
+      &params,
+      saa(),
+      cache_factory.create(exp_config->cache_strategy, &expstrat_cachep, rng),
+      rng);
 
   auto cache_starter = std::make_unique<tasks::d2::cache_starter>(
       task_config, std::move(cache_starter_fsm));
@@ -130,10 +124,8 @@ task_executive_builder::tasking_map task_executive_builder::d2_tasks_create(
   auto cache_collector = std::make_unique<tasks::d2::cache_collector>(
       task_config, std::move(cache_collector_fsm));
 
-  auto collector =
-      graph->find_vertex(tasks::d1::foraging_task::kCollectorName);
-  auto harvester =
-      graph->find_vertex(tasks::d1::foraging_task::kHarvesterName);
+  auto collector = graph->find_vertex(tasks::d1::foraging_task::kCollectorName);
+  auto harvester = graph->find_vertex(tasks::d1::foraging_task::kHarvesterName);
 
   collector->set_partitionable(true);
   collector->set_atomic(false);
@@ -146,21 +138,20 @@ task_executive_builder::tasking_map task_executive_builder::d2_tasks_create(
   children2.push_back(std::move(cache_transferer));
   children2.push_back(std::move(cache_collector));
 
-  graph->install_tab(tasks::d1::foraging_task::kHarvesterName,
-                     std::move(children1),
-                     rng);
-  graph->install_tab(tasks::d1::foraging_task::kCollectorName,
-                     std::move(children2),
-                     rng);
+  graph->install_tab(
+      tasks::d1::foraging_task::kHarvesterName, std::move(children1), rng);
+  graph->install_tab(
+      tasks::d1::foraging_task::kCollectorName, std::move(children2), rng);
   return tasking_map{
-      {"cache_starter",
-       graph->find_vertex(tasks::d2::foraging_task::kCacheStarterName)},
-      {"cache_finisher",
-       graph->find_vertex(tasks::d2::foraging_task::kCacheFinisherName)},
-      {"cache_transferer",
-       graph->find_vertex(tasks::d2::foraging_task::kCacheTransfererName)},
-      {"cache_collector",
-       graph->find_vertex(tasks::d2::foraging_task::kCacheCollectorName)}};
+    { "cache_starter",
+      graph->find_vertex(tasks::d2::foraging_task::kCacheStarterName) },
+    { "cache_finisher",
+      graph->find_vertex(tasks::d2::foraging_task::kCacheFinisherName) },
+    { "cache_transferer",
+      graph->find_vertex(tasks::d2::foraging_task::kCacheTransfererName) },
+    { "cache_collector",
+      graph->find_vertex(tasks::d2::foraging_task::kCacheCollectorName) }
+  };
 } /* d2_tasks_create() */
 
 void task_executive_builder::d2_exec_est_init(
@@ -219,11 +210,9 @@ void task_executive_builder::d2_exec_est_init(
   cache_collector->exec_estimate_init(cc_bounds, rng);
 } /* d2_exec_est_init() */
 
-void task_executive_builder::d2_subtasks_init(
-    const tasking_map& map,
-    cta::ds::bi_tdgraph* graph,
-    rmath::rng* rng) {
-
+void task_executive_builder::d2_subtasks_init(const tasking_map& map,
+                                              cta::ds::bi_tdgraph* graph,
+                                              rmath::rng* rng) {
   auto cache_starter = map.find("cache_starter")->second;
   auto cache_finisher = map.find("cache_finisher")->second;
   auto cache_transferer = map.find("cache_transferer")->second;

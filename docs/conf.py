@@ -111,7 +111,6 @@ xref_links = {
     "SILICON": ("SILICON", "https://swarm-robotics-silicon.readthedocs.io"),
     "SIERRA": ("SIERRA", "https://swarm-robotics-sierra.readthedocs.io"),
     "LIBRA": ("LIBRA", "https://swarm-robotics-libra.readthedocs.io")
-
 }
 
 # -- Options for HTML output ----------------------------------------------

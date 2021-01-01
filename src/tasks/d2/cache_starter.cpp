@@ -60,9 +60,9 @@ double cache_starter::abort_prob_calc(void) {
   }
 } /* abort_prob_calc() */
 
-rtypes::timestep cache_starter::interface_time_calc(
-    size_t interface,
-    const rtypes::timestep& start_time) {
+rtypes::timestep
+cache_starter::interface_time_calc(size_t interface,
+                                   const rtypes::timestep& start_time) {
   ER_ASSERT(0 == interface, "Bad interface ID: %zu", interface);
   return current_time() - start_time;
 } /* interface_time_calc() */
@@ -70,8 +70,8 @@ rtypes::timestep cache_starter::interface_time_calc(
 void cache_starter::active_interface_update(int) {
   auto* fsm = static_cast<fsm::d2::block_to_cache_site_fsm*>(mechanism());
 
-  if (fsm->goal_acquired() && fsm::foraging_transport_goal::ekCACHE_SITE ==
-                                  fsm->block_transport_goal()) {
+  if (fsm->goal_acquired() &&
+      fsm::foraging_transport_goal::ekCACHE_SITE == fsm->block_transport_goal()) {
     if (interface_in_prog(0)) {
       interface_exit(0);
       interface_time_mark_finish(0);
@@ -91,76 +91,76 @@ void cache_starter::active_interface_update(int) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEF(cache_starter,
-                         is_exploring_for_goal,
-                         *static_cast<fsm::d2::block_to_cache_site_fsm*>(
-                             polled_task::mechanism()),
-                         const);
-RCPPSW_WRAP_OVERRIDE_DEF(cache_starter,
-                         is_vectoring_to_goal,
-                         *static_cast<fsm::d2::block_to_cache_site_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    cache_starter,
+    is_exploring_for_goal,
+    *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
+    const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    cache_starter,
+    is_vectoring_to_goal,
+    *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(cache_starter,
-                         goal_acquired,
-                         *static_cast<fsm::d2::block_to_cache_site_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    cache_starter,
+    goal_acquired,
+    *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(cache_starter,
-                         acquisition_goal,
-                         *static_cast<fsm::d2::block_to_cache_site_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    cache_starter,
+    acquisition_goal,
+    *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(cache_starter,
-                         block_transport_goal,
-                         *static_cast<fsm::d2::block_to_cache_site_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    cache_starter,
+    block_transport_goal,
+    *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(cache_starter,
-                         acquisition_loc3D,
-                         *static_cast<fsm::d2::block_to_cache_site_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    cache_starter,
+    acquisition_loc3D,
+    *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(cache_starter,
-                         vector_loc3D,
-                         *static_cast<fsm::d2::block_to_cache_site_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    cache_starter,
+    vector_loc3D,
+    *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(cache_starter,
-                         explore_loc3D,
-                         *static_cast<fsm::d2::block_to_cache_site_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    cache_starter,
+    explore_loc3D,
+    *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(cache_starter,
-                         site_select_exec,
-                         *static_cast<fsm::d2::block_to_cache_site_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    cache_starter,
+    site_select_exec,
+    *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(cache_starter,
-                         site_select_success,
-                         *static_cast<fsm::d2::block_to_cache_site_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    cache_starter,
+    site_select_success,
+    *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(cache_starter,
-                         nlopt_result,
-                         *static_cast<fsm::d2::block_to_cache_site_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    cache_starter,
+    nlopt_result,
+    *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(cache_starter,
-                         entity_acquired_id,
-                         *static_cast<fsm::d2::block_to_cache_site_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    cache_starter,
+    entity_acquired_id,
+    *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
+    const);
 
 /*******************************************************************************
  * Event Handling

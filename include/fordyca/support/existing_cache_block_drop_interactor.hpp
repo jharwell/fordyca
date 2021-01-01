@@ -62,14 +62,14 @@ class existing_cache_block_drop_interactor
         m_penalty_handler(
             envd->penalty_handler(tv::cache_op_src::ekEXISTING_CACHE_DROP)) {}
 
-  existing_cache_block_drop_interactor(
-      existing_cache_block_drop_interactor&&) = default;
+  existing_cache_block_drop_interactor(existing_cache_block_drop_interactor&&) =
+      default;
 
   /* Not copy-constructible/assignable by default. */
   existing_cache_block_drop_interactor(
       const existing_cache_block_drop_interactor&) = delete;
-  existing_cache_block_drop_interactor& operator=(
-      const existing_cache_block_drop_interactor&) = delete;
+  existing_cache_block_drop_interactor&
+  operator=(const existing_cache_block_drop_interactor&) = delete;
 
   /**
    * \brief The actual handling function for interactions.
@@ -85,9 +85,8 @@ class existing_cache_block_drop_interactor
         ER_ASSERT(post_process_check(controller), "Post-drop check failed");
       }
     } else {
-      m_penalty_handler->penalty_init(controller,
-                                      tv::cache_op_src::ekEXISTING_CACHE_DROP,
-                                      t);
+      m_penalty_handler->penalty_init(
+          controller, tv::cache_op_src::ekEXISTING_CACHE_DROP, t);
     }
   }
 
@@ -180,9 +179,8 @@ class existing_cache_block_drop_interactor
         *cache_it,
         m_map->grid_resolution(),
         carena::arena_map_locking::ekCACHES_HELD);
-    events::robot_cache_block_drop_visitor rdrop_op(controller.block_release(),
-                                                    *cache_it,
-                                                    m_map->grid_resolution());
+    events::robot_cache_block_drop_visitor rdrop_op(
+        controller.block_release(), *cache_it, m_map->grid_resolution());
 
     (*cache_it)->penalty_served(penalty.penalty());
     controller.block_manip_recorder()->record(
@@ -204,33 +202,34 @@ class existing_cache_block_drop_interactor
     auto acq_goal = controller.current_task()->acquisition_goal();
     auto* task = dynamic_cast<const events::existing_cache_interactor*>(
         controller.current_task());
-    RCPPSW_UNUSED auto* polled = dynamic_cast<const cta::polled_task*>(
-        controller.current_task());
+    RCPPSW_UNUSED auto* polled =
+        dynamic_cast<const cta::polled_task*>(controller.current_task());
 
     ER_CHECK(penalty.controller() == &controller,
-              "Out of order cache penalty handling");
+             "Out of order cache penalty handling");
     ER_CHECK(nullptr != task,
              "Non-cache interface task '%s'!",
              polled->name().c_str());
     ER_CHECK(controller.current_task()->goal_acquired() &&
-             fsm::foraging_acq_goal::ekEXISTING_CACHE == acq_goal,
+                 fsm::foraging_acq_goal::ekEXISTING_CACHE == acq_goal,
              "Robot%d@%s/%s not waiting for cache block drop",
              controller.entity_id().v(),
              rcppsw::to_string(controller.rpos2D()).c_str(),
              rcppsw::to_string(controller.dpos2D()).c_str());
     return true;
 
- error:
+  error:
     return false;
   }
 
   bool post_process_check(const TController& controller) const {
     ER_CHECK(!m_penalty_handler->is_serving_penalty(controller),
-             "Multiple instances of same controller serving existing cache drop penalty");
+             "Multiple instances of same controller serving existing cache "
+             "drop penalty");
 
     return true;
 
- error:
+  error:
     return false;
   }
   /* clang-format off */

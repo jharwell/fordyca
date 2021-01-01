@@ -26,11 +26,11 @@
  ******************************************************************************/
 #include <boost/none.hpp>
 
-#include "cosm/tv/temporal_penalty.hpp"
 #include "cosm/interactors/base_arena_block_pickup.hpp"
+#include "cosm/tv/temporal_penalty.hpp"
 
-#include "fordyca/metrics/blocks/block_manip_events.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
+#include "fordyca/metrics/blocks/block_manip_events.hpp"
 #include "fordyca/support/tv/block_op_src.hpp"
 
 /*******************************************************************************
@@ -52,40 +52,39 @@ NS_START(fordyca, support);
 template <typename TController, typename TControllerSpecMap>
 class free_block_pickup_interactor final :
 
-    public cinteractors::base_arena_block_pickup<TController,
-                                                                                       TControllerSpecMap> {
+    public cinteractors::base_arena_block_pickup<TController, TControllerSpecMap> {
  public:
-  using typename cinteractors::base_arena_block_pickup<TController,
-                                                      TControllerSpecMap>::arena_map_type;
-  using typename cinteractors::base_arena_block_pickup<TController,
-                                                      TControllerSpecMap>::penalty_handler_type;
+  using typename cinteractors::
+      base_arena_block_pickup<TController, TControllerSpecMap>::arena_map_type;
+  using typename cinteractors::base_arena_block_pickup<
+      TController,
+      TControllerSpecMap>::penalty_handler_type;
 
-free_block_pickup_interactor(arena_map_type* const map,
-                             argos::CFloorEntity* const floor,
-                             penalty_handler_type* const handler)
-      : cinteractors::base_arena_block_pickup<TController,
-                                             TControllerSpecMap>(map,
-                                                                  floor,
-                                                                  handler) {}
+  free_block_pickup_interactor(arena_map_type* const map,
+                               argos::CFloorEntity* const floor,
+                               penalty_handler_type* const handler)
+      : cinteractors::base_arena_block_pickup<TController, TControllerSpecMap>(
+            map,
+            floor,
+            handler) {}
 
   free_block_pickup_interactor(free_block_pickup_interactor&&) = default;
 
   /* Not copy-constructible/assignable by default. */
   free_block_pickup_interactor(const free_block_pickup_interactor&) = delete;
-  free_block_pickup_interactor& operator=(const free_block_pickup_interactor&) = delete;
+  free_block_pickup_interactor&
+  operator=(const free_block_pickup_interactor&) = delete;
 
   void robot_penalty_init(const TController& controller,
                           const rtypes::timestep& t,
                           penalty_handler_type* handler) override {
-    handler->penalty_init(controller,
-                          t,
-                          tv::block_op_src::ekFREE_PICKUP,
-                          boost::none);
+    handler->penalty_init(
+        controller, t, tv::block_op_src::ekFREE_PICKUP, boost::none);
   }
 
   bool robot_goal_acquired(const TController& controller) const override {
     return controller.goal_acquired() &&
-        fsm::foraging_acq_goal::ekBLOCK == controller.acquisition_goal();
+           fsm::foraging_acq_goal::ekBLOCK == controller.acquisition_goal();
   }
 
   void robot_previsit_hook(TController& controller,

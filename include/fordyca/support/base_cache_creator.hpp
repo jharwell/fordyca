@@ -35,9 +35,9 @@
 #include "rcppsw/types/spatial_dist.hpp"
 #include "rcppsw/types/timestep.hpp"
 
+#include "cosm/arena/ds/nest_vector.hpp"
 #include "cosm/ds/arena_grid.hpp"
 #include "cosm/ds/block3D_vector.hpp"
-#include "cosm/arena/ds/nest_vector.hpp"
 
 #include "fordyca/support/cache_create_ro_params.hpp"
 
@@ -100,11 +100,11 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    * created cache, since all previously created caches already have passed all
    * checks.
    */
-  bool creation_sanity_checks(
-      const cads::acache_vectorro& c_caches,
-      const cds::block3D_vectorno& c_free_blocks,
-      const cfds::block3D_cluster_vector& c_clusters,
-      const cads::nest_vectorro& c_nests) const RCPPSW_PURE;
+  bool
+  creation_sanity_checks(const cads::acache_vectorro& c_caches,
+                         const cds::block3D_vectorno& c_free_blocks,
+                         const cfds::block3D_cluster_vector& c_clusters,
+                         const cads::nest_vectorro& c_nests) const RCPPSW_PURE;
 
  protected:
   const cds::arena_grid* grid(void) const { return m_grid; }
@@ -120,27 +120,29 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    *               way that callers probably do not want.
    * \param t The current timestep.
    */
-  std::unique_ptr<carepr::arena_cache> create_single_cache(
-      const rmath::vector2d& center,
-      cds::block3D_vectorno blocks,
-      const rtypes::timestep& t,
-      bool pre_dist);
+  std::unique_ptr<carepr::arena_cache>
+  create_single_cache(const rmath::vector2d& center,
+                      cds::block3D_vectorno blocks,
+                      const rtypes::timestep& t,
+                      bool pre_dist);
 
   rtypes::spatial_dist cache_dim(void) const { return mc_cache_dim; }
 
  private:
-  bool sanity_check_internal_consistency(const carepr::arena_cache* cache) const RCPPSW_PURE;
-  bool sanity_check_cross_consistency(const cads::acache_vectorro& c_caches) const;
+  bool sanity_check_internal_consistency(const carepr::arena_cache* cache) const
+      RCPPSW_PURE;
+  bool
+  sanity_check_cross_consistency(const cads::acache_vectorro& c_caches) const;
   bool sanity_check_cache_overlap(const cads::acache_vectorro& c_caches) const;
-  bool sanity_check_free_block_overlap(const carepr::arena_cache* cache,
-                                       const cds::block3D_vectorno& free_blocks) const;
+  bool
+  sanity_check_free_block_overlap(const carepr::arena_cache* cache,
+                                  const cds::block3D_vectorno& free_blocks) const;
   bool sanity_check_block_cluster_overlap(
       const carepr::arena_cache* cache,
       const cfds::block3D_cluster_vector& clusters) const;
 
-  bool sanity_check_nest_overlap(
-      const carepr::arena_cache* cache,
-      const cads::nest_vectorro& nests) const;
+  bool sanity_check_nest_overlap(const carepr::arena_cache* cache,
+                                 const cads::nest_vectorro& nests) const;
 
   /* clang-format off */
   const rtypes::spatial_dist mc_cache_dim;

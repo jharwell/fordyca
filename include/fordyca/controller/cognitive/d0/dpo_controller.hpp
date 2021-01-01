@@ -74,6 +74,7 @@ class dpo_controller : public reactive::d0::crw_controller,
   /* goal acquisition metrics */
   RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, is_phototaxiing_to_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(csmetrics::goal_acq_metrics::goal_type,
                             acquisition_goal,

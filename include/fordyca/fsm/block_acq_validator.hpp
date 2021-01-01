@@ -39,7 +39,7 @@ class dp_block_map;
 } /* namespace ds */
 namespace controller::cognitive {
 class block_sel_matrix;
-} /* namespace controller */
+} // namespace controller::cognitive
 
 NS_START(fsm);
 

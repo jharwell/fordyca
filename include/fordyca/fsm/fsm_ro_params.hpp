@@ -40,7 +40,7 @@ NS_START(fordyca);
 namespace controller::cognitive {
 class block_sel_matrix;
 class cache_sel_matrix;
-} /* namespace controller */
+} // namespace controller::cognitive
 
 namespace ds {
 class dpo_store;

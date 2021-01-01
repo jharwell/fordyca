@@ -39,8 +39,7 @@ dpo_controller_repository::dpo_controller_repository(void) {
   parser_register<block_sel::block_sel_matrix_parser,
                   block_sel::block_sel_matrix_config>(
       block_sel::block_sel_matrix_parser::kXMLRoot);
-  parser_register<cspconfig::xml::perception_parser,
-                  cspconfig::perception_config>(
+  parser_register<cspconfig::xml::perception_parser, cspconfig::perception_config>(
       cspconfig::xml::perception_parser::kXMLRoot);
 }
 

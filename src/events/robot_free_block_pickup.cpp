@@ -25,7 +25,6 @@
 
 #include "cosm/repr/base_block3D.hpp"
 
-#include "fordyca/controller/reactive/d0/crw_controller.hpp"
 #include "fordyca/controller/cognitive/d0/dpo_controller.hpp"
 #include "fordyca/controller/cognitive/d0/mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d0/odpo_controller.hpp"
@@ -40,6 +39,7 @@
 #include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
 #include "fordyca/controller/cognitive/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
+#include "fordyca/controller/reactive/d0/crw_controller.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cell2D_empty.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
@@ -82,8 +82,7 @@ void robot_free_block_pickup::dispatch_robot_free_block_interactor(
 } /* dispatch_robot_free_block_interactor() */
 
 template <typename TController>
-void robot_free_block_pickup::d1d2_dpo_controller_visit(
-    TController& controller) {
+void robot_free_block_pickup::d1d2_dpo_controller_visit(TController& controller) {
   controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
@@ -94,8 +93,7 @@ void robot_free_block_pickup::d1d2_dpo_controller_visit(
 } /* d1d2_dpo_controller_visit() */
 
 template <typename TController>
-void robot_free_block_pickup::d1d2_mdpo_controller_visit(
-    TController& controller) {
+void robot_free_block_pickup::d1d2_mdpo_controller_visit(TController& controller) {
   controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->dpo_store());
@@ -106,8 +104,7 @@ void robot_free_block_pickup::d1d2_mdpo_controller_visit(
 } /* d1d2_mdpo_controller_visit() */
 
 template <typename TController>
-void robot_free_block_pickup::d0_dpo_controller_visit(
-    TController& controller) {
+void robot_free_block_pickup::d0_dpo_controller_visit(TController& controller) {
   controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
@@ -118,8 +115,7 @@ void robot_free_block_pickup::d0_dpo_controller_visit(
 } /* d0_dpo_controller_visit() */
 
 template <typename TController>
-void robot_free_block_pickup::d0_mdpo_controller_visit(
-    TController& controller) {
+void robot_free_block_pickup::d0_mdpo_controller_visit(TController& controller) {
   controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
@@ -151,9 +147,8 @@ void robot_free_block_pickup::visit(fsm::d0::crw_fsm& fsm) {
  * DPO/MDPO Depth0 Foraging
  ******************************************************************************/
 void robot_free_block_pickup::visit(ds::dpo_store& store) {
-  ER_ASSERT(store.contains(block()),
-            "Block%d not in DPO store",
-            block()->id().v());
+  ER_ASSERT(
+      store.contains(block()), "Block%d not in DPO store", block()->id().v());
   store.block_remove(block());
   ER_ASSERT(!store.contains(block()),
             "Block%d in DPO store after removal",

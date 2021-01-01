@@ -24,9 +24,9 @@
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/subsystem/perception/config/perception_config.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
+#include "cosm/subsystem/perception/config/perception_config.hpp"
 
 #include "fordyca/config/d2/controller_repository.hpp"
 #include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
@@ -85,8 +85,8 @@ mdpo_perception_subsystem* birtd_mdpo_controller::mdpo_perception(void) {
   return static_cast<mdpo_perception_subsystem*>(dpo_controller::perception());
 } /* mdpo_perception() */
 
-const mdpo_perception_subsystem* birtd_mdpo_controller::mdpo_perception(
-    void) const {
+const mdpo_perception_subsystem*
+birtd_mdpo_controller::mdpo_perception(void) const {
   return static_cast<const mdpo_perception_subsystem*>(
       dpo_controller::perception());
 } /* mdpo_perception() */

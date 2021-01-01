@@ -25,9 +25,9 @@
 
 #include "rcppsw/types/type_uuid.hpp"
 
-#include "cosm/foraging/block_dist/dispatcher.hpp"
 #include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/foraging/block_dist/base_distributor.hpp"
+#include "cosm/foraging/block_dist/dispatcher.hpp"
 #include "cosm/foraging/repr/block_cluster.hpp"
 
 /*******************************************************************************
@@ -50,7 +50,7 @@ std::vector<rmath::vector2d> static_cache_locs_calculator::operator()(
   std::vector<rmath::vector2d> cache_rlocs;
   ER_ASSERT(1 == arena_map->nests().size(),
             "Multiple nests incompatible with static cache management");
-  auto *nest = arena_map->nest(rtypes::type_uuid(0));
+  auto* nest = arena_map->nest(rtypes::type_uuid(0));
 
   /*
    * For the single source, dual source, quad source block distributions, each
@@ -64,8 +64,8 @@ std::vector<rmath::vector2d> static_cache_locs_calculator::operator()(
 
     for (auto& c : clusters) {
       cache_rlocs.push_back(
-          {(c->xrspan().center() + nest->rcenter2D().x()) / 2.0,
-           (c->yrspan().center() + nest->rcenter2D().y()) / 2.0});
+          { (c->xrspan().center() + nest->rcenter2D().x()) / 2.0,
+            (c->yrspan().center() + nest->rcenter2D().y()) / 2.0 });
     } /* for(i..) */
   } else if (dispatcher_type::kDistQuadSrc == distp->dist_type) {
     /*
@@ -79,10 +79,10 @@ std::vector<rmath::vector2d> static_cache_locs_calculator::operator()(
      */
     auto clusters = arena_map->block_distributor()->block_clusters();
     for (auto& c : clusters) {
-      bool on_center_y =
-          std::fabs(c->xrspan().center() - nest->rcenter2D().x()) < 0.5;
-      bool on_center_x =
-          std::fabs(c->yrspan().center() - nest->rcenter2D().y()) < 0.5;
+      bool on_center_y = std::fabs(c->xrspan().center() - nest->rcenter2D().x()) <
+                         0.5;
+      bool on_center_x = std::fabs(c->yrspan().center() - nest->rcenter2D().y()) <
+                         0.5;
       ER_ASSERT(on_center_y || on_center_x,
                 "Cluster@%f,%f not centered in arena X or Y",
                 c->xrspan().center(),
@@ -90,42 +90,42 @@ std::vector<rmath::vector2d> static_cache_locs_calculator::operator()(
       if (on_center_x &&
           c->xrspan().center() < nest->rcenter2D().x()) { /* west */
         cache_rlocs.push_back(
-            {arena_map->xrsize() * 0.30, c->yrspan().center()});
-      } else if (on_center_x && c->xrspan().center() >
-                                    nest->rcenter2D().x()) { /* east */
+            { arena_map->xrsize() * 0.30, c->yrspan().center() });
+      } else if (on_center_x &&
+                 c->xrspan().center() > nest->rcenter2D().x()) { /* east */
         cache_rlocs.push_back(
-            {arena_map->xrsize() * 0.675, c->yrspan().center()});
-      } else if (on_center_y && c->yrspan().center() <
-                                    nest->rcenter2D().y()) { /* south */
+            { arena_map->xrsize() * 0.675, c->yrspan().center() });
+      } else if (on_center_y &&
+                 c->yrspan().center() < nest->rcenter2D().y()) { /* south */
         cache_rlocs.push_back(
-            {c->xrspan().center(), arena_map->yrsize() * 0.30});
-      } else if (on_center_y && c->yrspan().center() >
-                                    nest->rcenter2D().y()) { /* north */
+            { c->xrspan().center(), arena_map->yrsize() * 0.30 });
+      } else if (on_center_y &&
+                 c->yrspan().center() > nest->rcenter2D().y()) { /* north */
         cache_rlocs.push_back(
-            {c->xrspan().center(), arena_map->yrsize() * 0.675});
+            { c->xrspan().center(), arena_map->yrsize() * 0.675 });
       }
     } /* for(i..) */
   } else if (dispatcher_type::kDistPowerlaw == distp->dist_type ||
              dispatcher_type::kDistRandom == distp->dist_type) {
     /* west */
-    cache_rlocs.push_back({arena_map->xrsize() * 0.25,
-            arena_map->yrsize() * 0.5});
+    cache_rlocs.push_back(
+        { arena_map->xrsize() * 0.25, arena_map->yrsize() * 0.5 });
 
     /* east */
-    cache_rlocs.push_back({arena_map->xrsize() * 0.75,
-            arena_map->yrsize() * 0.5});
+    cache_rlocs.push_back(
+        { arena_map->xrsize() * 0.75, arena_map->yrsize() * 0.5 });
 
     /* south */
-    cache_rlocs.push_back({arena_map->xrsize() * 0.5,
-            arena_map->yrsize() * 0.25});
+    cache_rlocs.push_back(
+        { arena_map->xrsize() * 0.5, arena_map->yrsize() * 0.25 });
 
     /* north */
-    cache_rlocs.push_back({arena_map->xrsize() * 0.5,
-            arena_map->yrsize() * 0.75});
+    cache_rlocs.push_back(
+        { arena_map->xrsize() * 0.5, arena_map->yrsize() * 0.75 });
   } else {
-    ER_FATAL_SENTINEL(
-        "Block distribution '%s' unsupported for static cache management",
-        distp->dist_type.c_str());
+    ER_FATAL_SENTINEL("Block distribution '%s' unsupported for static cache "
+                      "management",
+                      distp->dist_type.c_str());
   }
   /*
    * For all cache locs, transform real -> discrete to ensure the real and
@@ -136,16 +136,15 @@ std::vector<rmath::vector2d> static_cache_locs_calculator::operator()(
   std::vector<rmath::vector2d> cache_rcenters;
   rmath::vector2d offset(arena_map->grid_resolution().v() / 2.0,
                          arena_map->grid_resolution().v() / 2.0);
-  std::transform(cache_rlocs.begin(),
-                 cache_rlocs.end(),
-                 std::back_inserter(cache_rcenters),
-                 [&](const auto& rloc) {
-                   auto tmp = rmath::dvec2zvec(rloc,
-                                               arena_map->grid_resolution().v());
-                   auto ll = rmath::zvec2dvec(tmp,
-                                              arena_map->grid_resolution().v());
-                   return ll + offset;
-                 });
+  std::transform(
+      cache_rlocs.begin(),
+      cache_rlocs.end(),
+      std::back_inserter(cache_rcenters),
+      [&](const auto& rloc) {
+        auto tmp = rmath::dvec2zvec(rloc, arena_map->grid_resolution().v());
+        auto ll = rmath::zvec2dvec(tmp, arena_map->grid_resolution().v());
+        return ll + offset;
+      });
   return cache_rcenters;
 } /* operator()() */
 

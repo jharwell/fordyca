@@ -33,9 +33,8 @@ NS_START(fordyca, ds);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-occupancy_grid::occupancy_grid(
-    const cspconfig::perception_config* c_config,
-    const std::string& robot_id)
+occupancy_grid::occupancy_grid(const cspconfig::perception_config* c_config,
+                               const std::string& robot_id)
     : ER_CLIENT_INIT("fordyca.ds.occupancy_grid"),
       stacked_grid2D(rmath::vector2d(0.0, 0.0),
                      c_config->occupancy_grid.dims,
@@ -54,7 +53,7 @@ occupancy_grid::occupancy_grid(
     for (uint j = 0; j < ydsize(); ++j) {
       cell_init(i, j, c_config->pheromone.rho);
     } /* for(j..) */
-  }   /* for(i..) */
+  } /* for(i..) */
 }
 
 /*******************************************************************************
@@ -68,13 +67,13 @@ void occupancy_grid::update(void) {
     for (uint j = 0; j < ymax; ++j) {
       access<kPheromone>(i, j).update();
     } /* for(j..) */
-  }   /* for(i..) */
+  } /* for(i..) */
 
   for (uint i = 0; i < xmax; ++i) {
     for (uint j = 0; j < ymax; ++j) {
       cell_state_update(i, j);
     } /* for(j..) */
-  }   /* for(i..) */
+  } /* for(i..) */
 } /* update() */
 
 void occupancy_grid::reset(void) {
@@ -84,7 +83,7 @@ void occupancy_grid::reset(void) {
     for (uint j = 0; j < ymax; ++j) {
       access<kCell>(i, j).reset();
     } /* for(j..) */
-  }   /* for(i..) */
+  } /* for(i..) */
 } /* Reset */
 
 void occupancy_grid::cell_init(uint i, uint j, double pheromone_rho) {

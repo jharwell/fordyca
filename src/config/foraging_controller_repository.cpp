@@ -26,9 +26,9 @@
 #include "rcppsw/math/config/xml/rng_parser.hpp"
 
 #include "cosm/metrics/config/xml/output_parser.hpp"
+#include "cosm/repr/config/xml/nest_parser.hpp"
 #include "cosm/subsystem/config/xml/actuation_subsystem2D_parser.hpp"
 #include "cosm/subsystem/config/xml/sensing_subsystemQ3D_parser.hpp"
-#include "cosm/repr/config/xml/nest_parser.hpp"
 
 #include "fordyca/config/exploration_parser.hpp"
 

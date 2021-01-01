@@ -23,10 +23,10 @@
  ******************************************************************************/
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 
-#include "cosm/spatial/fsm/acquire_goal_fsm.hpp"
 #include "cosm/robots/footbot/footbot_actuation_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+#include "cosm/spatial/fsm/acquire_goal_fsm.hpp"
 
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
@@ -52,19 +52,20 @@ block_to_goal_fsm::block_to_goal_fsm(csfsm::acquire_goal_fsm* const goal_fsm,
       RCPPSW_HFSM_CONSTRUCT_STATE(transport_to_goal, hfsm::top_state()),
       RCPPSW_HFSM_CONSTRUCT_STATE(wait_for_block_drop, hfsm::top_state()),
       RCPPSW_HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-      RCPPSW_HFSM_DEFINE_STATE_MAP(mc_state_map,
-                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&start),
-                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
-                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
-                                                        nullptr,
-                                                        &entry_wait_for_signal,
-                                                        nullptr),
-                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&transport_to_goal),
-                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_drop,
-                                                        nullptr,
-                                                        &entry_wait_for_signal,
-                                                        nullptr),
-                            RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&finished)),
+      RCPPSW_HFSM_DEFINE_STATE_MAP(
+          mc_state_map,
+          RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&start),
+          RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
+          RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
+                                             nullptr,
+                                             &entry_wait_for_signal,
+                                             nullptr),
+          RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&transport_to_goal),
+          RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_drop,
+                                             nullptr,
+                                             &entry_wait_for_signal,
+                                             nullptr),
+          RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&finished)),
       m_goal_fsm(goal_fsm),
       m_block_fsm(block_fsm) {}
 
@@ -102,8 +103,8 @@ RCPPSW_HFSM_STATE_DEFINE_ND(block_to_goal_fsm, transport_to_goal) {
 }
 
 RCPPSW_HFSM_STATE_DEFINE(block_to_goal_fsm,
-                  wait_for_block_pickup,
-                  rpfsm::event_data* data) {
+                         wait_for_block_pickup,
+                         rpfsm::event_data* data) {
   if (fsm::foraging_signal::ekBLOCK_PICKUP == data->signal()) {
     ER_DEBUG("Block pickup signal received");
     m_block_fsm->task_reset();
@@ -130,8 +131,8 @@ RCPPSW_HFSM_STATE_DEFINE(block_to_goal_fsm,
 }
 
 RCPPSW_HFSM_STATE_DEFINE(block_to_goal_fsm,
-                  wait_for_block_drop,
-                  rpfsm::event_data* data) {
+                         wait_for_block_drop,
+                         rpfsm::event_data* data) {
   saa()->actuation()->actuator<ckin2D::governed_diff_drive>()->reset();
   if (fsm::foraging_signal::ekBLOCK_DROP == data->signal()) {
     ER_DEBUG("Block drop signal received");
@@ -169,17 +170,13 @@ bool block_to_goal_fsm::exp_interference(void) const {
 } /* exp_interference() */
 
 bool block_to_goal_fsm::entered_interference(void) const {
-  return (m_block_fsm->task_running() &&
-          m_block_fsm->entered_interference()) ||
-         (m_goal_fsm->task_running() &&
-          m_goal_fsm->entered_interference());
+  return (m_block_fsm->task_running() && m_block_fsm->entered_interference()) ||
+         (m_goal_fsm->task_running() && m_goal_fsm->entered_interference());
 } /* entered_interference() */
 
 bool block_to_goal_fsm::exited_interference(void) const {
-  return (m_block_fsm->task_running() &&
-          m_block_fsm->exited_interference()) ||
-         (m_goal_fsm->task_running() &&
-          m_goal_fsm->exited_interference());
+  return (m_block_fsm->task_running() && m_block_fsm->exited_interference()) ||
+         (m_goal_fsm->task_running() && m_goal_fsm->exited_interference());
 } /* exited_interference() */
 
 rtypes::timestep block_to_goal_fsm::interference_duration(void) const {
@@ -204,14 +201,14 @@ rmath::vector3z block_to_goal_fsm::interference_loc3D(void) const {
 /*******************************************************************************
  * Acquisition Metrics
  ******************************************************************************/
-block_to_goal_fsm::exp_status block_to_goal_fsm::is_exploring_for_goal(
-    void) const {
+block_to_goal_fsm::exp_status
+block_to_goal_fsm::is_exploring_for_goal(void) const {
   if (m_block_fsm->task_running()) {
     return m_block_fsm->is_exploring_for_goal();
   } else if (m_goal_fsm->task_running()) {
     return m_goal_fsm->is_exploring_for_goal();
   }
-  return exp_status{false, false};
+  return exp_status{ false, false };
 } /* is_exploring_for_goal() */
 
 bool block_to_goal_fsm::is_vectoring_to_goal(void) const {
@@ -224,8 +221,8 @@ bool block_to_goal_fsm::goal_acquired(void) const {
          (ekST_WAIT_FOR_BLOCK_DROP == current_state());
 } /* goal_acquired() */
 
-csmetrics::goal_acq_metrics::goal_type block_to_goal_fsm::acquisition_goal(
-    void) const {
+csmetrics::goal_acq_metrics::goal_type
+block_to_goal_fsm::acquisition_goal(void) const {
   if (m_block_fsm->task_running()) {
     return m_block_fsm->acquisition_goal();
   } else if (m_goal_fsm->task_running()) {

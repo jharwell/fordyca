@@ -54,16 +54,14 @@ class robot_nest_block_drop : public rer::client<robot_nest_block_drop> {
  private:
   struct visit_typelist_impl {
     using controllers = boost::mpl::joint_view<
-        boost::mpl::joint_view<controller::d0::typelist,
-                               controller::d1::typelist>,
+        boost::mpl::joint_view<controller::d0::typelist, controller::d1::typelist>,
         controller::d2::typelist>;
 
     using fsms = rmpl::typelist<fsm::d0::crw_fsm,
                                 fsm::d0::dpo_fsm,
                                 fsm::d0::free_block_to_nest_fsm,
                                 fsm::d1::cached_block_to_nest_fsm>;
-    using tasks =
-        rmpl::typelist<tasks::d0::generalist, tasks::d1::collector>;
+    using tasks = rmpl::typelist<tasks::d0::generalist, tasks::d1::collector>;
 
     using value = boost::mpl::joint_view<
         boost::mpl::joint_view<controllers::type, tasks::type>,
@@ -138,7 +136,8 @@ NS_END(detail);
 class robot_nest_block_drop_visitor
     : public detail::robot_nest_block_drop_visitor_impl {
  public:
-  using detail::robot_nest_block_drop_visitor_impl::robot_nest_block_drop_visitor_impl;
+  using detail::robot_nest_block_drop_visitor_impl::
+      robot_nest_block_drop_visitor_impl;
 };
 
 NS_END(events, fordyca);

@@ -28,10 +28,10 @@
 #include "rcppsw/mpl/typelist.hpp"
 #include "rcppsw/utils/maskable_enum.hpp"
 
-#include "cosm/metrics/collector_registerer.hpp"
-#include "cosm/pal/argos_convergence_calculator.hpp"
 #include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/foraging/block_dist/base_distributor.hpp"
+#include "cosm/metrics/collector_registerer.hpp"
+#include "cosm/pal/argos_convergence_calculator.hpp"
 
 #include "fordyca//controller/foraging_controller.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
@@ -67,14 +67,14 @@ fordyca_metrics_aggregator::fordyca_metrics_aggregator(
 
   /* register collectors common to all of FORDYCA */
   cmetrics::collector_registerer<>::creatable_set creatable_set = {
-      {typeid(blocks::manipulation_metrics_collector),
-       "block_manipulation",
-       "blocks::manipulation",
-       rmetrics::output_mode::ekAPPEND},
-      {typeid(tv::env_dynamics_metrics_collector),
-       "tv_environment",
-       "tv::environment",
-       rmetrics::output_mode::ekAPPEND},
+    { typeid(blocks::manipulation_metrics_collector),
+      "block_manipulation",
+      "blocks::manipulation",
+      rmetrics::output_mode::ekAPPEND },
+    { typeid(tv::env_dynamics_metrics_collector),
+      "tv_environment",
+      "tv::environment",
+      rmetrics::output_mode::ekAPPEND },
   };
 
   cmetrics::collector_registerer<> registerer(mconfig, creatable_set, this);

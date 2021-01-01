@@ -45,11 +45,11 @@ mdpo_perception_metrics_collector::mdpo_perception_metrics_collector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<std::string> mdpo_perception_metrics_collector::csv_header_cols(
-    void) const {
+std::list<std::string>
+mdpo_perception_metrics_collector::csv_header_cols(void) const {
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
-      /* clang-format off */
+    /* clang-format off */
     "int_avg_ST_EMPTY_inaccuracies",
     "int_avg_ST_HAS_BLOCK_inaccuracies",
     "int_avg_ST_HAS_CACHE_inaccuracies",
@@ -62,7 +62,7 @@ std::list<std::string> mdpo_perception_metrics_collector::csv_header_cols(
     "cum_avg_known_percentage",
     "cum_avg_unknown_percentage",
     "cum_avg_knowledge_ratio"
-      /* clang-format on */
+    /* clang-format on */
   };
   merged.splice(merged.end(), cols);
   return merged;
@@ -79,10 +79,8 @@ boost::optional<std::string> mdpo_perception_metrics_collector::csv_line_build()
   }
   std::string line;
   line += csv_entry_intavg(m_interval.states[cfsm::cell2D_state::ekST_EMPTY]);
-  line +=
-      csv_entry_intavg(m_interval.states[cfsm::cell2D_state::ekST_HAS_BLOCK]);
-  line +=
-      csv_entry_intavg(m_interval.states[cfsm::cell2D_state::ekST_HAS_CACHE]);
+  line += csv_entry_intavg(m_interval.states[cfsm::cell2D_state::ekST_HAS_BLOCK]);
+  line += csv_entry_intavg(m_interval.states[cfsm::cell2D_state::ekST_HAS_CACHE]);
   line += csv_entry_tsavg(m_cum.states[cfsm::cell2D_state::ekST_EMPTY]);
   line += csv_entry_tsavg(m_cum.states[cfsm::cell2D_state::ekST_HAS_BLOCK]);
   line += csv_entry_tsavg(m_cum.states[cfsm::cell2D_state::ekST_HAS_CACHE]);
@@ -92,9 +90,8 @@ boost::optional<std::string> mdpo_perception_metrics_collector::csv_line_build()
   line += csv_entry_domavg(m_interval.known_percent, m_interval.unknown_percent);
   line += csv_entry_tsavg(m_cum.known_percent);
   line += csv_entry_tsavg(m_cum.unknown_percent);
-  line += csv_entry_domavg(m_interval.known_percent,
-                           m_interval.unknown_percent,
-                           true);
+  line += csv_entry_domavg(
+      m_interval.known_percent, m_interval.unknown_percent, true);
   return boost::make_optional(line);
 } /* csv_line_build() */
 

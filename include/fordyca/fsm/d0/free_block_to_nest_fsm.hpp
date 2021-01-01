@@ -30,6 +30,7 @@
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 #include "cosm/spatial/fsm/util_hfsm.hpp"
 #include "cosm/fsm/block_transporter.hpp"
+#include "cosm/fsm/metrics/block_transporter_metrics.hpp"
 
 #include "fordyca/fsm/fsm_ro_params.hpp"
 #include "fordyca/fsm/acquire_free_block_fsm.hpp"
@@ -56,11 +57,13 @@ NS_START(fsm, d0);
  * \class free_block_to_nest_fsm
  * \ingroup fsm d0
  *
- * \brief FILL ME IN!
+ * \brief FSM for acquiring a free block (somehow) in the arena, bringing it
+ * to the nest, and dropping it.
  */
 class free_block_to_nest_fsm final : public csfsm::util_hfsm,
                                      public rer::client<free_block_to_nest_fsm>,
                                      public csmetrics::goal_acq_metrics,
+                                     public cfsm::metrics::block_transporter_metrics,
                                      public cfsm::block_transporter<foraging_transport_goal>,
                                      public cta::taskable {
  public:
@@ -93,6 +96,8 @@ class free_block_to_nest_fsm final : public csfsm::util_hfsm,
   rmath::vector3z interference_loc3D(void) const override RCPPSW_PURE;
 
   /* goal acquisition metrics */
+  bool goal_acquired(void) const override RCPPSW_PURE;
+  csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCPPSW_PURE;
   RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, acquisition_loc3D, const);
@@ -100,11 +105,11 @@ class free_block_to_nest_fsm final : public csfsm::util_hfsm,
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, vector_loc3D, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid, entity_acquired_id, const);
 
-  bool goal_acquired(void) const override RCPPSW_PURE;
-  csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCPPSW_PURE;
+
 
   /* block transportation */
   fsm::foraging_transport_goal block_transport_goal(void) const override RCPPSW_PURE;
+  bool is_phototaxiing_to_goal(void) const override RCPPSW_PURE;
 
   void init(void) override;
 

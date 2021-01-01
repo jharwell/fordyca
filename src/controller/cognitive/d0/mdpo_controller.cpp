@@ -24,10 +24,10 @@
 #include "fordyca/controller/cognitive/d0/mdpo_controller.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/subsystem/perception/config/perception_config.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/subsystem/perception/config/perception_config.hpp"
 
 #include "fordyca/config/d0/mdpo_controller_repository.hpp"
 #include "fordyca/config/exploration_config.hpp"
@@ -112,10 +112,10 @@ void mdpo_controller::private_init(
   fsm::expstrat::block_factory f;
   fsm::expstrat::foraging_expstrat::params expstrat_params(
       saa(), nullptr, nullptr, perception()->dpo_store(), rutils::color());
-  fsm::fsm_ro_params fsm_ro_params = {.bsel_matrix = block_sel_matrix(),
-                                      .csel_matrix = nullptr,
-                                      .store = perception()->dpo_store(),
-                                      .exp_config = *exp_config};
+  fsm::fsm_ro_params fsm_ro_params = { .bsel_matrix = block_sel_matrix(),
+                                       .csel_matrix = nullptr,
+                                       .store = perception()->dpo_store(),
+                                       .exp_config = *exp_config };
   dpo_controller::fsm(std::make_unique<fsm::d0::dpo_fsm>(
       &fsm_ro_params,
       saa(),

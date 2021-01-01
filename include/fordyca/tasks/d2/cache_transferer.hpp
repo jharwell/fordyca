@@ -81,6 +81,7 @@ class cache_transferer final : public foraging_task,
   RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal,
                             block_transport_goal,
                             const);
+  bool is_phototaxiing_to_goal(void) const override { return false; }
 
   /* task metrics */
   bool task_completed(void) const override { return task_finished(); }

@@ -68,8 +68,7 @@ RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
 RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
 RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 
-REGISTER_QTOPENGL_USER_FUNCTIONS(d1_qt_user_functions,
-                                 "d1_qt_user_functions");
+REGISTER_QTOPENGL_USER_FUNCTIONS(d1_qt_user_functions, "d1_qt_user_functions");
 RCPPSW_WARNING_DISABLE_POP()
 
 NS_END(support, fordyca, d1);

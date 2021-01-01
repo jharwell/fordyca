@@ -45,10 +45,10 @@ new_cache_selector::new_cache_selector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-const crepr::base_block3D* new_cache_selector::operator()(
-    const ds::dp_block_map& new_caches,
-    const ds::dp_cache_map& existing_caches,
-    const rmath::vector2d& position) const {
+const crepr::base_block3D*
+new_cache_selector::operator()(const ds::dp_block_map& new_caches,
+                               const ds::dp_cache_map& existing_caches,
+                               const rmath::vector2d& position) const {
   const crepr::base_block3D* best = nullptr;
   ER_ASSERT(!new_caches.empty(), "No known new caches");
 
@@ -61,9 +61,9 @@ const crepr::base_block3D* new_cache_selector::operator()(
      * Use the center rather than the anchor to get a utility unaffected by the
      * relative position of the block and the robot
      */
-    math::new_cache_utility u(c.ent()->rcenter2D(),
-                              boost::get<rmath::vector2d>(
-                                  mc_matrix->find(cselm::kNestLoc)->second));
+    math::new_cache_utility u(
+        c.ent()->rcenter2D(),
+        boost::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second));
 
     double utility = u.calc(position, c.density());
     ER_ASSERT(utility > 0.0, "Bad utility calculation");
@@ -108,16 +108,16 @@ bool new_cache_selector::new_cache_is_excluded(
   for (auto& ec : existing_caches.const_values_range()) {
     double dist = (ec.ent()->rcenter2D() - new_cache->rcenter2D()).length();
     if (cache_prox >= dist) {
-      ER_DEBUG(
-          "Ignoring new cache%d@%s/%s: Too close to cache%d@%s/%s (%f <= %f)",
-          new_cache->id().v(),
-          rcppsw::to_string(new_cache->ranchor2D()).c_str(),
-          rcppsw::to_string(new_cache->danchor2D()).c_str(),
-          ec.ent()->id().v(),
-          rcppsw::to_string(ec.ent()->rcenter2D()).c_str(),
-          rcppsw::to_string(ec.ent()->dcenter2D()).c_str(),
-          dist,
-          cache_prox.v());
+      ER_DEBUG("Ignoring new cache%d@%s/%s: Too close to cache%d@%s/%s (%f <= "
+               "%f)",
+               new_cache->id().v(),
+               rcppsw::to_string(new_cache->ranchor2D()).c_str(),
+               rcppsw::to_string(new_cache->danchor2D()).c_str(),
+               ec.ent()->id().v(),
+               rcppsw::to_string(ec.ent()->rcenter2D()).c_str(),
+               rcppsw::to_string(ec.ent()->dcenter2D()).c_str(),
+               dist,
+               cache_prox.v());
       return true;
     }
   } /* for(&ec..) */
@@ -139,16 +139,15 @@ bool new_cache_selector::new_cache_is_excluded(
     double dist = (b.ent()->rcenter2D() - new_cache->rcenter2D()).length();
 
     if (cluster_prox >= dist) {
-      ER_DEBUG(
-          "Ignoring new cache%d@%s/%s: Too close to potential block "
-          "cluster@%s/%s (%f <= %f)",
-          new_cache->id().v(),
-          rcppsw::to_string(new_cache->ranchor2D()).c_str(),
-          rcppsw::to_string(new_cache->danchor2D()).c_str(),
-          rcppsw::to_string(b.ent()->ranchor2D()).c_str(),
-          rcppsw::to_string(b.ent()->danchor2D()).c_str(),
-          dist,
-          cluster_prox.v());
+      ER_DEBUG("Ignoring new cache%d@%s/%s: Too close to potential block "
+               "cluster@%s/%s (%f <= %f)",
+               new_cache->id().v(),
+               rcppsw::to_string(new_cache->ranchor2D()).c_str(),
+               rcppsw::to_string(new_cache->danchor2D()).c_str(),
+               rcppsw::to_string(b.ent()->ranchor2D()).c_str(),
+               rcppsw::to_string(b.ent()->danchor2D()).c_str(),
+               dist,
+               cluster_prox.v());
       return true;
     }
   } /* for(&b..) */

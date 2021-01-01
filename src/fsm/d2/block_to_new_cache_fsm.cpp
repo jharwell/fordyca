@@ -45,8 +45,8 @@ block_to_new_cache_fsm::block_to_new_cache_fsm(
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-csmetrics::goal_acq_metrics::goal_type block_to_new_cache_fsm::acquisition_goal(
-    void) const {
+csmetrics::goal_acq_metrics::goal_type
+block_to_new_cache_fsm::acquisition_goal(void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
     return fsm::to_goal_type(foraging_acq_goal::ekBLOCK);

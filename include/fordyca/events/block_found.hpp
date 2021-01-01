@@ -99,7 +99,6 @@ class block_found : public rer::client<block_found>, public cdops::cell2D_op {
   /* clang-format on */
 };
 
-
 NS_END(detail);
 
 /**

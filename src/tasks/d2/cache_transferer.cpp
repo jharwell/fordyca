@@ -61,9 +61,9 @@ double cache_transferer::abort_prob_calc(void) {
   }
 } /* abort_prob_calc() */
 
-rtypes::timestep cache_transferer::interface_time_calc(
-    size_t,
-    const rtypes::timestep& start_time) {
+rtypes::timestep
+cache_transferer::interface_time_calc(size_t,
+                                      const rtypes::timestep& start_time) {
   return current_time() - start_time;
 } /* interface_time_calc() */
 
@@ -113,7 +113,7 @@ void cache_transferer::accept(events::detail::cache_vanished& visitor) {
 }
 
 /*******************************************************************************
- * FSM Metrics
+ * Block Acquisition Metrics
  ******************************************************************************/
 RCPPSW_WRAP_OVERRIDE_DEF(
     cache_transferer,

@@ -42,7 +42,9 @@ std::string dp_cache_map::to_str(void) const {
                          std::string(),
                          [&](const std::string& a, const auto& pair) {
                            return a + "c" + rcppsw::to_string(pair.ent()->id()) +
-                               "@" + rcppsw::to_string(pair.ent()->dcenter2D()) + ",";
+                                  "@" +
+                                  rcppsw::to_string(pair.ent()->dcenter2D()) +
+                                  ",";
                          });
 } /* to_str() */
 

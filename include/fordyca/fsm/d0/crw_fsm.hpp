@@ -32,6 +32,7 @@
 #include "cosm/spatial/metrics/interference_metrics.hpp"
 #include "cosm/fsm/block_transporter.hpp"
 #include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
+#include "cosm/fsm/metrics/block_transporter_metrics.hpp"
 
 #include "fordyca/fsm/foraging_transport_goal.hpp"
 #include "fordyca/fordyca.hpp"
@@ -65,6 +66,7 @@ class crw_fsm final : public csfsm::util_hfsm,
                       public rer::client<crw_fsm>,
                       public csmetrics::goal_acq_metrics,
                       public cfsm::block_transporter<foraging_transport_goal>,
+                      public cfsm::metrics::block_transporter_metrics,
                       public cta::taskable {
  public:
   crw_fsm(crfootbot::footbot_saa_subsystem* saa,
@@ -94,6 +96,7 @@ class crw_fsm final : public csfsm::util_hfsm,
 
   /* block transportation */
   foraging_transport_goal block_transport_goal(void) const override RCPPSW_PURE;
+  bool is_phototaxiing_to_goal(void) const override RCPPSW_PURE;
 
   /* taskable overrides */
   void task_execute(void) override { run(); }

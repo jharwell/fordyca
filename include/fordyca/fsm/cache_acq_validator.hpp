@@ -45,7 +45,7 @@ class dp_cache_map;
 
 namespace controller::cognitive {
 class cache_sel_matrix;
-} /* namespace controller */
+} // namespace controller::cognitive
 
 NS_START(fsm);
 

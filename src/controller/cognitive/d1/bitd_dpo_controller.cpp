@@ -28,12 +28,12 @@
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
+#include "cosm/repr/config/nest_config.hpp"
 #include "cosm/robots/footbot/config/saa_xml_names.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/subsystem/config/sensing_subsystemQ3D_config.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
-#include "cosm/repr/config/nest_config.hpp"
 
 #include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
 #include "fordyca/config/cache_sel/cache_sel_matrix_config.hpp"

@@ -93,7 +93,7 @@ bool robot_cache_block_drop::dispatch_d2_cache_interactor(
             rcppsw::to_string(m_cache->dcenter2D()).c_str(),
             polled->name().c_str());
     csel_matrix->sel_exception_add(
-        {m_cache->id(), controller::cognitive::cache_sel_exception::ekPICKUP});
+        { m_cache->id(), controller::cognitive::cache_sel_exception::ekPICKUP });
     ret = true;
   }
   interactor->accept(*this);
@@ -129,12 +129,11 @@ void robot_cache_block_drop::visit(
 
   dispatch_d1_cache_interactor(controller.current_task());
 
-  ER_INFO("Dropped block%d in cache%d,task='%s'",
-          m_block->id().v(),
-          m_cache->id().v(),
-          dynamic_cast<cta::logical_task*>(controller.current_task())
-              ->name()
-              .c_str());
+  ER_INFO(
+      "Dropped block%d in cache%d,task='%s'",
+      m_block->id().v(),
+      m_cache->id().v(),
+      dynamic_cast<cta::logical_task*>(controller.current_task())->name().c_str());
 
   controller.ndc_pop();
 } /* visit() */
@@ -146,12 +145,11 @@ void robot_cache_block_drop::visit(
   visit(*controller.mdpo_perception()->map());
   dispatch_d1_cache_interactor(controller.current_task());
 
-  ER_INFO("Dropped block%d in cache%d,task='%s'",
-          m_block->id().v(),
-          m_cache->id().v(),
-          dynamic_cast<cta::logical_task*>(controller.current_task())
-              ->name()
-              .c_str());
+  ER_INFO(
+      "Dropped block%d in cache%d,task='%s'",
+      m_block->id().v(),
+      m_cache->id().v(),
+      dynamic_cast<cta::logical_task*>(controller.current_task())->name().c_str());
 
   controller.ndc_pop();
 } /* visit() */
@@ -162,12 +160,11 @@ void robot_cache_block_drop::visit(
 
   dispatch_d1_cache_interactor(controller.current_task());
 
-  ER_INFO("Dropped block%d in cache%d,task='%s'",
-          m_block->id().v(),
-          m_cache->id().v(),
-          dynamic_cast<cta::logical_task*>(controller.current_task())
-              ->name()
-              .c_str());
+  ER_INFO(
+      "Dropped block%d in cache%d,task='%s'",
+      m_block->id().v(),
+      m_cache->id().v(),
+      dynamic_cast<cta::logical_task*>(controller.current_task())->name().c_str());
 
   controller.ndc_pop();
 } /* visit() */
@@ -179,12 +176,11 @@ void robot_cache_block_drop::visit(
   visit(*controller.mdpo_perception()->map());
   dispatch_d1_cache_interactor(controller.current_task());
 
-  ER_INFO("Dropped block%d in cache%d,task='%s'",
-          m_block->id().v(),
-          m_cache->id().v(),
-          dynamic_cast<cta::logical_task*>(controller.current_task())
-              ->name()
-              .c_str());
+  ER_INFO(
+      "Dropped block%d in cache%d,task='%s'",
+      m_block->id().v(),
+      m_cache->id().v(),
+      dynamic_cast<cta::logical_task*>(controller.current_task())->name().c_str());
 
   controller.ndc_pop();
 } /* visit() */
@@ -209,12 +205,11 @@ void robot_cache_block_drop::visit(
                                    controller.cache_sel_matrix())) {
     controller.csel_exception_added(true);
   }
-  ER_INFO("Dropped block%d in cache%d,task='%s'",
-          m_block->id().v(),
-          m_cache->id().v(),
-          dynamic_cast<cta::logical_task*>(controller.current_task())
-              ->name()
-              .c_str());
+  ER_INFO(
+      "Dropped block%d in cache%d,task='%s'",
+      m_block->id().v(),
+      m_cache->id().v(),
+      dynamic_cast<cta::logical_task*>(controller.current_task())->name().c_str());
 
   controller.ndc_pop();
 } /* visit() */
@@ -228,12 +223,11 @@ void robot_cache_block_drop::visit(
     controller.csel_exception_added(true);
   }
   visit(*controller.mdpo_perception()->map());
-  ER_INFO("Dropped block%d in cache%d,task='%s'",
-          m_block->id().v(),
-          m_cache->id().v(),
-          dynamic_cast<cta::logical_task*>(controller.current_task())
-              ->name()
-              .c_str());
+  ER_INFO(
+      "Dropped block%d in cache%d,task='%s'",
+      m_block->id().v(),
+      m_cache->id().v(),
+      dynamic_cast<cta::logical_task*>(controller.current_task())->name().c_str());
 
   controller.ndc_pop();
 } /* visit() */
@@ -246,12 +240,11 @@ void robot_cache_block_drop::visit(
                                    controller.cache_sel_matrix())) {
     controller.csel_exception_added(true);
   }
-  ER_INFO("Dropped block%d in cache%d,task='%s'",
-          m_block->id().v(),
-          m_cache->id().v(),
-          dynamic_cast<cta::logical_task*>(controller.current_task())
-              ->name()
-              .c_str());
+  ER_INFO(
+      "Dropped block%d in cache%d,task='%s'",
+      m_block->id().v(),
+      m_cache->id().v(),
+      dynamic_cast<cta::logical_task*>(controller.current_task())->name().c_str());
 
   controller.ndc_pop();
 } /* visit() */
@@ -265,12 +258,11 @@ void robot_cache_block_drop::visit(
     controller.csel_exception_added(true);
   }
   visit(*controller.mdpo_perception()->map());
-  ER_INFO("Dropped block%d in cache%d,task='%s'",
-          m_block->id().v(),
-          m_cache->id().v(),
-          dynamic_cast<cta::logical_task*>(controller.current_task())
-              ->name()
-              .c_str());
+  ER_INFO(
+      "Dropped block%d in cache%d,task='%s'",
+      m_block->id().v(),
+      m_cache->id().v(),
+      dynamic_cast<cta::logical_task*>(controller.current_task())->name().c_str());
 
   controller.ndc_pop();
 } /* visit() */

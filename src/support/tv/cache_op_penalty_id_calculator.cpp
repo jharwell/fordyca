@@ -37,15 +37,14 @@ cache_op_penalty_id_calculator::cache_op_penalty_id_calculator(void)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-rtypes::type_uuid cache_op_penalty_id_calculator::operator()(
-    cache_op_src src,
-    op_filter_result filter) const {
+rtypes::type_uuid
+cache_op_penalty_id_calculator::operator()(cache_op_src src,
+                                           op_filter_result filter) const {
   rtypes::type_uuid id = rtypes::constants::kNoUUID;
   switch (src) {
     case cache_op_src::ekEXISTING_CACHE_DROP:
     case cache_op_src::ekEXISTING_CACHE_PICKUP:
-      ER_ASSERT(rtypes::constants::kNoUUID != filter.id,
-                "Robot not in cache?");
+      ER_ASSERT(rtypes::constants::kNoUUID != filter.id, "Robot not in cache?");
       id = filter.id;
     default:
       break;

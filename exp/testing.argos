@@ -204,7 +204,8 @@
         <append
             output_interval="1000"
             block_acq_counts="block-acq-counts"
-            block_transport="block-transport"
+            block_transporter="block-transporter"
+            block_transportee="block-transportee"
             block_manipulation="block-manipulation"
             cache_acq_counts="cache-acq-counts"
             cache_utilization="cache-utilization"
@@ -384,7 +385,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="1" max_trials="1000">
+      <entity quantity="16" max_trials="1000">
         <foot-bot id="fb" omnidirectional_camera_aperture="89">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->

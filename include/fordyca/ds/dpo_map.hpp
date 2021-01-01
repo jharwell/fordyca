@@ -115,8 +115,8 @@ class dpo_map {
    * \brief Return an iterator for examining, but not modifying, the keys of
    * the map.
    */
-  iterator_type<const map_type, decltype(boost::adaptors::map_keys)> keys_range(
-      void) const {
+  iterator_type<const map_type, decltype(boost::adaptors::map_keys)>
+  keys_range(void) const {
     return boost::make_iterator_range(m_obj.begin(), m_obj.end()) |
            boost::adaptors::map_keys;
   }

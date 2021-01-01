@@ -24,8 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <map>
 #include <algorithm>
+#include <map>
 
 #include "cosm/ds/block3D_vector.hpp"
 
@@ -54,16 +54,15 @@ class block_alloc_map {
 
   bool contains(const crepr::base_block3D* block) const {
     auto cache_i_alloc = [&](const auto& alloc_i) {
-      return alloc_i.second.end() != std::find(alloc_i.second.begin(),
-                                               alloc_i.second.end(),
-                                               block);
+      return alloc_i.second.end() !=
+             std::find(alloc_i.second.begin(), alloc_i.second.end(), block);
     };
     return std::any_of(m_decoratee.begin(), m_decoratee.end(), cache_i_alloc);
   }
 
  private:
   const map_type& decoratee(void) const { return m_decoratee; }
-  map_type& decoratee(void)  { return m_decoratee; }
+  map_type& decoratee(void) { return m_decoratee; }
 
   /* clang-format off */
   map_type m_decoratee{};

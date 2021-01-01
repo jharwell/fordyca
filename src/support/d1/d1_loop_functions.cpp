@@ -35,8 +35,9 @@
 
 #include "cosm/arena/config/arena_map_config.hpp"
 #include "cosm/controller/operations/applicator.hpp"
+#include "cosm/foraging/block_dist/base_distributor.hpp"
+#include "cosm/foraging/metrics/block_transportee_metrics_collector.hpp"
 #include "cosm/foraging/oracle/foraging_oracle.hpp"
-#include "cosm/foraging/metrics/block_transport_metrics_collector.hpp"
 #include "cosm/interactors/applicator.hpp"
 #include "cosm/oracle/config/aggregate_oracle_config.hpp"
 #include "cosm/pal/argos_convergence_calculator.hpp"
@@ -44,7 +45,6 @@
 #include "cosm/robots/footbot/config/saa_xml_names.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
-#include "cosm/foraging/block_dist/base_distributor.hpp"
 
 #include "fordyca/controller/cognitive/d1/bitd_dpo_controller.hpp"
 #include "fordyca/controller/cognitive/d1/bitd_mdpo_controller.hpp"
@@ -54,9 +54,9 @@
 #include "fordyca/support/d1/d1_metrics_aggregator.hpp"
 #include "fordyca/support/d1/robot_arena_interactor.hpp"
 #include "fordyca/support/d1/robot_configurer.hpp"
+#include "fordyca/support/d1/static_cache_locs_calculator.hpp"
 #include "fordyca/support/d1/static_cache_manager.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
-#include "fordyca/support/d1/static_cache_locs_calculator.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -101,10 +101,11 @@ struct d1_subtask_status_extractor_adaptor
       : mc_controller(c) {}
 
   template <typename Controller>
-  std::pair<bool, bool> operator()(
-      const d1_subtask_status_extractor<Controller>& extractor) const {
-    auto cast = dynamic_cast<const typename d1_subtask_status_extractor<
-        Controller>::controller_type*>(mc_controller);
+  std::pair<bool, bool>
+  operator()(const d1_subtask_status_extractor<Controller>& extractor) const {
+    auto cast = dynamic_cast<
+        const typename d1_subtask_status_extractor<Controller>::controller_type*>(
+        mc_controller);
     return extractor(cast);
   }
   const controller::foraging_controller* const mc_controller;
@@ -120,18 +121,19 @@ struct d1_subtask_status_extractor_adaptor
  */
 struct functor_maps_initializer : public boost::static_visitor<void> {
   RCPPSW_COLD functor_maps_initializer(configurer_map_type* const cmap,
-                                     d1_loop_functions* const lf_in)
+                                       d1_loop_functions* const lf_in)
 
       : lf(lf_in), config_map(cmap) {}
   template <typename T>
   RCPPSW_COLD void operator()(const T& controller) const {
     typename robot_arena_interactor<T, carena::caching_arena_map>::params p{
-        lf->arena_map(),
-        lf->m_metrics_agg.get(),
-        lf->floor(),
-        lf->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>(),
-        lf->m_cache_manager.get(),
-        lf};
+      lf->arena_map(),
+      lf->m_metrics_agg.get(),
+      lf->floor(),
+      lf->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>(),
+      lf->m_cache_manager.get(),
+      lf
+    };
     lf->m_interactor_map->emplace(
         typeid(controller),
         robot_arena_interactor<T, carena::caching_arena_map>(p));
@@ -212,7 +214,6 @@ void d1_loop_functions::private_init(void) {
   auto* output = config()->config_get<cmconfig::output_config>();
   auto* arena = config()->config_get<caconfig::arena_map_config>();
 
-
   /* initialize cache handling and create initial cache */
   cache_handling_init(
       config()->config_get<config::caches::caches_config>(),
@@ -227,23 +228,21 @@ void d1_loop_functions::private_init(void) {
     arena_map_init(vconfig);
   }
 
-  m_metrics_agg = std::make_unique<d1_metrics_aggregator>(&output->metrics,
-                                                              &arena->grid,
-                                                              output_root(),
-                                                              arena_map()->block_distributor()->block_clusters().size());
+  m_metrics_agg = std::make_unique<d1_metrics_aggregator>(
+      &output->metrics,
+      &arena->grid,
+      output_root(),
+      arena_map()->block_distributor()->block_clusters().size());
   /* this starts at 0, and ARGoS starts at 1, so sync up */
   m_metrics_agg->timestep_inc_all();
-
 
   /*
    * Initialize convergence calculations to include task distribution (if
    * enabled in XML file).
    */
   if (nullptr != conv_calculator()) {
-    conv_calculator()->task_dist_entropy_init(
-        std::bind(&d1_loop_functions::robot_tasks_extract,
-                  this,
-                  std::placeholders::_1));
+    conv_calculator()->task_dist_entropy_init(std::bind(
+        &d1_loop_functions::robot_tasks_extract, this, std::placeholders::_1));
   }
 
   /*
@@ -320,24 +319,21 @@ void d1_loop_functions::cache_handling_init(
    * initial caches.
    */
   auto cache_locs = static_cache_locs_calculator()(arena_map(), distp);
-  m_cache_manager = std::make_unique<static_cache_manager>(cachep,
-                                                           arena_map(),
-                                                           cache_locs,
-                                                           rng());
+  m_cache_manager = std::make_unique<static_cache_manager>(
+      cachep, arena_map(), cache_locs, rng());
   cfds::block3D_cluster_vector clusters;
   if (!delay_arena_map_init()) {
     clusters = arena_map()->block_distributor()->block_clusters();
   }
-  cache_create_ro_params ccp = {
-      .current_caches = arena_map()->caches(),
-      .clusters = clusters,
-      .t = rtypes::timestep(GetSpace().GetSimulationClock())};
+  cache_create_ro_params ccp = { .current_caches = arena_map()->caches(),
+                                 .clusters = clusters,
+                                 .t = rtypes::timestep(
+                                     GetSpace().GetSimulationClock()) };
 
   cpal::argos_sm_adaptor::led_medium(crfootbot::config::saa_xml_names::leds_saa);
   bool pre_dist = (nullptr == arena_map()->block_distributor());
-  if (auto created = m_cache_manager->create(ccp,
-                                             arena_map()->blocks(),
-                                             pre_dist)) {
+  if (auto created =
+          m_cache_manager->create(ccp, arena_map()->blocks(), pre_dist)) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }
@@ -355,7 +351,7 @@ std::vector<int> d1_loop_functions::robot_tasks_extract(uint) const {
               controller->GetId().c_str(),
               controller->type_index().name());
     auto applicator =
-    ccops::applicator<controller::foraging_controller, ccops::task_id_extract>(
+        ccops::applicator<controller::foraging_controller, ccops::task_id_extract>(
             controller);
 
     v.push_back(boost::apply_visitor(
@@ -421,12 +417,14 @@ void d1_loop_functions::post_step(void) {
 
   /* update arena map */
   auto* collector =
-      m_metrics_agg->get<cfmetrics::block_transport_metrics_collector>(
-          "blocks::transport");
+      m_metrics_agg->get<cfmetrics::block_transportee_metrics_collector>("blocks::"
+                                                                       "transpor"
+                                                                       "ter");
 
-  arena_map()->post_step_update(rtypes::timestep(GetSpace().GetSimulationClock()),
-                                collector->cum_transported(),
-                                nullptr != conv_calculator() ? conv_calculator()->converged() : false);
+  arena_map()->post_step_update(
+      rtypes::timestep(GetSpace().GetSimulationClock()),
+      collector->cum_transported(),
+      nullptr != conv_calculator() ? conv_calculator()->converged() : false);
 
   /* Collect metrics from/about existing caches */
   for (auto* c : arena_map()->caches()) {
@@ -474,13 +472,12 @@ void d1_loop_functions::reset(void) {
   m_metrics_agg->reset_all();
 
   cache_create_ro_params ccp = {
-      .current_caches = arena_map()->caches(),
-      .clusters = arena_map()->block_distributor()->block_clusters(),
-      .t = rtypes::timestep(GetSpace().GetSimulationClock())};
+    .current_caches = arena_map()->caches(),
+    .clusters = arena_map()->block_distributor()->block_clusters(),
+    .t = rtypes::timestep(GetSpace().GetSimulationClock())
+  };
 
-  if (auto created = m_cache_manager->create(ccp,
-                                             arena_map()->blocks(),
-                                             false)) {
+  if (auto created = m_cache_manager->create(ccp, arena_map()->blocks(), false)) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }
@@ -536,15 +533,13 @@ void d1_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
             "Controller '%s' type '%s' not in d1 interactor map",
             controller->GetId().c_str(),
             controller->type_index().name());
-  auto iapplicator =
-      cinteractors::applicator<controller::foraging_controller,
-                               robot_arena_interactor,
-                               carena::caching_arena_map>(
-          controller, rtypes::timestep(GetSpace().GetSimulationClock()));
+  auto iapplicator = cinteractors::applicator<controller::foraging_controller,
+                                              robot_arena_interactor,
+                                              carena::caching_arena_map>(
+      controller, rtypes::timestep(GetSpace().GetSimulationClock()));
 
-  auto status =
-      boost::apply_visitor(iapplicator,
-                           m_interactor_map->at(controller->type_index()));
+  auto status = boost::apply_visitor(
+      iapplicator, m_interactor_map->at(controller->type_index()));
   /*
    * The oracle does not necessarily have up-to-date information about all
    * blocks in the arena, as a robot could have dropped a block in the nest or
@@ -590,9 +585,10 @@ void d1_loop_functions::static_cache_monitor(void) {
   }
 
   cache_create_ro_params ccp = {
-      .current_caches = arena_map()->caches(),
-      .clusters = arena_map()->block_distributor()->block_clusters(),
-      .t = rtypes::timestep(GetSpace().GetSimulationClock())};
+    .current_caches = arena_map()->caches(),
+    .clusters = arena_map()->block_distributor()->block_clusters(),
+    .t = rtypes::timestep(GetSpace().GetSimulationClock())
+  };
 
   if (auto created =
           m_cache_manager->create_conditional(ccp,

@@ -28,8 +28,8 @@
 
 #include "cosm/arena/caching_arena_map.hpp"
 
-#include "fordyca/events/cache_proximity.hpp"
 #include "fordyca//controller/foraging_controller.hpp"
+#include "fordyca/events/cache_proximity.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -49,10 +49,10 @@ NS_START(fordyca, support);
  * \note This can't be part of the other event utils, because you can't forward
  * declare things because it has to be a template function.
  */
-class cache_prox_checker: public rer::client<cache_prox_checker> {
+class cache_prox_checker : public rer::client<cache_prox_checker> {
  public:
   struct proximity_status {
-    rtypes::type_uuid id{rtypes::constants::kNoUUID};
+    rtypes::type_uuid id{ rtypes::constants::kNoUUID };
     rmath::vector2d loc{};
     rmath::vector2d distance{};
   };
@@ -69,7 +69,6 @@ class cache_prox_checker: public rer::client<cache_prox_checker> {
 
   cache_prox_checker(cache_prox_checker&&) = default;
   cache_prox_checker& operator=(cache_prox_checker&&) = delete;
-
 
   /**
    * \brief Determine if creating a new cache centered at the robot's current
@@ -98,9 +97,9 @@ class cache_prox_checker: public rer::client<cache_prox_checker> {
     mc_map->maybe_lock_rd(mc_map->cache_mtx(), need_lock);
     for (const auto* cache : mc_map->caches()) {
       if (mc_prox_dist >= (cache->rcenter2D() - c.rpos2D()).length()) {
-        result = {cache->id(),
-                  cache->rcenter2D(),
-                  cache->rcenter2D() - c.rpos2D()};
+        result = { cache->id(),
+                   cache->rcenter2D(),
+                   cache->rcenter2D() - c.rpos2D() };
         break;
       }
     } /* for(&b..) */
@@ -108,7 +107,7 @@ class cache_prox_checker: public rer::client<cache_prox_checker> {
     return result;
   }
 
-  template<typename TController>
+  template <typename TController>
   bool check_and_notify(TController& controller,
                         RCPPSW_UNUSED const std::string& drop_dest) const {
     mc_map->lock_rd(mc_map->cache_mtx());
@@ -129,7 +128,8 @@ class cache_prox_checker: public rer::client<cache_prox_checker> {
       mc_map->unlock_rd(mc_map->cache_mtx());
       return false;
     } else {
-      ER_WARN("Robot%d@%s cannot drop block in %s: Cache%d@%s too close (%f <= %f)",
+      ER_WARN("Robot%d@%s cannot drop block in %s: Cache%d@%s too close (%f <= "
+              "%f)",
               controller.entity_id().v(),
               controller.rpos2D().to_str().c_str(),
               drop_dest.c_str(),
@@ -143,12 +143,10 @@ class cache_prox_checker: public rer::client<cache_prox_checker> {
        * the index position of cache i to be the same as its ID, so we need to
        * search for the correct cache.
        */
-      auto it = std::find_if(mc_map->caches().begin(),
-                             mc_map->caches().end(),
-                             [&](const auto& c) {
-                               return c->id() == prox_status.id;
-                             });
-
+      auto it =
+          std::find_if(mc_map->caches().begin(),
+                       mc_map->caches().end(),
+                       [&](const auto& c) { return c->id() == prox_status.id; });
 
       events::cache_proximity_visitor prox_op(*it);
       prox_op.visit(controller);
@@ -163,7 +161,6 @@ class cache_prox_checker: public rer::client<cache_prox_checker> {
   const carena::caching_arena_map* mc_map;
   /* clang-format on */
 };
-
 
 NS_END(support, fordyca);
 

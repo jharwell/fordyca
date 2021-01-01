@@ -71,9 +71,8 @@ class foraging_expstrat;
  * \brief Acquire an existing cache within the arena. Once such a cache has been
  * acquired (always by vectoring), it signals that it has completed its task.
  */
-class acquire_existing_cache_fsm
-    : public rer::client<acquire_existing_cache_fsm>,
-      public csfsm::acquire_goal_fsm {
+class acquire_existing_cache_fsm : public rer::client<acquire_existing_cache_fsm>,
+                                   public csfsm::acquire_goal_fsm {
  public:
   /**
    * \param for_pickup Are we acquiring a cache for pickup or block drop?
@@ -88,8 +87,8 @@ class acquire_existing_cache_fsm
   ~acquire_existing_cache_fsm(void) override = default;
 
   acquire_existing_cache_fsm(const acquire_existing_cache_fsm&) = delete;
-  acquire_existing_cache_fsm& operator=(const acquire_existing_cache_fsm&) =
-      delete;
+  acquire_existing_cache_fsm&
+  operator=(const acquire_existing_cache_fsm&) = delete;
 
   const controller::cognitive::cache_sel_matrix* matrix(void) const {
     return mc_matrix;
@@ -101,8 +100,8 @@ class acquire_existing_cache_fsm
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  static csmetrics::goal_acq_metrics::goal_type acq_goal_internal(void)
-      RCPPSW_CONST;
+  static csmetrics::goal_acq_metrics::goal_type
+  acq_goal_internal(void) RCPPSW_CONST;
 
   boost::optional<acquire_goal_fsm::candidate_type> existing_cache_select(void);
   bool candidates_exist(void) const RCPPSW_PURE;
