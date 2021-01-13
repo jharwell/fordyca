@@ -164,7 +164,7 @@ bool dynamic_cache_creator::cache_i_verify(
     RCPPSW_UNUSED const carepr::arena_cache* cache,
     const cads::acache_vectorro& c_caches,
     const cds::block3D_vectorno& c_all_blocks,
-    const cfds::block3D_cluster_vector& c_clusters) const {
+    const cfds::block3D_cluster_vectorro& c_clusters) const {
   auto free_blocks = carena::free_blocks_calculator()(c_all_blocks, c_caches);
 
   if (!creation_sanity_checks(c_caches, free_blocks, c_clusters, m_map->nests())) {

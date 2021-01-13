@@ -42,7 +42,7 @@ cache_center_calculator::cache_center_calculator(
     cds::arena_grid* const grid,
     const rtypes::spatial_dist& cache_dim,
     const cads::nest_vectorro& c_nests,
-    const cfds::block3D_cluster_vector& c_clusters)
+    const cfds::block3D_cluster_vectorro& c_clusters)
     : ER_CLIENT_INIT("fordyca.support.d2.cache_center_calculator"),
       mc_cache_dim(cache_dim),
       mc_nests(c_nests),

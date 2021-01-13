@@ -153,7 +153,7 @@ class d2_loop_functions final : public d1::d1_loop_functions,
   std::mutex                                 m_dynamic_cache_mtx{};
   bool                                       m_dynamic_cache_create{false};
 
-  std::unique_ptr<d2_metrics_aggregator> m_metrics_agg;
+  std::unique_ptr<d2_metrics_aggregator>     m_metrics_agg;
   std::unique_ptr<dynamic_cache_manager>     m_cache_manager;
   std::unique_ptr<interactor_map_type>       m_interactor_map;
   std::unique_ptr<metric_extractor_map_type> m_metric_extractor_map;

@@ -142,7 +142,7 @@ private:
   void robot_post_step(argos::CFootBotEntity& robot);
 
   /* clang-format off */
-  std::unique_ptr<d0_metrics_aggregator>  m_metrics_agg;
+  std::unique_ptr<d0_metrics_aggregator>      m_metrics_agg;
   std::unique_ptr<interactor_map_type>        m_interactor_map;
   std::unique_ptr<metric_extraction_map_type> m_metrics_map;
   std::unique_ptr<los_updater_map_type>       m_los_update_map;

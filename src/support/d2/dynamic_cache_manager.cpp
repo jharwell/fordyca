@@ -96,7 +96,7 @@ dynamic_cache_manager::create(const cache_create_ro_params& c_params,
 boost::optional<dynamic_cache_manager::creation_blocks>
 dynamic_cache_manager::creation_blocks_alloc(
     const cads::acache_vectorno& existing_caches,
-    const cfds::block3D_cluster_vector& clusters,
+    const cfds::block3D_cluster_vectorro& clusters,
     const cds::block3D_vectorno& all_blocks) {
   creation_blocks blocks;
 

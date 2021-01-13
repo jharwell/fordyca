@@ -29,6 +29,7 @@
 #include "cosm/foraging/block_dist/base_distributor.hpp"
 #include "cosm/foraging/block_dist/dispatcher.hpp"
 #include "cosm/foraging/repr/block_cluster.hpp"
+#include "cosm/repr/nest.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -60,7 +61,7 @@ std::vector<rmath::vector2d> static_cache_locs_calculator::operator()(
    */
   if (dispatcher_type::kDistSingleSrc == distp->dist_type ||
       dispatcher_type::kDistDualSrc == distp->dist_type) {
-    auto clusters = arena_map->block_distributor()->block_clusters();
+    auto clusters = arena_map->block_distributor()->block_clustersro();
 
     for (auto& c : clusters) {
       cache_rlocs.push_back(
@@ -77,7 +78,7 @@ std::vector<rmath::vector2d> static_cache_locs_calculator::operator()(
      * Basically we want the cache centers to be halfway between the nest center
      * and each of the block cluster centers (we assume a square arena).
      */
-    auto clusters = arena_map->block_distributor()->block_clusters();
+    auto clusters = arena_map->block_distributor()->block_clustersro();
     for (auto& c : clusters) {
       bool on_center_y = std::fabs(c->xrspan().center() - nest->rcenter2D().x()) <
                          0.5;

@@ -79,7 +79,7 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
   cache_center_calculator(cds::arena_grid* grid,
                           const rtypes::spatial_dist& cache_dim,
                           const cads::nest_vectorro& c_nests,
-                          const cfds::block3D_cluster_vector& c_clusters);
+                          const cfds::block3D_cluster_vectorro& c_clusters);
 
   cache_center_calculator(const cache_center_calculator&) = delete;
   cache_center_calculator& operator=(const cache_center_calculator&) = delete;
@@ -148,7 +148,7 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
   /* clang-format off */
   const rtypes::spatial_dist         mc_cache_dim;
   const cads::nest_vectorro          mc_nests;
-  const cfds::block3D_cluster_vector mc_clusters;
+  const cfds::block3D_cluster_vectorro mc_clusters;
 
   cds::arena_grid*                   m_grid;
   /* clang-format on */

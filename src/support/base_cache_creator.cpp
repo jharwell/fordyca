@@ -192,7 +192,7 @@ void base_cache_creator::cache_extents_configure(
 bool base_cache_creator::creation_sanity_checks(
     const cads::acache_vectorro& c_caches,
     const cds::block3D_vectorno& c_free_blocks,
-    const cfds::block3D_cluster_vector& c_clusters,
+    const cfds::block3D_cluster_vectorro& c_clusters,
     const cads::nest_vectorro& c_nests) const {
   for (auto& c : c_caches) {
     ER_CHECK(sanity_check_internal_consistency(c),
@@ -287,7 +287,7 @@ error:
 
 bool base_cache_creator::sanity_check_block_cluster_overlap(
     const carepr::arena_cache* cache,
-    const cfds::block3D_cluster_vector& clusters) const {
+    const cfds::block3D_cluster_vectorro& clusters) const {
   for (auto& cluster : clusters) {
     ER_CHECK(!(cache->xrspan().overlaps_with(cluster->xrspan()) &&
                cache->yrspan().overlaps_with(cluster->yrspan())),

@@ -153,7 +153,6 @@ git clone https://github.com/swarm-robotics/fordyca.git
 cd fordyca
 git checkout devel
 git submodule update --init --recursive --remote
-npm install
 
 rm -rf ext/cosm
 ln -s $repo_root/cosm ext/cosm
@@ -170,9 +169,9 @@ mkdir -p build && cd build
 cmake \
     -DCMAKE_C_COMPILER=gcc-9\
     -DCMAKE_CXX_COMPILER=g++-9\
-    -DCMAKE_BUILD_TYPE=$build_type\
-    -DCOSM_PROJECT_DEPS_PREFIX=$prefix\
-    -DLIBRA_ER="$er"\
+    -DCMAKE_BUILD_TYPE=OPT\
+    -DCOSM_PROJECT_DEPS_PREFIX=/usr/local\
+    -DLIBRA_ER=NONE\
     ..
 make -j $n_cores
 make documentation

@@ -334,7 +334,7 @@
               n_clusters="10"
               />
           <manifest
-              n_cube="100"
+              n_cube="300"
               n_ramp="0"
               unit_dim="0.2"
               />

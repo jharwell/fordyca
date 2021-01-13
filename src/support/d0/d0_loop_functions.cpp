@@ -150,7 +150,7 @@ void d0_loop_functions::private_init(void) {
       &output->metrics,
       &arena->grid,
       output_root(),
-      arena_map()->block_distributor()->block_clusters().size());
+      arena_map()->block_distributor()->block_clustersro().size());
 
   /* this starts at 0, and ARGoS starts at 1, so sync up */
   m_metrics_agg->timestep_inc_all();
@@ -232,6 +232,7 @@ void d0_loop_functions::post_step(void) {
   arena_map()->post_step_update(
       rtypes::timestep(GetSpace().GetSimulationClock()),
       collector->cum_transported(),
+      false, /* all pickup/drop block ops handled internally by arena map */
       nullptr != conv_calculator() ? conv_calculator()->converged() : false);
 
   /* Collect metrics from loop functions */
@@ -326,6 +327,7 @@ void d0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
   if (interactor_status::ekNO_EVENT != status && nullptr != oracle()) {
     oracle()->update(arena_map());
   }
+
   /*
    * Collect metrics from robot, now that it has finished interacting with the
    * environment and no more changes to its state will occur this timestep.

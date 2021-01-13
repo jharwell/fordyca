@@ -232,7 +232,7 @@ void d1_loop_functions::private_init(void) {
       &output->metrics,
       &arena->grid,
       output_root(),
-      arena_map()->block_distributor()->block_clusters().size());
+      arena_map()->block_distributor()->block_clustersro().size());
   /* this starts at 0, and ARGoS starts at 1, so sync up */
   m_metrics_agg->timestep_inc_all();
 
@@ -321,9 +321,9 @@ void d1_loop_functions::cache_handling_init(
   auto cache_locs = static_cache_locs_calculator()(arena_map(), distp);
   m_cache_manager = std::make_unique<static_cache_manager>(
       cachep, arena_map(), cache_locs, rng());
-  cfds::block3D_cluster_vector clusters;
+  cfds::block3D_cluster_vectorro clusters;
   if (!delay_arena_map_init()) {
-    clusters = arena_map()->block_distributor()->block_clusters();
+    clusters = arena_map()->block_distributor()->block_clustersro();
   }
   cache_create_ro_params ccp = { .current_caches = arena_map()->caches(),
                                  .clusters = clusters,
@@ -397,12 +397,12 @@ void d1_loop_functions::post_step(void) {
    * allowed 1 usage of ARGoS threads per PreStep()/PostStep() function call.
    */
   auto cb = [&](argos::CControllableEntity* robot) {
-    ndc_push();
-    robot_post_step(dynamic_cast<argos::CFootBotEntity&>(robot->GetParent()));
-    caches_recreation_task_counts_collect(
-        &static_cast<controller::foraging_controller&>(robot->GetController()));
-    ndc_pop();
-  };
+              ndc_push();
+              robot_post_step(dynamic_cast<argos::CFootBotEntity&>(robot->GetParent()));
+              caches_recreation_task_counts_collect(
+                  &static_cast<controller::foraging_controller&>(robot->GetController()));
+              ndc_pop();
+            };
   cpal::argos_swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
 
   ndc_push();
@@ -418,13 +418,20 @@ void d1_loop_functions::post_step(void) {
   /* update arena map */
   auto* collector =
       m_metrics_agg->get<cfmetrics::block_transportee_metrics_collector>("blocks::"
-                                                                       "transpor"
-                                                                       "ter");
+                                                                         "transpor"
+                                                                         "ter");
 
+  /*
+   * Update arena map. Free block pickups and nest block drops are covered
+   * internally by the arena map in terms of updating block clusters, but task
+   * aborts are not, and we need to handle those.
+   */
   arena_map()->post_step_update(
       rtypes::timestep(GetSpace().GetSimulationClock()),
       collector->cum_transported(),
+      block_op(),
       nullptr != conv_calculator() ? conv_calculator()->converged() : false);
+  block_op(false);
 
   /* Collect metrics from/about existing caches */
   for (auto* c : arena_map()->caches()) {
@@ -473,7 +480,7 @@ void d1_loop_functions::reset(void) {
 
   cache_create_ro_params ccp = {
     .current_caches = arena_map()->caches(),
-    .clusters = arena_map()->block_distributor()->block_clusters(),
+    .clusters = arena_map()->block_distributor()->block_clustersro(),
     .t = rtypes::timestep(GetSpace().GetSimulationClock())
   };
 
@@ -561,6 +568,16 @@ void d1_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
   }
 
   /*
+   * Mark that a block operation has occured this timestep, and additional
+   * processing is needed AFTER all robots have finished their control steps.
+   */
+  if ((interactor_status::ekFREE_BLOCK_DROP | interactor_status::ekTASK_ABORT) & status) {
+    block_op_mtx()->lock();
+    block_op(true);
+    block_op_mtx()->unlock();
+  }
+
+  /*
    * Collect metrics from robot, now that it has finished interacting with the
    * environment and no more changes to its state will occur this timestep.
    */
@@ -586,7 +603,7 @@ void d1_loop_functions::static_cache_monitor(void) {
 
   cache_create_ro_params ccp = {
     .current_caches = arena_map()->caches(),
-    .clusters = arena_map()->block_distributor()->block_clusters(),
+    .clusters = arena_map()->block_distributor()->block_clustersro(),
     .t = rtypes::timestep(GetSpace().GetSimulationClock())
   };
 

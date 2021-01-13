@@ -102,7 +102,8 @@
           output_dir="metrics">
           <append
               output_interval="1000"
-              block_transport="block-transport.csv"
+              block_transporter="block-transporter.csv"
+              block_transportee="block-transportee.csv"
               fsm_collision_counts="fsm-collision-counts.csv"
               fsm_movement="fsm-movement.csv"
               block_acq_counts="block-acq-counts.csv"

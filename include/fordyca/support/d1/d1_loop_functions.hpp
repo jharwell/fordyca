@@ -98,6 +98,10 @@ class d1_loop_functions : public d0::d0_loop_functions,
    */
   void shared_init(ticpp::Element& node) RCPPSW_COLD;
 
+  bool block_op(void) const { return m_block_op; }
+  void block_op(bool block_op) { m_block_op = block_op; }
+  std::mutex* block_op_mtx(void) { return &m_block_op_mtx; }
+
  private:
   struct cache_counts {
     std::atomic_uint n_harvesters{0};
@@ -202,13 +206,16 @@ class d1_loop_functions : public d0::d0_loop_functions,
       const controller::foraging_controller* controller);
 
   /* clang-format off */
+  bool                                                m_block_op{false};
+  std::mutex                                          m_block_op_mtx{};
+
   std::unique_ptr<interactor_map_type>                m_interactor_map;
   std::unique_ptr<metric_extractor_map_type>          m_metric_extractor_map;
   std::unique_ptr<los_updater_map_type>               m_los_update_map;
   std::unique_ptr<task_extractor_map_type>            m_task_extractor_map;
   std::unique_ptr<detail::d1_subtask_status_map_type> m_subtask_status_map;
 
-  std::unique_ptr<d1_metrics_aggregator>          m_metrics_agg;
+  std::unique_ptr<d1_metrics_aggregator>              m_metrics_agg;
   std::unique_ptr<static_cache_manager>               m_cache_manager;
   cache_counts                                        m_cache_counts{};
   /* clang-format on */

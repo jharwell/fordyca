@@ -119,7 +119,7 @@ class dynamic_cache_creator : public base_cache_creator,
   bool cache_i_verify(const carepr::arena_cache* cache,
                       const cads::acache_vectorro& c_caches,
                       const cds::block3D_vectorno& c_all_blocks,
-                      const cfds::block3D_cluster_vector& c_clusters) const;
+                      const cfds::block3D_cluster_vectorro& c_clusters) const;
 
   /**
    * \brief If a newly created cache failed verification checks, delete it.

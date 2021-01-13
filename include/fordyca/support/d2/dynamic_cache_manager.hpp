@@ -114,7 +114,7 @@ class dynamic_cache_manager final : public base_cache_manager,
    */
   boost::optional<creation_blocks> creation_blocks_alloc(
       const cads::acache_vectorno& existing_caches,
-      const cfds::block3D_cluster_vector& clusters,
+      const cfds::block3D_cluster_vectorro& clusters,
       const cds::block3D_vectorno& all_blocks);
 
   bool creation_blocks_alloc_check(const creation_blocks& c_blocks,

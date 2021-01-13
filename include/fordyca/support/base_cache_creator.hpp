@@ -103,7 +103,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
   bool
   creation_sanity_checks(const cads::acache_vectorro& c_caches,
                          const cds::block3D_vectorno& c_free_blocks,
-                         const cfds::block3D_cluster_vector& c_clusters,
+                         const cfds::block3D_cluster_vectorro& c_clusters,
                          const cads::nest_vectorro& c_nests) const RCPPSW_PURE;
 
  protected:
@@ -139,7 +139,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
                                   const cds::block3D_vectorno& free_blocks) const;
   bool sanity_check_block_cluster_overlap(
       const carepr::arena_cache* cache,
-      const cfds::block3D_cluster_vector& clusters) const;
+      const cfds::block3D_cluster_vectorro& clusters) const;
 
   bool sanity_check_nest_overlap(const carepr::arena_cache* cache,
                                  const cads::nest_vectorro& nests) const;
