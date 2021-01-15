@@ -131,29 +131,34 @@ void foraging_controller::saa_init(
     const csubsystem::config::sensing_subsystemQ3D_config* sensing_p) {
   using saa_names = crfootbot::config::saa_xml_names;
 
-#ifdef FORDYCA_WITH_ROBOT_RAB
+#ifdef FORDYCA_WITH_FOOTBOT_RAB
   /* auto rabs = chal::sensors::wifi_sensor( */
   /*     GetSensor<argos::CCI_RangeAndBearingSensor>(saa_names::rab_saa)); */
   auto rabs = nullptr;
 #else
   auto rabs = chal::sensors::wifi_sensor(nullptr);
-#endif /* FORDYCA_WITH_ROBOT_RAB */
+#endif /* FORDYCA_WITH_FOOTBOT_RAB */
 
-#ifdef FORDYCA_WITH_ROBOT_BATTERY
+#ifdef FORDYCA_WITH_FOOTBOT_BATTERY
   auto battery = chal::sensors::battery_sensor(
       GetSensor<argos::CCI_BatterySensor>(saa_names::battery_sensor));
 #else
   auto battery = chal::sensors::battery_sensor(nullptr);
-#endif /* FORDYCA_WITH_ROBOT_BATTERY */
+#endif /* FORDYCA_WITH_FOOTBOT_BATTERY */
+
+#ifdef FORDYCA_WITH_FOOTBOT_CAMERA
+  auto blobs = chal::sensors::colored_blob_camera_sensor(
+      GetSensor<argos::CCI_ColoredBlobOmnidirectionalCameraSensor>(
+          saa_names::camera_sensor));
+#else
+  auto blobs = chal::sensors::colored_blob_camera_sensor(nullptr);
+#endif
 
   auto position = chal::sensors::position_sensor(
       GetSensor<argos::CCI_PositioningSensor>(saa_names::position_sensor));
   auto proximity = chal::sensors::proximity_sensor(
       GetSensor<argos::CCI_FootBotProximitySensor>(saa_names::prox_sensor),
       &sensing_p->proximity);
-  auto blobs = chal::sensors::colored_blob_camera_sensor(
-      GetSensor<argos::CCI_ColoredBlobOmnidirectionalCameraSensor>(
-          saa_names::camera_sensor));
   auto light = chal::sensors::light_sensor(
       GetSensor<argos::CCI_FootBotLightSensor>(saa_names::light_sensor));
   auto ground = chal::sensors::ground_sensor(
@@ -181,20 +186,20 @@ void foraging_controller::saa_init(
               saa_names::diff_steering_saa)),
       ckin2D::governed_diff_drive::drive_type::ekFSM_DRIVE);
 
-#ifdef COSM_ARGOS_WITH_ROBOT_LEDS
+#ifdef FORDYCA_WITH_FOOTBOT_LEDS
   auto leds = chal::actuators::led_actuator(
       GetActuator<argos::CCI_LEDsActuator>(saa_names::leds_saa));
 #else
   auto leds = chal::actuators::led_actuator(nullptr);
-#endif /* COSM_ARGOS_WITH_ROBOT_LEDS */
+#endif /* FORDYCA_WITH_FOOTBOT_LEDS */
 
-#ifdef FORDYCA_WITH_ROBOT_RAB
+#ifdef FORDYCA_WITH_FOOTBOT_RAB
   auto raba = chal::actuators::wifi_actuator(
       GetActuator<argos::CCI_RangeAndBearingActuator>(saa_names::rab_saa));
 
 #else
   auto raba = chal::actuators::wifi_actuator(nullptr);
-#endif /* FORDYCA_WITH_ROBOT_RABS */
+#endif /* FORDYCA_WITH_FOOTBOT_RABS */
 
   auto actuators = csubsystem::actuation_subsystem2D::actuator_map{
     /*

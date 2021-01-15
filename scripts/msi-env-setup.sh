@@ -34,5 +34,5 @@ fi
 # Add argos to our path
 gcc_prefix=$(gcc -v 2>&1  |grep prefix | awk -F'=' '{print $2}' | awk '{print $1}')
 export PATH=$PATH:$SWARMROOT/bin
-export ARGOS_PLUGIN_PATH=$SWARMROOT/$MSICLUSTER/lib/argos3
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$SWARMROOT/$MSICLUSTER/lib/argos3:$gcc_prefix/lib64
+export ARGOS_PLUGIN_PATH=$SWARMROOT/$MSIARCH/lib/argos3
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$SWARMROOT/$MSIARCH/lib/argos3:$gcc_prefix/lib64

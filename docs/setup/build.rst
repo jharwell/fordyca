@@ -81,15 +81,17 @@ one ``bootstrap.sh`` uses for you. Something like the following, run from the
   -DWITH_FOOTBOT_BATTERY=NO \
   -DWITH_FOOTBOT_RAB=NO \
   -DWITH_FOOTBOT_LEDS=NO \
+  -DWITH_FOOTBOT_CAMERA=NO \
   \..
 
 To get an idea of what some of the non-project specific options mean, head over
 to the :xref:`LIBRA` docs.
 
-``WITH_FOOTBOT_BATTERY``, ``WITH_FOOTBOT_RAB``, ``WITH_FOOTBOT_LEDS`` are things
-that are only needed if you are running experiments which utilize those
-sensors/actuators, otherwise they slow things down a **LOT** with large swarms
-(which is why you are compiling with optimizations on in the first place).
+``WITH_FOOTBOT_BATTERY``, ``WITH_FOOTBOT_RAB``, ``WITH_FOOTBOT_LEDS``,
+``WITH_FOOTBOT_CAMERA`` are things that are only needed if you are running
+experiments which utilize those sensors/actuators, otherwise they slow things
+down a **LOT** with large swarms (which is why you are compiling with
+optimizations on in the first place).
 
 Build Notes
 -----------

@@ -320,7 +320,8 @@
             policy="Null"
             random_walk_prob="1.0"/>
         <distribution
-            dist_type="random">
+            dist_type="single_source"
+            strict_success="false">
 
           <!-- <redist_governor -->
           <!--     trigger="timestep" -->
