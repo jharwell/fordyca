@@ -45,15 +45,15 @@ cache_site_selector::cache_site_selector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-boost::optional<rmath::vector2d> cache_site_selector::operator()(
-    const ds::dp_cache_map& known_caches,
-    rmath::vector2d position,
-    rmath::rng* rng) {
+boost::optional<rmath::vector2d>
+cache_site_selector::operator()(const ds::dp_cache_map& known_caches,
+                                rmath::vector2d position,
+                                rmath::rng* rng) {
   double max_utility;
   std::vector<double> point;
   struct site_utility_data u;
   rmath::vector2d site;
-  opt_init_conditions init_cond{known_caches, position};
+  opt_init_conditions init_cond{ known_caches, position };
   opt_initialize(&init_cond, &u, &point, rng);
 
   /*
@@ -78,7 +78,8 @@ boost::optional<rmath::vector2d> cache_site_selector::operator()(
   ER_INFO("Computed cache site@%s", rcppsw::to_string(site).c_str());
 
   bool site_ok = verify_site(site, known_caches);
-  bool strict = boost::get<bool>(mc_matrix->find(cselm::kStrictConstraints)->second);
+  bool strict =
+      boost::get<bool>(mc_matrix->find(cselm::kStrictConstraints)->second);
 
   if (site_ok || (!site_ok && !strict)) {
     return boost::make_optional(site);
@@ -96,21 +97,21 @@ bool cache_site_selector::verify_site(const rmath::vector2d& site,
   /* check distances to known caches */
   for (auto& c : known_caches.const_values_range()) {
     ER_CHECK(rtypes::spatial_dist((c.ent()->rcenter2D() - site).length()) >=
-                  std::get<0>(m_constraints)[0].cache_prox,
-              "Cache site@%s too close to cache%d (%f <= %f)",
+                 std::get<0>(m_constraints)[0].cache_prox,
+             "Cache site@%s too close to cache%d (%f <= %f)",
              rcppsw::to_string(site).c_str(),
-              c.ent()->id().v(),
-              (c.ent()->rcenter2D() - site).length(),
-              std::get<0>(m_constraints)[0].cache_prox.v());
+             c.ent()->id().v(),
+             (c.ent()->rcenter2D() - site).length(),
+             std::get<0>(m_constraints)[0].cache_prox.v());
   } /* for(&c..) */
 
   /* check distance to nest center */
   ER_CHECK(rtypes::spatial_dist((ndata->nest_loc - site).length()) >=
-                ndata->nest_prox,
-            "Cache site@%s too close to nest (%f <= %f)",
+               ndata->nest_prox,
+           "Cache site@%s too close to nest (%f <= %f)",
            rcppsw::to_string(site).c_str(),
-            (ndata->nest_loc - site).length(),
-            ndata->nest_prox.v());
+           (ndata->nest_loc - site).length(),
+           ndata->nest_prox.v());
 
   return true;
 
@@ -140,16 +141,16 @@ void cache_site_selector::opt_initialize(const opt_init_conditions* cond,
       boost::get<rmath::rangeu>(mc_matrix->find(cselm::kSiteXRange)->second);
   auto yrange =
       boost::get<rmath::rangeu>(mc_matrix->find(cselm::kSiteYRange)->second);
-  *utility_data = {cond->position, nest_loc};
+  *utility_data = { cond->position, nest_loc };
   m_alg.set_max_objective(&__site_utility_func, utility_data);
   m_alg.set_ftol_rel(kUTILITY_TOL);
   m_alg.set_stopval(1000000);
   m_alg.set_lower_bounds(
-      {static_cast<double>(xrange.lb()), static_cast<double>(yrange.lb())});
+      { static_cast<double>(xrange.lb()), static_cast<double>(yrange.lb()) });
   m_alg.set_upper_bounds(
-      {static_cast<double>(xrange.ub()), static_cast<double>(yrange.ub())});
+      { static_cast<double>(xrange.ub()), static_cast<double>(yrange.ub()) });
   m_alg.set_maxeval(kMAX_ITERATIONS);
-  m_alg.set_default_initial_step({1.0, 1.0});
+  m_alg.set_default_initial_step({ 1.0, 1.0 });
 
   /* Initial guess: random point in the arena */
   std::uniform_int_distribution<> xdist(xrange.lb(), xrange.ub());
@@ -157,7 +158,7 @@ void cache_site_selector::opt_initialize(const opt_init_conditions* cond,
   uint x = rng->uniform(xrange);
   uint y = rng->uniform(yrange);
 
-  *initial_guess = {static_cast<double>(x), static_cast<double>(y)};
+  *initial_guess = { static_cast<double>(x), static_cast<double>(y) };
   ER_INFO("Initial guess: (%u,%u), xrange=%s, yrange=%s",
           x,
           y,
@@ -165,27 +166,25 @@ void cache_site_selector::opt_initialize(const opt_init_conditions* cond,
           yrange.to_str().c_str());
 } /* opt_initialize() */
 
-void cache_site_selector::constraints_create(
-    const ds::dp_cache_map& known_caches,
-    const rmath::vector2d& nest_loc) {
+void cache_site_selector::constraints_create(const ds::dp_cache_map& known_caches,
+                                             const rmath::vector2d& nest_loc) {
   for (auto& c : known_caches.const_values_range()) {
     std::get<0>(m_constraints)
-        .push_back({c.ent(),
-                    this,
-                    boost::get<rtypes::spatial_dist>(
-                        mc_matrix->find(cselm::kCacheProxDist)->second)});
+        .push_back({ c.ent(),
+                     this,
+                     boost::get<rtypes::spatial_dist>(
+                         mc_matrix->find(cselm::kCacheProxDist)->second) });
   } /* for(&c..) */
 
   std::get<1>(m_constraints)
-      .push_back({nest_loc,
-                  this,
-                  boost::get<rtypes::spatial_dist>(
-                      mc_matrix->find(cselm::kNestProxDist)->second)});
+      .push_back({ nest_loc,
+                   this,
+                   boost::get<rtypes::spatial_dist>(
+                       mc_matrix->find(cselm::kNestProxDist)->second) });
 
   for (auto& c : std::get<0>(m_constraints)) {
-    m_alg.add_inequality_constraint(__cache_constraint_func,
-                                    &c,
-                                    kCACHE_CONSTRAINT_TOL);
+    m_alg.add_inequality_constraint(
+        __cache_constraint_func, &c, kCACHE_CONSTRAINT_TOL);
   } /* for(c..) */
 
   m_alg.add_inequality_constraint(__nest_constraint_func,

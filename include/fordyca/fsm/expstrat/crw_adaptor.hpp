@@ -59,20 +59,20 @@ class crw_adaptor final : public foraging_expstrat,
   crw_adaptor& operator=(const crw_adaptor&) = delete;
 
   /* interference metrics */
-  RCPPSW_DECLDEF_WRAP_OVERRIDE(exp_interference, decoratee(), const);
-  RCPPSW_DECLDEF_WRAP_OVERRIDE(entered_interference, decoratee(), const);
-  RCPPSW_DECLDEF_WRAP_OVERRIDE(exited_interference, decoratee(), const);
-  RCPPSW_DECLDEF_WRAP_OVERRIDE(interference_duration, decoratee(), const);
-  RCPPSW_DECLDEF_WRAP_OVERRIDE(interference_loc3D, decoratee(), const);
+  RCPPSW_WRAP_DECLDEF_OVERRIDE(exp_interference, decoratee(), const);
+  RCPPSW_WRAP_DECLDEF_OVERRIDE(entered_interference, decoratee(), const);
+  RCPPSW_WRAP_DECLDEF_OVERRIDE(exited_interference, decoratee(), const);
+  RCPPSW_WRAP_DECLDEF_OVERRIDE(interference_duration, decoratee(), const);
+  RCPPSW_WRAP_DECLDEF_OVERRIDE(interference_loc3D, decoratee(), const);
 
-  RCPPSW_DECLDEF_WRAP_OVERRIDE(task_reset, decoratee());
-  RCPPSW_DECLDEF_WRAP_OVERRIDE(task_running, decoratee(), const);
-  RCPPSW_DECLDEF_WRAP_OVERRIDE(task_finished, decoratee(), const);
-  RCPPSW_DECLDEF_WRAP_OVERRIDE(task_execute, decoratee());
+  RCPPSW_WRAP_DECLDEF_OVERRIDE(task_reset, decoratee());
+  RCPPSW_WRAP_DECLDEF_OVERRIDE(task_running, decoratee(), const);
+  RCPPSW_WRAP_DECLDEF_OVERRIDE(task_finished, decoratee(), const);
+  RCPPSW_WRAP_DECLDEF_OVERRIDE(task_execute, decoratee());
   void task_start(cta::taskable_argument* arg) override { decoratee().task_start(arg); }
 
   /* prototype overrides */
-  RCPPSW_DECLDEF_WRAP_OVERRIDE(clone, decoratee(), const);
+  RCPPSW_WRAP_DECLDEF_OVERRIDE(clone, decoratee(), const);
 };
 
 NS_END(expstrat, fsm, fordyca);

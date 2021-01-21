@@ -24,10 +24,10 @@
 #include "fordyca/controller/cognitive/d1/bitd_mdpo_controller.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/subsystem/perception/config/perception_config.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/subsystem/perception/config/perception_config.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 
 #include "fordyca/config/d1/controller_repository.hpp"
@@ -108,10 +108,9 @@ void bitd_mdpo_controller::shared_init(
    * bitd_dpo_controller, we have to replace it because we have our own
    * perception subsystem, which is used to create the executive's graph.
    */
-  executive(task_executive_builder(block_sel_matrix(),
-                                   cache_sel_matrix(),
-                                   saa(),
-                                   perception())(config_repo, rng()));
+  executive(task_executive_builder(
+      block_sel_matrix(), cache_sel_matrix(), saa(), perception())(config_repo,
+                                                                   rng()));
   executive()->task_abort_notify(std::bind(
       &bitd_mdpo_controller::task_abort_cb, this, std::placeholders::_1));
 } /* shared_init() */
@@ -120,8 +119,8 @@ mdpo_perception_subsystem* bitd_mdpo_controller::mdpo_perception(void) {
   return static_cast<mdpo_perception_subsystem*>(dpo_controller::perception());
 } /* perception() */
 
-const mdpo_perception_subsystem* bitd_mdpo_controller::mdpo_perception(
-    void) const {
+const mdpo_perception_subsystem*
+bitd_mdpo_controller::mdpo_perception(void) const {
   return static_cast<const mdpo_perception_subsystem*>(
       dpo_controller::perception());
 } /* perception() */

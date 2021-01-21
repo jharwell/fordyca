@@ -59,8 +59,7 @@ class robot_free_block_pickup : public rer::client<robot_free_block_pickup>,
  private:
   struct visit_typelist_impl {
     using controllers = boost::mpl::joint_view<
-        boost::mpl::joint_view<controller::d0::typelist,
-                               controller::d1::typelist>,
+        boost::mpl::joint_view<controller::d0::typelist, controller::d1::typelist>,
         controller::d2::typelist>;
     using tasks = rmpl::typelist<tasks::d0::generalist,
                                  tasks::d1::harvester,
@@ -144,7 +143,8 @@ NS_END(detail);
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using robot_free_block_pickup_visitor = rpvisitor::filtered_visitor<detail::robot_free_block_pickup>;
+using robot_free_block_pickup_visitor =
+    rpvisitor::filtered_visitor<detail::robot_free_block_pickup>;
 
 NS_END(events, fordyca);
 

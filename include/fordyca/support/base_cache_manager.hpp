@@ -28,8 +28,8 @@
 #include <vector>
 
 #include "rcppsw/er/client.hpp"
-#include "rcppsw/types/timestep.hpp"
 #include "rcppsw/types/spatial_dist.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 #include "cosm/arena/ds/cache_vector.hpp"
 #include "cosm/ds/block3D_vector.hpp"
@@ -68,7 +68,9 @@ class base_cache_manager : public metrics::caches::lifecycle_metrics,
 
   /* cache lifecycle metrics */
   size_t caches_created(void) const override final { return m_caches_created; }
-  size_t caches_discarded(void) const override final { return m_caches_discarded; }
+  size_t caches_discarded(void) const override final {
+    return m_caches_discarded;
+  }
   size_t caches_depleted(void) const override final {
     return m_depletion_ages.size();
   }

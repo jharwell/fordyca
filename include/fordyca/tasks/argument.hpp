@@ -50,8 +50,7 @@ NS_START(fordyca, tasks);
  */
 class foraging_signal_argument : public cta::taskable_argument {
  public:
-  explicit foraging_signal_argument(fsm::foraging_signal::type s)
-      : m_signal(s) {}
+  explicit foraging_signal_argument(fsm::foraging_signal::type s) : m_signal(s) {}
 
   fsm::foraging_signal::type signal(void) const { return m_signal; }
 

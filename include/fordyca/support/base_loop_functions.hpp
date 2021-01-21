@@ -101,16 +101,16 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
   using convergence_calculator_type =
       cpal::argos_convergence_calculator<cpal::argos_controller2D_adaptor>;
 
-  base_loop_functions(void) RCSW_COLD;
-  ~base_loop_functions(void) override RCSW_COLD;
+  base_loop_functions(void) RCPPSW_COLD;
+  ~base_loop_functions(void) override RCPPSW_COLD;
 
   /* Not copy constructible/assignable by default */
   base_loop_functions(const base_loop_functions& s) = delete;
   base_loop_functions& operator=(const base_loop_functions& s) = delete;
 
   /* swarm manager overrides */
-  void init(ticpp::Element&) override RCSW_COLD;
-  void reset(void) override RCSW_COLD;
+  void init(ticpp::Element&) override RCPPSW_COLD;
+  void reset(void) override RCPPSW_COLD;
   void pre_step(void) override;
   void post_step(void) override;
 
@@ -119,20 +119,16 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
     return m_conv_calc.get();
   }
   const cforacle::foraging_oracle* oracle(void) const { return m_oracle.get(); }
-  const carena::caching_arena_map* arena_map(void) const RCSW_PURE;
+  const carena::caching_arena_map* arena_map(void) const RCPPSW_PURE;
 
  protected:
   tv::tv_manager* tv_manager(void) { return m_tv_manager.get(); }
-  const config::loop_function_repository* config(void) const {
-    return &m_config;
-  }
+  const config::loop_function_repository* config(void) const { return &m_config; }
   config::loop_function_repository* config(void) { return &m_config; }
-  convergence_calculator_type* conv_calculator(void) {
-    return m_conv_calc.get();
-  }
+  convergence_calculator_type* conv_calculator(void) { return m_conv_calc.get(); }
   cforacle::foraging_oracle* oracle(void) { return m_oracle.get(); }
-  carena::caching_arena_map* arena_map(void) RCSW_PURE;
-  void config_parse(ticpp::Element& node) RCSW_COLD;
+  carena::caching_arena_map* arena_map(void) RCPPSW_PURE;
+  void config_parse(ticpp::Element& node) RCPPSW_COLD;
 
   /*
    * If we are doing a powerlaw distribution we may need to create caches BEFORE
@@ -149,31 +145,33 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
    *
    * \param config Parsed convergence parameters.
    */
-  void convergence_init(const cconvconfig::convergence_config* config) RCSW_COLD;
+  void
+  convergence_init(const cconvconfig::convergence_config* config) RCPPSW_COLD;
 
   /**
    * \brief Initialize temporal variance handling.
    *
    * \param tvp Parsed TV parameters.
    */
-  void tv_init(const config::tv::tv_manager_config* tvp) RCSW_COLD;
+  void tv_init(const config::tv::tv_manager_config* tvp) RCPPSW_COLD;
 
   /**
    * \brief Initialize logging for all support/loop function code.
    *
    * \param output Parsed output parameters.
    */
-  void output_init(const cmconfig::output_config* output) RCSW_COLD;
+  void output_init(const cmconfig::output_config* output) RCPPSW_COLD;
 
   /**
    * \brief Initialize oracular information injection.
    *
    * \param oraclep Parsed \ref aggregate_oracle parameters.
    */
-  void oracle_init(const coconfig::aggregate_oracle_config* oraclep) RCSW_COLD;
+  void oracle_init(const coconfig::aggregate_oracle_config* oraclep) RCPPSW_COLD;
 
   /* clang-format off */
   bool                                         m_delay_arena_map_init{false};
+
   config::loop_function_repository             m_config{};
   std::unique_ptr<tv::tv_manager>              m_tv_manager;
   std::unique_ptr<convergence_calculator_type> m_conv_calc;

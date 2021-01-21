@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH2_CACHE_SITE_BLOCK_DROP_INTERACTOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH2_CACHE_SITE_BLOCK_DROP_INTERACTOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_D2_CACHE_SITE_BLOCK_DROP_INTERACTOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_D2_CACHE_SITE_BLOCK_DROP_INTERACTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -167,7 +167,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
     auto acq_goal = controller.current_task()->acquisition_goal();
     auto* task = dynamic_cast<const events::dynamic_cache_interactor*>(
         controller.current_task());
-    RCSW_UNUSED auto* polled = dynamic_cast<const cta::polled_task*>(
+    RCPPSW_UNUSED auto* polled = dynamic_cast<const cta::polled_task*>(
         controller.current_task());
 
     ER_CHECK(penalty.controller() == &controller,
@@ -209,4 +209,4 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
 
 NS_END(d2, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH2_CACHE_SITE_BLOCK_DROP_INTERACTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_D2_CACHE_SITE_BLOCK_DROP_INTERACTOR_HPP_ */

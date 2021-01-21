@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_DEPTH0_DPO_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_DEPTH0_DPO_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D0_DPO_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D0_DPO_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -62,18 +62,19 @@ NS_START(d0);
 class dpo_controller : public reactive::d0::crw_controller,
                        public rer::client<dpo_controller> {
  public:
-  dpo_controller(void) RCSW_COLD;
-  ~dpo_controller(void) override RCSW_COLD;
+  dpo_controller(void) RCPPSW_COLD;
+  ~dpo_controller(void) override RCPPSW_COLD;
 
   /* foraging_controller overrides */
-  void init(ticpp::Element& node) override RCSW_COLD;
+  void init(ticpp::Element& node) override RCPPSW_COLD;
   void control_step(void) override;
-  void reset(void) override RCSW_COLD;
+  void reset(void) override RCPPSW_COLD;
   std::type_index type_index(void) const override { return typeid(*this); }
 
   /* goal acquisition metrics */
   RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, is_phototaxiing_to_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(csmetrics::goal_acq_metrics::goal_type,
                             acquisition_goal,
@@ -97,7 +98,7 @@ class dpo_controller : public reactive::d0::crw_controller,
    */
   void fsm(std::unique_ptr<class fsm::d0::dpo_fsm> fsm);
 
-  double los_dim(void) const RCSW_PURE;
+  double los_dim(void) const RCPPSW_PURE;
 
   /**
    * \brief Set whether or not a robot is supposed to display it's LOS as a
@@ -118,8 +119,8 @@ class dpo_controller : public reactive::d0::crw_controller,
     return m_perception.get();
   }
 
-  dpo_perception_subsystem* dpo_perception(void) RCSW_PURE;
-  const dpo_perception_subsystem* dpo_perception(void) const RCSW_PURE;
+  dpo_perception_subsystem* dpo_perception(void) RCPPSW_PURE;
+  const dpo_perception_subsystem* dpo_perception(void) const RCPPSW_PURE;
 
   fsm::d0::dpo_fsm* fsm(void) { return m_fsm.get(); }
   const fsm::d0::dpo_fsm* fsm(void) const { return m_fsm.get(); }
@@ -152,7 +153,7 @@ class dpo_controller : public reactive::d0::crw_controller,
    * - DPO perception subsystem (\ref dpo_perception_subsystem)
    * - Block selection matrix (\ref block_sel_matrix)
    */
-  void shared_init(const config::d0::dpo_controller_repository& config_repo) RCSW_COLD;
+  void shared_init(const config::d0::dpo_controller_repository& config_repo) RCPPSW_COLD;
 
  private:
   /**
@@ -167,7 +168,7 @@ class dpo_controller : public reactive::d0::crw_controller,
    *
    * This is called after \ref shared_init() during \ref init().
    */
-  void private_init(const config::d0::dpo_controller_repository& config_repo) RCSW_COLD;
+  void private_init(const config::d0::dpo_controller_repository& config_repo) RCPPSW_COLD;
 
   /* clang-format off */
   bool                                           m_display_los{false};
@@ -179,4 +180,4 @@ class dpo_controller : public reactive::d0::crw_controller,
 
 NS_END(cognitive, d0, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_DEPTH0_DPO_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D0_DPO_CONTROLLER_HPP_ */

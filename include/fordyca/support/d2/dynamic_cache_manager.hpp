@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH2_DYNAMIC_CACHE_MANAGER_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH2_DYNAMIC_CACHE_MANAGER_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_D2_DYNAMIC_CACHE_MANAGER_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_D2_DYNAMIC_CACHE_MANAGER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -114,7 +114,7 @@ class dynamic_cache_manager final : public base_cache_manager,
    */
   boost::optional<creation_blocks> creation_blocks_alloc(
       const cads::acache_vectorno& existing_caches,
-      const cfds::block3D_cluster_vector& clusters,
+      const cfds::block3D_cluster_vectorro& clusters,
       const cds::block3D_vectorno& all_blocks);
 
   bool creation_blocks_alloc_check(const creation_blocks& c_blocks,
@@ -130,4 +130,4 @@ class dynamic_cache_manager final : public base_cache_manager,
 
 NS_END(d2, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH2_DYNAMIC_CACHE_MANAGER_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_D2_DYNAMIC_CACHE_MANAGER_HPP_ */

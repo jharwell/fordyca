@@ -55,7 +55,7 @@ struct cache_create_ro_params {
    * \brief The block clusters in the arena. For use in avoiding overlaps
    * during cache creation.
    */
-  cfds::block3D_cluster_vector clusters;
+  cfds::block3D_cluster_vectorro clusters;
 
   /**
    * \brief The current timestep.

@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_DEPTH2_CACHE_SITE_SELECTOR_HPP_
-#define INCLUDE_FORDYCA_FSM_DEPTH2_CACHE_SITE_SELECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_D2_CACHE_SITE_SELECTOR_HPP_
+#define INCLUDE_FORDYCA_FSM_D2_CACHE_SITE_SELECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -157,7 +157,7 @@ class cache_site_selector: public rer::client<cache_site_selector> {
                       rmath::rng* rng);
 
   bool verify_site(const rmath::vector2d& site,
-                   const ds::dp_cache_map& known_caches) const RCSW_CONST;
+                   const ds::dp_cache_map& known_caches) const RCPPSW_CONST;
 
   std::string nlopt_ret_str(nlopt::result res) const;
 
@@ -172,7 +172,7 @@ class cache_site_selector: public rer::client<cache_site_selector> {
 
 double __cache_constraint_func(const std::vector<double>& x,
                                std::vector<double>& ,
-                               void *data) RCSW_PURE;
+                               void *data) RCPPSW_PURE;
 
 /**
  * \brief Implements the nest nearness constraint for cache site selection, as
@@ -181,7 +181,7 @@ double __cache_constraint_func(const std::vector<double>& x,
  */
 double __nest_constraint_func(const std::vector<double>& x,
                                std::vector<double>& ,
-                               void *data) RCSW_PURE;
+                               void *data) RCPPSW_PURE;
 
 /**
  * \brief Implements the cache site utility function cache site selection, as
@@ -190,8 +190,8 @@ double __nest_constraint_func(const std::vector<double>& x,
  */
 double __site_utility_func(const std::vector<double>& x,
                            std::vector<double>& ,
-                           void *data) RCSW_PURE;
+                           void *data) RCPPSW_PURE;
 
 NS_END(d2, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_DEPTH2_CACHE_SITE_SELECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_D2_CACHE_SITE_SELECTOR_HPP_ */

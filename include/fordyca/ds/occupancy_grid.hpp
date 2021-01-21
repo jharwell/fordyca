@@ -30,9 +30,9 @@
 #include "rcppsw/ds/stacked_grid2D.hpp"
 #include "rcppsw/math/vector2.hpp"
 
-#include "cosm/subsystem/perception/config/perception_config.hpp"
 #include "cosm/ds/cell2D.hpp"
 #include "cosm/repr/pheromone_density.hpp"
+#include "cosm/subsystem/perception/config/perception_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -82,9 +82,7 @@ class occupancy_grid : public rer::client<occupancy_grid>,
    */
   void reset(void);
 
-  bool pheromone_repeat_deposit(void) const {
-    return m_pheromone_repeat_deposit;
-  }
+  bool pheromone_repeat_deposit(void) const { return m_pheromone_repeat_deposit; }
 
   uint known_cell_count(void) const { return m_known_cell_count; }
   void known_cells_inc(void) { ++m_known_cell_count; }

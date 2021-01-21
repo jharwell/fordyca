@@ -28,6 +28,7 @@
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
+#include "cosm/repr/config/nest_config.hpp"
 #include "cosm/robots/footbot/config/saa_xml_names.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/subsystem/config/sensing_subsystemQ3D_config.hpp"
@@ -109,12 +110,11 @@ void bitd_dpo_controller::shared_init(
 
   auto* cache_mat =
       config_repo.config_get<config::cache_sel::cache_sel_matrix_config>();
-  auto* block_mat =
-      config_repo.config_get<config::block_sel::block_sel_matrix_config>();
+  auto* nest = config_repo.config_get<crepr::config::nest_config>();
 
   /* cache selection matrix */
   m_cache_sel_matrix =
-      std::make_unique<cognitive::cache_sel_matrix>(cache_mat, block_mat->nest);
+      std::make_unique<cognitive::cache_sel_matrix>(cache_mat, nest->center);
 
   /*
    * Cache detection via ground sensors. This is *NOT* enabled by the

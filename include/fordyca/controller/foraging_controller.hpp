@@ -31,21 +31,23 @@
 #include "cosm/controller/block_carrying_controller.hpp"
 #include "cosm/controller/irv_recipient_controller.hpp"
 #include "cosm/controller/manip_event_recorder.hpp"
+#include "cosm/fsm/block_transporter.hpp"
 #include "cosm/metrics/config/output_config.hpp"
 #include "cosm/pal/argos_controller2D_adaptor.hpp"
 #include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
-#include "cosm/fsm/block_transporter.hpp"
+#include "cosm/fsm/metrics/block_transporter_metrics.hpp"
+
 
 #include "fordyca/fordyca.hpp"
-#include "fordyca/metrics/blocks/block_manip_events.hpp"
 #include "fordyca/fsm/foraging_transport_goal.hpp"
+#include "fordyca/metrics/blocks/block_manip_events.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 namespace fordyca::controller::cognitive {
 class foraging_perception_subsystem;
-} /* namespace fordyca::controller */
+} // namespace fordyca::controller::cognitive
 
 namespace cosm::subsystem::config {
 struct actuation_subsystem2D_config;
@@ -84,24 +86,26 @@ NS_START(fordyca, controller);
  * class to be used as the robot controller handle when rendering QT graphics
  * overlays.
  */
-class foraging_controller : public cpal::argos_controller2D_adaptor,
-                            public ccontroller::block_carrying_controller,
-                            public cfsm::block_transporter<fsm::foraging_transport_goal>,
-                            public ccontroller::irv_recipient_controller,
-                            public rer::client<foraging_controller> {
+class foraging_controller
+    : public cpal::argos_controller2D_adaptor,
+      public ccontroller::block_carrying_controller,
+      public cfsm::block_transporter<fsm::foraging_transport_goal>,
+      public cfsm::metrics::block_transporter_metrics,
+      public ccontroller::irv_recipient_controller,
+      public rer::client<foraging_controller> {
  public:
   using block_manip_recorder_type = ccontroller::manip_event_recorder<
       metrics::blocks::block_manip_events::ekMAX_EVENTS>;
 
-  foraging_controller(void) RCSW_COLD;
-  ~foraging_controller(void) override RCSW_COLD;
+  foraging_controller(void) RCPPSW_COLD;
+  ~foraging_controller(void) override RCPPSW_COLD;
 
   foraging_controller(const foraging_controller&) = delete;
   foraging_controller& operator=(const foraging_controller&) = delete;
 
   /* foraging_controller2D overrides */
-  void init(ticpp::Element& node) override RCSW_COLD;
-  void reset(void) override RCSW_COLD;
+  void init(ticpp::Element& node) override RCPPSW_COLD;
+  void reset(void) override RCPPSW_COLD;
   rtypes::type_uuid entity_id(void) const override final;
 
   /* rda_recipient_controller overrides */
@@ -110,6 +114,12 @@ class foraging_controller : public cpal::argos_controller2D_adaptor,
 
   /* block carrying controller overrides */
   bool block_detected(void) const override;
+
+  /* movement metrics */
+  rtypes::spatial_dist
+  ts_distance(const csmetrics::movement_category& category) const override;
+  rmath::vector3d
+  ts_velocity(const csmetrics::movement_category& category) const override;
 
   /**
    * \brief By default controllers have no perception subsystem, and are
@@ -123,7 +133,9 @@ class foraging_controller : public cpal::argos_controller2D_adaptor,
    * \brief By default controllers have no perception subsystem, and are
    * basically blind centipedes.
    */
-  virtual cognitive::foraging_perception_subsystem* perception(void) { return nullptr; }
+  virtual cognitive::foraging_perception_subsystem* perception(void) {
+    return nullptr;
+  }
 
   /**
    * \brief If \c TRUE, the robot is currently at least most of the way in the
@@ -134,18 +146,16 @@ class foraging_controller : public cpal::argos_controller2D_adaptor,
   const block_manip_recorder_type* block_manip_recorder(void) const {
     return &m_block_manip;
   }
-  block_manip_recorder_type* block_manip_recorder(void) {
-    return &m_block_manip;
-  }
+  block_manip_recorder_type* block_manip_recorder(void) { return &m_block_manip; }
 
  protected:
-  class crfootbot::footbot_saa_subsystem* saa(void) RCSW_PURE;
-  const class crfootbot::footbot_saa_subsystem* saa(void) const RCSW_PURE;
+  class crfootbot::footbot_saa_subsystem* saa(void) RCPPSW_PURE;
+  const class crfootbot::footbot_saa_subsystem* saa(void) const RCPPSW_PURE;
 
  private:
-  void saa_init(
-      const csubsystem::config::actuation_subsystem2D_config* actuation_p,
-      const csubsystem::config::sensing_subsystemQ3D_config* sensing_p);
+  void
+  saa_init(const csubsystem::config::actuation_subsystem2D_config* actuation_p,
+           const csubsystem::config::sensing_subsystemQ3D_config* sensing_p);
   void output_init(const cmconfig::output_config* outputp);
 
   /* clang-format off */

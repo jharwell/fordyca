@@ -36,11 +36,10 @@ NS_START(fordyca, support);
  * Member Functions
  ******************************************************************************/
 void base_cache_manager::bloctree_update(const cads::acache_vectoro& caches) {
-  for (auto &cache : caches) {
-    for (auto &pair : cache->blocks()) {
-      m_map->bloctree_update(pair.second,
-                             carena::arena_map_locking::ekALL_HELD,
-                             caches);
+  for (auto& cache : caches) {
+    for (auto& pair : cache->blocks()) {
+      m_map->bloctree_update(
+          pair.second, carena::arena_map_locking::ekALL_HELD, caches);
     } /* for(*block..) */
   } /* for(&cache..) */
 } /* bloctree_update() */

@@ -128,8 +128,7 @@ void dpo_perception_subsystem::process_los_blocks(
   ER_DEBUG("Blocks in DPO store: [%s]",
            rcppsw::to_string(m_store->blocks()).c_str());
   if (!los_blocks.empty()) {
-    ER_DEBUG("Blocks in LOS: [%s]",
-             rcppsw::to_string(los_blocks).c_str());
+    ER_DEBUG("Blocks in LOS: [%s]", rcppsw::to_string(los_blocks).c_str());
   }
 
   /*
@@ -172,7 +171,8 @@ void dpo_perception_subsystem::los_tracking_sync(
   auto it = range.begin();
 
   while (it != range.end()) {
-    ER_TRACE("Check tracked DPO cache%d@%s/%s xspan=%s,yspan=%s w/LOS xspan=%s,yspan=%s",
+    ER_TRACE("Check tracked DPO cache%d@%s/%s xspan=%s,yspan=%s w/LOS "
+             "xspan=%s,yspan=%s",
              it->ent()->id().v(),
              rcppsw::to_string(it->ent()->rcenter2D()).c_str(),
              rcppsw::to_string(it->ent()->dcenter2D()).c_str(),
@@ -195,7 +195,8 @@ void dpo_perception_subsystem::los_tracking_sync(
         });
 
     if (should_be_in_los && !in_los) {
-      ER_INFO("Remove tracked DPO cache%d@%s/%s xspan=%s,yspan=%s: not in LOS xspan=%s,yspan=%s",
+      ER_INFO("Remove tracked DPO cache%d@%s/%s xspan=%s,yspan=%s: not in LOS "
+              "xspan=%s,yspan=%s",
               it->ent()->id().v(),
               rcppsw::to_string(it->ent()->rcenter2D()).c_str(),
               rcppsw::to_string(it->ent()->dcenter2D()).c_str(),

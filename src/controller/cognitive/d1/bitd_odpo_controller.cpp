@@ -41,8 +41,7 @@ NS_START(fordyca, controller, cognitive, d1);
  * Constructors/Destructor
  ******************************************************************************/
 bitd_odpo_controller::bitd_odpo_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.d1.bitd_odpo"),
-      m_receptor(nullptr) {}
+    : ER_CLIENT_INIT("fordyca.controller.d1.bitd_odpo"), m_receptor(nullptr) {}
 
 bitd_odpo_controller::~bitd_odpo_controller(void) = default;
 

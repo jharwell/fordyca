@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_DEPTH0_FREE_BLOCK_TO_NEST_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_DEPTH0_FREE_BLOCK_TO_NEST_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_D0_FREE_BLOCK_TO_NEST_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_D0_FREE_BLOCK_TO_NEST_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -30,6 +30,7 @@
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 #include "cosm/spatial/fsm/util_hfsm.hpp"
 #include "cosm/fsm/block_transporter.hpp"
+#include "cosm/fsm/metrics/block_transporter_metrics.hpp"
 
 #include "fordyca/fsm/fsm_ro_params.hpp"
 #include "fordyca/fsm/acquire_free_block_fsm.hpp"
@@ -56,11 +57,13 @@ NS_START(fsm, d0);
  * \class free_block_to_nest_fsm
  * \ingroup fsm d0
  *
- * \brief FILL ME IN!
+ * \brief FSM for acquiring a free block (somehow) in the arena, bringing it
+ * to the nest, and dropping it.
  */
 class free_block_to_nest_fsm final : public csfsm::util_hfsm,
                                      public rer::client<free_block_to_nest_fsm>,
                                      public csmetrics::goal_acq_metrics,
+                                     public cfsm::metrics::block_transporter_metrics,
                                      public cfsm::block_transporter<foraging_transport_goal>,
                                      public cta::taskable {
  public:
@@ -86,13 +89,15 @@ class free_block_to_nest_fsm final : public csfsm::util_hfsm,
   }
 
   /* interference metrics */
-  bool exp_interference(void) const override RCSW_PURE;
-  bool entered_interference(void) const override RCSW_PURE;
-  bool exited_interference(void) const override RCSW_PURE;
-  rtypes::timestep interference_duration(void) const override RCSW_PURE;
-  rmath::vector3z interference_loc3D(void) const override RCSW_PURE;
+  bool exp_interference(void) const override RCPPSW_PURE;
+  bool entered_interference(void) const override RCPPSW_PURE;
+  bool exited_interference(void) const override RCPPSW_PURE;
+  rtypes::timestep interference_duration(void) const override RCPPSW_PURE;
+  rmath::vector3z interference_loc3D(void) const override RCPPSW_PURE;
 
   /* goal acquisition metrics */
+  bool goal_acquired(void) const override RCPPSW_PURE;
+  csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCPPSW_PURE;
   RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, acquisition_loc3D, const);
@@ -100,11 +105,11 @@ class free_block_to_nest_fsm final : public csfsm::util_hfsm,
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, vector_loc3D, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid, entity_acquired_id, const);
 
-  bool goal_acquired(void) const override RCSW_PURE;
-  csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
+
 
   /* block transportation */
-  fsm::foraging_transport_goal block_transport_goal(void) const override RCSW_PURE;
+  fsm::foraging_transport_goal block_transport_goal(void) const override RCPPSW_PURE;
+  bool is_phototaxiing_to_goal(void) const override RCPPSW_PURE;
 
   void init(void) override;
 
@@ -126,26 +131,27 @@ class free_block_to_nest_fsm final : public csfsm::util_hfsm,
 
  private:
   /* inherited states */
-  HFSM_STATE_INHERIT(csfsm::util_hfsm, leaving_nest,
+  RCPPSW_HFSM_STATE_INHERIT(csfsm::util_hfsm, leaving_nest,
                      rpfsm::event_data);
-  HFSM_STATE_INHERIT(csfsm::util_hfsm, transport_to_nest,
-                     rpfsm::event_data);
-  HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_wait_for_signal);
-  HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_transport_to_nest);
-  HFSM_EXIT_INHERIT(csfsm::util_hfsm, exit_transport_to_nest);
-  HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_leaving_nest);
-  HFSM_STATE_DECLARE(free_block_to_nest_fsm, start, rpfsm::event_data);
-  HFSM_STATE_DECLARE_ND(free_block_to_nest_fsm, acquire_block);
-  HFSM_STATE_DECLARE(free_block_to_nest_fsm,
+  RCPPSW_HFSM_STATE_INHERIT(csfsm::util_hfsm,
+                     transport_to_nest,
+                     nest_transport_data);
+  RCPPSW_HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_wait_for_signal);
+  RCPPSW_HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_transport_to_nest);
+  RCPPSW_HFSM_EXIT_INHERIT(csfsm::util_hfsm, exit_transport_to_nest);
+  RCPPSW_HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_leaving_nest);
+  RCPPSW_HFSM_STATE_DECLARE(free_block_to_nest_fsm, start, rpfsm::event_data);
+  RCPPSW_HFSM_STATE_DECLARE_ND(free_block_to_nest_fsm, acquire_block);
+  RCPPSW_HFSM_STATE_DECLARE(free_block_to_nest_fsm,
                      wait_for_pickup,
                      rpfsm::event_data);
 
   /* d0 foraging states */
-  HFSM_STATE_DECLARE(free_block_to_nest_fsm,
+  RCPPSW_HFSM_STATE_DECLARE(free_block_to_nest_fsm,
                      wait_for_drop,
                      rpfsm::event_data);
 
-  HFSM_STATE_DECLARE_ND(free_block_to_nest_fsm, finished);
+  RCPPSW_HFSM_STATE_DECLARE_ND(free_block_to_nest_fsm, finished);
 
   /**
    * \brief Defines the state map for the FSM.
@@ -153,17 +159,18 @@ class free_block_to_nest_fsm final : public csfsm::util_hfsm,
    * Note that the order of the states in the map MUST match the order of the
    * states in \enum fsm_states, or things will not work correctly.
    */
-  HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
+  RCPPSW_HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   return &mc_state_map[index];
   }
 
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
+  RCPPSW_HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 
   /* clang-format off */
+  const rmath::vector2d  mc_nest_loc;
   acquire_free_block_fsm m_block_fsm;
   /* clang-format on */
 };
 
 NS_END(d0, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_DEPTH0_FREE_BLOCK_TO_NEST_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_D0_FREE_BLOCK_TO_NEST_FSM_HPP_ */

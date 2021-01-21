@@ -23,8 +23,8 @@
  ******************************************************************************/
 #include "fordyca/tasks/d1/foraging_task.hpp"
 
-#include "cosm/spatial/fsm/util_hfsm.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+#include "cosm/spatial/fsm/util_hfsm.hpp"
 #include "cosm/ta/config/task_alloc_config.hpp"
 
 /*******************************************************************************

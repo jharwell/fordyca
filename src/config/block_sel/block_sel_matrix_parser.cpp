@@ -23,8 +23,6 @@
  ******************************************************************************/
 #include "fordyca/config/block_sel/block_sel_matrix_parser.hpp"
 
-#include "rcppsw/utils/line_parser.hpp"
-
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -40,12 +38,6 @@ void block_sel_matrix_parser::parse(const ticpp::Element& node) {
   }
   ticpp::Element cnode = node_get(node, kXMLRoot);
   m_config = std::make_unique<config_type>();
-
-  rcppsw::utils::line_parser parser(' ');
-  std::string val;
-  std::vector<std::string> res;
-  res = parser.parse(cnode.GetAttribute("nest"));
-  m_config->nest.set(std::atof(res[0].c_str()), std::atof(res[1].c_str()));
 
   m_priorities.parse(cnode);
   if (m_priorities.is_parsed()) {

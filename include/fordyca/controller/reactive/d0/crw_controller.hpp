@@ -18,16 +18,17 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_REACTIVE_DEPTH0_CRW_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_REACTIVE_DEPTH0_CRW_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_REACTIVE_D0_CRW_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_REACTIVE_D0_CRW_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <memory>
 
-#include "fordyca//controller/foraging_controller.hpp"
 #include "rcppsw/patterns/fsm/base_fsm.hpp"
+
+#include "fordyca//controller/foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,13 +52,13 @@ NS_START(controller, reactive, d0);
 class crw_controller : public foraging_controller,
                        public rer::client<crw_controller> {
  public:
-  crw_controller(void) RCSW_COLD;
-  ~crw_controller(void) override RCSW_COLD;
+  crw_controller(void) RCPPSW_COLD;
+  ~crw_controller(void) override RCPPSW_COLD;
 
   /* foraging_controller overrides */
-  void init(ticpp::Element& node) override RCSW_COLD;
+  void init(ticpp::Element& node) override RCPPSW_COLD;
   void control_step(void) override;
-  void reset(void) override RCSW_COLD;
+  void reset(void) override RCPPSW_COLD;
   std::type_index type_index(void) const override { return typeid(*this); }
 
   /* goal acquisition metrics */
@@ -76,6 +77,7 @@ class crw_controller : public foraging_controller,
   RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal,
                             block_transport_goal,
                             const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, is_phototaxiing_to_goal, const);
 
   const fsm::d0::crw_fsm* fsm(void) const { return m_fsm.get(); }
   fsm::d0::crw_fsm* fsm(void) { return m_fsm.get(); }
@@ -88,4 +90,4 @@ class crw_controller : public foraging_controller,
 
 NS_END(d0, reactive, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_REACTIVE_DEPTH0_CRW_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_REACTIVE_D0_CRW_CONTROLLER_HPP_ */

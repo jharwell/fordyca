@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_DEPTH2_FORAGING_TASK_HPP_
-#define INCLUDE_FORDYCA_TASKS_DEPTH2_FORAGING_TASK_HPP_
+#ifndef INCLUDE_FORDYCA_TASKS_D2_FORAGING_TASK_HPP_
+#define INCLUDE_FORDYCA_TASKS_D2_FORAGING_TASK_HPP_
 
 /*******************************************************************************
  * Includes
@@ -67,12 +67,12 @@ class foraging_task
   static constexpr char kCacheTransfererName[] = "Cache Transferer";
   static constexpr char kCacheCollectorName[] = "Cache Collector";
 
-  static bool task_in_d2(const polled_task* task) RCSW_PURE;
+  static bool task_in_d2(const polled_task* task) RCPPSW_PURE;
 
   /* task overrides */
-  rtypes::timestep current_time(void) const override RCSW_PURE;
+  rtypes::timestep current_time(void) const override RCPPSW_PURE;
 };
 
 NS_END(d2, tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_TASKS_DEPTH2_FORAGING_TASK_HPP_ */
+#endif /* INCLUDE_FORDYCA_TASKS_D2_FORAGING_TASK_HPP_ */

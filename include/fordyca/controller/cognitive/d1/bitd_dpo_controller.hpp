@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_DEPTH1_BITD_DPO_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_DEPTH1_BITD_DPO_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D1_BITD_DPO_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D1_BITD_DPO_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -76,14 +76,14 @@ class bitd_dpo_controller : public d0::dpo_controller,
  public:
   using dpo_controller::perception;
 
-  bitd_dpo_controller(void) RCSW_COLD;
-  ~bitd_dpo_controller(void) override RCSW_COLD;
+  bitd_dpo_controller(void) RCPPSW_COLD;
+  ~bitd_dpo_controller(void) override RCPPSW_COLD;
 
   bitd_dpo_controller(const bitd_dpo_controller&) = delete;
   bitd_dpo_controller& operator=(const bitd_dpo_controller&) = delete;
 
   /* foraging_controller overrides */
-  void init(ticpp::Element& node) override RCSW_COLD;
+  void init(ticpp::Element& node) override RCPPSW_COLD;
   void control_step(void) override;
   std::type_index type_index(void) const override { return typeid(*this); }
 
@@ -109,10 +109,10 @@ class bitd_dpo_controller : public d0::dpo_controller,
   /**
    * \brief Get the current task the controller is executing.
    */
-  tasks::base_foraging_task* current_task(void) RCSW_PURE {
+  tasks::base_foraging_task* current_task(void) RCPPSW_PURE {
     return m_current_task;
   }
-  const tasks::base_foraging_task* current_task(void) const RCSW_PURE {
+  const tasks::base_foraging_task* current_task(void) const RCPPSW_PURE {
     return m_current_task;
   }
 
@@ -130,7 +130,7 @@ class bitd_dpo_controller : public d0::dpo_controller,
    */
   bool display_task(void) const { return m_display_task; }
 
-  const cta::ds::bi_tab* active_tab(void) const RCSW_PURE;
+  const cta::ds::bi_tab* active_tab(void) const RCPPSW_PURE;
 
   /*
    * Public to setup metric collection from tasks.
@@ -172,7 +172,7 @@ class bitd_dpo_controller : public d0::dpo_controller,
    * \param config_repo Handle to parameter repository for this controller
    *                   (after parsing and validation).
    */
-  void shared_init(const config::d1::controller_repository& config_repo) RCSW_COLD;
+  void shared_init(const config::d1::controller_repository& config_repo) RCPPSW_COLD;
 
   /*
    * The \ref bitd_dpo_controller owns the executive, but derived classes can
@@ -201,7 +201,7 @@ class bitd_dpo_controller : public d0::dpo_controller,
   void current_task(tasks::base_foraging_task* t) { m_current_task = t; }
 
  private:
-  void private_init(const config::d1::controller_repository& config_repo) RCSW_COLD;
+  void private_init(const config::d1::controller_repository& config_repo) RCPPSW_COLD;
 
   /* clang-format off */
   bool                                         m_display_task{false};
@@ -223,4 +223,4 @@ class bitd_dpo_controller : public d0::dpo_controller,
 
 NS_END(cognitive, d1, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_DEPTH1_BITD_DPO_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D1_BITD_DPO_CONTROLLER_HPP_ */

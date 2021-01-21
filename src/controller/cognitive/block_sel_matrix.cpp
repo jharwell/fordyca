@@ -34,8 +34,9 @@ NS_START(fordyca, controller, cognitive);
  * Constructors/Destructors
  ******************************************************************************/
 block_sel_matrix::block_sel_matrix(
-    const config::block_sel::block_sel_matrix_config* config) {
-  this->insert(std::make_pair(kNestLoc, config->nest));
+    const config::block_sel::block_sel_matrix_config* config,
+    const rmath::vector2d& nest_loc) {
+  this->insert(std::make_pair(kNestLoc, nest_loc));
   this->insert(std::make_pair(kCubePriority, config->priorities.cube));
   this->insert(std::make_pair(kRampPriority, config->priorities.ramp));
   this->insert(std::make_pair(kSelExceptions, std::vector<rtypes::type_uuid>()));

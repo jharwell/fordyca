@@ -94,7 +94,8 @@ NS_END(detail);
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using block_proximity_visitor = rpvisitor::filtered_visitor<detail::block_proximity>;
+using block_proximity_visitor =
+    rpvisitor::filtered_visitor<detail::block_proximity>;
 
 NS_END(events, fordyca);
 

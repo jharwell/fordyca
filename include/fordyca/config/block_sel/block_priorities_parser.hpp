@@ -56,13 +56,13 @@ class block_priorities_parser final : public rconfig::xml::xml_config_parser {
    */
   static constexpr char kXMLRoot[] = "block_priorities";
 
-  void parse(const ticpp::Element& node) override RCSW_COLD;
-  bool validate(void) const override RCSW_ATTR(pure, cold);
+  void parse(const ticpp::Element& node) override RCPPSW_COLD;
+  bool validate(void) const override RCPPSW_ATTR(pure, cold);
 
-  RCSW_COLD std::string xml_root(void) const override { return kXMLRoot; }
+  RCPPSW_COLD std::string xml_root(void) const override { return kXMLRoot; }
 
  private:
-  RCSW_COLD const rconfig::base_config* config_get_impl(void) const override {
+  RCPPSW_COLD const rconfig::base_config* config_get_impl(void) const override {
     return m_config.get();
   }
 

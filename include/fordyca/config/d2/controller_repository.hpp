@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONFIG_DEPTH2_CONTROLLER_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_CONFIG_DEPTH2_CONTROLLER_REPOSITORY_HPP_
+#ifndef INCLUDE_FORDYCA_CONFIG_D2_CONTROLLER_REPOSITORY_HPP_
+#define INCLUDE_FORDYCA_CONFIG_D2_CONTROLLER_REPOSITORY_HPP_
 
 /*******************************************************************************
  * Includes
@@ -43,9 +43,9 @@ NS_START(fordyca, config, d2);
  */
 class controller_repository: public d1::controller_repository {
  public:
-  controller_repository(void) RCSW_COLD;
+  controller_repository(void) RCPPSW_COLD;
 };
 
 NS_END(d2, config, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONFIG_DEPTH2_CONTROLLER_REPOSITORY_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONFIG_D2_CONTROLLER_REPOSITORY_HPP_ */

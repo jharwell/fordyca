@@ -4,10 +4,10 @@ Building The Code Locally
 =========================
 
 .. IMPORTANT:: If you want to build an optimized version of FORDYCA (necessary
-   for large swarms), you will need to either manually modify the
-   ``bootstrap.sh`` script that you copied, or re-run ``cmake`` and ``make`` as
-   shown in the :ref:`ln-opt-build` section below, as that script is for a debug
-   build by default.
+   for large swarms), make sure you pass ``--opt`` to the ``bootstrap.sh``
+   script that you copied, or re-run ``cmake`` and ``make`` as shown in the
+   :ref:`ln-opt-build` section below, as that script is for a debug build by
+   default.
 
 
 Debug Build
@@ -22,8 +22,8 @@ Debug Build
 
    - You have sudo privileges on the machine you want to install the project on.
 
-   If either of these conditions is not met, you will be on your own for getting
-   things setup in your development environment of choice.
+   If either of these conditions are not met, you will be on your own for
+   getting things setup in your development environment of choice.
 
 Download ``scripts/bootstrap.sh`` BEFORE cloning the FORDYCA repo. The script
 can be downloaded by navigating to the file on github, clicking the ``raw``
@@ -35,23 +35,28 @@ run from anywhere), with the following arguments:
                ``devel`` branch of the FORDYCA repo. The one on the ``master``
                branch may be out of date.
 
-- 1st arg: The root directory for the project (all repos will be cloned/built
-  in here, and it **must** be an absolute path).
-- 2nd arg: ``YES`` if you want to install ARGoS system wide (you probably do)
-  and ``NO`` otherwise.
-- 3rd arg: Location ARGoS should be installed into.
-- 4th arg: The # of cores to use when building ARGoS/FORDYCA (should be set to
-  # cores on your machine).
+The bootstrap script takes a number of arguments, which you can read about via::
+
+  ./bootstrap.sh --help
+
+The default values of the arguments should be OK for most use cases. Some
+important considerations:
+
+- If you set ``--prefix`` to a system location, then it is assumed you have sudo
+  access.
+
+- If set ``--prefix`` to a system location, then you will not need to set
+  ``LD_LIBRARY_PATH`` later so bash can find it.
 
 For example::
 
-  ./bootstrap.sh $HOME/research YES /usr/local 2 > output.txt 2>&1
+  ./bootstrap.sh  > output.txt 2>&1
 
-To build the code under ``~/research`` on a 2 core machine and install ARGoS
-system-wide. The ``> output.txt 2>&1`` part is important to capture the output
-of running the script so that if there are errors it is easier to track them
-down (the script generates a LOT of output, which usually overflows terminal
-ringbuffers).
+Will install system packages, build the code under ``$HOME/research`` and
+install ARGoS to ``$HOME/.local``. The ``> output.txt 2>&1`` part is
+important to capture the output of running the script so that if there are
+errors it is easier to track them down (the script generates a LOT of output,
+which usually overflows terminal ringbuffers).
 
 The script is configured such that it will stop if any command fails. So if the
 script makes it all the way through and you see a ``BOOTSTRAP SUCCESS!`` line at
@@ -71,21 +76,22 @@ one ``bootstrap.sh`` uses for you. Something like the following, run from the
 
   cmake -DCMAKE_C_COMPILER=gcc-9 \
   -DCMAKE_CXX_COMPILER=g++-9 \
+  -DCMAKE_BUILD_TYPE=OPT \
+  -DLIBRA_ER=NONE \
   -DWITH_FOOTBOT_BATTERY=NO \
   -DWITH_FOOTBOT_RAB=NO \
   -DWITH_FOOTBOT_LEDS=NO \
-  -DCMAKE_BUILD_TYPE=OPT \
-  -DLIBRA_ER=NONE \
+  -DWITH_FOOTBOT_CAMERA=NO \
   \..
 
 To get an idea of what some of the non-project specific options mean, head over
-to the `libra <https://github.com/swarm-robotics/libra/tree/devel/README.md>`_
-repo and look at the README.
+to the :xref:`LIBRA` docs.
 
-``WITH_FOOTBOT_BATTERY``, ``WITH_FOOTBOT_RAB``, ``WITH_FOOTBOT_LEDS`` are things
-that are only needed if you are running experiments which utilize those
-sensors/actuators, otherwise they slow things down a **LOT** with large swarms
-(which is why you are compiling with optimizations on in the first place).
+``WITH_FOOTBOT_BATTERY``, ``WITH_FOOTBOT_RAB``, ``WITH_FOOTBOT_LEDS``,
+``WITH_FOOTBOT_CAMERA`` are things that are only needed if you are running
+experiments which utilize those sensors/actuators, otherwise they slow things
+down a **LOT** with large swarms (which is why you are compiling with
+optimizations on in the first place).
 
 Build Notes
 -----------

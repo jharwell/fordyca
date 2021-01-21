@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_DEPTH1_BITD_ODPO_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_DEPTH1_BITD_ODPO_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D1_BITD_ODPO_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D1_BITD_ODPO_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -53,14 +53,14 @@ class bitd_odpo_controller : public d1::bitd_dpo_controller,
  public:
   using bitd_dpo_controller::perception;
 
-  bitd_odpo_controller(void) RCSW_COLD;
-  ~bitd_odpo_controller(void) override RCSW_COLD;
+  bitd_odpo_controller(void) RCPPSW_COLD;
+  ~bitd_odpo_controller(void) override RCPPSW_COLD;
 
   /* foraging_controller overrides */
   void control_step(void) override;
   std::type_index type_index(void) const override { return {typeid(*this)}; }
 
-  void oracle_init(std::unique_ptr<oracular_info_receptor> receptor) RCSW_COLD;
+  void oracle_init(std::unique_ptr<oracular_info_receptor> receptor) RCPPSW_COLD;
 
  private:
   /* clang-format off */
@@ -70,4 +70,4 @@ class bitd_odpo_controller : public d1::bitd_dpo_controller,
 
 NS_END(cognitive, d1, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_DEPTH1_BITD_ODPO_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D1_BITD_ODPO_CONTROLLER_HPP_ */

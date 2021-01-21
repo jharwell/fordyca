@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONFIG_DEPTH0_MDPO_CONTROLLER_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_CONFIG_DEPTH0_MDPO_CONTROLLER_REPOSITORY_HPP_
+#ifndef INCLUDE_FORDYCA_CONFIG_D0_MDPO_CONTROLLER_REPOSITORY_HPP_
+#define INCLUDE_FORDYCA_CONFIG_D0_MDPO_CONTROLLER_REPOSITORY_HPP_
 
 /*******************************************************************************
  * Includes
@@ -48,4 +48,4 @@ class mdpo_controller_repository: public dpo_controller_repository {
 
 NS_END(d0, config, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONFIG_DEPTH0_MDPO_CONTROLLER_REPOSITORY_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONFIG_D0_MDPO_CONTROLLER_REPOSITORY_HPP_ */

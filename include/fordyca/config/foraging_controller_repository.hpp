@@ -46,7 +46,7 @@ NS_START(fordyca, config);
 class foraging_controller_repository
     : public rconfig::xml::xml_config_repository {
  public:
-  foraging_controller_repository(void) RCSW_COLD;
+  foraging_controller_repository(void) RCPPSW_COLD;
 };
 
 NS_END(config, fordyca);

@@ -1,15 +1,23 @@
 ################################################################################
 # Configuration Options                                                        #
 ################################################################################
-set(WITH_FOOTBOT_RAB "NO" CACHE STRING "Enable footbot robots to read/write over the RAB medium via sensors/actuators.")
-set(WITH_FOOTBOT_BATTERY "NO" CACHE STRING "Enable footbot robots to use the battery.")
+set(FORDYCA_WITH_FOOTBOT_RAB "NO" CACHE STRING "Enable footbot robots to read/write over the RAB medium via sensors/actuators.")
+set(FORDYCA_WITH_FOOTBOT_BATTERY "NO" CACHE STRING "Enable footbot robots to use the battery.")
+set(FORDYCA_WITH_FOOTBOT_LEDS "NO" CACHE STRING "Enable footbot robots to use their LEDs.")
+set(FORDYCA_WITH_FOOTBOT_CAMERA "YES" CACHE STRING "Enable footbot robots to use their camera.")
 
-define_property(CACHED_VARIABLE PROPERTY "WITH_FOOTBOT_RAB"
-  BRIEF_DOCS "Enable footbot robots to use the RAB medium. Only for simulated robots"
+define_property(CACHED_VARIABLE PROPERTY "FORDYCA_WITH_FOOTBOT_RAB"
+  BRIEF_DOCS "Enable footbot robots to use the RAB medium."
   FULL_DOCS "Default=NO.")
-define_property(CACHED_VARIABLE PROPERTY "WITH_FOOTBOT_BATTERY"
-  BRIEF_DOCS "Enable footbot robots to use the battery. Only for simulation robots."
+define_property(CACHED_VARIABLE PROPERTY "FORDYCA_WITH_FOOTBOT_BATTERY"
+  BRIEF_DOCS "Enable footbot robots to use the battery."
   FULL_DOCS "Default=NO.")
+define_property(CACHED_VARIABLE PROPERTY "FORDYCA_WITH_FOOTBOT_LEDS"
+  BRIEF_DOCS "Enable footbot robots to use their LEDs."
+  FULL_DOCS "Default=NO.")
+define_property(CACHED_VARIABLE PROPERTY "FORDYCA_WITH_FOOTBOT_CAMERA"
+  BRIEF_DOCS "Enable footbot robots to use their camera."
+  FULL_DOCS "Default=YES.")
 
 # Needed by COSM for population dynamics and swarm iteration
 if (NOT COSM_BUILD_FOR)
@@ -18,7 +26,6 @@ endif()
 set(COSM_ARGOS_ROBOT_TYPE "foot-bot")
 set(COSM_ARGOS_ROBOT_NAME_PREFIX "fb")
 set(COSM_ARGOS_CONTROLLER_XML_ID "ffc")
-set(COSM_WITH_ARGOS_ROBOT_LEDS "NO")
 
 ################################################################################
 # External Projects                                                            #
@@ -28,7 +35,7 @@ set(${target}_CHECK_LANGUAGE "CXX")
 # Support libraries
 add_subdirectory(ext/cosm)
 
-if (${COSM_WITH_VIS})
+if ("${COSM_WITH_VIS}")
   set(CMAKE_AUTOMOC ON)
   find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui)
   set(CMAKE_AUTOMOC OFF)
@@ -40,9 +47,9 @@ endif()
 if (NOT ${COSM_WITH_VIS})
     list(REMOVE_ITEM ${target}_ROOT_SRC
     ${${target}_SRC_PATH}/support/los_visualizer.cpp
-    ${${target}_SRC_PATH}/support/depth0/depth0_qt_user_functions.cpp
-    ${${target}_SRC_PATH}/support/depth1/depth1_qt_user_functions.cpp
-    ${${target}_SRC_PATH}/support/depth2/depth2_qt_user_functions.cpp)
+    ${${target}_SRC_PATH}/support/d0/d0_qt_user_functions.cpp
+    ${${target}_SRC_PATH}/support/d1/d1_qt_user_functions.cpp
+    ${${target}_SRC_PATH}/support/d2/d2_qt_user_functions.cpp)
 endif()
 
 ################################################################################
@@ -127,15 +134,19 @@ target_link_libraries(${target} ${${target}_LIBRARIES} cosm nlopt)
 # Compile Options/Definitions                                                  #
 ################################################################################
 if ("${COSM_BUILD_FOR}" MATCHES "ARGOS")
-  if (WITH_FOOTBOT_RAB)
-    target_compile_definitions(${target} PUBLIC FORDYCA_WITH_ROBOT_RAB)
+  if (FORDYCA_WITH_FOOTBOT_RAB)
+    target_compile_definitions(${target} PUBLIC FORDYCA_WITH_FOOTBOT_RAB)
   endif()
-  if (WITH_FOOTBOT_BATTERY)
-    target_compile_definitions(${target} PUBLIC FORDYCA_WITH_ROBOT_BATTERY)
+  if (FORDYCA_WITH_FOOTBOT_BATTERY)
+    target_compile_definitions(${target} PUBLIC FORDYCA_WITH_FOOTBOT_BATTERY)
   endif()
-
+  if (FORDYCA_WITH_FOOTBOT_CAMERA)
+    target_compile_definitions(${target} PUBLIC FORDYCA_WITH_FOOTBOT_CAMERA)
+  endif()
+  if (FORDYCA_WITH_FOOTBOT_LEDS)
+    target_compile_definitions(${target} PUBLIC FORDYCA_WITH_FOOTBOT_LEDS)
+  endif()
 endif()
-
 
 if ("${COSM_BUILD_FOR}" MATCHES "MSI")
   target_compile_options(${target} PUBLIC

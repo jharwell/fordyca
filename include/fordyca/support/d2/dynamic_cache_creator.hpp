@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH2_DYNAMIC_CACHE_CREATOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH2_DYNAMIC_CACHE_CREATOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_D2_DYNAMIC_CACHE_CREATOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_D2_DYNAMIC_CACHE_CREATOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -119,7 +119,7 @@ class dynamic_cache_creator : public base_cache_creator,
   bool cache_i_verify(const carepr::arena_cache* cache,
                       const cads::acache_vectorro& c_caches,
                       const cds::block3D_vectorno& c_all_blocks,
-                      const cfds::block3D_cluster_vector& c_clusters) const;
+                      const cfds::block3D_cluster_vectorro& c_clusters) const;
 
   /**
    * \brief If a newly created cache failed verification checks, delete it.
@@ -185,4 +185,4 @@ class dynamic_cache_creator : public base_cache_creator,
 
 NS_END(d2, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH2_DYNAMIC_CACHE_CREATOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_D2_DYNAMIC_CACHE_CREATOR_HPP_ */

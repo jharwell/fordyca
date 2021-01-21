@@ -35,8 +35,9 @@
 #include "cosm/pal/argos_swarm_iterator.hpp"
 #include "cosm/vis/config/visualization_config.hpp"
 
-#include "fordyca/config/tv/tv_manager_config.hpp"
 #include "fordyca//controller/foraging_controller.hpp"
+#include "fordyca/config/tv/tv_manager_config.hpp"
+#include "fordyca/metrics/fordyca_metrics_aggregator.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/support/tv/fordyca_pd_adaptor.hpp"
 
@@ -172,7 +173,7 @@ void base_loop_functions::pre_step(void) {
   auto t = rtypes::timestep(GetSpace().GetSimulationClock());
 
   /* update the arena map, which MIGHT require a redraw of the floor */
-  auto status = arena_map()->update(t);
+  auto status = arena_map()->pre_step_update(t);
   if (carena::update_status::ekBLOCK_MOTION == status) {
     floor()->SetChanged();
   }
@@ -192,7 +193,7 @@ void base_loop_functions::pre_step(void) {
 
 void base_loop_functions::post_step(void) {
   /*
-   * Needs to be after robot controllers are run, because compute convergence
+   * Needs to be after robot controllers are run, because computing convergence
    * before that gives you the convergence status for the LAST timestep.
    */
   if (nullptr != m_conv_calc) {
@@ -208,7 +209,8 @@ void base_loop_functions::reset(void) {
  * Member Functions
  ******************************************************************************/
 const carena::caching_arena_map* base_loop_functions::arena_map(void) const {
-  return static_cast<const carena::caching_arena_map*>(argos_sm_adaptor::arena_map());
+  return static_cast<const carena::caching_arena_map*>(
+      argos_sm_adaptor::arena_map());
 }
 carena::caching_arena_map* base_loop_functions::arena_map(void) {
   return static_cast<carena::caching_arena_map*>(argos_sm_adaptor::arena_map());

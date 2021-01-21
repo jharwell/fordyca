@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_STATIC_CACHE_MANAGER_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_STATIC_CACHE_MANAGER_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_D1_STATIC_CACHE_MANAGER_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_D1_STATIC_CACHE_MANAGER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -150,4 +150,4 @@ class static_cache_manager final : public base_cache_manager,
 
 NS_END(d1, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_STATIC_CACHE_MANAGER_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_D1_STATIC_CACHE_MANAGER_HPP_ */

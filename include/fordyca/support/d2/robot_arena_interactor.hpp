@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH2_ROBOT_ARENA_INTERACTOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH2_ROBOT_ARENA_INTERACTOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_D2_ROBOT_ARENA_INTERACTOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_D2_ROBOT_ARENA_INTERACTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -70,7 +70,7 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
 
   struct params {
     carena::caching_arena_map* const map;
-    d0::depth0_metrics_aggregator *const metrics_agg;
+    d0::d0_metrics_aggregator *const metrics_agg;
     argos::CFloorEntity* const floor;
     tv::env_dynamics* const envd;
     dynamic_cache_manager* cache_manager;
@@ -155,4 +155,4 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
 
 NS_END(d2, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH2_ROBOT_ARENA_INTERACTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_D2_ROBOT_ARENA_INTERACTOR_HPP_ */

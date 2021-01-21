@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <bitd_dpo_controller id="ffc"
+    <crw_controller id="ffc"
                           library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -125,8 +125,8 @@
             </tab_sel>
           </stoch_nbhd1>
         </task_alloc>
-        <block_sel_matrix
-            nest="6, 3">
+        <nest dims="2.4, 2.4" center="6, 6" />
+        <block_sel_matrix>
           <!--       <block_priorities -->
           <!--           cube="1.0" -->
           <!--           ramp="1.0" -->
@@ -183,11 +183,11 @@
             <phototaxis_force max="8"/>
           </force_calculator>
 
-          <diff_drive soft_turn_max="45"
+          <diff_drive soft_turn_max="15"
                       max_speed="10.0" />
         </actuation_subsystem2D>
       </params>
-    </bitd_dpo_controller>
+    </crw_controller>
 
   </controllers>
 
@@ -195,7 +195,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth1_loop_functions">
+                  label="d0_loop_functions">
     <output
         output_root="output"
         output_dir="__current_date__">
@@ -204,11 +204,13 @@
         <append
             output_interval="1000"
             block_acq_counts="block-acq-counts"
-            block_transport="block-transport"
+            block_transporter="block-transporter"
+            block_transportee="block-transportee"
             block_manipulation="block-manipulation"
             cache_acq_counts="cache-acq-counts"
             cache_utilization="cache-utilization"
             cache_lifecycle="cache-lifecycle"
+            fsm_interference_counts="fsm-interference-counts"
             cache_site_selection="cache-site-selection"
             task_execution_generalist="task-execution-generalist"
             task_execution_collector="task-execution-collector"
@@ -221,12 +223,14 @@
             task_tab_collector="task-tab-collector"
             task_tab_harvester="task-tab-harvester"
             task_distribution="task-distribution"
-            perception_dpo="perception-dpo"
-            perception_mdpo="perception-mdpo"
+            spatial_movement='spatial-movement'
+            perception_crw="perception-crw"
+            perception_mcrw="perception-mcrw"
             swarm_convergence="swarm-convergence"
             tv_population="tv-population"
             block_distributor="block-distributor"
             block_motion="block-motion"
+            block_clusters="block-clusters"
             tv_environment="tv-environment"/>
 
         <create output_interval="10"
@@ -313,10 +317,11 @@
               dims="12, 12, 2"/>
       <blocks>
         <motion
-            policy="random_walk"
+            policy="Null"
             random_walk_prob="1.0"/>
         <distribution
-            dist_type="random">
+            dist_type="single_source"
+            strict_success="false">
 
           <!-- <redist_governor -->
           <!--     trigger="timestep" -->
@@ -330,7 +335,7 @@
               n_clusters="10"
               />
           <manifest
-              n_cube="100"
+              n_cube="300"
               n_ramp="0"
               unit_dim="0.2"
               />
@@ -441,21 +446,7 @@
   <!--      <!-\-                 headless_grabbing="true" -\-> -->
   <!--      <!-\-                 headless_frame_size="1600x1200" -\-> -->
   <!--      <!-\-                 /> -\-> -->
-  <!--     <camera> -->
-  <!--       <placement idx="0" -->
-  <!--                  position="6,6,6" -->
-  <!--                  look_at="6,6,0" -->
-  <!--                  lens_focal_length="20" -->
-  <!--                  up="0,1,0" -->
-  <!--                  /> -->
-  <!--       <placement idx="1" -->
-  <!--                  position="6,0,5" -->
-  <!--                  look_at="6,6,0" -->
-  <!--                  lens_focal_length="20" -->
-  <!--                  up="0,1,0" -->
-  <!--                  /> -->
-  <!--     </camera> -->
-  <!--     <user_functions label="depth0_qt_user_functions" /> -->
+  <!--     <user_functions label="d0_qt_user_functions" /> -->
   <!--   </qt-opengl> -->
   <!-- </visualization> -->
 

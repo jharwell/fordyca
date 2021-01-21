@@ -122,12 +122,12 @@ class block_op_penalty_handler final : public ctv::temporal_penalty_handler,
     rtypes::type_uuid id = m_id_calc(controller, src, filter);
 
     rtypes::timestep orig_duration = penalty_calc(t);
-    rtypes::timestep RCSW_UNUSED duration = penalty_add(&controller,
+    rtypes::timestep RCPPSW_UNUSED duration = penalty_add(&controller,
                                                         id,
                                                         orig_duration,
                                                         t);
 
-    ER_INFO("%s: block%d start=%u, penalty=%u, adjusted penalty=%u src=%d",
+    ER_INFO("%s: block%d start=%zu, penalty=%zu, adjusted penalty=%zu src=%d",
             controller.GetId().c_str(),
             id.v(),
             t.v(),

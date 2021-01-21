@@ -26,11 +26,12 @@
 #include <fstream>
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/subsystem/perception/config/perception_config.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
+#include "cosm/repr/config/nest_config.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+#include "cosm/subsystem/perception/config/perception_config.hpp"
 
 #include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
 #include "fordyca/config/d0/dpo_controller_repository.hpp"
@@ -119,16 +120,17 @@ void dpo_controller::init(ticpp::Element& node) {
 
 void dpo_controller::shared_init(
     const config::d0::dpo_controller_repository& config_repo) {
-  auto* perception =
-      config_repo.config_get<cspconfig::perception_config>();
+  auto* perception = config_repo.config_get<cspconfig::perception_config>();
   auto* block_matrix =
       config_repo.config_get<config::block_sel::block_sel_matrix_config>();
+  auto* nest = config_repo.config_get<crepr::config::nest_config>();
 
   /* DPO perception subsystem */
   m_perception = std::make_unique<dpo_perception_subsystem>(perception);
 
   /* block selection matrix */
-  m_block_sel_matrix = std::make_unique<class block_sel_matrix>(block_matrix);
+  m_block_sel_matrix =
+      std::make_unique<class block_sel_matrix>(block_matrix, nest->center);
 } /* shared_init() */
 
 void dpo_controller::private_init(
@@ -137,10 +139,10 @@ void dpo_controller::private_init(
   fsm::expstrat::block_factory f;
   fsm::expstrat::foraging_expstrat::params expstrat_params(
       saa(), nullptr, nullptr, nullptr, rutils::color());
-  fsm::fsm_ro_params fsm_ro_params = {.bsel_matrix = block_sel_matrix(),
-                                      .csel_matrix = nullptr,
-                                      .store = perception()->dpo_store(),
-                                      .exp_config = *exp_config};
+  fsm::fsm_ro_params fsm_ro_params = { .bsel_matrix = block_sel_matrix(),
+                                       .csel_matrix = nullptr,
+                                       .store = perception()->dpo_store(),
+                                       .exp_config = *exp_config };
   m_fsm = std::make_unique<fsm::d0::dpo_fsm>(
       &fsm_ro_params,
       saa(),
@@ -165,17 +167,22 @@ void dpo_controller::reset(void) {
 } /* reset() */
 
 /*******************************************************************************
- * FSM Metrics
+ * Goal Acquisition Metrics
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, block_transport_goal, *m_fsm, const);
-RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, entity_acquired_id, *m_fsm, const);
-RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, acquisition_goal, *m_fsm, const);
-RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, acquisition_loc3D, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, goal_acquired, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, entity_acquired_id, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, is_exploring_for_goal, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, is_vectoring_to_goal, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, acquisition_goal, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, block_transport_goal, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, acquisition_loc3D, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, vector_loc3D, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, explore_loc3D, *m_fsm, const);
+
+/*******************************************************************************
+ * Block Transportation Metrics
+ ******************************************************************************/
+RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, is_phototaxiing_to_goal, *m_fsm, const);
 
 using namespace argos; // NOLINT
 

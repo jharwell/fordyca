@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_DEPTH2_CACHE_STARTER_HPP_
-#define INCLUDE_FORDYCA_TASKS_DEPTH2_CACHE_STARTER_HPP_
+#ifndef INCLUDE_FORDYCA_TASKS_D2_CACHE_STARTER_HPP_
+#define INCLUDE_FORDYCA_TASKS_D2_CACHE_STARTER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -85,6 +85,7 @@ class cache_starter final : public foraging_task,
   RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal,
                             block_transport_goal,
                             const);
+  bool is_phototaxiing_to_goal(void) const override { return false; }
 
   /* site selection metrics overrides */
   RCPPSW_WRAP_OVERRIDE_DECL(bool, site_select_exec, const);
@@ -95,12 +96,12 @@ class cache_starter final : public foraging_task,
   bool task_completed(void) const override { return task_finished(); }
 
   void task_start(cta::taskable_argument*) override;
-  double abort_prob_calc(void) override RCSW_PURE;
+  double abort_prob_calc(void) override RCPPSW_PURE;
   rtypes::timestep interface_time_calc(size_t interface,
-                                       const rtypes::timestep& start_time) override RCSW_PURE;
+                                       const rtypes::timestep& start_time) override RCPPSW_PURE;
   void active_interface_update(int) override;
 };
 
 NS_END(d2, tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_TASKS_DEPTH2_CACHE_STARTER_HPP_ */
+#endif /* INCLUDE_FORDYCA_TASKS_D2_CACHE_STARTER_HPP_ */

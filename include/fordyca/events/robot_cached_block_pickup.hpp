@@ -30,8 +30,8 @@
 #include "rcppsw/types/timestep.hpp"
 #include "rcppsw/types/type_uuid.hpp"
 
-#include "cosm/ds/operations/cell2D_op.hpp"
 #include "cosm/controller/operations/base_block_pickup.hpp"
+#include "cosm/ds/operations/cell2D_op.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/block_pickup_base_visit_set.hpp"
@@ -69,9 +69,8 @@ class robot_cached_block_pickup : public rer::client<robot_cached_block_pickup>,
                                   public ccops::base_block_pickup {
  private:
   struct visit_typelist_impl {
-    using controllers =
-        boost::mpl::joint_view<controller::d1::typelist::type,
-                               controller::d2::typelist::type>;
+    using controllers = boost::mpl::joint_view<controller::d1::typelist::type,
+                                               controller::d2::typelist::type>;
     using others = rmpl::typelist<
         /* d1 */
         fsm::block_to_goal_fsm,
@@ -94,8 +93,8 @@ class robot_cached_block_pickup : public rer::client<robot_cached_block_pickup>,
   ~robot_cached_block_pickup(void) override;
 
   robot_cached_block_pickup(const robot_cached_block_pickup& op) = delete;
-  robot_cached_block_pickup& operator=(const robot_cached_block_pickup& op) =
-      delete;
+  robot_cached_block_pickup&
+  operator=(const robot_cached_block_pickup& op) = delete;
 
   /* d1 foraging */
 
@@ -124,8 +123,9 @@ class robot_cached_block_pickup : public rer::client<robot_cached_block_pickup>,
   using ccops::base_block_pickup::visit;
 
   void dispatch_d1_cache_interactor(tasks::base_foraging_task* task);
-  bool dispatch_d2_cache_interactor(tasks::base_foraging_task* task,
-                                    controller::cognitive::cache_sel_matrix* csel_matrix);
+  bool dispatch_d2_cache_interactor(
+      tasks::base_foraging_task* task,
+      controller::cognitive::cache_sel_matrix* csel_matrix);
 
   /* clang-format off */
   const rtypes::timestep               mc_timestep;

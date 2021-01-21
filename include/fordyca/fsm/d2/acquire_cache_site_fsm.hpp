@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_DEPTH2_ACQUIRE_CACHE_SITE_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_DEPTH2_ACQUIRE_CACHE_SITE_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_D2_ACQUIRE_CACHE_SITE_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_D2_ACQUIRE_CACHE_SITE_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -80,11 +80,11 @@ class acquire_cache_site_fsm : public rer::client<acquire_cache_site_fsm>,
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  csmetrics::goal_acq_metrics::goal_type acquisition_goal_internal(void) const RCSW_CONST;
+  csmetrics::goal_acq_metrics::goal_type acquisition_goal_internal(void) const RCPPSW_CONST;
   boost::optional<acquire_goal_fsm::candidate_type> site_select(void);
   bool candidates_exist(void) const { return true; }
-  bool site_exploration_term_cb(void) const RCSW_CONST;
-  bool site_acquired_cb(bool explore_result) const RCSW_CONST;
+  bool site_exploration_term_cb(void) const RCPPSW_CONST;
+  bool site_acquired_cb(bool explore_result) const RCPPSW_CONST;
 
   /* clang-format off */
   bool                                                 m_sel_success{false};
@@ -97,4 +97,4 @@ class acquire_cache_site_fsm : public rer::client<acquire_cache_site_fsm>,
 
 NS_END(d2, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_DEPTH2_ACQUIRE_CACHE_SITE_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_D2_ACQUIRE_CACHE_SITE_FSM_HPP_ */

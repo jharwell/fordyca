@@ -80,8 +80,7 @@ bool robot_free_block_drop::dispatch_free_block_interactor(
      * If we are performing a free block drop because we have just aborted our
      * task, then obviously no need to do that.
      */
-    if (tasks::d2::foraging_task::task_in_d2(polled) &&
-        !polled->task_aborted()) {
+    if (tasks::d2::foraging_task::task_in_d2(polled) && !polled->task_aborted()) {
       ER_INFO("Added block%d@%s/%s to exception list,task='%s'",
               m_block->id().v(),
               rcppsw::to_string(m_block->ranchor2D()).c_str(),

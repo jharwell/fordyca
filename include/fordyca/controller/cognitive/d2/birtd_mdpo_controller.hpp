@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_DEPTH2_BIRTD_MDPO_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_DEPTH2_BIRTD_MDPO_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_BIRTD_MDPO_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_BIRTD_MDPO_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -52,19 +52,19 @@ NS_START(d2);
 class birtd_mdpo_controller : public d2::birtd_dpo_controller,
                             public rer::client<birtd_mdpo_controller> {
  public:
-  birtd_mdpo_controller(void) RCSW_COLD;
-  ~birtd_mdpo_controller(void) override RCSW_COLD;
+  birtd_mdpo_controller(void) RCPPSW_COLD;
+  ~birtd_mdpo_controller(void) override RCPPSW_COLD;
 
   /* foraging_controller overrides */
-  void init(ticpp::Element& node) override RCSW_COLD;
+  void init(ticpp::Element& node) override RCPPSW_COLD;
   std::type_index type_index(void) const override { return typeid(*this); }
 
-  void shared_init(const config::d2::controller_repository& config_repo) RCSW_COLD;
+  void shared_init(const config::d2::controller_repository& config_repo) RCPPSW_COLD;
 
-  mdpo_perception_subsystem* mdpo_perception(void) RCSW_PURE;
-  const mdpo_perception_subsystem* mdpo_perception(void) const RCSW_PURE;
+  mdpo_perception_subsystem* mdpo_perception(void) RCPPSW_PURE;
+  const mdpo_perception_subsystem* mdpo_perception(void) const RCPPSW_PURE;
 };
 
 NS_END(cognitive, d2, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_DEPTH2_BIRTD_MDPO_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_BIRTD_MDPO_CONTROLLER_HPP_ */

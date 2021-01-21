@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_DEPTH0_OMDPO_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_DEPTH0_OMDPO_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D0_OMDPO_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D0_OMDPO_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -49,14 +49,14 @@ NS_START(d0);
 class omdpo_controller : public mdpo_controller,
                          public rer::client<omdpo_controller> {
  public:
-  omdpo_controller(void) RCSW_COLD;
-  ~omdpo_controller(void) override RCSW_COLD;
+  omdpo_controller(void) RCPPSW_COLD;
+  ~omdpo_controller(void) override RCPPSW_COLD;
 
   /* foraging_controller overrides */
   void control_step(void) override;
   std::type_index type_index(void) const override { return typeid(*this); }
 
-  void oracle_init(std::unique_ptr<oracular_info_receptor> receptor) RCSW_COLD;
+  void oracle_init(std::unique_ptr<oracular_info_receptor> receptor) RCPPSW_COLD;
 
  private:
   /* clang-format off */
@@ -66,4 +66,4 @@ class omdpo_controller : public mdpo_controller,
 
 NS_END(cognitive, d0, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_DEPTH0_OMDPO_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D0_OMDPO_CONTROLLER_HPP_ */

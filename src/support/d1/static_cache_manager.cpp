@@ -22,12 +22,12 @@
  ******************************************************************************/
 #include "fordyca/support/d1/static_cache_manager.hpp"
 
-#include "cosm/arena/operations/free_block_drop.hpp"
-#include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/arena/caching_arena_map.hpp"
-#include "cosm/repr/base_block3D.hpp"
 #include "cosm/arena/free_blocks_calculator.hpp"
+#include "cosm/arena/operations/free_block_drop.hpp"
 #include "cosm/arena/operations/free_block_pickup.hpp"
+#include "cosm/arena/repr/arena_cache.hpp"
+#include "cosm/repr/base_block3D.hpp"
 #include "cosm/spatial/conflict_checker.hpp"
 #include "cosm/spatial/dimension_checker.hpp"
 
@@ -57,10 +57,10 @@ static_cache_manager::static_cache_manager(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-boost::optional<cads::acache_vectoro> static_cache_manager::create(
-    const cache_create_ro_params& c_params,
-    const cds::block3D_vectorno& c_all_blocks,
-    bool initial) {
+boost::optional<cads::acache_vectoro>
+static_cache_manager::create(const cache_create_ro_params& c_params,
+                             const cds::block3D_vectorno& c_all_blocks,
+                             bool initial) {
   ER_DEBUG("(Re)-Creating static cache(s)");
   ER_ASSERT(mc_cache_config.static_.size >= carepr::base_cache::kMinBlocks,
             "Static cache size %u < minimum %zu",
@@ -69,13 +69,12 @@ boost::optional<cads::acache_vectoro> static_cache_manager::create(
 
   auto to_use = blocks_alloc(c_params.current_caches, c_all_blocks);
 
-  if (std::any_of(to_use.begin(),
-                  to_use.end(),
-                  [&](const auto& cache_i) { return cache_i.second.empty(); })) {
-    ER_WARN(
-        "Unable to create all static cache(s): Not enough free blocks "
-        "(n_caches=%zu)",
-        c_params.current_caches.size());
+  if (std::any_of(to_use.begin(), to_use.end(), [&](const auto& cache_i) {
+        return cache_i.second.empty();
+      })) {
+    ER_WARN("Unable to create all static cache(s): Not enough free blocks "
+            "(n_caches=%zu)",
+            c_params.current_caches.size());
     return boost::optional<cads::acache_vectoro>();
   }
 
@@ -83,16 +82,14 @@ boost::optional<cads::acache_vectoro> static_cache_manager::create(
   using checker = cspatial::dimension_checker;
   auto even_multiple = checker::even_multiple(arena_map()->grid_resolution(),
                                               mc_cache_config.dimension);
-  auto odd_dsize = checker::odd_dsize(arena_map()->grid_resolution(),
-                                      even_multiple);
+  auto odd_dsize =
+      checker::odd_dsize(arena_map()->grid_resolution(), even_multiple);
 
-  static_cache_creator creator(&arena_map()->decoratee(),
-                               mc_cache_locs,
-                               odd_dsize);
+  static_cache_creator creator(
+      &arena_map()->decoratee(), mc_cache_locs, odd_dsize);
 
-  static_cache_creator::creation_result res = creator.create_all(c_params,
-                                                                 to_use,
-                                                                 initial);
+  static_cache_creator::creation_result res =
+      creator.create_all(c_params, to_use, initial);
 
   /* Configure cache extents */
   creator.cache_extents_configure(res.created);
@@ -105,16 +102,13 @@ boost::optional<cads::acache_vectoro> static_cache_manager::create(
   std::transform(res.created.begin(),
                  res.created.end(),
                  std::back_inserter(sanity_caches),
-                 [&](const auto& c) {
-                   return c.get();
-                 });
-  auto free_blocks = carena::free_blocks_calculator()(c_all_blocks,
-                                                      sanity_caches);
-  ER_ASSERT(creator.creation_sanity_checks(sanity_caches,
-                                           free_blocks,
-                                           c_params.clusters,
-                                           arena_map()->nests()),
-            "One or more bad caches on creation");
+                 [&](const auto& c) { return c.get(); });
+  auto free_blocks =
+      carena::free_blocks_calculator()(c_all_blocks, sanity_caches);
+  ER_ASSERT(
+      creator.creation_sanity_checks(
+          sanity_caches, free_blocks, c_params.clusters, arena_map()->nests()),
+      "One or more bad caches on creation");
 
   caches_created(res.created.size());
   caches_discarded(res.n_discarded);
@@ -127,8 +121,7 @@ boost::optional<cads::acache_vectoro> static_cache_manager::create_conditional(
     const cds::block3D_vectorno& c_all_blocks,
     size_t n_harvesters,
     size_t n_collectors) {
-  math::cache_respawn_probability p(
-      mc_cache_config.static_.respawn_scale_factor);
+  math::cache_respawn_probability p(mc_cache_config.static_.respawn_scale_factor);
 
   if (p.calc(n_harvesters, n_collectors) >= m_rng->uniform(0.0, 1.0)) {
     return create(c_params, c_all_blocks, false);
@@ -140,7 +133,6 @@ boost::optional<cads::acache_vectoro> static_cache_manager::create_conditional(
 ds::block_alloc_map static_cache_manager::blocks_alloc(
     const cads::acache_vectorno& c_existing_caches,
     const cds::block3D_vectorno& c_all_blocks) const {
-
   ds::block_alloc_map allocs;
   for (size_t i = 0; i < mc_cache_locs.size(); ++i) {
     if (auto cache_i = cache_i_blocks_alloc(c_existing_caches,
@@ -168,7 +160,7 @@ boost::optional<cds::block3D_vectorno> static_cache_manager::cache_i_blocks_allo
     size_t n_blocks) const {
   cds::block3D_vectorno cache_i_blocks;
 
-    /*
+  /*
      * Initial allocation.
      *
      * Note that the calculations for membership are ordered from least to most
@@ -181,31 +173,27 @@ boost::optional<cds::block3D_vectorno> static_cache_manager::cache_i_blocks_allo
       [&](const auto* b) {
         /* don't have enough blocks yet */
         return (cache_i_blocks.size() < n_blocks) &&
-            /* not carried by robot */
-            rtypes::constants::kNoUUID == b->md()->robot_id() &&
-            /*
+               /* not carried by robot */
+               rtypes::constants::kNoUUID == b->md()->robot_id() &&
+               /*
              * Not already on a cell where the cache will be re-created, or
              * on the cell where ANOTHER cache *might* be recreated.
              */
-            std::all_of(mc_cache_locs.begin(),
-                        mc_cache_locs.end(),
-                        [&](const auto& loc) {
-                          auto dloc = rmath::dvec2zvec(loc,
-                                                       arena_map()->grid_resolution().v());
-                          return b->danchor2D() != dloc;
-                        }) &&
+               std::all_of(mc_cache_locs.begin(),
+                           mc_cache_locs.end(),
+                           [&](const auto& loc) {
+                             auto dloc = rmath::dvec2zvec(
+                                 loc, arena_map()->grid_resolution().v());
+                             return b->danchor2D() != dloc;
+                           }) &&
 
-            /* not already allocated for a different cache */
-            !c_alloc_map.contains(b) &&
+               /* not already allocated for a different cache */
+               !c_alloc_map.contains(b) &&
 
-
-            std::all_of(c_existing_caches.begin(),
-                        c_existing_caches.end(),
-                        [&](const auto& c) {
-                          return !c->contains_block(b);
-                        });
+               std::all_of(c_existing_caches.begin(),
+                           c_existing_caches.end(),
+                           [&](const auto& c) { return !c->contains_block(b); });
       });
-
 
   ER_DEBUG("Cache initial allocation: %s (%zu)",
            rcppsw::to_string(cache_i_blocks).c_str(),
@@ -230,11 +218,10 @@ boost::optional<cds::block3D_vectorno> static_cache_manager::cache_i_blocks_allo
          * - Are not already allocated to another cache
          */
         return status.x && status.y &&
-            cache_i_blocks.end() == std::find(cache_i_blocks.begin(),
-                                              cache_i_blocks.end(),
-                                              b) &&
+               cache_i_blocks.end() ==
+                   std::find(cache_i_blocks.begin(), cache_i_blocks.end(), b) &&
 
-            !c_alloc_map.contains(b);
+               !c_alloc_map.contains(b);
       });
 
   ER_DEBUG("Cache allocation including hidden blocks: %s (%zu)",
@@ -250,8 +237,7 @@ bool static_cache_manager::cache_i_blocks_alloc_check(
     const cds::block3D_vectorno& cache_i_blocks,
     const rmath::vector2d& c_center) const {
   if (cache_i_blocks.size() < carepr::base_cache::kMinBlocks) {
-    auto dcenter = rmath::dvec2zvec(c_center,
-                                    arena_map()->grid_resolution().v());
+    auto dcenter = rmath::dvec2zvec(c_center, arena_map()->grid_resolution().v());
 
     /*
      * Cannot use std::accumulate for these, because that doesn't work with
@@ -259,28 +245,25 @@ bool static_cache_manager::cache_i_blocks_alloc_check(
      * set of blocks into an int).
      */
     size_t count = 0;
-    std::for_each(cache_i_blocks.begin(),
-                  cache_i_blocks.end(),
-                  [&](const auto& b) {
-                    count += (b->is_out_of_sight() || b->danchor2D() == dcenter);
-                  });
+    std::for_each(
+        cache_i_blocks.begin(), cache_i_blocks.end(), [&](const auto& b) {
+          count += (b->is_out_of_sight() || b->danchor2D() == dcenter);
+        });
 
     std::string accum;
-    std::for_each(cache_i_blocks.begin(),
-                  cache_i_blocks.end(),
-                  [&](const auto& b) {
-                    accum += "b" + rcppsw::to_string(b->id()) + "->fb" +
-                             rcppsw::to_string(b->md()->robot_id()) + ",";
-                  });
+    std::for_each(
+        cache_i_blocks.begin(), cache_i_blocks.end(), [&](const auto& b) {
+          accum += "b" + rcppsw::to_string(b->id()) + "->fb" +
+                   rcppsw::to_string(b->md()->robot_id()) + ",";
+        });
     ER_TRACE("Cache i alloc_blocks carry statuses: [%s]", accum.c_str());
 
     accum = "";
-    std::for_each(cache_i_blocks.begin(),
-                  cache_i_blocks.end(),
-                  [&](const auto& b) {
-                    accum += "b" + rcppsw::to_string(b->id()) + "->" +
-                             b->danchor2D().to_str() + ",";
-                  });
+    std::for_each(
+        cache_i_blocks.begin(), cache_i_blocks.end(), [&](const auto& b) {
+          accum += "b" + rcppsw::to_string(b->id()) + "->" +
+                   b->danchor2D().to_str() + ",";
+        });
     ER_TRACE("Cache i alloc_blocks locs: [%s]", accum.c_str());
 
     ER_ASSERT(cache_i_blocks.size() - count < carepr::base_cache::kMinBlocks,
@@ -293,12 +276,11 @@ bool static_cache_manager::cache_i_blocks_alloc_check(
     return false;
   }
   if (cache_i_blocks.size() < mc_cache_config.static_.size) {
-    ER_WARN(
-        "Not enough free blocks to meet min size for new cache@/%s (%zu < "
-        "%u)",
-        rcppsw::to_string(c_center).c_str(),
-        cache_i_blocks.size(),
-        mc_cache_config.static_.size);
+    ER_WARN("Not enough free blocks to meet min size for new cache@/%s (%zu < "
+            "%u)",
+            rcppsw::to_string(c_center).c_str(),
+            cache_i_blocks.size(),
+            mc_cache_config.static_.size);
     return false;
   }
   return true;

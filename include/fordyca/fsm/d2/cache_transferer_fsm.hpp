@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_DEPTH2_CACHE_TRANSFERER_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_DEPTH2_CACHE_TRANSFERER_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_D2_CACHE_TRANSFERER_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_D2_CACHE_TRANSFERER_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -67,14 +67,15 @@ class cache_transferer_fsm final : public block_to_goal_fsm {
   cache_transferer_fsm& operator=(const cache_transferer_fsm&) = delete;
 
   /* goal acquisition metrics */
-  csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
+  csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCPPSW_PURE;
   rtypes::type_uuid entity_acquired_id(void) const override;
 
   /* block transportation */
-  foraging_transport_goal block_transport_goal(void) const override RCSW_PURE;
+  foraging_transport_goal block_transport_goal(void) const override RCPPSW_PURE;
+  bool is_phototaxiing_to_goal(void) const override { return false; }
 
-  bool is_acquiring_dest_cache(void) const RCSW_PURE;
-  bool is_acquiring_src_cache(void) const RCSW_PURE;
+  bool is_acquiring_dest_cache(void) const RCPPSW_PURE;
+  bool is_acquiring_src_cache(void) const RCPPSW_PURE;
 
  private:
   /* clang-format off */
@@ -85,4 +86,4 @@ class cache_transferer_fsm final : public block_to_goal_fsm {
 
 NS_END(d2, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_DEPTH2_CACHE_TRANSFERER_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_D2_CACHE_TRANSFERER_FSM_HPP_ */

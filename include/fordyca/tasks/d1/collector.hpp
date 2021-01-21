@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_DEPTH1_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_TASKS_DEPTH1_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_TASKS_D1_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_TASKS_D1_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -89,13 +89,14 @@ class collector : public foraging_task,
   RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal,
                             block_transport_goal,
                             const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, is_phototaxiing_to_goal, const);
 
   /* task metrics */
-  bool task_at_interface(void) const override RCSW_PURE;
+  bool task_at_interface(void) const override RCPPSW_PURE;
   bool task_completed(void) const override { return task_finished(); }
 
   void task_start(cta::taskable_argument*) override;
-  double abort_prob_calc(void) override RCSW_PURE;
+  double abort_prob_calc(void) override RCPPSW_PURE;
   rtypes::timestep interface_time_calc(size_t interface,
                                        const rtypes::timestep& start_time) override;
   void active_interface_update(int) override;
@@ -103,4 +104,4 @@ class collector : public foraging_task,
 
 NS_END(d1, tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_TASKS_DEPTH1_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_TASKS_D1_COLLECTOR_HPP_ */

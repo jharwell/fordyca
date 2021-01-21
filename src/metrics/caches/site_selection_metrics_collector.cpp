@@ -43,11 +43,11 @@ site_selection_metrics_collector::site_selection_metrics_collector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<std::string> site_selection_metrics_collector::csv_header_cols(
-    void) const {
+std::list<std::string>
+site_selection_metrics_collector::csv_header_cols(void) const {
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
-      /* clang-format off */
+    /* clang-format off */
     "int_n_successes",
     "int_n_fails",
     "int_nlopt_stopval",
@@ -60,7 +60,7 @@ std::list<std::string> site_selection_metrics_collector::csv_header_cols(
     "cum_nlopt_ftol",
     "cum_nlopt_xtol",
     "cum_nlopt_maxeval",
-      /* clang-format on */
+    /* clang-format on */
   };
   merged.splice(merged.end(), cols);
   return merged;
@@ -71,8 +71,8 @@ void site_selection_metrics_collector::reset(void) {
   reset_after_interval();
 } /* reset() */
 
-boost::optional<std::string> site_selection_metrics_collector::csv_line_build(
-    void) {
+boost::optional<std::string>
+site_selection_metrics_collector::csv_line_build(void) {
   if (!(timestep() % interval() == 0)) {
     return boost::none;
   }

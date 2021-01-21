@@ -42,7 +42,7 @@
  ******************************************************************************/
 namespace fordyca::controller::cognitive {
 class block_sel_matrix;
-} /* namespace fordyca::controller */
+} // namespace fordyca::controller::cognitive
 
 namespace fordyca::ds {
 class dpo_semantic_map;
@@ -71,8 +71,7 @@ class robot_free_block_drop : public rer::client<robot_free_block_drop>,
   struct visit_typelist_impl {
     using inherited = cdops::cell2D_op::visit_typelist;
     using controllers = boost::mpl::joint_view<
-        boost::mpl::joint_view<controller::d0::typelist,
-                               controller::d1::typelist>,
+        boost::mpl::joint_view<controller::d0::typelist, controller::d1::typelist>,
         controller::d2::typelist>;
 
     using others = rmpl::typelist<
@@ -122,8 +121,9 @@ class robot_free_block_drop : public rer::client<robot_free_block_drop>,
  private:
   void visit(fsm::block_to_goal_fsm& fsm);
 
-  bool dispatch_free_block_interactor(tasks::base_foraging_task* task,
-                                      controller::cognitive::block_sel_matrix* bsel_matrix);
+  bool dispatch_free_block_interactor(
+      tasks::base_foraging_task* task,
+      controller::cognitive::block_sel_matrix* bsel_matrix);
 
   /* clang-format off */
   const rtypes::discretize_ratio       mc_resolution;
@@ -147,7 +147,8 @@ NS_END(detail);
 class robot_free_block_drop_visitor
     : public detail::robot_free_block_drop_visitor_impl {
  public:
-  using detail::robot_free_block_drop_visitor_impl::robot_free_block_drop_visitor_impl;
+  using detail::robot_free_block_drop_visitor_impl::
+      robot_free_block_drop_visitor_impl;
 };
 
 NS_END(events, fordyca);

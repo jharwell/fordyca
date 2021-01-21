@@ -53,19 +53,19 @@ enum class foraging_acq_goal {
  * Operators
  ******************************************************************************/
 bool operator==(const csmetrics::goal_acq_metrics::goal_type& goal1,
-                const foraging_acq_goal& goal2) RCSW_PURE;
+                const foraging_acq_goal& goal2) RCPPSW_PURE;
 
 bool operator==(const foraging_acq_goal& goal1,
-                const csmetrics::goal_acq_metrics::goal_type& goal2) RCSW_PURE;
+                const csmetrics::goal_acq_metrics::goal_type& goal2) RCPPSW_PURE;
 
 bool operator!=(const csmetrics::goal_acq_metrics::goal_type& goal1,
-                const foraging_acq_goal& goal2) RCSW_PURE;
+                const foraging_acq_goal& goal2) RCPPSW_PURE;
 
 bool operator!=(const foraging_acq_goal& goal1,
-                const csmetrics::goal_acq_metrics::goal_type& goal2) RCSW_PURE;
+                const csmetrics::goal_acq_metrics::goal_type& goal2) RCPPSW_PURE;
 
-csmetrics::goal_acq_metrics::goal_type to_goal_type(
-    const foraging_acq_goal& goal);
+csmetrics::goal_acq_metrics::goal_type
+to_goal_type(const foraging_acq_goal& goal);
 
 NS_END(fsm, fordyca);
 

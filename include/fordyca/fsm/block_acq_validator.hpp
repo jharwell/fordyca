@@ -39,7 +39,7 @@ class dp_block_map;
 } /* namespace ds */
 namespace controller::cognitive {
 class block_sel_matrix;
-} /* namespace controller */
+} // namespace controller::cognitive
 
 NS_START(fsm);
 
@@ -63,7 +63,7 @@ class block_acq_validator : public rer::client<block_acq_validator> {
   block_acq_validator& operator=(const block_acq_validator& v) = delete;
 
   bool operator()(const rmath::vector2d& loc,
-                  const rtypes::type_uuid& id) const RCSW_PURE;
+                  const rtypes::type_uuid& id) const RCPPSW_PURE;
 
  private:
   /* clang-format off */

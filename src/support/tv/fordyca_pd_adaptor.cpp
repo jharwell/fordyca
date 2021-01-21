@@ -66,11 +66,10 @@ void fordyca_pd_adaptor::pre_kill_cleanup(
     ER_INFO("Kill victim robot %s is carrying block%d",
             foraging->GetId().c_str(),
             foraging->block()->id().v());
-    auto it = std::find_if(m_map->blocks().begin(),
-                           m_map->blocks().end(),
-                           [&](const auto& b) {
-                             return foraging->block()->id() == b->id();
-                           });
+    auto it = std::find_if(
+        m_map->blocks().begin(), m_map->blocks().end(), [&](const auto& b) {
+          return foraging->block()->id() == b->id();
+        });
     /*
      * We are not REALLY holding all the arena map locks, but since population
      * dynamics are always applied AFTER all robots have had their control steps

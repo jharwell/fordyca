@@ -25,7 +25,6 @@
 
 #include "cosm/repr/base_block3D.hpp"
 
-#include "fordyca/controller/reactive/d0/crw_controller.hpp"
 #include "fordyca/controller/cognitive/d0/dpo_controller.hpp"
 #include "fordyca/controller/cognitive/d0/mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d0/odpo_controller.hpp"
@@ -38,6 +37,7 @@
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
+#include "fordyca/controller/reactive/d0/crw_controller.hpp"
 #include "fordyca/fsm/d0/crw_fsm.hpp"
 #include "fordyca/fsm/d0/dpo_fsm.hpp"
 #include "fordyca/fsm/d1/cached_block_to_nest_fsm.hpp"
@@ -65,7 +65,7 @@ robot_nest_block_drop::robot_nest_block_drop(crepr::base_block3D* block,
  ******************************************************************************/
 void robot_nest_block_drop::dispatch_nest_interactor(
     tasks::base_foraging_task* const task) {
-  RCSW_UNUSED auto* polled = dynamic_cast<cta::polled_task*>(task);
+  RCPPSW_UNUSED auto* polled = dynamic_cast<cta::polled_task*>(task);
   auto interactor = dynamic_cast<events::nest_interactor*>(task);
   ER_ASSERT(nullptr != interactor,
             "Non nest-interactor task %s causing nest block drop",
@@ -76,7 +76,8 @@ void robot_nest_block_drop::dispatch_nest_interactor(
 /*******************************************************************************
  * Depth0 Foraging
  ******************************************************************************/
-void robot_nest_block_drop::visit(controller::reactive::d0::crw_controller& controller) {
+void robot_nest_block_drop::visit(
+    controller::reactive::d0::crw_controller& controller) {
   controller.ndc_pusht();
   visit(*controller.fsm());
 
@@ -89,7 +90,8 @@ void robot_nest_block_drop::visit(fsm::d0::crw_fsm& fsm) {
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
-void robot_nest_block_drop::visit(controller::cognitive::d0::dpo_controller& controller) {
+void robot_nest_block_drop::visit(
+    controller::cognitive::d0::dpo_controller& controller) {
   controller.ndc_pusht();
 
   visit(*controller.fsm());

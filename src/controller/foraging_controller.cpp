@@ -120,8 +120,8 @@ void foraging_controller::output_init(const cmconfig::output_config* outputp) {
   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.fsm"), dir + "/fsm.log");
   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.controller.saa"),
                  dir + "/saa.log");
-  ER_LOGFILE_SET(log4cxx::Logger::getLogger(
-                     "fordyca.controller.explore_behavior"),
+  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.controller.explore_"
+                                            "behavior"),
                  dir + "/saa.log");
 #endif
 } /* output_init() */
@@ -131,29 +131,34 @@ void foraging_controller::saa_init(
     const csubsystem::config::sensing_subsystemQ3D_config* sensing_p) {
   using saa_names = crfootbot::config::saa_xml_names;
 
-#ifdef FORDYCA_WITH_ROBOT_RAB
+#ifdef FORDYCA_WITH_FOOTBOT_RAB
   /* auto rabs = chal::sensors::wifi_sensor( */
   /*     GetSensor<argos::CCI_RangeAndBearingSensor>(saa_names::rab_saa)); */
   auto rabs = nullptr;
 #else
   auto rabs = chal::sensors::wifi_sensor(nullptr);
-#endif /* FORDYCA_WITH_ROBOT_RAB */
+#endif /* FORDYCA_WITH_FOOTBOT_RAB */
 
-#ifdef FORDYCA_WITH_ROBOT_BATTERY
+#ifdef FORDYCA_WITH_FOOTBOT_BATTERY
   auto battery = chal::sensors::battery_sensor(
       GetSensor<argos::CCI_BatterySensor>(saa_names::battery_sensor));
 #else
   auto battery = chal::sensors::battery_sensor(nullptr);
-#endif /* FORDYCA_WITH_ROBOT_BATTERY */
+#endif /* FORDYCA_WITH_FOOTBOT_BATTERY */
+
+#ifdef FORDYCA_WITH_FOOTBOT_CAMERA
+  auto blobs = chal::sensors::colored_blob_camera_sensor(
+      GetSensor<argos::CCI_ColoredBlobOmnidirectionalCameraSensor>(
+          saa_names::camera_sensor));
+#else
+  auto blobs = chal::sensors::colored_blob_camera_sensor(nullptr);
+#endif
 
   auto position = chal::sensors::position_sensor(
       GetSensor<argos::CCI_PositioningSensor>(saa_names::position_sensor));
   auto proximity = chal::sensors::proximity_sensor(
       GetSensor<argos::CCI_FootBotProximitySensor>(saa_names::prox_sensor),
       &sensing_p->proximity);
-  auto blobs = chal::sensors::colored_blob_camera_sensor(
-      GetSensor<argos::CCI_ColoredBlobOmnidirectionalCameraSensor>(
-          saa_names::camera_sensor));
   auto light = chal::sensors::light_sensor(
       GetSensor<argos::CCI_FootBotLightSensor>(saa_names::light_sensor));
   auto ground = chal::sensors::ground_sensor(
@@ -165,13 +170,14 @@ void foraging_controller::saa_init(
           saa_names::diff_steering_saa));
 
   auto sensors = csubsystem::sensing_subsystemQ3D::sensor_map{
-      csubsystem::sensing_subsystemQ3D::map_entry_create(rabs),
-      csubsystem::sensing_subsystemQ3D::map_entry_create(battery),
-      csubsystem::sensing_subsystemQ3D::map_entry_create(proximity),
-      csubsystem::sensing_subsystemQ3D::map_entry_create(blobs),
-      csubsystem::sensing_subsystemQ3D::map_entry_create(light),
-      csubsystem::sensing_subsystemQ3D::map_entry_create(ground),
-      csubsystem::sensing_subsystemQ3D::map_entry_create(diff_drives)};
+    csubsystem::sensing_subsystemQ3D::map_entry_create(rabs),
+    csubsystem::sensing_subsystemQ3D::map_entry_create(battery),
+    csubsystem::sensing_subsystemQ3D::map_entry_create(proximity),
+    csubsystem::sensing_subsystemQ3D::map_entry_create(blobs),
+    csubsystem::sensing_subsystemQ3D::map_entry_create(light),
+    csubsystem::sensing_subsystemQ3D::map_entry_create(ground),
+    csubsystem::sensing_subsystemQ3D::map_entry_create(diff_drives)
+  };
 
   auto diff_drivea = ckin2D::governed_diff_drive(
       &actuation_p->diff_drive,
@@ -180,31 +186,32 @@ void foraging_controller::saa_init(
               saa_names::diff_steering_saa)),
       ckin2D::governed_diff_drive::drive_type::ekFSM_DRIVE);
 
-#ifdef COSM_ARGOS_WITH_ROBOT_LEDS
+#ifdef FORDYCA_WITH_FOOTBOT_LEDS
   auto leds = chal::actuators::led_actuator(
       GetActuator<argos::CCI_LEDsActuator>(saa_names::leds_saa));
 #else
   auto leds = chal::actuators::led_actuator(nullptr);
-#endif /* COSM_ARGOS_WITH_ROBOT_LEDS */
+#endif /* FORDYCA_WITH_FOOTBOT_LEDS */
 
-#ifdef FORDYCA_WITH_ROBOT_RAB
+#ifdef FORDYCA_WITH_FOOTBOT_RAB
   auto raba = chal::actuators::wifi_actuator(
       GetActuator<argos::CCI_RangeAndBearingActuator>(saa_names::rab_saa));
 
 #else
   auto raba = chal::actuators::wifi_actuator(nullptr);
-#endif /* FORDYCA_WITH_ROBOT_RABS */
+#endif /* FORDYCA_WITH_FOOTBOT_RABS */
 
   auto actuators = csubsystem::actuation_subsystem2D::actuator_map{
-      /*
+    /*
      * We put the governed differential drive in the actuator map twice because
      * some of the reusable components use the base class differential drive
      * instead of the governed version (no robust way to inform that we want to
      * use the governed version).
      */
-      csubsystem::actuation_subsystem2D::map_entry_create(diff_drivea),
-      csubsystem::actuation_subsystem2D::map_entry_create(leds),
-      csubsystem::actuation_subsystem2D::map_entry_create(raba)};
+    csubsystem::actuation_subsystem2D::map_entry_create(diff_drivea),
+    csubsystem::actuation_subsystem2D::map_entry_create(leds),
+    csubsystem::actuation_subsystem2D::map_entry_create(raba)
+  };
 
   base_controller2D::saa(std::make_unique<crfootbot::footbot_saa_subsystem>(
       position, sensors, actuators, &actuation_p->steering));
@@ -230,12 +237,49 @@ void foraging_controller::irv_init(const ctv::robot_dynamics_applicator* rda) {
 } /* irv_init() */
 
 class crfootbot::footbot_saa_subsystem* foraging_controller::saa(void) {
-  return static_cast<crfootbot::footbot_saa_subsystem*>(
-      base_controller2D::saa());
+  return static_cast<crfootbot::footbot_saa_subsystem*>(base_controller2D::saa());
 }
-const class crfootbot::footbot_saa_subsystem* foraging_controller::saa(
-    void) const {
+const class crfootbot::footbot_saa_subsystem*
+foraging_controller::saa(void) const {
   return static_cast<const crfootbot::footbot_saa_subsystem*>(
       base_controller2D::saa());
 }
+
+/*******************************************************************************
+ * Movement Metrics
+ ******************************************************************************/
+rtypes::spatial_dist foraging_controller::ts_distance(
+    const csmetrics::movement_category& category) const {
+  if (csmetrics::movement_category::ekALL == category) {
+    return ts_distance_impl();
+  } else if (csmetrics::movement_category::ekHOMING == category) {
+    if (fsm::foraging_transport_goal::ekNEST == block_transport_goal()) {
+      return ts_distance_impl();
+    }
+  } else if (csmetrics::movement_category::ekEXPLORING == category) {
+    auto status = is_exploring_for_goal();
+    if (status.is_exploring && status.is_true) {
+      return ts_distance_impl();
+    }
+  }
+  return rtypes::spatial_dist(0);
+} /* ts_distance() */
+
+rmath::vector3d foraging_controller::ts_velocity(
+    const csmetrics::movement_category& category) const {
+  if (csmetrics::movement_category::ekALL == category) {
+    return ts_velocity_impl();
+  } else if (csmetrics::movement_category::ekHOMING == category) {
+    if (fsm::foraging_transport_goal::ekNEST == block_transport_goal()) {
+      return ts_velocity_impl();
+    }
+  } else if (csmetrics::movement_category::ekEXPLORING == category) {
+    auto status = is_exploring_for_goal();
+    if (status.is_exploring && status.is_true) {
+      return ts_velocity_impl();
+    }
+  }
+  return {};
+} /* ts_velocity() */
+
 NS_END(controller, fordyca);

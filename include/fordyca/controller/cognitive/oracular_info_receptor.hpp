@@ -80,9 +80,9 @@ class oracular_info_receptor final : public rer::client<oracular_info_receptor> 
    */
   void dpo_store_update(ds::dpo_store* store);
 
-  bool entities_blocks_enabled(void) const RCSW_PURE;
-  bool entities_caches_enabled(void) const RCSW_PURE;
-  bool tasking_enabled(void) const RCSW_PURE;
+  bool entities_blocks_enabled(void) const RCPPSW_PURE;
+  bool entities_caches_enabled(void) const RCPPSW_PURE;
+  bool tasking_enabled(void) const RCPPSW_PURE;
 
   void tasking_hooks_register(cta::bi_tdgraph_executive* executive);
 

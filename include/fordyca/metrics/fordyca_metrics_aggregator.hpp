@@ -56,13 +56,13 @@ NS_START(metrics);
  * \brief Extends the \ref cmetrics::base_metrics_aggregator for the FORDYCA
  * project.
  */
-class fordyca_metrics_aggregator
-    : public rer::client<fordyca_metrics_aggregator>,
-      public cmetrics::base_metrics_aggregator {
+class fordyca_metrics_aggregator : public rer::client<fordyca_metrics_aggregator>,
+                                   public cmetrics::base_metrics_aggregator {
  public:
   fordyca_metrics_aggregator(const cmconfig::metrics_config* mconfig,
                              const cdconfig::grid2D_config* gconfig,
-                             const std::string& output_root);
+                             const std::string& output_root,
+                             size_t n_block_clusters);
   ~fordyca_metrics_aggregator(void) override = default;
 
   void collect_from_loop(const support::base_loop_functions* loop);

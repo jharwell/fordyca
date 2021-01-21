@@ -27,8 +27,10 @@
 
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
+#include "cosm/repr/config/nest_config.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
+#include "fordyca/config/foraging_controller_repository.hpp"
 #include "fordyca/fsm/d0/crw_fsm.hpp"
 #include "fordyca/fsm/expstrat/block_factory.hpp"
 
@@ -53,15 +55,23 @@ void crw_controller::init(ticpp::Element& node) {
   ndc_push();
   ER_INFO("Initializing...");
 
-  fsm::expstrat::foraging_expstrat::params p(saa(),
-                                             nullptr,
-                                             nullptr,
-                                             nullptr,
-                                             rutils::color());
+  config::foraging_controller_repository repo;
+  repo.parse_all(node);
+
+  if (!repo.validate_all()) {
+    ER_FATAL_SENTINEL("Not all parameters were validated");
+    std::exit(EXIT_FAILURE);
+  }
+
+  fsm::expstrat::foraging_expstrat::params p(
+      saa(), nullptr, nullptr, nullptr, rutils::color());
+  auto* nest = repo.config_get<crepr::config::nest_config>();
+
   m_fsm = std::make_unique<fsm::d0::crw_fsm>(
       saa(),
       fsm::expstrat::block_factory().create(
           fsm::expstrat::block_factory::kCRW, &p, rng()),
+      nest->center,
       rng());
   /* Set CRW FSM supervision */
   supervisor()->supervisee_update(m_fsm.get());
@@ -93,7 +103,7 @@ void crw_controller::control_step(void) {
 } /* control_step() */
 
 /*******************************************************************************
- * FSM Metrics
+ * Goal Acquisition Metrics
  ******************************************************************************/
 RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, goal_acquired, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, entity_acquired_id, *m_fsm, const);
@@ -103,6 +113,11 @@ RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, block_transport_goal, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, acquisition_loc3D, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, vector_loc3D, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, explore_loc3D, *m_fsm, const);
+
+/*******************************************************************************
+ * Block Transportation Metrics
+ ******************************************************************************/
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, is_phototaxiing_to_goal, *m_fsm, const);
 
 using namespace argos; // NOLINT
 

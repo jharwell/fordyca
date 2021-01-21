@@ -45,11 +45,11 @@ dpo_perception_metrics_collector::dpo_perception_metrics_collector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<std::string> dpo_perception_metrics_collector::csv_header_cols(
-    void) const {
+std::list<std::string>
+dpo_perception_metrics_collector::csv_header_cols(void) const {
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
-      /* clang-format off */
+    /* clang-format off */
       "int_avg_known_blocks",
       "cum_avg_known_blocks",
       "int_avg_known_caches",
@@ -58,7 +58,7 @@ std::list<std::string> dpo_perception_metrics_collector::csv_header_cols(
       "cum_avg_block_pheromone_density",
       "int_avg_cache_pheromone_density",
       "cum_avg_cache_pheromone_density"
-      /* clang-format on */
+    /* clang-format on */
   };
   merged.splice(merged.end(), cols);
   return merged;
@@ -69,8 +69,8 @@ void dpo_perception_metrics_collector::reset(void) {
   reset_after_interval();
 } /* reset() */
 
-boost::optional<std::string> dpo_perception_metrics_collector::csv_line_build(
-    void) {
+boost::optional<std::string>
+dpo_perception_metrics_collector::csv_line_build(void) {
   if (!(timestep() % interval() == 0)) {
     return boost::none;
   }

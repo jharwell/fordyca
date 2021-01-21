@@ -82,16 +82,15 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
                  * policy). Allowing acquisition via exploration can result in
                  * violations of the pickup policy.
                  */
-              RCPPSW_STRUCT_DOT_INITIALIZER(explore_term_cb,
-                                            std::bind([]() noexcept {
-                                              return false;
-                                            })),
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  explore_term_cb,
+                  std::bind([]() noexcept { return false; })),
               RCPPSW_STRUCT_DOT_INITIALIZER(
                   goal_valid_cb,
                   std::bind(&acquire_existing_cache_fsm::cache_acq_valid,
                             this,
                             std::placeholders::_1,
-                            std::placeholders::_2))}),
+                            std::placeholders::_2)) }),
       mc_for_pickup(for_pickup),
       mc_matrix(c_params->csel_matrix),
       mc_store(c_params->store) {}
@@ -99,16 +98,16 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
 /*******************************************************************************
  * Non-Member Functions
  ******************************************************************************/
-csmetrics::goal_acq_metrics::goal_type acquire_existing_cache_fsm::
-    acq_goal_internal(void) {
+csmetrics::goal_acq_metrics::goal_type
+acquire_existing_cache_fsm::acq_goal_internal(void) {
   return fsm::to_goal_type(foraging_acq_goal::ekEXISTING_CACHE);
 } /* acq_goal() */
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-boost::optional<acquire_existing_cache_fsm::acq_loc_type> acquire_existing_cache_fsm::
-    calc_acq_location(void) {
+boost::optional<acquire_existing_cache_fsm::acq_loc_type>
+acquire_existing_cache_fsm::calc_acq_location(void) {
   existing_cache_selector selector(mc_for_pickup, mc_matrix, &mc_store->caches());
 
   if (auto best = selector(mc_store->caches(),
@@ -132,8 +131,8 @@ boost::optional<acquire_existing_cache_fsm::acq_loc_type> acquire_existing_cache
   }
 } /* calc_acq_location() */
 
-boost::optional<csfsm::acquire_goal_fsm::candidate_type> acquire_existing_cache_fsm::
-    existing_cache_select(void) {
+boost::optional<csfsm::acquire_goal_fsm::candidate_type>
+acquire_existing_cache_fsm::existing_cache_select(void) {
   if (auto selection = calc_acq_location()) {
     return boost::make_optional(acquire_goal_fsm::candidate_type(
         selection.get().second, kCACHE_ARRIVAL_TOL, selection.get().first));
@@ -150,8 +149,8 @@ bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) const {
     ER_FATAL_SENTINEL("Robot acquired cache via exploration");
     return false;
   } else {
-    if (saa()->sensing()->sensor<chal::sensors::ground_sensor>()->detect(
-            "cache")) {
+    if (saa()->sensing()->sensor<chal::sensors::ground_sensor>()->detect("cach"
+                                                                         "e")) {
       return true;
     }
     ER_WARN("Robot arrived at goal, but no cache was detected");
@@ -161,9 +160,8 @@ bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) const {
 
 bool acquire_existing_cache_fsm::cache_acq_valid(const rmath::vector2d& loc,
                                                  const rtypes::type_uuid& id) {
-  return cache_acq_validator(&mc_store->caches(),
-                             mc_matrix,
-                             mc_for_pickup)(loc, id, saa()->sensing()->tick());
+  return cache_acq_validator(&mc_store->caches(), mc_matrix, mc_for_pickup)(
+      loc, id, saa()->sensing()->tick());
 } /* cache_acq_valid() */
 
 NS_END(controller, fordyca);

@@ -46,9 +46,7 @@
           <pheromone rho="0.00001"
                      repeat_deposit="false"/>
         </perception>
-
-        <block_sel_matrix
-              nest="2.0, 3"/>
+        <nest dims="1.0, 4.0" center="2, 3" />
         <exploration
             block_strategy="CRW"
             cache_strategy="ledtaxis_search"/>
@@ -97,14 +95,15 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth0_loop_functions">
+                  label="d0_loop_functions">
     <output output_root="output"
             output_dir="__current_date__">
       <metrics
           output_dir="metrics">
           <append
               output_interval="1000"
-              block_transport="block-transport.csv"
+              block_transporter="block-transporter.csv"
+              block_transportee="block-transportee.csv"
               fsm_collision_counts="fsm-collision-counts.csv"
               fsm_movement="fsm-movement.csv"
               block_acq_counts="block-acq-counts.csv"
@@ -213,7 +212,7 @@
                    up="0,1,0"
                    />
       </camera>
-      <user_functions label="depth0_qt_user_functions" />
+      <user_functions label="d0_qt_user_functions" />
     </qt-opengl>
   </visualization>
 

@@ -23,15 +23,15 @@
  ******************************************************************************/
 #include "fordyca/support/base_cache_creator.hpp"
 
-#include "cosm/ds/operations/cell2D_cache_extent.hpp"
+#include "cosm/arena/operations/block_extent_clear.hpp"
+#include "cosm/arena/operations/cache_extent_set.hpp"
 #include "cosm/arena/operations/free_block_drop.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/arena/repr/light_type_index.hpp"
+#include "cosm/ds/operations/cell2D_cache_extent.hpp"
 #include "cosm/foraging/repr/block_cluster.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/repr/nest.hpp"
-#include "cosm/arena/operations/cache_extent_set.hpp"
-#include "cosm/arena/operations/block_extent_clear.hpp"
 
 #include "fordyca/events/cell2D_empty.hpp"
 
@@ -53,11 +53,11 @@ base_cache_creator::base_cache_creator(cds::arena_grid* const grid,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
-    const rmath::vector2d& center,
-    cds::block3D_vectorno blocks,
-    const rtypes::timestep& t,
-    bool pre_dist) {
+std::unique_ptr<carepr::arena_cache>
+base_cache_creator::create_single_cache(const rmath::vector2d& center,
+                                        cds::block3D_vectorno blocks,
+                                        const rtypes::timestep& t,
+                                        bool pre_dist) {
   ER_ASSERT(center.x() > 0 && center.y() > 0,
             "Center@%s is not positive definite",
             center.to_str().c_str());
@@ -113,10 +113,10 @@ std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
      */
     for (auto& block : blocks) {
       ER_DEBUG("Clearing block%d host cell@%s and extents: x=%s,y=%s",
-              block->id().v(),
-              rcppsw::to_string(block->danchor2D()).c_str(),
-              rcppsw::to_string(block->xdspan()).c_str(),
-              rcppsw::to_string(block->ydspan()).c_str());
+               block->id().v(),
+               rcppsw::to_string(block->danchor2D()).c_str(),
+               rcppsw::to_string(block->xdspan()).c_str(),
+               rcppsw::to_string(block->ydspan()).c_str());
       /* Mark block host cell as empty */
       events::cell2D_empty_visitor cell_op(block->danchor2D());
       cell_op.visit(m_grid->access<arena_grid::kCell>(block->danchor2D()));
@@ -148,11 +148,11 @@ std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
   /* create the cache! */
   cds::block3D_vectorno block_vec(blocks.begin(), blocks.end());
   auto ret = std::make_unique<carepr::arena_cache>(
-      carepr::arena_cache::params{mc_cache_dim,
-            m_grid->resolution(),
-            center,
-            block_vec,
-            rtypes::constants::kNoUUID},
+      carepr::arena_cache::params{ mc_cache_dim,
+                                   m_grid->resolution(),
+                                   center,
+                                   block_vec,
+                                   rtypes::constants::kNoUUID },
       carepr::light_type_index()[carepr::light_type_index::kCache]);
   ret->creation_ts(t);
   ER_ASSERT(dcenter == ret->dcenter2D(),
@@ -160,7 +160,8 @@ std::unique_ptr<carepr::arena_cache> base_cache_creator::create_single_cache(
             ret->id().v(),
             rcppsw::to_string(ret->dcenter2D()).c_str(),
             rcppsw::to_string(dcenter).c_str());
-  ER_INFO("Created cache%d@%s/%s,anchor=%s/%s,xspan=%s/%s,yspan=%s/%s with %zu blocks [%s]",
+  ER_INFO("Created cache%d@%s/%s,anchor=%s/%s,xspan=%s/%s,yspan=%s/%s with %zu "
+          "blocks [%s]",
           ret->id().v(),
           rcppsw::to_string(ret->rcenter2D()).c_str(),
           rcppsw::to_string(ret->dcenter2D()).c_str(),
@@ -191,26 +192,27 @@ void base_cache_creator::cache_extents_configure(
 bool base_cache_creator::creation_sanity_checks(
     const cads::acache_vectorro& c_caches,
     const cds::block3D_vectorno& c_free_blocks,
-    const cfds::block3D_cluster_vector& c_clusters,
+    const cfds::block3D_cluster_vectorro& c_clusters,
     const cads::nest_vectorro& c_nests) const {
   for (auto& c : c_caches) {
     ER_CHECK(sanity_check_internal_consistency(c),
              "Cache%d@%s/%s not internally consistent",
              c->id().v(),
              rcppsw::to_string(c->rcenter2D()).c_str(),
-              rcppsw::to_string(c->dcenter2D()).c_str());;
+             rcppsw::to_string(c->dcenter2D()).c_str());
+    ;
   }
-  for (auto &c : c_caches) {
+  for (auto& c : c_caches) {
     ER_CHECK(sanity_check_free_block_overlap(c, c_free_blocks),
              "One or more caches overlap with free blocks");
   } /* for(&c..) */
 
-  for (auto &c : c_caches) {
+  for (auto& c : c_caches) {
     ER_CHECK(sanity_check_block_cluster_overlap(c, c_clusters),
              "One or more caches overlap with one or more block clusters");
   } /* for(&c..) */
 
-  for (auto &c : c_caches) {
+  for (auto& c : c_caches) {
     ER_CHECK(sanity_check_nest_overlap(c, c_nests),
              "One or more caches overlap with one or more nests");
   } /* for(&c..) */
@@ -218,9 +220,7 @@ bool base_cache_creator::creation_sanity_checks(
   ER_CHECK(sanity_check_cross_consistency(c_caches),
            "Two or more caches not cross-consistent");
 
-  ER_CHECK(sanity_check_cache_overlap(c_caches),
-           "Two or more caches overlap");
-
+  ER_CHECK(sanity_check_cache_overlap(c_caches), "Two or more caches overlap");
 
   return true;
 
@@ -245,7 +245,7 @@ bool base_cache_creator::sanity_check_internal_consistency(
            "Cache does not have enough blocks: %zu < %zu",
            cache->n_blocks(),
            carepr::base_cache::kMinBlocks);
-  for (auto &pair : cache->blocks()) {
+  for (auto& pair : cache->blocks()) {
     auto* b = pair.second;
     ER_CHECK(b->danchor2D() == cache->dcenter2D(),
              "Block%d@%s not in cache host cell@%s",
@@ -287,18 +287,16 @@ error:
 
 bool base_cache_creator::sanity_check_block_cluster_overlap(
     const carepr::arena_cache* cache,
-    const cfds::block3D_cluster_vector& clusters) const {
-
+    const cfds::block3D_cluster_vectorro& clusters) const {
   for (auto& cluster : clusters) {
-    ER_CHECK(
-        !(cache->xrspan().overlaps_with(cluster->xrspan()) &&
-          cache->yrspan().overlaps_with(cluster->yrspan())),
-        "Cache%d xspan=%s,yspan=%s overlaps cluster w/xspan=%s,yspan=%s",
-        cache->id().v(),
-        rcppsw::to_string(cache->xrspan()).c_str(),
-        rcppsw::to_string(cache->yrspan()).c_str(),
-        rcppsw::to_string(cluster->xrspan()).c_str(),
-        rcppsw::to_string(cluster->yrspan()).c_str());
+    ER_CHECK(!(cache->xrspan().overlaps_with(cluster->xrspan()) &&
+               cache->yrspan().overlaps_with(cluster->yrspan())),
+             "Cache%d xspan=%s,yspan=%s overlaps cluster w/xspan=%s,yspan=%s",
+             cache->id().v(),
+             rcppsw::to_string(cache->xrspan()).c_str(),
+             rcppsw::to_string(cache->yrspan()).c_str(),
+             rcppsw::to_string(cluster->xrspan()).c_str(),
+             rcppsw::to_string(cluster->yrspan()).c_str());
   } /* for(&cluster..) */
   return true;
 
@@ -309,18 +307,16 @@ error:
 bool base_cache_creator::sanity_check_nest_overlap(
     const carepr::arena_cache* cache,
     const cads::nest_vectorro& nests) const {
-
   for (auto& nest : nests) {
-    ER_CHECK(
-        !(cache->xrspan().overlaps_with(nest->xrspan()) &&
-          cache->yrspan().overlaps_with(nest->yrspan())),
-        "Cache%d xspan=%s,yspan=%s overlaps nest%d w/xspan=%s,yspan=%s",
-        cache->id().v(),
-        rcppsw::to_string(cache->xrspan()).c_str(),
-        rcppsw::to_string(cache->yrspan()).c_str(),
-        nest->id().v(),
-        rcppsw::to_string(nest->xrspan()).c_str(),
-        rcppsw::to_string(nest->yrspan()).c_str());
+    ER_CHECK(!(cache->xrspan().overlaps_with(nest->xrspan()) &&
+               cache->yrspan().overlaps_with(nest->yrspan())),
+             "Cache%d xspan=%s,yspan=%s overlaps nest%d w/xspan=%s,yspan=%s",
+             cache->id().v(),
+             rcppsw::to_string(cache->xrspan()).c_str(),
+             rcppsw::to_string(cache->yrspan()).c_str(),
+             nest->id().v(),
+             rcppsw::to_string(nest->xrspan()).c_str(),
+             rcppsw::to_string(nest->yrspan()).c_str());
   } /* for(&nest..) */
   return true;
 
@@ -330,20 +326,19 @@ error:
 
 bool base_cache_creator::sanity_check_cross_consistency(
     const cads::acache_vectorro& caches) const {
-
   for (auto& c1 : caches) {
     auto c1_xspan = c1->xrspan();
     auto c1_yspan = c1->yrspan();
 
-      /* check caches contain different blocks and no duplicates */
+    /* check caches contain different blocks and no duplicates */
     for (auto& c2 : caches) {
       if (c1->id() == c2->id()) {
         continue;
       }
       for (auto& pair : c1->blocks()) {
         auto* b = pair.second;
-        ER_CHECK(c1->blocks().end() == std::adjacent_find(c1->blocks().begin(),
-                                                          c1->blocks().end()),
+        ER_CHECK(c1->blocks().end() ==
+                     std::adjacent_find(c1->blocks().begin(), c1->blocks().end()),
                  "Multiple blocks with the same ID in cache%d",
                  c1->id().v());
 
@@ -353,7 +348,7 @@ bool base_cache_creator::sanity_check_cross_consistency(
                  c1->id().v(),
                  c2->id().v());
       } /* for(&b..) */
-    }   /* for(&c2..) */
+    } /* for(&c2..) */
   } /* for(&c1..) */
   return true;
 

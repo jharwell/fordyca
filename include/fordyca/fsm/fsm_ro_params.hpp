@@ -27,6 +27,7 @@
 #include <memory>
 
 #include "rcppsw/common/common.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 #include "fordyca/config/exploration_config.hpp"
 #include "fordyca/fordyca.hpp"
@@ -39,7 +40,7 @@ NS_START(fordyca);
 namespace controller::cognitive {
 class block_sel_matrix;
 class cache_sel_matrix;
-} /* namespace controller */
+} // namespace controller::cognitive
 
 namespace ds {
 class dpo_store;

@@ -45,26 +45,22 @@ static_cache_creator::static_cache_creator(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-static_cache_creator::creation_result static_cache_creator::create_all(
-    const cache_create_ro_params& c_params,
-    const ds::block_alloc_map& c_alloc_map,
-    bool pre_dist) {
-
-
+static_cache_creator::creation_result
+static_cache_creator::create_all(const cache_create_ro_params& c_params,
+                                 const ds::block_alloc_map& c_alloc_map,
+                                 bool pre_dist) {
   creation_result res;
-  for (const auto &alloc_i : c_alloc_map) {
+  for (const auto& alloc_i : c_alloc_map) {
     ER_DEBUG("Cache%d allocked blocks: [%s] (%zu)",
              alloc_i.first,
              rcppsw::to_string(alloc_i.second).c_str(),
              mc_centers.size());
     auto rcenter = mc_centers[alloc_i.first];
-    auto dcenter = rmath::dvec2zvec(rcenter,
-                                    grid()->resolution().v());
-    auto exists = std::find_if(c_params.current_caches.begin(),
-                               c_params.current_caches.end(),
-                               [&](const auto& c) {
-                                 return dcenter == c->dcenter2D();
-                               });
+    auto dcenter = rmath::dvec2zvec(rcenter, grid()->resolution().v());
+    auto exists =
+        std::find_if(c_params.current_caches.begin(),
+                     c_params.current_caches.end(),
+                     [&](const auto& c) { return dcenter == c->dcenter2D(); });
     /* static cache already exists */
     if (c_params.current_caches.end() != exists) {
       ER_DEBUG("Cache%d@%s/%s already exists",
@@ -75,12 +71,12 @@ static_cache_creator::creation_result static_cache_creator::create_all(
     }
 
     if (alloc_i.second.size() < base_cache::kMinBlocks) {
-        ER_WARN("Not enough blocks provided to construct cache%d@%s/%s: %zu < %zu",
-                alloc_i.first,
-                rcppsw::to_string(rcenter).c_str(),
-                rcppsw::to_string(dcenter).c_str(),
-                alloc_i.second.size(),
-                base_cache::kMinBlocks);
+      ER_WARN("Not enough blocks provided to construct cache%d@%s/%s: %zu < %zu",
+              alloc_i.first,
+              rcppsw::to_string(rcenter).c_str(),
+              rcppsw::to_string(dcenter).c_str(),
+              alloc_i.second.size(),
+              base_cache::kMinBlocks);
       continue;
     }
 
@@ -90,15 +86,12 @@ static_cache_creator::creation_result static_cache_creator::create_all(
             rcppsw::to_string(dcenter).c_str(),
             rcppsw::to_string(alloc_i.second).c_str(),
             alloc_i.second.size());
-    auto cache = create_single_cache(rcenter,
-                                     alloc_i.second,
-                                     c_params.t,
-                                     pre_dist);
+    auto cache =
+        create_single_cache(rcenter, alloc_i.second, c_params.t, pre_dist);
     res.created.push_back(std::move(cache));
   } /* for(&alloc_i..) */
 
   return res;
 } /* create_all() */
-
 
 NS_END(d1, support, fordyca);

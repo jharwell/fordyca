@@ -71,31 +71,30 @@ double harvester::abort_prob_calc(void) {
   }
 } /* calc_abort_prob() */
 
-rtypes::timestep harvester::interface_time_calc(
-    size_t interface,
-    const rtypes::timestep& start_time) {
+rtypes::timestep
+harvester::interface_time_calc(size_t interface,
+                               const rtypes::timestep& start_time) {
   ER_ASSERT(0 == interface, "Bad interface ID: %zu", interface);
   return current_time() - start_time;
 } /* interface_time_calc() */
 
 void harvester::active_interface_update(int) {
-  auto* fsm =
-      static_cast<fsm::d1::block_to_existing_cache_fsm*>(mechanism());
+  auto* fsm = static_cast<fsm::d1::block_to_existing_cache_fsm*>(mechanism());
 
   if (fsm->goal_acquired() && fsm::foraging_transport_goal::ekEXISTING_CACHE ==
                                   fsm->block_transport_goal()) {
     if (interface_in_prog(0)) {
       interface_exit(0);
       interface_time_mark_finish(0);
-      ER_DEBUG("Interface finished at timestep %u", current_time().v());
+      ER_DEBUG("Interface finished at timestep %zu", current_time().v());
     }
-    ER_TRACE("Interface time: %u", interface_time(0).v());
+    ER_TRACE("Interface time: %zu", interface_time(0).v());
   } else if (fsm::foraging_transport_goal::ekEXISTING_CACHE ==
              fsm->block_transport_goal()) {
     if (!interface_in_prog(0)) {
       interface_enter(0);
       interface_time_mark_start(0);
-      ER_DEBUG("Interface start at timestep %u", current_time().v());
+      ER_DEBUG("Interface start at timestep %zu", current_time().v());
     }
   }
 } /* active_interface_update() */
@@ -118,67 +117,66 @@ void harvester::accept(events::detail::block_vanished& visitor) {
 }
 
 /*******************************************************************************
- * FSM Metrics
+ * Block Acquisition Metrics
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEF(harvester,
-                         is_exploring_for_goal,
-                         *static_cast<fsm::d1::block_to_existing_cache_fsm*>(
-                             polled_task::mechanism()),
-                         const);
-RCPPSW_WRAP_OVERRIDE_DEF(harvester,
-                         is_vectoring_to_goal,
-                         *static_cast<fsm::d1::block_to_existing_cache_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    harvester,
+    is_exploring_for_goal,
+    *static_cast<fsm::d1::block_to_existing_cache_fsm*>(polled_task::mechanism()),
+    const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    harvester,
+    is_vectoring_to_goal,
+    *static_cast<fsm::d1::block_to_existing_cache_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(harvester,
-                         goal_acquired,
-                         *static_cast<fsm::d1::block_to_existing_cache_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    harvester,
+    goal_acquired,
+    *static_cast<fsm::d1::block_to_existing_cache_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(harvester,
-                         acquisition_goal,
-                         *static_cast<fsm::d1::block_to_existing_cache_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    harvester,
+    acquisition_goal,
+    *static_cast<fsm::d1::block_to_existing_cache_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(harvester,
-                         block_transport_goal,
-                         *static_cast<fsm::d1::block_to_existing_cache_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    harvester,
+    block_transport_goal,
+    *static_cast<fsm::d1::block_to_existing_cache_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(harvester,
-                         acquisition_loc3D,
-                         *static_cast<fsm::d1::block_to_existing_cache_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    harvester,
+    acquisition_loc3D,
+    *static_cast<fsm::d1::block_to_existing_cache_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(harvester,
-                         explore_loc3D,
-                         *static_cast<fsm::d1::block_to_existing_cache_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    harvester,
+    explore_loc3D,
+    *static_cast<fsm::d1::block_to_existing_cache_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(harvester,
-                         vector_loc3D,
-                         *static_cast<fsm::d1::block_to_existing_cache_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    harvester,
+    vector_loc3D,
+    *static_cast<fsm::d1::block_to_existing_cache_fsm*>(polled_task::mechanism()),
+    const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(harvester,
-                         entity_acquired_id,
-                         *static_cast<fsm::d1::block_to_existing_cache_fsm*>(
-                             polled_task::mechanism()),
-                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(
+    harvester,
+    entity_acquired_id,
+    *static_cast<fsm::d1::block_to_existing_cache_fsm*>(polled_task::mechanism()),
+    const);
 
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/
 bool harvester::task_at_interface(void) const {
-  auto* fsm =
-      static_cast<fsm::d1::block_to_existing_cache_fsm*>(mechanism());
+  auto* fsm = static_cast<fsm::d1::block_to_existing_cache_fsm*>(mechanism());
   return fsm::foraging_transport_goal::ekEXISTING_CACHE ==
          fsm->block_transport_goal();
 } /* task_at_interface()() */

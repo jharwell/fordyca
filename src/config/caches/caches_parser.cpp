@@ -60,9 +60,9 @@ bool caches_parser::validate(void) const {
     return true;
   }
 
-  RCSW_CHECK(m_config->dimension > 0.0);
-  RCSW_CHECK(m_dynamic.validate());
-  RCSW_CHECK(m_static.validate());
+  RCPPSW_CHECK(m_config->dimension > 0.0);
+  RCPPSW_CHECK(m_dynamic.validate());
+  RCPPSW_CHECK(m_static.validate());
   return true;
 
 error:

@@ -52,8 +52,7 @@ class block_vanished : public rer::client<block_vanished> {
  private:
   struct visit_typelist_impl {
     using controllers = boost::mpl::joint_view<
-      boost::mpl::joint_view<controller::d0::typelist,
-                             controller::d1::typelist>,
+        boost::mpl::joint_view<controller::d0::typelist, controller::d1::typelist>,
         controller::d2::typelist>;
     using tasks = rmpl::typelist<tasks::d0::generalist,
                                  tasks::d1::harvester,
@@ -121,7 +120,8 @@ NS_END(detail);
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using block_vanished_visitor = rpvisitor::filtered_visitor<detail::block_vanished>;
+using block_vanished_visitor =
+    rpvisitor::filtered_visitor<detail::block_vanished>;
 
 NS_END(events, fordyca);
 

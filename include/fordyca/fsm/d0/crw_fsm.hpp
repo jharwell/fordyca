@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_DEPTH0_CRW_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_DEPTH0_CRW_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_D0_CRW_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_D0_CRW_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -32,11 +32,13 @@
 #include "cosm/spatial/metrics/interference_metrics.hpp"
 #include "cosm/fsm/block_transporter.hpp"
 #include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
+#include "cosm/fsm/metrics/block_transporter_metrics.hpp"
 
 #include "fordyca/fsm/foraging_transport_goal.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/fsm/foraging_transport_goal.hpp"
+#include "fordyca/fsm/fsm_ro_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -64,34 +66,37 @@ class crw_fsm final : public csfsm::util_hfsm,
                       public rer::client<crw_fsm>,
                       public csmetrics::goal_acq_metrics,
                       public cfsm::block_transporter<foraging_transport_goal>,
+                      public cfsm::metrics::block_transporter_metrics,
                       public cta::taskable {
  public:
   crw_fsm(crfootbot::footbot_saa_subsystem* saa,
           std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+          const rmath::vector2d& nest_loc,
           rmath::rng* rng);
 
   crw_fsm(const crw_fsm&) = delete;
   crw_fsm& operator=(const crw_fsm&) = delete;
 
   /* interference metrics */
-  bool exp_interference(void) const override RCSW_PURE;
-  bool entered_interference(void) const override RCSW_PURE;
-  bool exited_interference(void) const override RCSW_PURE;
-  rtypes::timestep interference_duration(void) const override RCSW_PURE;
+  bool exp_interference(void) const override RCPPSW_PURE;
+  bool entered_interference(void) const override RCPPSW_PURE;
+  bool exited_interference(void) const override RCPPSW_PURE;
+  rtypes::timestep interference_duration(void) const override RCPPSW_PURE;
   rmath::vector3z interference_loc3D(void) const override;
 
   /* goal acquisition metrics */
-  csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
-  exp_status is_exploring_for_goal(void) const override RCSW_PURE;
+  csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCPPSW_PURE;
+  exp_status is_exploring_for_goal(void) const override RCPPSW_PURE;
   bool is_vectoring_to_goal(void) const override { return false; }
-  bool goal_acquired(void) const override RCSW_PURE;
+  bool goal_acquired(void) const override RCPPSW_PURE;
   rmath::vector3z acquisition_loc3D(void) const override;
-  rtypes::type_uuid entity_acquired_id(void) const override RCSW_PURE;
+  rtypes::type_uuid entity_acquired_id(void) const override RCPPSW_PURE;
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, explore_loc3D, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, vector_loc3D, const);
 
   /* block transportation */
-  foraging_transport_goal block_transport_goal(void) const override RCSW_PURE;
+  foraging_transport_goal block_transport_goal(void) const override RCPPSW_PURE;
+  bool is_phototaxiing_to_goal(void) const override RCPPSW_PURE;
 
   /* taskable overrides */
   void task_execute(void) override { run(); }
@@ -124,23 +129,24 @@ class crw_fsm final : public csfsm::util_hfsm,
   };
 
   /* inherited states */
-  HFSM_STATE_INHERIT(csfsm::util_hfsm, transport_to_nest,
-                     rpfsm::event_data);
-  HFSM_STATE_INHERIT(csfsm::util_hfsm, leaving_nest,
+  RCPPSW_HFSM_STATE_INHERIT(csfsm::util_hfsm,
+                     transport_to_nest,
+                     nest_transport_data);
+  RCPPSW_HFSM_STATE_INHERIT(csfsm::util_hfsm, leaving_nest,
                      rpfsm::event_data);
 
-  HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_transport_to_nest);
-  HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_leaving_nest);
-  HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_wait_for_signal);
+  RCPPSW_HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_transport_to_nest);
+  RCPPSW_HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_leaving_nest);
+  RCPPSW_HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_wait_for_signal);
 
-  HFSM_EXIT_INHERIT(csfsm::util_hfsm, exit_transport_to_nest);
+  RCPPSW_HFSM_EXIT_INHERIT(csfsm::util_hfsm, exit_transport_to_nest);
 
   /* crw fsm states */
-  HFSM_STATE_DECLARE(crw_fsm, start, rpfsm::event_data);
-  HFSM_STATE_DECLARE_ND(crw_fsm, acquire_block);
-  HFSM_STATE_DECLARE(crw_fsm, wait_for_block_pickup,
+  RCPPSW_HFSM_STATE_DECLARE(crw_fsm, start, rpfsm::event_data);
+  RCPPSW_HFSM_STATE_DECLARE_ND(crw_fsm, acquire_block);
+  RCPPSW_HFSM_STATE_DECLARE(crw_fsm, wait_for_block_pickup,
                      rpfsm::event_data);
-  HFSM_STATE_DECLARE(crw_fsm, wait_for_block_drop,
+  RCPPSW_HFSM_STATE_DECLARE(crw_fsm, wait_for_block_drop,
                      rpfsm::event_data);
 
   /**
@@ -149,13 +155,15 @@ class crw_fsm final : public csfsm::util_hfsm,
    * Note that the order of the states in the map MUST match the order of the
    * states in \enum fsm_states, or things will not work correctly.
    */
-  HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
+  RCPPSW_HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   return (&mc_state_map[index]);
   }
 
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
+  RCPPSW_HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 
   /* clang-format off */
+  const rmath::vector2d       mc_nest_loc;
+
   bool                        m_task_finished{false};
   csfsm::explore_for_goal_fsm m_explore_fsm;
   /* clang-format on */
@@ -163,4 +171,4 @@ class crw_fsm final : public csfsm::util_hfsm,
 
 NS_END(d0, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_DEPTH0_CRW_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_D0_CRW_FSM_HPP_ */
