@@ -18,37 +18,37 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_EXPSTRAT_LEDTAXIS_CACHE_SEARCH_HPP_
-#define INCLUDE_FORDYCA_FSM_EXPSTRAT_LEDTAXIS_CACHE_SEARCH_HPP_
+#ifndef INCLUDE_FORDYCA_STRATEGY_EXPLORE_LEDTAXIS_CACHE_SEARCH_HPP_
+#define INCLUDE_FORDYCA_STRATEGY_EXPLORE_LEDTAXIS_CACHE_SEARCH_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <memory>
-#include "fordyca/fsm/expstrat/ledtaxis.hpp"
-#include "fordyca/fsm/expstrat/crw_adaptor.hpp"
-#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
+#include "fordyca/strategy/explore/ledtaxis.hpp"
+#include "fordyca/strategy/explore/crw_adaptor.hpp"
+#include "fordyca/strategy/foraging_strategy.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, fsm, expstrat);
+NS_START(fordyca, strategy, explore);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * \class ledtaxis_cache_search
- * \ingroup fsm expstrat
+ * \ingroup strategy explore
  *
  * \brief Vector to the last known location of a cache, then begin performing
  * CRW at that location, with the idea being that the ledtaxis of another
  * cache being nearby is higher, given that you've found one there before.
  */
-class ledtaxis_cache_search : public foraging_expstrat,
+class ledtaxis_cache_search : public foraging_strategy,
                               public rer::client<ledtaxis_cache_search> {
  public:
-  explicit ledtaxis_cache_search(const foraging_expstrat::params* const c_params,
+  explicit ledtaxis_cache_search(const foraging_strategy::params* const c_params,
                                  rmath::rng* rng)
       : ledtaxis_cache_search(c_params->saa,
                               c_params->ledtaxis_target,
@@ -56,8 +56,8 @@ class ledtaxis_cache_search : public foraging_expstrat,
   ledtaxis_cache_search(crfootbot::footbot_saa_subsystem* saa,
                         const rutils::color& ledtaxis_target,
                         rmath::rng* rng)
-      : foraging_expstrat(saa, rng),
-        ER_CLIENT_INIT("fordyca.fsm.expstrat.ledtaxis_cache_search"),
+      : foraging_strategy(saa, rng),
+        ER_CLIENT_INIT("fordyca.fsm.strategy.ledtaxis_cache_search"),
         m_crw(saa, rng),
         m_taxis(saa, ledtaxis_target, rng) {}
 
@@ -99,7 +99,7 @@ class ledtaxis_cache_search : public foraging_expstrat,
   rmath::vector3z interference_loc3D(void) const override final RCPPSW_PURE;
 
   /* prototype overrides */
-  std::unique_ptr<csexpstrat::base_expstrat> clone(void) const override {
+  std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
     return std::make_unique<ledtaxis_cache_search>(saa(),
                                                    m_taxis.target(),
                                                    rng());
@@ -112,6 +112,6 @@ class ledtaxis_cache_search : public foraging_expstrat,
   /* clang-format on */
 };
 
-NS_END(expstrat, fsm, fordyca);
+NS_END(explore, strategy, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_EXPSTRAT_LEDTAXIS_CACHE_SEARCH_HPP_ */
+#endif /* INCLUDE_FORDYCA_STRATEGY_EXPLORE_LEDTAXIS_CACHE_SEARCH_HPP_ */

@@ -45,7 +45,7 @@ block_to_goal_fsm::block_to_goal_fsm(csfsm::acquire_goal_fsm* const goal_fsm,
                                      crfootbot::footbot_saa_subsystem* saa,
                                      rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.block_to_goal"),
-      util_hfsm(saa, rng, ekST_MAX_STATES),
+      foraging_util_hfsm(saa, nullptr, rng, ekST_MAX_STATES),
       RCPPSW_HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       RCPPSW_HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
       RCPPSW_HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
@@ -144,7 +144,7 @@ RCPPSW_HFSM_STATE_DEFINE(block_to_goal_fsm,
     internal_event(ekST_TRANSPORT_TO_GOAL);
   } else if (fsm::foraging_signal::ekCACHE_VANISHED == data->signal()) {
     ER_ASSERT(foraging_acq_goal::ekEXISTING_CACHE == acquisition_goal(),
-              "Non-existing cache vanished? ");
+              "Non-existing cache vanished?");
     m_goal_fsm->task_reset();
     internal_event(ekST_TRANSPORT_TO_GOAL);
   } else if (fsm::foraging_signal::ekCACHE_PROXIMITY == data->signal()) {
@@ -247,7 +247,7 @@ rmath::vector3z block_to_goal_fsm::vector_loc3D(void) const {
  * General Member Functions
  ******************************************************************************/
 void block_to_goal_fsm::init(void) {
-  csfsm::util_hfsm::init();
+  util_hfsm::init();
   m_goal_fsm->task_reset();
   m_block_fsm->task_reset();
 } /* init() */

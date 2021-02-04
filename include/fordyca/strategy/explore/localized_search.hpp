@@ -18,39 +18,40 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_EXPSTRAT_LOCALIZED_SEARCH_HPP_
-#define INCLUDE_FORDYCA_FSM_EXPSTRAT_LOCALIZED_SEARCH_HPP_
+#ifndef INCLUDE_FORDYCA_STRATEGY_EXPLORE_LOCALIZED_SEARCH_HPP_
+#define INCLUDE_FORDYCA_STRATEGY_EXPLORE_LOCALIZED_SEARCH_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <memory>
 
-#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
+#include "fordyca/strategy/foraging_strategy.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "cosm/spatial/fsm/vector_fsm.hpp"
-#include "fordyca/fsm/expstrat/crw_adaptor.hpp"
+#include "fordyca/strategy/explore/crw_adaptor.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, fsm, expstrat);
+NS_START(fordyca, strategy, explore);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * \class localized_search
- * \ingroup fsm expstrat
+ * \ingroup strategy explore
  *
  * \brief An exploration behavior in which robots vector to a specific location,
- * then begin correlated random walk exploration there via \ref crw. Falls back
- * to vanilla \ref crw if a specific location is not given during at task start.
+ * then begin correlated random walk exploration there via \ref
+ * crw_adaptor. Falls back to vanilla \ref crw_adaptor if a specific location is
+ * not given during at task start.
  */
-class localized_search : public foraging_expstrat,
+class localized_search : public foraging_strategy,
                          public rer::client<localized_search> {
  public:
-  localized_search(const foraging_expstrat::params* const c_params,
+  localized_search(const foraging_strategy::params* const c_params,
                    rmath::rng* rng)
       : localized_search(c_params->saa, rng) {}
 
@@ -99,7 +100,7 @@ class localized_search : public foraging_expstrat,
   void task_execute(void) override final;
 
   /* prototype overrides */
-  std::unique_ptr<csexpstrat::base_expstrat> clone(void) const override {
+  std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
     return std::make_unique<localized_search>(saa(), rng());
   }
 
@@ -110,6 +111,6 @@ class localized_search : public foraging_expstrat,
   /* clang-format on */
 };
 
-NS_END(expstrat, fsm, fordyca);
+NS_END(explore, strategy, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_EXPSTRAT_LOCALIZED_SEARCH_HPP_ */
+#endif /* INCLUDE_FORDYCA_STRATEGY_EXPLORE_LOCALIZED_SEARCH_HPP_ */

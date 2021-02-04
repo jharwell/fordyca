@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <memory>
 
-#include "cosm/spatial/fsm/util_hfsm.hpp"
+#include "cosm/foraging/fsm/foraging_util_hfsm.hpp"
 #include "cosm/spatial/fsm/explore_for_goal_fsm.hpp"
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 #include "cosm/spatial/metrics/interference_metrics.hpp"
@@ -44,9 +44,9 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
-namespace expstrat {
-class foraging_expstrat;
-} /* namespace expstrat */
+namespace strategy {
+class foraging_strategy;
+} /* namespace strategy */
 
 NS_START(d0);
 
@@ -62,7 +62,7 @@ NS_START(d0);
  * this FSM roams around randomly until it finds a block, and then brings the
  * block back to the nest, and drops it.
  */
-class crw_fsm final : public csfsm::util_hfsm,
+class crw_fsm final : public cffsm::foraging_util_hfsm,
                       public rer::client<crw_fsm>,
                       public csmetrics::goal_acq_metrics,
                       public cfsm::block_transporter<foraging_transport_goal>,
@@ -70,7 +70,8 @@ class crw_fsm final : public csfsm::util_hfsm,
                       public cta::taskable {
  public:
   crw_fsm(crfootbot::footbot_saa_subsystem* saa,
-          std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+          std::unique_ptr<csstrategy::base_strategy> explore,
+          std::unique_ptr<csstrategy::base_strategy> nest_acq,
           const rmath::vector2d& nest_loc,
           rmath::rng* rng);
 
@@ -129,17 +130,17 @@ class crw_fsm final : public csfsm::util_hfsm,
   };
 
   /* inherited states */
-  RCPPSW_HFSM_STATE_INHERIT(csfsm::util_hfsm,
+  RCPPSW_HFSM_STATE_INHERIT(cffsm::foraging_util_hfsm,
                      transport_to_nest,
                      nest_transport_data);
-  RCPPSW_HFSM_STATE_INHERIT(csfsm::util_hfsm, leaving_nest,
+  RCPPSW_HFSM_STATE_INHERIT(cffsm::foraging_util_hfsm, leaving_nest,
                      rpfsm::event_data);
 
-  RCPPSW_HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_transport_to_nest);
-  RCPPSW_HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_leaving_nest);
+  RCPPSW_HFSM_ENTRY_INHERIT_ND(cffsm::foraging_util_hfsm, entry_transport_to_nest);
+  RCPPSW_HFSM_ENTRY_INHERIT_ND(cffsm::foraging_util_hfsm, entry_leaving_nest);
   RCPPSW_HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_wait_for_signal);
 
-  RCPPSW_HFSM_EXIT_INHERIT(csfsm::util_hfsm, exit_transport_to_nest);
+  RCPPSW_HFSM_EXIT_INHERIT(cffsm::foraging_util_hfsm, exit_transport_to_nest);
 
   /* crw fsm states */
   RCPPSW_HFSM_STATE_DECLARE(crw_fsm, start, rpfsm::event_data);

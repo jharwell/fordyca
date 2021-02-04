@@ -37,9 +37,9 @@ namespace ds { class dpo_store; }
 
 NS_START(fsm);
 
-namespace expstrat {
-class foraging_expstrat;
-} /* namespace expstrat */
+namespace strategy {
+class foraging_strategy;
+} /* namespace strategy */
 
 NS_START(d2);
 
@@ -59,7 +59,7 @@ class cache_transferer_fsm final : public block_to_goal_fsm {
  public:
   cache_transferer_fsm(const fsm_ro_params* c_params,
                        crfootbot::footbot_saa_subsystem* saa,
-                       std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+                       std::unique_ptr<csstrategy::base_strategy> exp_behavior,
                        rmath::rng* rng);
   ~cache_transferer_fsm(void) override = default;
 

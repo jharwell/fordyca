@@ -26,7 +26,7 @@
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
-#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
+#include "fordyca/strategy/foraging_strategy.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
 
@@ -43,9 +43,10 @@ using csel_matrix = controller::cognitive::cache_sel_matrix;
 cached_block_to_nest_fsm::cached_block_to_nest_fsm(
     const fsm_ro_params* const c_params,
     crfootbot::footbot_saa_subsystem* saa,
-    std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+    std::unique_ptr<csstrategy::base_strategy> explore,
+    std::unique_ptr<csstrategy::base_strategy> nest_acq,
     rmath::rng* rng)
-    : util_hfsm(saa, rng, ekST_MAX_STATES),
+    : foraging_util_hfsm(saa, std::move(nest_acq), rng, ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.d1.cached_block_to_nest"),
       RCPPSW_HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       RCPPSW_HFSM_CONSTRUCT_STATE(leaving_nest, &start),
@@ -77,7 +78,7 @@ cached_block_to_nest_fsm::cached_block_to_nest_fsm(
           RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&finished)),
       mc_nest_loc(boost::get<rmath::vector2d>(
           c_params->csel_matrix->find(csel_matrix::kNestLoc)->second)),
-      m_cache_fsm(c_params, saa, std::move(exp_behavior), rng, true) {}
+      m_cache_fsm(c_params, saa, std::move(explore), rng, true) {}
 
 RCPPSW_HFSM_STATE_DEFINE(cached_block_to_nest_fsm,
                          start,
@@ -140,24 +141,24 @@ RCPPSW_CONST RCPPSW_HFSM_STATE_DEFINE_ND(cached_block_to_nest_fsm, finished) {
  ******************************************************************************/
 bool cached_block_to_nest_fsm::exp_interference(void) const {
   return (m_cache_fsm.task_running() && m_cache_fsm.exp_interference()) ||
-         csfsm::util_hfsm::exp_interference();
+         cffsm::foraging_util_hfsm::exp_interference();
 } /* in_interference() */
 
 bool cached_block_to_nest_fsm::entered_interference(void) const {
   return (m_cache_fsm.task_running() && m_cache_fsm.entered_interference()) ||
-         csfsm::util_hfsm::entered_interference();
+         cffsm::foraging_util_hfsm::entered_interference();
 } /* entered_interference() */
 
 bool cached_block_to_nest_fsm::exited_interference(void) const {
   return (m_cache_fsm.task_running() && m_cache_fsm.exited_interference()) ||
-         csfsm::util_hfsm::exited_interference();
+         cffsm::foraging_util_hfsm::exited_interference();
 } /* exited_interference() */
 
 rtypes::timestep cached_block_to_nest_fsm::interference_duration(void) const {
   if (m_cache_fsm.task_running()) {
     return m_cache_fsm.interference_duration();
   } else {
-    return csfsm::util_hfsm::interference_duration();
+    return cffsm::foraging_util_hfsm::interference_duration();
   }
 } /* interference_duration() */
 
@@ -165,7 +166,7 @@ rmath::vector3z cached_block_to_nest_fsm::interference_loc3D(void) const {
   if (m_cache_fsm.task_running()) {
     return m_cache_fsm.interference_loc3D();
   } else {
-    return csfsm::util_hfsm::interference_loc3D();
+    return cffsm::foraging_util_hfsm::interference_loc3D();
   }
 } /* interference_loc3D() */
 
@@ -242,7 +243,7 @@ cached_block_to_nest_fsm::block_transport_goal(void) const {
 } /* block_transport_goal() */
 
 void cached_block_to_nest_fsm::init(void) {
-  csfsm::util_hfsm::init();
+  foraging_util_hfsm::init();
   m_cache_fsm.task_reset();
 } /* init() */
 

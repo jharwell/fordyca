@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <memory>
 
-#include "cosm/spatial/fsm/util_hfsm.hpp"
+#include "cosm/foraging/fsm/foraging_util_hfsm.hpp"
 #include "cosm/fsm/block_transporter.hpp"
 #include "cosm/fsm/metrics/block_transporter_metrics.hpp"
 
@@ -58,7 +58,7 @@ NS_START(fsm, d0);
  * way to the nest and dropped it in the nest, it will repeat the same sequence
  * (i.e. it loops indefinitely).
  */
-class dpo_fsm final : public csfsm::util_hfsm,
+class dpo_fsm final : public cffsm::foraging_util_hfsm,
                       public rer::client<dpo_fsm>,
                       public csmetrics::goal_acq_metrics,
                       public cfsm::metrics::block_transporter_metrics,
@@ -67,7 +67,8 @@ class dpo_fsm final : public csfsm::util_hfsm,
  public:
   dpo_fsm(const fsm_ro_params * params,
           crfootbot::footbot_saa_subsystem* saa,
-          std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+          std::unique_ptr<csstrategy::base_strategy> explore,
+          std::unique_ptr<csstrategy::base_strategy> nest_acq,
           rmath::rng* rng);
   ~dpo_fsm(void) override = default;
   dpo_fsm(const dpo_fsm&) = delete;
@@ -126,9 +127,9 @@ class dpo_fsm final : public csfsm::util_hfsm,
 
  private:
   /* inherited states */
-  RCPPSW_HFSM_STATE_INHERIT(csfsm::util_hfsm, leaving_nest,
+  RCPPSW_HFSM_STATE_INHERIT(cffsm::foraging_util_hfsm, leaving_nest,
                      rpfsm::event_data);
-  RCPPSW_HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_leaving_nest);
+  RCPPSW_HFSM_ENTRY_INHERIT_ND(cffsm::foraging_util_hfsm, entry_leaving_nest);
 
   /* foraging states */
   RCPPSW_HFSM_STATE_DECLARE(dpo_fsm, start, rpfsm::event_data);

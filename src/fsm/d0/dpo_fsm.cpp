@@ -25,7 +25,7 @@
 
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
-#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
+#include "fordyca/strategy/foraging_strategy.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
 
 /*******************************************************************************
@@ -38,9 +38,10 @@ NS_START(fordyca, fsm, d0);
  ******************************************************************************/
 dpo_fsm::dpo_fsm(const fsm_ro_params* params,
                  crfootbot::footbot_saa_subsystem* saa,
-                 std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+                 std::unique_ptr<csstrategy::base_strategy> explore,
+                 std::unique_ptr<csstrategy::base_strategy> nest_acq,
                  rmath::rng* rng)
-    : util_hfsm(saa, rng, ekST_MAX_STATES),
+    : foraging_util_hfsm(saa, nullptr, rng, ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.d0.dpo"),
       RCPPSW_HFSM_CONSTRUCT_STATE(leaving_nest, &start),
       RCPPSW_HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
@@ -53,7 +54,11 @@ dpo_fsm::dpo_fsm(const fsm_ro_params* params,
                                              nullptr,
                                              &entry_leaving_nest,
                                              nullptr)),
-      m_block_fsm(params, saa, std::move(exp_behavior), rng) {
+      m_block_fsm(params,
+                  saa,
+                  std::move(explore),
+                  std::move(nest_acq),
+                  rng) {
   hfsm::change_parent(ekST_LEAVING_NEST, &start);
 }
 

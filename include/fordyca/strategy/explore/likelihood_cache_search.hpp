@@ -1,5 +1,5 @@
 /**
- * \file likelihood_block_search.hpp
+ * \file likelihood_cache_search.hpp
  *
  * \copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,15 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_EXPSTRAT_LIKELIHOOD_BLOCK_SEARCH_HPP_
-#define INCLUDE_FORDYCA_FSM_EXPSTRAT_LIKELIHOOD_BLOCK_SEARCH_HPP_
+#ifndef INCLUDE_FORDYCA_STRATEGY_EXPLORE_LIKELIHOOD_CACHE_SEARCH_HPP_
+#define INCLUDE_FORDYCA_STRATEGY_EXPLORE_LIKELIHOOD_CACHE_SEARCH_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <memory>
 
-#include "fordyca/fsm/expstrat/localized_search.hpp"
+#include "fordyca/strategy/explore/localized_search.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,45 +36,40 @@ namespace ds {
 class dpo_store;
 } /* namespace ds */
 
-NS_START(fsm, expstrat);
+NS_START(strategy, explore);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class likelihood_block_search
- * \ingroup fsm expstrat
+ * \class likelihood_cache_search
+ * \ingroup strategy explore
  *
- * \brief Vector to the last known location of a block, then begin performing
+ * \brief Vector to the last known location of a cache, then begin performing
  * CRW at that location, with the idea being that the likelihood of another
- * block being nearby is higher, given that you've found one there before.
+ * cache being nearby is higher, given that you've found one there before.
  */
-class likelihood_block_search : public localized_search {
+class likelihood_cache_search : public localized_search {
  public:
-  likelihood_block_search(const foraging_expstrat::params* const c_params,
+  likelihood_cache_search(const foraging_strategy::params* const c_params,
                           rmath::rng* rng)
-      : likelihood_block_search(c_params->saa,
-                                c_params->dpo_store,
-                                rng) {}
-
-  likelihood_block_search(crfootbot::footbot_saa_subsystem* saa,
+      : likelihood_cache_search(c_params->saa, c_params->dpo_store, rng) {}
+  likelihood_cache_search(crfootbot::footbot_saa_subsystem* saa,
                           const ds::dpo_store* store,
                           rmath::rng* rng)
       : localized_search(saa, rng),
         mc_store(store) {}
 
-  ~likelihood_block_search(void) override = default;
-  likelihood_block_search(const likelihood_block_search&) = delete;
-  likelihood_block_search& operator=(const likelihood_block_search&) = delete;
+  ~likelihood_cache_search(void) override = default;
+  likelihood_cache_search(const likelihood_cache_search&) = delete;
+  likelihood_cache_search& operator=(const likelihood_cache_search&) = delete;
 
   /* taskable overrides */
-  void task_start(cta::taskable_argument*) override final;
+  void task_start(cta::taskable_argument*) override;
 
   /* prototype overrides */
-  std::unique_ptr<csexpstrat::base_expstrat> clone(void) const override {
-    return std::make_unique<likelihood_block_search>(saa(),
-                                                     mc_store,
-                                                     rng());
+  std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
+    return std::make_unique<likelihood_cache_search>(saa(), mc_store, rng());
   }
 
  private:
@@ -83,6 +78,6 @@ class likelihood_block_search : public localized_search {
   /* clang-format on */
 };
 
-NS_END(expstrat, fsm, fordyca);
+NS_END(explore, strategy, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_EXPSTRAT_LIKELIHOOD_BLOCK_SEARCH_HPP_ */
+#endif /* INCLUDE_FORDYCA_STRATEGY_EXPLORE_LIKELIHOOD_CACHE_SEARCH_HPP_ */

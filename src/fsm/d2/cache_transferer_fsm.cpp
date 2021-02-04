@@ -23,7 +23,6 @@
  ******************************************************************************/
 #include "fordyca/fsm/d2/cache_transferer_fsm.hpp"
 
-#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 
 /*******************************************************************************
@@ -37,7 +36,7 @@ NS_START(fordyca, fsm, d2);
 cache_transferer_fsm::cache_transferer_fsm(
     const fsm_ro_params* c_params,
     crfootbot::footbot_saa_subsystem* saa,
-    std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+    std::unique_ptr<csstrategy::base_strategy> exp_behavior,
     rmath::rng* rng)
     : block_to_goal_fsm(&m_dest_cache_fsm, &m_src_cache_fsm, saa, rng),
       m_src_cache_fsm(c_params, saa, exp_behavior->clone(), rng, true),

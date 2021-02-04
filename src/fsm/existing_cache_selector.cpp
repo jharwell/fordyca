@@ -91,7 +91,7 @@ existing_cache_selector::operator()(const ds::dp_cache_map& existing_caches,
             rcppsw::to_string(best->dcenter2D()).c_str(),
             best->n_blocks(),
             max_utility);
-  ER_CHECKW(nullptr != best,
+  ER_CHECKD(nullptr != best,
             "No best existing cache found: all known caches excluded!");
   return best;
 } /* operator()() */

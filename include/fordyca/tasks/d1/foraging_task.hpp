@@ -64,7 +64,7 @@ class foraging_task : public base_foraging_task,
 
   static bool task_in_d1(const polled_task* task) RCPPSW_PURE;
 
-    /* task overrides */
+  /* task overrides */
   rtypes::timestep current_time(void) const override RCPPSW_PURE;
 };
 

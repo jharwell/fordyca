@@ -1,7 +1,7 @@
 /**
- * \file block_factory.hpp
+ * \file explore_parser.hpp
  *
- * \copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,44 +18,58 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_EXPSTRAT_BLOCK_FACTORY_HPP_
-#define INCLUDE_FORDYCA_FSM_EXPSTRAT_BLOCK_FACTORY_HPP_
+#ifndef INCLUDE_FORDYCA_CONFIG_STRATEGY_EXPLORE_PARSER_HPP_
+#define INCLUDE_FORDYCA_CONFIG_STRATEGY_EXPLORE_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
 #include <string>
 
-#include "rcppsw/patterns/factory/factory.hpp"
+#include "rcppsw/config/xml/xml_config_parser.hpp"
+
+#include "fordyca/config/strategy/explore_config.hpp"
 #include "fordyca/fordyca.hpp"
-#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 
 /*******************************************************************************
- * Namespaces/Decls
+ * Namespaces
  ******************************************************************************/
-NS_START(fordyca, fsm, expstrat);
+NS_START(fordyca, config, strategy);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class block_factory
- * \ingroup fsm expstrat
+ * \class explore_parser
+ * \ingroup config strategy
  *
- * \brief Factory for creating block exploration strategies.
+ * \brief Parses XML configuration for how robots should explore for things into
+ * \ref explore_config.
  */
-class block_factory :
-    public rpfactory::releasing_factory<csexpstrat::base_expstrat,
-                                        std::string, /* key type */
-                                        const expstrat::foraging_expstrat::params*,
-                                        rmath::rng*> {
+class explore_parser final : public rconfig::xml::xml_config_parser {
  public:
-  static constexpr char kCRW[] = "CRW";
-  static constexpr char kLikelihoodSearch[] = "likelihood_search";
+  using config_type = explore_config;
 
-  block_factory(void);
+  /**
+   * \brief The root tag that all XML configuration for explore should lie
+   * under in the XML tree.
+   */
+  static constexpr char kXMLRoot[] = "explore";
+
+  void parse(const ticpp::Element& node) override;
+  std::string xml_root(void) const override { return kXMLRoot; }
+
+ private:
+  const rconfig::base_config* config_get_impl(void) const override {
+    return m_config.get();
+  }
+
+  /* clang-format off */
+  std::unique_ptr<config_type> m_config{nullptr};
+  /* clang-format on */
 };
 
-NS_END(expstrat, fsm, fordyca);
+NS_END(strategy, config, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_EXPSTRAT_BLOCK_FACTORY_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONFIG_STRATEGY_EXPLORE_PARSER_HPP_ */

@@ -35,9 +35,10 @@
 #include "cosm/ta/config/task_alloc_config.hpp"
 #include "cosm/ta/config/task_executive_config.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
+#include "cosm/spatial/strategy/nest_acq/factory.hpp"
 
 #include "fordyca/config/d1/controller_repository.hpp"
-#include "fordyca/config/exploration_config.hpp"
+#include "fordyca/config/strategy/strategy_config.hpp"
 #include "fordyca/controller/cognitive/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/cognitive/foraging_perception_subsystem.hpp"
 #include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
@@ -45,8 +46,8 @@
 #include "fordyca/fsm/d0/dpo_fsm.hpp"
 #include "fordyca/fsm/d1/block_to_existing_cache_fsm.hpp"
 #include "fordyca/fsm/d1/cached_block_to_nest_fsm.hpp"
-#include "fordyca/fsm/expstrat/block_factory.hpp"
-#include "fordyca/fsm/expstrat/cache_factory.hpp"
+#include "fordyca/strategy/explore/block_factory.hpp"
+#include "fordyca/strategy/explore/cache_factory.hpp"
 #include "fordyca/tasks/d0/generalist.hpp"
 #include "fordyca/tasks/d1/collector.hpp"
 #include "fordyca/tasks/d1/harvester.hpp"
@@ -80,36 +81,48 @@ task_executive_builder::tasking_map task_executive_builder::d1_tasks_create(
     cta::ds::bi_tdgraph* const graph,
     rmath::rng* rng) {
   auto* task_config = config_repo.config_get<cta::config::task_alloc_config>();
-  auto* exp_config = config_repo.config_get<config::exploration_config>();
-  fsm::expstrat::block_factory block_factory;
-  fsm::expstrat::cache_factory cache_factory;
+  auto* strat_config = config_repo.config_get<fcstrategy::strategy_config>();
   auto cache_color = carepr::light_type_index()[carepr::light_type_index::kCache];
-  fsm::expstrat::foraging_expstrat::params expstrat_cachep(
+  fstrategy::foraging_strategy::params strategy_cachep(
       saa(), nullptr, mc_csel_matrix, m_perception->dpo_store(), cache_color);
-  fsm::expstrat::foraging_expstrat::params expstrat_blockp(
+  fstrategy::foraging_strategy::params strategy_blockp(
       saa(), nullptr, mc_csel_matrix, m_perception->dpo_store(), rutils::color());
 
   ER_ASSERT(nullptr != mc_bsel_matrix, "NULL block selection matrix");
   ER_ASSERT(nullptr != mc_csel_matrix, "NULL cache selection matrix");
 
-  fsm::fsm_ro_params params = { .bsel_matrix = block_sel_matrix(),
-                                .csel_matrix = mc_csel_matrix,
-                                .store = m_perception->dpo_store(),
-                                .exp_config = *exp_config };
+  fsexplore::block_factory block_factory;
+  fsexplore::cache_factory cache_factory;
+  csstrategy::nest_acq::factory nest_acq_factory;
+
+  fsm::fsm_ro_params params = {
+    .bsel_matrix = block_sel_matrix(),
+    .csel_matrix = mc_csel_matrix,
+    .store = m_perception->dpo_store(),
+    .strategy_config = *strat_config
+  };
 
   auto generalist_fsm = std::make_unique<fsm::d0::free_block_to_nest_fsm>(
       &params,
       saa(),
-      block_factory.create(exp_config->block_strategy, &expstrat_blockp, rng),
+      block_factory.create(strat_config->explore.block_strategy,
+                           &strategy_blockp,
+                           rng),
+      nest_acq_factory.create(strat_config->nest_acq.strategy, saa(), rng),
       rng);
   auto collector_fsm = std::make_unique<fsm::d1::cached_block_to_nest_fsm>(
       &params,
       saa(),
-      cache_factory.create(exp_config->cache_strategy, &expstrat_cachep, rng),
+      cache_factory.create(strat_config->explore.cache_strategy,
+                           &strategy_cachep,
+                           rng),
+      nest_acq_factory.create(strat_config->nest_acq.strategy, saa(), rng),
       rng);
 
   auto harvester_fsm =
-      std::make_unique<fsm::d1::block_to_existing_cache_fsm>(&params, saa(), rng);
+      std::make_unique<fsm::d1::block_to_existing_cache_fsm>(&params,
+                                                             saa(),
+                                                             rng);
 
   auto collector = std::make_unique<tasks::d1::collector>(
       task_config, std::move(collector_fsm));

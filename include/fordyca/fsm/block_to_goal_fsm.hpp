@@ -28,7 +28,7 @@
 
 #include "cosm/fsm/block_transporter.hpp"
 #include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
-#include "cosm/spatial/fsm/util_hfsm.hpp"
+#include "cosm/foraging/fsm/foraging_util_hfsm.hpp"
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 #include "cosm/ta/taskable.hpp"
 #include "cosm/fsm/metrics/block_transporter_metrics.hpp"
@@ -63,7 +63,7 @@ class acquire_free_block_fsm;
  */
 class block_to_goal_fsm
     : public rer::client<block_to_goal_fsm>,
-      public csfsm::util_hfsm,
+      public cffsm::foraging_util_hfsm,
       public cta::taskable,
       public csmetrics::goal_acq_metrics,
       public cfsm::block_transporter<foraging_transport_goal>,

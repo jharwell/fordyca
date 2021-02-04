@@ -1,5 +1,5 @@
 /**
- * \file cache_factory.cpp
+ * \file foraging_strategy.cpp
  *
  * \copyright 2019 John Harwell, All rights reserved.
  *
@@ -21,26 +21,31 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/expstrat/cache_factory.hpp"
+#include "fordyca/strategy/foraging_strategy.hpp"
 
-#include "fordyca/fsm/expstrat/crw_adaptor.hpp"
-#include "fordyca/fsm/expstrat/ledtaxis_cache_search.hpp"
-#include "fordyca/fsm/expstrat/likelihood_cache_search.hpp"
-#include "fordyca/fsm/expstrat/utility_cache_search.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, fsm, expstrat);
+NS_START(fordyca, strategy);
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-cache_factory::cache_factory(void) {
-  register_type<crw_adaptor>(kCRW);
-  register_type<likelihood_cache_search>(kLikelihoodSearch);
-  register_type<utility_cache_search>(kUtilitySearch);
-  register_type<ledtaxis_cache_search>(kLEDTaxisSearch);
-}
+foraging_strategy::foraging_strategy(crfootbot::footbot_saa_subsystem* saa,
+                                     rmath::rng* rng)
+    : base_strategy(saa, rng) {}
 
-NS_END(expstrat, fsm, fordyca);
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+crfootbot::footbot_saa_subsystem* foraging_strategy::saa(void) const {
+  return static_cast<crfootbot::footbot_saa_subsystem*>(base_strategy::saa());
+} /* saa() */
+
+crfootbot::footbot_saa_subsystem* foraging_strategy::saa(void) {
+  return static_cast<crfootbot::footbot_saa_subsystem*>(base_strategy::saa());
+} /* saa() */
+
+NS_END(strategy, fordyca);

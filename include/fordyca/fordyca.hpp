@@ -167,4 +167,30 @@
  * execution.
  */
 
+namespace fordyca {
+namespace config {
+namespace strategy {}
+} /* namespace config */
+
+namespace strategy {
+namespace explore {}
+} /* namespace strategy */
+
+namespace controller {
+namespace cognitive {}
+namespace reactive {}
+}
+
+} /* namespace fordyca */
+
+namespace fconfig = fordyca::config;
+namespace fcstrategy = fconfig::strategy;
+
+namespace fstrategy = fordyca::strategy;
+namespace fsexplore = fstrategy::explore;
+
+namespace fcontroller = fordyca::controller;
+namespace fccognitive = fcontroller::cognitive;
+namespace fcreactive = fcontroller::reactive;
+
 #endif /* INCLUDE_FORDYCA_FORDYCA_HPP_ */

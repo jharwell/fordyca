@@ -18,36 +18,36 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_EXPSTRAT_LEDTAXIS_HPP_
-#define INCLUDE_FORDYCA_FSM_EXPSTRAT_LEDTAXIS_HPP_
+#ifndef INCLUDE_FORDYCA_STRATEGY_EXPLORE_LEDTAXIS_HPP_
+#define INCLUDE_FORDYCA_STRATEGY_EXPLORE_LEDTAXIS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <memory>
 
-#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
+#include "fordyca/strategy/foraging_strategy.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, fsm, expstrat);
+NS_START(fordyca, strategy, explore);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * \class ledtaxis
- * \ingroup fsm expstrat
+ * \ingroup strategy explore
  *
  * \brief Assumes that the target entity type isequipped with an LED entity that
  * robots can detect with their blob camera. Performs phototaxis towards the
  * source of the signal if one is found, and performs phototaxis to it.
  */
-class ledtaxis : public foraging_expstrat,
+class ledtaxis : public foraging_strategy,
                  public rer::client<ledtaxis> {
  public:
-  explicit ledtaxis(const foraging_expstrat::params* const c_params,
+  explicit ledtaxis(const foraging_strategy::params* const c_params,
                     rmath::rng* rng)
       : ledtaxis(c_params->saa,
                  c_params->ledtaxis_target,
@@ -77,7 +77,7 @@ class ledtaxis : public foraging_expstrat,
   void task_execute(void) override final;
 
   /* prototype overrides */
-  std::unique_ptr<csexpstrat::base_expstrat> clone(void) const override {
+  std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
     return nullptr; /* Should not be a top level explore behavior */
   }
 
@@ -96,6 +96,6 @@ class ledtaxis : public foraging_expstrat,
   /* clang-format on */
 };
 
-NS_END(expstrat, fsm, fordyca);
+NS_END(explore, strategy, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_EXPSTRAT_LEDTAXIS_HPP_ */
+#endif /* INCLUDE_FORDYCA_STRATEGY_EXPLORE_LEDTAXIS_HPP_ */

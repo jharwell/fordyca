@@ -1,5 +1,5 @@
 /**
- * \file likelihood_cache_search.cpp
+ * \file cache_factory.hpp
  *
  * \copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,32 +18,46 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_STRATEGY_EXPLORE_CACHE_FACTORY_HPP_
+#define INCLUDE_FORDYCA_STRATEGY_EXPLORE_CACHE_FACTORY_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/expstrat/likelihood_cache_search.hpp"
+#include <string>
 
-#include "cosm/spatial/fsm/point_argument.hpp"
-
-#include "fordyca/ds/dpo_store.hpp"
-#include "fordyca/fsm/arrival_tol.hpp"
-#include "fordyca/tasks/argument.hpp"
+#include "rcppsw/patterns/factory/factory.hpp"
+#include "fordyca/fordyca.hpp"
+#include "fordyca/strategy/foraging_strategy.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, fsm, expstrat);
+NS_START(fordyca, strategy, explore);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-void likelihood_cache_search::task_start(cta::taskable_argument*) {
-  if (auto loc = mc_store->last_cache_loc()) {
-    csfsm::point_argument v(kCACHE_ARRIVAL_TOL, *loc);
-    localized_search::task_start(&v);
-  } else {
-    localized_search::task_start(nullptr);
-  }
-} /* task_start() */
+/**
+ * \class cache_factory
+ * \ingroup strategy explore
+ *
+ * \brief Factory for creating cache exploration strategies.
+ */
+class cache_factory :
+    public rpfactory::releasing_factory<csstrategy::base_strategy,
+                                        std::string, /* key type */
+                                        const foraging_strategy::params*,
+                                        rmath::rng*> {
+ public:
+  static constexpr char kCRW[] = "CRW";
+  static constexpr char kLikelihoodSearch[] = "likelihood_search";
+  static constexpr char kUtilitySearch[] = "utility_search";
+  static constexpr char kLEDTaxisSearch[] = "ledtaxis_search";
 
-NS_END(expstrat, fsm, fordyca);
+  cache_factory(void);
+};
+
+NS_END(explore, strategy, fordyca);
+
+#endif /* INCLUDE_FORDYCA_STRATEGY_EXPLORE_CACHE_FACTORY_HPP_ */

@@ -44,7 +44,7 @@
     <priority value ="info" />
   </category>
   <category name="fordyca.fsm.cache_acquisition_validator" >
-    <priority value ="all" />
+    <priority value ="info" />
   </category>
   <category name="fordyca.fsm.acquire_goal_fsm" >
     <priority value ="trace" />

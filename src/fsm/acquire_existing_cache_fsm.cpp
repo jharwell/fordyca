@@ -32,7 +32,6 @@
 #include "fordyca/fsm/cache_acq_point_selector.hpp"
 #include "fordyca/fsm/cache_acq_validator.hpp"
 #include "fordyca/fsm/existing_cache_selector.hpp"
-#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/fsm/foraging_transport_goal.hpp"
 
@@ -47,7 +46,7 @@ NS_START(fordyca, fsm);
 acquire_existing_cache_fsm::acquire_existing_cache_fsm(
     const fsm_ro_params* c_params,
     crfootbot::footbot_saa_subsystem* saa,
-    std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+    std::unique_ptr<csstrategy::base_strategy> exp_behavior,
     rmath::rng* rng,
     bool for_pickup)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_existing_cache"),

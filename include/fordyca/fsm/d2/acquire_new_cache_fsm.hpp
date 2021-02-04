@@ -41,9 +41,9 @@ namespace ds { class dpo_store; }
 
 NS_START(fsm);
 
-namespace expstrat {
-class foraging_expstrat;
-} /* namespace expstrat */
+namespace strategy {
+class foraging_strategy;
+} /* namespace strategy */
 
 NS_START(d2);
 
@@ -65,7 +65,7 @@ class acquire_new_cache_fsm final : public rer::client<acquire_new_cache_fsm>,
  public:
   acquire_new_cache_fsm(const fsm_ro_params* c_params,
                         crfootbot::footbot_saa_subsystem* saa,
-                        std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+                        std::unique_ptr<csstrategy::base_strategy> exp_behavior,
                         rmath::rng* rng);
   ~acquire_new_cache_fsm(void) override = default;
 

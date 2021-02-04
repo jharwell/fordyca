@@ -147,9 +147,14 @@
               timestep="20000"
               cache_size="3"/>
         </cache_sel_matrix>
-        <exploration
-            block_strategy="CRW"
-            cache_strategy="utility_search"/>
+        <strategy>
+          <explore
+              block_strategy="CRW"
+              cache_strategy="utility_search"/>
+          <nest_acq
+              strategy="wander"
+              />
+        </strategy>
         <sensing_subsystemQ3D>
           <!-- -5pi/6 : 5pi/6 -->
           <proximity_sensor fov="-2.61:2.61"
@@ -233,12 +238,12 @@
             block_clusters="block-clusters"
             tv_environment="tv-environment"/>
 
-        <create output_interval="10"
-                block_acq_locs="block-acq-locs"
-                block_acq_explore_locs="block-acq-explore-locs"
-                cache_acq_locs="cache-acq-locs"
-                cache_acq_explore_locs="cache-acq-explore-locs"
-                cache_acq_vector_locs="cache-acq-vector-locs"
+        <truncate output_interval="10"
+                block_acq_locs2D="block-acq-locs"
+                block_acq_explore_locs2D="block-acq-explore-locs"
+                cache_acq_locs2D="cache-acq-locs"
+                cache_acq_explore_locs2D="cache-acq-explore-locs"
+                cache_acq_vector_locs2D="cache-acq-vector-locs"
                 cache_locations="cache-locations"
                 swarm_dist2D_pos="swarm-dist-pos2D"/>
       </metrics>

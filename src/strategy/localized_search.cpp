@@ -21,22 +21,22 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/expstrat/localized_search.hpp"
+#include "fordyca/strategy/explore/localized_search.hpp"
 
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, fsm, expstrat);
+NS_START(fordyca, strategy, explore);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 localized_search::localized_search(crfootbot::footbot_saa_subsystem* saa,
                                    rmath::rng* rng)
-    : foraging_expstrat(saa, rng),
-      ER_CLIENT_INIT("fordyca.fsm.expstrat.localized_search"),
+    : foraging_strategy(saa, rng),
+      ER_CLIENT_INIT("fordyca.fsm.strategy.localized_search"),
       m_vfsm(saa, rng),
       m_crw(saa, rng) {}
 
@@ -92,4 +92,4 @@ rmath::vector3z localized_search::interference_loc3D(void) const {
   }
 } /* interference_loc3D() */
 
-NS_END(expstrat, fsm, fordyca);
+NS_END(explore, strategy, fordyca);

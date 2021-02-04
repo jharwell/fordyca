@@ -1,5 +1,5 @@
 /**
- * \file likelihood_block_search.cpp
+ * \file likelihood_cache_search.cpp
  *
  * \copyright 2019 John Harwell, All rights reserved.
  *
@@ -21,28 +21,29 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/expstrat/likelihood_block_search.hpp"
+#include "fordyca/strategy/explore/likelihood_cache_search.hpp"
 
 #include "cosm/spatial/fsm/point_argument.hpp"
 
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
+#include "fordyca/tasks/argument.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, fsm, expstrat);
+NS_START(fordyca, strategy, explore);
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void likelihood_block_search::task_start(cta::taskable_argument*) {
-  if (auto loc = mc_store->last_block_loc()) {
-    csfsm::point_argument v(kBLOCK_ARRIVAL_TOL, *loc);
+void likelihood_cache_search::task_start(cta::taskable_argument*) {
+  if (auto loc = mc_store->last_cache_loc()) {
+    csfsm::point_argument v(fsm::kCACHE_ARRIVAL_TOL, *loc);
     localized_search::task_start(&v);
   } else {
     localized_search::task_start(nullptr);
   }
 } /* task_start() */
 
-NS_END(expstrat, fsm, fordyca);
+NS_END(explore, strategy, fordyca);

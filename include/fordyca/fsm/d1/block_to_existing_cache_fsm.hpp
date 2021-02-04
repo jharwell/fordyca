@@ -29,7 +29,6 @@
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 #include "fordyca/fsm/acquire_free_block_fsm.hpp"
-#include "fordyca/config/exploration_config.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
 
 /*******************************************************************************
@@ -54,7 +53,7 @@ NS_START(fsm, d1);
  * complete.
  *
  * This FSM takes \ref config::exploration_config as an argument because it
- * needs to be able to use the \ref expstrat::factory to create exploration
+ * needs to be able to use the \ref strategy::factory to create exploration
  * strategies for BOTH blocks and caches, and so you can't cleanly pass the
  * result of factory creation at a higher level into the constructor, like you
  * can with other FSMs.

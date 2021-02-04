@@ -1,5 +1,5 @@
 /**
- * \file exploration_parser.cpp
+ * \file explore_parser.cpp
  *
  * \copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,17 +21,17 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/config/exploration_parser.hpp"
+#include "fordyca/config/strategy/explore_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, config);
+NS_START(fordyca, config, strategy);
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void exploration_parser::parse(const ticpp::Element& node) {
+void explore_parser::parse(const ticpp::Element& node) {
   if (nullptr == node.FirstChild(kXMLRoot, false)) {
     return;
   }
@@ -42,4 +42,4 @@ void exploration_parser::parse(const ticpp::Element& node) {
   XML_PARSE_ATTR_DFLT(vnode, m_config, cache_strategy, std::string());
 } /* parse() */
 
-NS_END(config, fordyca);
+NS_END(config, fordyca, strategy);

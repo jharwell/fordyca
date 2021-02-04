@@ -1,7 +1,7 @@
 /**
- * \file crw_adaptor.cpp
+ * \file likelihood_block_search.cpp
  *
- * \copyright 2020 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,23 +21,28 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/expstrat/crw_adaptor.hpp"
+#include "fordyca/strategy/explore/likelihood_block_search.hpp"
 
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/spatial/fsm/point_argument.hpp"
 
-/*******************************************************************************
- * Namespaces
-******************************************************************************/
-NS_START(fordyca, fsm, expstrat);
+#include "fordyca/ds/dpo_store.hpp"
+#include "fordyca/fsm/arrival_tol.hpp"
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Namespaces/Decls
  ******************************************************************************/
-crw_adaptor::crw_adaptor(const fsm::expstrat::foraging_expstrat::params* c_params,
-                         rmath::rng* rng)
-    : crw_adaptor(c_params->saa, rng) {}
+NS_START(fordyca, strategy, explore);
 
-crw_adaptor::crw_adaptor(crfootbot::footbot_saa_subsystem* saa, rmath::rng* rng)
-    : foraging_expstrat(saa, rng), decorator(saa, rng) {}
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void likelihood_block_search::task_start(cta::taskable_argument*) {
+  if (auto loc = mc_store->last_block_loc()) {
+    csfsm::point_argument v(fsm::kBLOCK_ARRIVAL_TOL, *loc);
+    localized_search::task_start(&v);
+  } else {
+    localized_search::task_start(nullptr);
+  }
+} /* task_start() */
 
-NS_END(expstrat, fsm, fordyca);
+NS_END(explore, strategy, fordyca);

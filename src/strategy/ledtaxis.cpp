@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/expstrat/ledtaxis.hpp"
+#include "fordyca/strategy/explore/ledtaxis.hpp"
 
 #include "cosm/arena/repr/light_type_index.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
@@ -29,7 +29,7 @@
 /*******************************************************************************
  * Namespaces
 ******************************************************************************/
-NS_START(fordyca, fsm, expstrat);
+NS_START(fordyca, strategy, explore);
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -37,8 +37,8 @@ NS_START(fordyca, fsm, expstrat);
 ledtaxis::ledtaxis(crfootbot::footbot_saa_subsystem* saa,
                    const rutils::color& target,
                    rmath::rng* rng)
-    : foraging_expstrat(saa, rng),
-      ER_CLIENT_INIT("fordyca.fsm.expstrat.ledtaxis"),
+    : foraging_strategy(saa, rng),
+      ER_CLIENT_INIT("fordyca.fsm.strategy.ledtaxis"),
       m_target(target) {}
 
 /*******************************************************************************
@@ -97,4 +97,4 @@ bool ledtaxis::task_finished(void) const {
   return false;
 } /* task_finished() */
 
-NS_END(expstrat, fsm, fordyca);
+NS_END(explore, strategy, fordyca);

@@ -53,7 +53,7 @@ class block_to_new_cache_fsm final : public block_to_goal_fsm {
   block_to_new_cache_fsm(
       const fsm_ro_params* c_params,
       crfootbot::footbot_saa_subsystem* saa,
-      std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+      std::unique_ptr<csstrategy::base_strategy> exp_behavior,
       rmath::rng* rng);
   ~block_to_new_cache_fsm(void) override = default;
 

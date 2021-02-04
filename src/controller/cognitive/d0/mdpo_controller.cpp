@@ -28,13 +28,14 @@
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/subsystem/perception/config/perception_config.hpp"
+#include "cosm/spatial/strategy/nest_acq/factory.hpp"
 
 #include "fordyca/config/d0/mdpo_controller_repository.hpp"
-#include "fordyca/config/exploration_config.hpp"
+#include "fordyca/config/strategy/strategy_config.hpp"
 #include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/d0/dpo_fsm.hpp"
-#include "fordyca/fsm/expstrat/block_factory.hpp"
+#include "fordyca/strategy/explore/block_factory.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -108,18 +109,23 @@ void mdpo_controller::shared_init(
 
 void mdpo_controller::private_init(
     const config::d0::mdpo_controller_repository& config_repo) {
-  auto* exp_config = config_repo.config_get<config::exploration_config>();
-  fsm::expstrat::block_factory f;
-  fsm::expstrat::foraging_expstrat::params expstrat_params(
+    auto* strat_config = config_repo.config_get<fcstrategy::strategy_config>();
+
+  fstrategy::foraging_strategy::params strategy_params(
       saa(), nullptr, nullptr, perception()->dpo_store(), rutils::color());
   fsm::fsm_ro_params fsm_ro_params = { .bsel_matrix = block_sel_matrix(),
                                        .csel_matrix = nullptr,
                                        .store = perception()->dpo_store(),
-                                       .exp_config = *exp_config };
+                                       .strategy_config = *strat_config };
   dpo_controller::fsm(std::make_unique<fsm::d0::dpo_fsm>(
       &fsm_ro_params,
       saa(),
-      f.create(exp_config->block_strategy, &expstrat_params, rng()),
+      fsexplore::block_factory().create(strat_config->explore.block_strategy,
+                                        &strategy_params,
+                                        rng()),
+      csstrategy::nest_acq::factory().create(strat_config->nest_acq.strategy,
+                                             saa(),
+                                             rng()),
       rng()));
 
   /* Set MDPO FSM supervision */

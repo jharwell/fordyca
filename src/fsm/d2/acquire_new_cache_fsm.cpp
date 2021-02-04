@@ -29,7 +29,6 @@
 #include "fordyca/controller/cognitive/d2/new_cache_selector.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
-#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 
 /*******************************************************************************
@@ -43,7 +42,7 @@ NS_START(fordyca, fsm, d2);
 acquire_new_cache_fsm::acquire_new_cache_fsm(
     const fsm_ro_params* c_params,
     crfootbot::footbot_saa_subsystem* saa,
-    std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+    std::unique_ptr<csstrategy::base_strategy> exp_behavior,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.d2.acquire_new_cache"),
       acquire_goal_fsm(
@@ -98,6 +97,7 @@ acquire_new_cache_fsm::cache_select(void) const {
             best->id().v(),
             rcppsw::to_string(best->ranchor2D()).c_str(),
             rcppsw::to_string(best->danchor2D()).c_str());
+
     return boost::make_optional(acquire_goal_fsm::candidate_type(
         best->rcenter2D(), kNEW_CACHE_ARRIVAL_TOL, best->id()));
   } else {

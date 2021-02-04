@@ -1,5 +1,5 @@
 /**
- * \file foraging_expstrat.cpp
+ * \file utility_cache_search.cpp
  *
  * \copyright 2019 John Harwell, All rights reserved.
  *
@@ -21,31 +21,47 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
+#include "fordyca/strategy/explore/utility_cache_search.hpp"
 
+#include <numeric>
+
+#include "cosm/repr/base_block3D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/spatial/fsm/point_argument.hpp"
+
+#include "fordyca/ds/dpo_store.hpp"
+#include "fordyca/fsm/arrival_tol.hpp"
+#include "fordyca/fsm/d2/cache_site_selector.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, fsm, expstrat);
-
-/*******************************************************************************
- * Constructors/Destructors
- ******************************************************************************/
-foraging_expstrat::foraging_expstrat(crfootbot::footbot_saa_subsystem* saa,
-                                     rmath::rng* rng)
-    : base_expstrat(saa, rng) {}
+NS_START(fordyca, strategy, explore);
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-crfootbot::footbot_saa_subsystem* foraging_expstrat::saa(void) const {
-  return static_cast<crfootbot::footbot_saa_subsystem*>(base_expstrat::saa());
-} /* saa() */
+void utility_cache_search::task_start(cta::taskable_argument*) {
+  auto range = mc_store->blocks().const_values_range();
+  rmath::vector2d position;
+  if (!range.empty()) {
+    position = std::accumulate(range.begin(),
+                               range.end(),
+                               rmath::vector2d(),
+                               [&](rmath::vector2d& sum, const auto& bent) {
+                                 return sum + bent.ent()->rcenter2D();
+                               }) /
+               boost::size(range);
+  } else {
+    position = saa()->sensing()->rpos2D();
+  }
+  fsm::d2::cache_site_selector sel(mc_matrix);
+  if (auto site = sel(mc_store->caches(), position, rng())) {
+    csfsm::point_argument v(fsm::kCACHE_ARRIVAL_TOL, *site);
+    localized_search::task_start(&v);
+  } else {
+    localized_search::task_start(nullptr);
+  }
+} /* task_start() */
 
-crfootbot::footbot_saa_subsystem* foraging_expstrat::saa(void) {
-  return static_cast<crfootbot::footbot_saa_subsystem*>(base_expstrat::saa());
-} /* saa() */
-
-NS_END(expstrat, fsm, fordyca);
+NS_END(explore, strategy, fordyca);

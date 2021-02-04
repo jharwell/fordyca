@@ -1,7 +1,7 @@
 /**
- * \file fsm_ro_params.hpp
+ * \file strategy_parser.cpp
  *
- * \copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2021 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,53 +18,32 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_FSM_RO_PARAMS_HPP_
-#define INCLUDE_FORDYCA_FSM_FSM_RO_PARAMS_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <memory>
-
-#include "rcppsw/common/common.hpp"
-#include "rcppsw/math/vector2.hpp"
-
-#include "fordyca/config/strategy/strategy_config.hpp"
-#include "fordyca/fordyca.hpp"
+#include "fordyca/config/strategy/strategy_parser.hpp"
 
 /*******************************************************************************
- * Namespaces/Decls
+ * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace controller::cognitive {
-class block_sel_matrix;
-class cache_sel_matrix;
-} // namespace controller::cognitive
-
-namespace ds {
-class dpo_store;
-} /* namespace ds */
-
-NS_START(fsm);
+NS_START(fordyca, config, strategy);
 
 /*******************************************************************************
- * Struct Definitions
+ * Member Functions
  ******************************************************************************/
-/**
- * \struct fsm_ro_params
- * \ingroup fsm
- *
- * \brief Contains all parameters for FSM initialization that will be read-only
- * by the FSM at run-time; not all FSMs need all members.
- */
-struct fsm_ro_params {
-  const fccognitive::block_sel_matrix* bsel_matrix;
-  const fccognitive::cache_sel_matrix* csel_matrix;
-  const ds::dpo_store* store;
-  const fcstrategy::strategy_config strategy_config;
-};
+void strategy_parser::parse(const ticpp::Element& node) {
+  ticpp::Element snode = node_get(node, kXMLRoot);
+  m_config = std::make_unique<config_type>();
 
-NS_END(fsm, fordyca);
+  m_explore.parse(snode);
+  m_nest_acq.parse(snode);
 
-#endif /* INCLUDE_FORDYCA_FSM_FSM_RO_PARAMS_HPP_ */
+  if (m_explore.is_parsed()) {
+    m_config->explore = *m_explore.config_get<explore_parser::config_type>();
+  }
+  if (m_nest_acq.is_parsed()) {
+    m_config->nest_acq = *m_nest_acq.config_get<csstrategy::config::xml::nest_acq_parser::config_type>();
+  }
+} /* parse() */
+
+NS_END(config, fordyca, strategy);

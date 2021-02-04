@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_EXPSTRAT_CRW_ADAPTOR_HPP_
-#define INCLUDE_FORDYCA_FSM_EXPSTRAT_CRW_ADAPTOR_HPP_
+#ifndef INCLUDE_FORDYCA_STRATEGY_EXPLORE_CRW_ADAPTOR_HPP_
+#define INCLUDE_FORDYCA_STRATEGY_EXPLORE_CRW_ADAPTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -27,31 +27,30 @@
 #include <memory>
 #include "rcppsw/patterns/decorator/decorator.hpp"
 
-#include "cosm/spatial/expstrat/crw.hpp"
-#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
+#include "cosm/spatial/strategy/crw.hpp"
+#include "fordyca/strategy/foraging_strategy.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, fsm, expstrat);
+NS_START(fordyca, strategy, explore);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * \class crw_adaptor
- * \ingroup fsm expstrat
+ * \ingroup strategy explore
  *
  * \brief Adaptor for the CRW exploration strategy to enable it as an
  * exploration factory output within FORDYCA. Uses the decorator pattern on the
  * parent CRW class in order to avoid diamond inheritance with \ref
- * csexpstrat::base_expstrat.
+ * csstrategy::base_strategy.
  */
-class crw_adaptor final : public foraging_expstrat,
-                          public rpdecorator::decorator<csexpstrat::crw> {
+class crw_adaptor final : public foraging_strategy,
+                          public rpdecorator::decorator<csstrategy::crw> {
  public:
-  crw_adaptor(const fsm::expstrat::foraging_expstrat::params* c_params,
-              rmath::rng* rng);
+  crw_adaptor(const foraging_strategy::params* c_params, rmath::rng* rng);
   crw_adaptor(crfootbot::footbot_saa_subsystem* saa, rmath::rng* rng);
 
   ~crw_adaptor(void) override = default;
@@ -75,6 +74,6 @@ class crw_adaptor final : public foraging_expstrat,
   RCPPSW_WRAP_DECLDEF_OVERRIDE(clone, decoratee(), const);
 };
 
-NS_END(expstrat, fsm, fordyca);
+NS_END(explore, strategy, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_EXPSTRAT_CRW_ADAPTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_STRATEGY_EXPLORE_CRW_ADAPTOR_HPP_ */

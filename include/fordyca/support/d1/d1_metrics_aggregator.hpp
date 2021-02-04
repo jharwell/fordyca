@@ -157,7 +157,7 @@ class d1_metrics_aggregator : public d0::d0_metrics_aggregator,
       return;
     }
     collect("fsm::interference_counts", *task->mechanism());
-    collect("blocks::transporter", *controller);
+    collect("blocks::transporter", *task->mechanism());
     collect_if("fsm::interference_locs2D",
                *task->mechanism(),
                [&](const rmetrics::base_metrics& metrics) {
