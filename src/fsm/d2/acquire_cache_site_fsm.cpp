@@ -102,8 +102,9 @@ acquire_cache_site_fsm::site_select(void) {
     m_sel_success = true;
     m_sel_exec = true;
     m_nlopt_res = selector.nlopt_res();
-    return boost::make_optional(
-        acquire_goal_fsm::candidate_type(*best, kCACHE_SITE_ARRIVAL_TOL, -1));
+    return boost::make_optional(acquire_goal_fsm::candidate_type(*best,
+                                                                 kCACHE_SITE_ARRIVAL_TOL,
+                                                                 -1));
   } else {
     ER_WARN("No cache site selected for acquisition--possible internal error");
     m_sel_success = false;

@@ -77,7 +77,7 @@ class acquire_new_cache_fsm final : public rer::client<acquire_new_cache_fsm>,
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
   csmetrics::goal_acq_metrics::goal_type acquisition_goal_internal(void) const RCPPSW_CONST;
-  boost::optional<acquire_goal_fsm::candidate_type> cache_select(void) const;
+  boost::optional<acquire_goal_fsm::candidate_type> cache_select(void);
   bool candidates_exist(void) const RCPPSW_PURE;
   bool cache_acquired_cb(bool explore_result) const;
 

@@ -321,7 +321,7 @@ XML configuration:
     <cache_sel_matrix>
         ...
         <pickup_policy
-            policy=""
+            policy="time|cache_size|cache_duration"
             timestep="INTEGER"
             cache_size="INTEGER"/>
         ...
@@ -335,7 +335,10 @@ XML configuration:
     ``cache_size`` blocks in them. Robots intending to drop blocks in caches are
     not restricted.
 
-  - ``timestep`` - Only allow robots to pickup from caches after ``timestep``
+  - ``cache_duration`` - Only allow robots to pickup from caches after they have
+    existed for at least ``time`` timesteps.
+
+  - ``time`` - Only allow robots to pickup from caches after ``timestep``
     timesteps have elapsed during simulation. Robots intending to drop blocks in
     caches are not restricted.
 

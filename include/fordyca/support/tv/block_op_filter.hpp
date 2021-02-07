@@ -90,8 +90,7 @@ class block_op_filter : public rer::client<block_op_filter> {
       case block_op_src::ekCACHE_SITE_DROP:
         ER_ASSERT(cache_prox && *cache_prox > 0.0,
                   "Cache proximity distance not specified for cache site drop");
-        return cache_site_drop_filter(controller,
-                                      *cache_prox);
+        return cache_site_drop_filter(controller, *cache_prox);
       case block_op_src::ekNEW_CACHE_DROP:
         ER_ASSERT(cache_prox && *cache_prox > 0.0,
                   "Cache proximity distance not specified for new cache drop");
@@ -173,6 +172,7 @@ class block_op_filter : public rer::client<block_op_filter> {
 
       if (rtypes::constants::kNoUUID != prox.id) {
         result.status = op_filter_status::ekCACHE_PROXIMITY;
+        result.id == prox.id;
       } else {
         result.status = op_filter_status::ekSATISFIED;
       }
@@ -200,6 +200,7 @@ class block_op_filter : public rer::client<block_op_filter> {
 
       if (rtypes::constants::kNoUUID != prox.id) {
         result.status = op_filter_status::ekCACHE_PROXIMITY;
+        result.id = prox.id;
       } else {
         result.status = op_filter_status::ekSATISFIED;
       }

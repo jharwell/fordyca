@@ -44,11 +44,13 @@ cache_sel_matrix::cache_sel_matrix(
   this->insert(std::make_pair(kClusterProxDist, config->nest_prox_dist));
   this->insert(std::make_pair(kSiteXRange, config->site_xrange));
   this->insert(std::make_pair(kSiteYRange, config->site_yrange));
-  this->insert(
-      std::make_pair(kPickupExceptions, std::vector<rtypes::type_uuid>()));
-  this->insert(std::make_pair(kDropExceptions, std::vector<rtypes::type_uuid>()));
+  this->insert(std::make_pair(kPickupExceptions,
+                              std::vector<rtypes::type_uuid>()));
+  this->insert(std::make_pair(kDropExceptions,
+                              std::vector<rtypes::type_uuid>()));
   this->insert(std::make_pair(kPickupPolicy, config->pickup_policy));
   this->insert(std::make_pair(kStrictConstraints, config->strict_constraints));
+  this->insert(std::make_pair(kNewCacheDropTolerance, config->new_cache_tol));
 }
 
 /*******************************************************************************

@@ -63,6 +63,8 @@ struct cache_sel_matrix_config final : public rconfig::base_config {
    * cheaper computationally.
    */
   bool                         strict_constraints{true};
+
+  rtypes::spatial_dist         new_cache_tol{0.0};
 };
 
 NS_END(cache_sel, config, fordyca);

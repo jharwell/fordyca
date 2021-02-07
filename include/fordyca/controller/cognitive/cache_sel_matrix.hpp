@@ -91,6 +91,8 @@ class cache_sel_matrix final
   static constexpr char kPickupExceptions[] = "pickup_exceptions";
   static constexpr char kDropExceptions[] = "drop_exceptions";
   static constexpr char kStrictConstraints[] = "strict_constraints";
+  static constexpr char kNewCacheDropTolerance[] = "new_cache_tol";
+
   /**
    * \brief The conditions that must be satisfied before a robot will be
    * able to pickup from *ANY* cache.
@@ -99,6 +101,7 @@ class cache_sel_matrix final
   static constexpr char kPickupPolicyNull[] = "";
   static constexpr char kPickupPolicyTime[] = "time";
   static constexpr char kPickupPolicyCacheSize[] = "cache_size";
+  static constexpr char kPickupPolicyCacheDuration[] = "cache_duration";
 
   using std::map<std::string, cache_sel_variant>::find;
   cache_sel_matrix(const config::cache_sel::cache_sel_matrix_config* config,

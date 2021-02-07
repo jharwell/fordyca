@@ -547,6 +547,7 @@ void d1_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
 
   auto status = boost::apply_visitor(
       iapplicator, m_interactor_map->at(controller->type_index()));
+
   /*
    * The oracle does not necessarily have up-to-date information about all
    * blocks in the arena, as a robot could have dropped a block in the nest or

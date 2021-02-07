@@ -104,11 +104,19 @@ bool cache_acq_validator::pickup_policy_validate(const carepr::base_cache* cache
     return false;
   } else if (cselm::kPickupPolicyCacheSize == config.policy &&
              cache->n_blocks() < config.cache_size) {
-    ER_DEBUG("Cache%d invalid for acquisition: policy=%s, %zu < %u",
+    ER_DEBUG("Cache%d invalid for acquisition: policy=%s, %zu < %zu",
             cache->id().v(),
             config.policy.c_str(),
             cache->n_blocks(),
             config.cache_size);
+    return false;
+  } else if (cselm::kPickupPolicyCacheDuration == config.policy &&
+             t - cache->creation_ts() < config.timestep) {
+    ER_DEBUG("Cache%d invalid for acquisition: policy=%s, %zu < %zu",
+             cache->id().v(),
+             config.policy.c_str(),
+             (t - cache->creation_ts()).v(),
+             config.timestep.v());
     return false;
   }
   return true;

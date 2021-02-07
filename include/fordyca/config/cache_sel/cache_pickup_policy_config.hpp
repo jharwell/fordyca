@@ -47,8 +47,8 @@ NS_START(fordyca, config, cache_sel);
 struct cache_pickup_policy_config final : public rconfig::base_config {
   std::string      policy{};
   rtypes::timestep timestep{0};
-  uint             cache_count{0};
-  uint             cache_size{0};
+  size_t           cache_count{0};
+  size_t           cache_size{0};
 };
 
 NS_END(cache_sel, config, fordyca);

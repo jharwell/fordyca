@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <crw_controller id="ffc"
+    <bitd_dpo_controller id="ffc"
                           library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -86,8 +86,8 @@
           <stoch_nbhd1
               tab_init_policy="max_depth">
             <task_partition
-                always_partition="true"
-                never_partition="false">
+                always_partition="false"
+                never_partition="true">
               <src_sigmoid_sel
                   input_src="exec">
                 <sigmoid_sel
@@ -140,6 +140,7 @@
             cache_prox_dist="1.6"
             nest_prox_dist="3.0"
             block_prox_dist="1.0"
+            new_cache_tol="1.2"
             site_xrange="2:10"
             site_yrange="2.5:3">
           <pickup_policy
@@ -192,7 +193,7 @@
                       max_speed="10.0" />
         </actuation_subsystem2D>
       </params>
-    </crw_controller>
+    </bitd_dpo_controller>
 
   </controllers>
 
@@ -200,7 +201,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="d0_loop_functions">
+                  label="d1_loop_functions">
     <output
         output_root="output"
         output_dir="__current_date__">
@@ -241,6 +242,7 @@
         <truncate output_interval="10"
                 block_acq_locs2D="block-acq-locs"
                 block_acq_explore_locs2D="block-acq-explore-locs"
+                block_acq_vector_locs2D="block-acq-vector-locs"
                 cache_acq_locs2D="cache-acq-locs"
                 cache_acq_explore_locs2D="cache-acq-explore-locs"
                 cache_acq_vector_locs2D="cache-acq-vector-locs"
@@ -391,7 +393,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="16" max_trials="1000">
+      <entity quantity="1" max_trials="1000">
         <foot-bot id="fb" omnidirectional_camera_aperture="89">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->

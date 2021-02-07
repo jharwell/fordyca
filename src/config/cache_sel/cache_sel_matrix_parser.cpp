@@ -50,6 +50,7 @@ void cache_sel_matrix_parser::parse(const ticpp::Element& node) {
   XML_PARSE_ATTR(cnode, m_config, site_xrange);
   XML_PARSE_ATTR(cnode, m_config, site_yrange);
   XML_PARSE_ATTR_DFLT(cnode, m_config, strict_constraints, true);
+  XML_PARSE_ATTR(cnode, m_config, new_cache_tol);
 } /* parse() */
 
 bool cache_sel_matrix_parser::validate(void) const {
@@ -60,6 +61,7 @@ bool cache_sel_matrix_parser::validate(void) const {
   RCPPSW_CHECK(m_config->cache_prox_dist > 0.0);
   RCPPSW_CHECK(m_config->block_prox_dist > 0.0);
   RCPPSW_CHECK(m_config->nest_prox_dist > 0.0);
+  RCPPSW_CHECK(m_config->new_cache_tol > 0.0);
   return true;
 
 error:

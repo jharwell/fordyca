@@ -101,10 +101,23 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
       }
     } else {
       auto prox_dist = boost::make_optional(m_cache_manager->cache_proximity_dist());
-      m_penalty_handler->penalty_init(controller,
-                                      t,
-                                      tv::block_op_src::ekCACHE_SITE_DROP,
-                                      prox_dist);
+      auto penalty_status = m_penalty_handler->penalty_init(controller,
+                                                    t,
+                                                    tv::block_op_src::ekCACHE_SITE_DROP,
+                                                    prox_dist);
+
+      /*
+       * The checking is redundant here, because it was already done during
+       * penalty_init(), but it doesn't hurt. What we DO need from
+       * check_and_notify() is the "notify" part. Without it, robots which try
+       * to start caches too close to existing caches NEVER get the signal that
+       * they are too close, and just sit waiting until they abort.
+       *
+       * See FORDYCA#684.
+       */
+      if (tv::op_filter_status::ekCACHE_PROXIMITY == penalty_status) {
+        m_prox_checker.check_and_notify(controller, "cache_site");
+      }
     }
     return status;
   }

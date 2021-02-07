@@ -30,11 +30,13 @@
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
+#include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm, d2);
+using cselm = controller::cognitive::cache_sel_matrix;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -87,7 +89,7 @@ bool acquire_new_cache_fsm::candidates_exist(void) const {
 } /* candidates_exsti() */
 
 boost::optional<csfsm::acquire_goal_fsm::candidate_type>
-acquire_new_cache_fsm::cache_select(void) const {
+acquire_new_cache_fsm::cache_select(void) {
   controller::cognitive::d2::new_cache_selector selector(mc_matrix);
 
   /* A "new" cache is the same as a single block  */
@@ -98,8 +100,11 @@ acquire_new_cache_fsm::cache_select(void) const {
             rcppsw::to_string(best->ranchor2D()).c_str(),
             rcppsw::to_string(best->danchor2D()).c_str());
 
-    return boost::make_optional(acquire_goal_fsm::candidate_type(
-        best->rcenter2D(), kNEW_CACHE_ARRIVAL_TOL, best->id()));
+    auto tol = boost::get<rtypes::spatial_dist>(
+        mc_matrix->find(cselm::kNewCacheDropTolerance)->second);
+    return boost::make_optional(acquire_goal_fsm::candidate_type(best->rcenter2D(),
+                                                                 tol.v(),
+                                                                 best->id()));
   } else {
     /*
      * If this happens, all the blocks we know of are ineligible for us to
