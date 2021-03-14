@@ -493,7 +493,7 @@ bool d2_loop_functions::cache_creation_handle(bool on_drop) {
     .t = rtypes::timestep(GetSpace().GetSimulationClock())
   };
 
-  if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
+  if (auto created = m_cache_manager->create(ccp, arena_map()->free_blocks())) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
     return true;

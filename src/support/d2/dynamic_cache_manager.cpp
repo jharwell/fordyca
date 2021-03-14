@@ -117,8 +117,8 @@ dynamic_cache_manager::creation_blocks_alloc(
                          return cblocks.end() ==
                                 std::find(cblocks.begin(), cblocks.end(), b);
                        }) &&
-           /* blocks cannot be carried by a robot */
-           rtypes::constants::kNoUUID == b->md()->robot_id();
+        /* blocks cannot be carried by a robot */
+        !b->is_carried_by_robot();
   };
 
   auto absorbable_filter = [&](const auto& b) {
@@ -127,8 +127,8 @@ dynamic_cache_manager::creation_blocks_alloc(
                        existing_caches.end(),
                        [&](const auto& c) { return !c->contains_block(b); }) &&
 
-           /* blocks cannot be carried by a robot */
-           rtypes::constants::kNoUUID == b->md()->robot_id();
+        /* blocks cannot be carried by a robot */
+        !b->is_carried_by_robot();
   };
   auto absorbable_transform = [&](auto* b) { return std::make_pair(b->id(), b); };
   std::copy_if(all_blocks.begin(),

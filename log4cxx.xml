@@ -40,6 +40,9 @@
   <category name="cosm.foraging.block_dist.multi_cluster" >
     <priority value ="debug" />
   </category>
+  <category name="cosm.foraging.block_motion_handler" >
+    <priority value ="debug" />
+  </category>
   <category name="fordyca.controller" >
     <priority value ="info" />
   </category>

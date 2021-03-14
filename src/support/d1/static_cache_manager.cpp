@@ -85,11 +85,13 @@ static_cache_manager::create(const cache_create_ro_params& c_params,
   auto odd_dsize =
       checker::odd_dsize(arena_map()->grid_resolution(), even_multiple);
 
-  static_cache_creator creator(
-      &arena_map()->decoratee(), mc_cache_locs, odd_dsize);
+  static_cache_creator creator(&arena_map()->decoratee(),
+                               mc_cache_locs,
+                               odd_dsize);
 
-  static_cache_creator::creation_result res =
-      creator.create_all(c_params, to_use, initial);
+  static_cache_creator::creation_result res = creator.create_all(c_params,
+                                                                 to_use,
+                                                                 initial);
 
   /* Configure cache extents */
   creator.cache_extents_configure(res.created);
@@ -103,12 +105,13 @@ static_cache_manager::create(const cache_create_ro_params& c_params,
                  res.created.end(),
                  std::back_inserter(sanity_caches),
                  [&](const auto& c) { return c.get(); });
-  auto free_blocks =
-      carena::free_blocks_calculator()(c_all_blocks, sanity_caches);
-  ER_ASSERT(
-      creator.creation_sanity_checks(
-          sanity_caches, free_blocks, c_params.clusters, arena_map()->nests()),
-      "One or more bad caches on creation");
+  auto free_blocks = carena::free_blocks_calculator()(c_all_blocks,
+                                                      sanity_caches);
+  ER_ASSERT(creator.creation_sanity_checks(sanity_caches,
+                                           free_blocks,
+                                           c_params.clusters,
+                                           arena_map()->nests()),
+            "One or more bad caches on creation");
 
   caches_created(res.created.size());
   caches_discarded(res.n_discarded);
@@ -173,9 +176,9 @@ boost::optional<cds::block3D_vectorno> static_cache_manager::cache_i_blocks_allo
       [&](const auto* b) {
         /* don't have enough blocks yet */
         return (cache_i_blocks.size() < n_blocks) &&
-               /* not carried by robot */
-               rtypes::constants::kNoUUID == b->md()->robot_id() &&
-               /*
+            /* not carried by robot */
+            !b->is_carried_by_robot() &&
+            /*
              * Not already on a cell where the cache will be re-created, or
              * on the cell where ANOTHER cache *might* be recreated.
              */

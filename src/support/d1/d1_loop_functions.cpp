@@ -45,6 +45,7 @@
 #include "cosm/robots/footbot/config/saa_xml_names.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
+#include "cosm/foraging/block_dist/dispatcher.hpp"
 
 #include "fordyca/controller/cognitive/d1/bitd_dpo_controller.hpp"
 #include "fordyca/controller/cognitive/d1/bitd_mdpo_controller.hpp"
@@ -333,7 +334,7 @@ void d1_loop_functions::cache_handling_init(
   cpal::argos_sm_adaptor::led_medium(crfootbot::config::saa_xml_names::leds_saa);
   bool pre_dist = (nullptr == arena_map()->block_distributor());
   if (auto created =
-          m_cache_manager->create(ccp, arena_map()->blocks(), pre_dist)) {
+          m_cache_manager->create(ccp, arena_map()->free_blocks(), pre_dist)) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }
@@ -610,7 +611,7 @@ void d1_loop_functions::static_cache_monitor(void) {
 
   if (auto created =
           m_cache_manager->create_conditional(ccp,
-                                              arena_map()->blocks(),
+                                              arena_map()->free_blocks(),
                                               m_cache_counts.n_harvesters,
                                               m_cache_counts.n_collectors)) {
     arena_map()->caches_add(*created, this);

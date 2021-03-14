@@ -167,7 +167,11 @@ bool dynamic_cache_creator::cache_i_verify(
     const cfds::block3D_cluster_vectorro& c_clusters) const {
   auto free_blocks = carena::free_blocks_calculator()(c_all_blocks, c_caches);
 
-  if (!creation_sanity_checks(c_caches, free_blocks, c_clusters, m_map->nests())) {
+  bool sanity_ok = creation_sanity_checks(c_caches,
+                                          free_blocks,
+                                          c_clusters,
+                                          m_map->nests());
+  if (!sanity_ok) {
     if (mc_strict_constraints) {
       ER_WARN("Bad cache%d@%s/%s creation--discard (strict constraints)",
               cache->id().v(),
@@ -255,15 +259,6 @@ cds::block3D_vectorno dynamic_cache_creator::cache_i_blocks_alloc(
   while (anchor_it != c_usable_blocks.end()) {
     auto* candidate = *anchor_it;
     ++anchor_it;
-    /*
-     * We have to check if the block is actually in the arena, because for some
-     * simulations the # blocks is to great to be distributed successfull (and
-     * not treated as an error), so there will be some blocks that are not
-     * ACTUALLY in the arena.
-     */
-    if (candidate->is_out_of_sight()) {
-      continue;
-    }
     /*
      * If we find a block that is close enough to our anchor/target block, then
      * add to the src list.
