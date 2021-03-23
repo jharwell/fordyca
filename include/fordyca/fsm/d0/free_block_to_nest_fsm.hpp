@@ -99,18 +99,18 @@ class free_block_to_nest_fsm final : public cffsm::foraging_util_hfsm,
   /* goal acquisition metrics */
   bool goal_acquired(void) const override RCPPSW_PURE;
   csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCPPSW_PURE;
-  RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, acquisition_loc3D, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, explore_loc3D, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, vector_loc3D, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid, entity_acquired_id, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(exp_status, is_exploring_for_goal, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(bool, is_vectoring_to_goal, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, acquisition_loc3D, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, explore_loc3D, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, vector_loc3D, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(rtypes::type_uuid, entity_acquired_id, const);
 
 
 
   /* block transportation */
   fsm::foraging_transport_goal block_transport_goal(void) const override RCPPSW_PURE;
-  bool is_phototaxiing_to_goal(void) const override RCPPSW_PURE;
+  bool is_phototaxiing_to_goal(bool includea_ca) const override RCPPSW_PURE;
 
   void init(void) override;
 

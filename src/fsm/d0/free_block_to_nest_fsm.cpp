@@ -175,27 +175,27 @@ rmath::vector3z free_block_to_nest_fsm::interference_loc3D(void) const {
 /*******************************************************************************
  * Goal Acquisition Metrics
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEF(free_block_to_nest_fsm,
+RCPPSW_WRAP_DEF_OVERRIDE(free_block_to_nest_fsm,
                          is_exploring_for_goal,
                          m_block_fsm,
                          const);
-RCPPSW_WRAP_OVERRIDE_DEF(free_block_to_nest_fsm,
+RCPPSW_WRAP_DEF_OVERRIDE(free_block_to_nest_fsm,
                          is_vectoring_to_goal,
                          m_block_fsm,
                          const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(free_block_to_nest_fsm,
+RCPPSW_WRAP_DEF_OVERRIDE(free_block_to_nest_fsm,
                          acquisition_loc3D,
                          m_block_fsm,
                          const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(free_block_to_nest_fsm,
+RCPPSW_WRAP_DEF_OVERRIDE(free_block_to_nest_fsm,
                          explore_loc3D,
                          m_block_fsm,
                          const);
-RCPPSW_WRAP_OVERRIDE_DEF(free_block_to_nest_fsm, vector_loc3D, m_block_fsm, const);
+RCPPSW_WRAP_DEF_OVERRIDE(free_block_to_nest_fsm, vector_loc3D, m_block_fsm, const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(free_block_to_nest_fsm,
+RCPPSW_WRAP_DEF_OVERRIDE(free_block_to_nest_fsm,
                          entity_acquired_id,
                          m_block_fsm,
                          const);
@@ -219,8 +219,13 @@ bool free_block_to_nest_fsm::goal_acquired(void) const {
 /*******************************************************************************
  * Block Transport Metrics
  ******************************************************************************/
-bool free_block_to_nest_fsm::is_phototaxiing_to_goal(void) const {
-  return (foraging_transport_goal::ekNEST == block_transport_goal());
+bool free_block_to_nest_fsm::is_phototaxiing_to_goal(bool include_ca) const {
+  if (include_ca) {
+    return foraging_transport_goal::ekNEST == block_transport_goal();
+  } else {
+    return foraging_transport_goal::ekNEST == block_transport_goal() &&
+        !exp_interference();
+  }
 } /* is_phototaxiing_to_goal() */
 
 /*******************************************************************************

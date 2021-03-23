@@ -91,72 +91,72 @@ void cache_starter::active_interface_update(int) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_starter,
     is_exploring_for_goal,
     *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
     const);
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_starter,
     is_vectoring_to_goal,
     *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_starter,
     goal_acquired,
     *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_starter,
     acquisition_goal,
     *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_starter,
     block_transport_goal,
     *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_starter,
     acquisition_loc3D,
     *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_starter,
     vector_loc3D,
     *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_starter,
     explore_loc3D,
     *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_starter,
     site_select_exec,
     *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_starter,
     site_select_success,
     *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_starter,
     nlopt_result,
     *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_starter,
     entity_acquired_id,
     *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),

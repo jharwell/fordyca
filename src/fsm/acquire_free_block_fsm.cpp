@@ -126,7 +126,7 @@ bool acquire_free_block_fsm::block_acq_valid(const rmath::vector2d& loc,
 } /* block_acq_valid() */
 
 /*******************************************************************************
- * Non-Member Functions
+ * Goal Acquisition Metrics
  ******************************************************************************/
 csmetrics::goal_acq_metrics::goal_type
 acquire_free_block_fsm::acq_goal_internal(void) {

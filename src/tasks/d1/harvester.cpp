@@ -119,54 +119,54 @@ void harvester::accept(events::detail::block_vanished& visitor) {
 /*******************************************************************************
  * Block Acquisition Metrics
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     harvester,
     is_exploring_for_goal,
     *static_cast<fsm::d1::block_to_existing_cache_fsm*>(polled_task::mechanism()),
     const);
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     harvester,
     is_vectoring_to_goal,
     *static_cast<fsm::d1::block_to_existing_cache_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     harvester,
     goal_acquired,
     *static_cast<fsm::d1::block_to_existing_cache_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     harvester,
     acquisition_goal,
     *static_cast<fsm::d1::block_to_existing_cache_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     harvester,
     block_transport_goal,
     *static_cast<fsm::d1::block_to_existing_cache_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     harvester,
     acquisition_loc3D,
     *static_cast<fsm::d1::block_to_existing_cache_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     harvester,
     explore_loc3D,
     *static_cast<fsm::d1::block_to_existing_cache_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     harvester,
     vector_loc3D,
     *static_cast<fsm::d1::block_to_existing_cache_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     harvester,
     entity_acquired_id,
     *static_cast<fsm::d1::block_to_existing_cache_fsm*>(polled_task::mechanism()),

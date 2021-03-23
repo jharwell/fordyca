@@ -174,8 +174,13 @@ rtypes::type_uuid crw_fsm::entity_acquired_id(void) const {
 /*******************************************************************************
  * Block Transport Metrics
  ******************************************************************************/
-bool crw_fsm::is_phototaxiing_to_goal(void) const {
-  return (foraging_transport_goal::ekNEST == block_transport_goal());
+bool crw_fsm::is_phototaxiing_to_goal(bool include_ca) const {
+  if (include_ca) {
+    return foraging_transport_goal::ekNEST == block_transport_goal();
+  } else {
+    return foraging_transport_goal::ekNEST == block_transport_goal() &&
+        !exp_interference();
+  }
 } /* is_phototaxiing_to_goal() */
 
 /*******************************************************************************

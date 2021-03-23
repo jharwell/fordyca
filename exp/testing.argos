@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <bitd_dpo_controller id="ffc"
+    <crw_controller id="ffc"
                           library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -153,7 +153,7 @@
               block_strategy="CRW"
               cache_strategy="utility_search"/>
           <nest_acq
-              strategy="wander"
+              strategy="random_thresh"
               />
         </strategy>
         <sensing_subsystemQ3D>
@@ -193,7 +193,7 @@
                       max_speed="10.0" />
         </actuation_subsystem2D>
       </params>
-    </bitd_dpo_controller>
+    </crw_controller>
 
   </controllers>
 
@@ -201,7 +201,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="d1_loop_functions">
+                  label="d0_loop_functions">
     <output
         output_root="output"
         output_dir="__current_date__">
@@ -327,7 +327,7 @@
             policy="Null"
             random_walk_prob="1.0"/>
         <distribution
-            dist_type="single_source"
+            dist_type="random"
             strict_success="false">
 
           <!-- <redist_governor -->
@@ -342,14 +342,17 @@
               n_clusters="10"
               />
           <manifest
-              n_cube="300"
+              n_cube="50"
               n_ramp="0"
               unit_dim="0.2"
               />
         </distribution>
       </blocks>
       <nests>
-        <nest dims="2.4, 2.4" center="6, 6" />
+        <nest dims="2.4, 2.4"
+              center="6, 6"
+              light_height="10.0"
+              light_intensity="5.0"/>
       </nests>
     </arena_map>
     <caches dimension="1.0">
@@ -391,9 +394,9 @@
       <body position="0,6,0" orientation="0,0,0" />
     </box>
     <distribute>
-      <position method="uniform" min="1,1,0" max="10,5,0" />
+      <position method="uniform" min="1,1,0" max="10,10,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="1" max_trials="1000">
+      <entity quantity="16" max_trials="1000">
         <foot-bot id="fb" omnidirectional_camera_aperture="89">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->
@@ -441,20 +444,20 @@
     <led id="leds" />
   </media>
 
-  <!-- ****************** -->
-  <!-- * Visualization * -->
-  <!-- ****************** -->
-  <!-- <visualization> -->
-  <!--   <qt-opengl autoplay="false"> -->
-  <!--      <!-\- <frame_grabbing directory="frames" -\-> -->
-  <!--      <!-\-                 base_name="frame_" -\-> -->
-  <!--      <!-\-                 format="png" -\-> -->
-  <!--      <!-\-                 quality="100" -\-> -->
-  <!--      <!-\-                 headless_grabbing="true" -\-> -->
-  <!--      <!-\-                 headless_frame_size="1600x1200" -\-> -->
-  <!--      <!-\-                 /> -\-> -->
-  <!--     <user_functions label="d0_qt_user_functions" /> -->
-  <!--   </qt-opengl> -->
-  <!-- </visualization> -->
+  ******************
+  * Visualization *
+  ******************
+  <visualization>
+    <qt-opengl autoplay="false">
+       <!-- <frame_grabbing directory="frames" -->
+       <!--                 base_name="frame_" -->
+       <!--                 format="png" -->
+       <!--                 quality="100" -->
+       <!--                 headless_grabbing="true" -->
+       <!--                 headless_frame_size="1600x1200" -->
+       <!--                 /> -->
+      <user_functions label="d0_qt_user_functions" />
+    </qt-opengl>
+  </visualization>
 
 </argos-configuration>

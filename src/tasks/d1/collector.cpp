@@ -117,54 +117,54 @@ void collector::accept(events::detail::cache_vanished& visitor) {
 /*******************************************************************************
  * Block Acquisition Metrics
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     collector,
     is_exploring_for_goal,
     *static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism()),
     const);
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     collector,
     is_vectoring_to_goal,
     *static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     collector,
     goal_acquired,
     *static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     collector,
     acquisition_goal,
     *static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     collector,
     block_transport_goal,
     *static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     collector,
     acquisition_loc3D,
     *static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     collector,
     vector_loc3D,
     *static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     collector,
     explore_loc3D,
     *static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     collector,
     entity_acquired_id,
     *static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism()),
@@ -173,11 +173,10 @@ RCPPSW_WRAP_OVERRIDE_DEF(
 /*******************************************************************************
  * Block Transport Metrics
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEF(
-    collector,
-    is_phototaxiing_to_goal,
-    *static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism()),
-    const);
+bool collector::is_phototaxiing_to_goal(bool include_ca) const {
+  return static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism())->is_phototaxiing_to_goal(include_ca);
+} /* is_phototaxiing_to_goal() */
+
 
 /*******************************************************************************
  * Task Metrics

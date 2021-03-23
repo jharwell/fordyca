@@ -108,7 +108,6 @@ RCPPSW_WRAP_DEF(dpo_fsm, interference_loc3D, m_block_fsm, const);
  ******************************************************************************/
 RCPPSW_WRAP_DEF(dpo_fsm, is_exploring_for_goal, m_block_fsm, const);
 RCPPSW_WRAP_DEF(dpo_fsm, is_vectoring_to_goal, m_block_fsm, const);
-RCPPSW_WRAP_DEF(dpo_fsm, is_phototaxiing_to_goal, m_block_fsm, const);
 RCPPSW_WRAP_DEF(dpo_fsm, acquisition_goal, m_block_fsm, const);
 RCPPSW_WRAP_DEF(dpo_fsm, block_transport_goal, m_block_fsm, const);
 RCPPSW_WRAP_DEF(dpo_fsm, goal_acquired, m_block_fsm, const);
@@ -116,6 +115,10 @@ RCPPSW_WRAP_DEF(dpo_fsm, acquisition_loc3D, m_block_fsm, const);
 RCPPSW_WRAP_DEF(dpo_fsm, explore_loc3D, m_block_fsm, const);
 RCPPSW_WRAP_DEF(dpo_fsm, vector_loc3D, m_block_fsm, const);
 RCPPSW_WRAP_DEF(dpo_fsm, entity_acquired_id, m_block_fsm, const);
+
+bool dpo_fsm::is_phototaxiing_to_goal(bool include_ca) const {
+  return m_block_fsm.is_phototaxiing_to_goal(include_ca);
+} /* is_phototaxiing_to_goal() */
 
 /*******************************************************************************
  * General Member Functions

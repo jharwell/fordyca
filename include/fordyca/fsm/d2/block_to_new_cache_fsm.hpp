@@ -66,7 +66,7 @@ class block_to_new_cache_fsm final : public block_to_goal_fsm {
 
   /* block transportation */
   foraging_transport_goal block_transport_goal(void) const override RCPPSW_PURE;
-  bool is_phototaxiing_to_goal(void) const override { return false; }
+  bool is_phototaxiing_to_goal(bool) const override { return false; }
 
   /* clang-format off */
   acquire_new_cache_fsm  m_cache_fsm;

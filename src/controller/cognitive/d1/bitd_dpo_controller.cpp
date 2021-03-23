@@ -166,7 +166,7 @@ void bitd_dpo_controller::executive(
 /*******************************************************************************
  * Block Transportation
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEFP(bitd_dpo_controller,
+RCPPSW_WRAP_DEFP_OVERRIDE(bitd_dpo_controller,
                           block_transport_goal,
                           current_task(),
                           fsm::foraging_transport_goal::ekNONE,
@@ -175,19 +175,19 @@ RCPPSW_WRAP_OVERRIDE_DEFP(bitd_dpo_controller,
 /*******************************************************************************
  * Goal Acquisition
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEFP(bitd_dpo_controller,
+RCPPSW_WRAP_DEFP_OVERRIDE(bitd_dpo_controller,
                           acquisition_goal,
                           current_task(),
                           fsm::to_goal_type(fsm::foraging_acq_goal::ekNONE),
                           const);
 
-RCPPSW_WRAP_OVERRIDE_DEFP(bitd_dpo_controller,
+RCPPSW_WRAP_DEFP_OVERRIDE(bitd_dpo_controller,
                           goal_acquired,
                           current_task(),
                           false,
                           const);
 
-RCPPSW_WRAP_OVERRIDE_DEFP(bitd_dpo_controller,
+RCPPSW_WRAP_DEFP_OVERRIDE(bitd_dpo_controller,
                           entity_acquired_id,
                           current_task(),
                           rtypes::constants::kNoUUID,

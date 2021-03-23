@@ -92,12 +92,12 @@ class crw_fsm final : public cffsm::foraging_util_hfsm,
   bool goal_acquired(void) const override RCPPSW_PURE;
   rmath::vector3z acquisition_loc3D(void) const override;
   rtypes::type_uuid entity_acquired_id(void) const override RCPPSW_PURE;
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, explore_loc3D, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, vector_loc3D, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, explore_loc3D, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, vector_loc3D, const);
 
   /* block transportation */
   foraging_transport_goal block_transport_goal(void) const override RCPPSW_PURE;
-  bool is_phototaxiing_to_goal(void) const override RCPPSW_PURE;
+  bool is_phototaxiing_to_goal(bool include_ca) const override RCPPSW_PURE;
 
   /* taskable overrides */
   void task_execute(void) override { run(); }

@@ -71,54 +71,54 @@ void generalist::accept(events::detail::block_vanished& visitor) {
 /*******************************************************************************
  * Goal Acquisition Metrics
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     generalist,
     is_exploring_for_goal,
     *static_cast<fsm::d0::free_block_to_nest_fsm*>(polled_task::mechanism()),
     const);
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     generalist,
     is_vectoring_to_goal,
     *static_cast<fsm::d0::free_block_to_nest_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     generalist,
     goal_acquired,
     *static_cast<fsm::d0::free_block_to_nest_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     generalist,
     acquisition_goal,
     *static_cast<fsm::d0::free_block_to_nest_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     generalist,
     block_transport_goal,
     *static_cast<fsm::d0::free_block_to_nest_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     generalist,
     acquisition_loc3D,
     *static_cast<fsm::d0::free_block_to_nest_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     generalist,
     explore_loc3D,
     *static_cast<fsm::d0::free_block_to_nest_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     generalist,
     vector_loc3D,
     *static_cast<fsm::d0::free_block_to_nest_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     generalist,
     entity_acquired_id,
     *static_cast<fsm::d0::free_block_to_nest_fsm*>(polled_task::mechanism()),
@@ -127,10 +127,8 @@ RCPPSW_WRAP_OVERRIDE_DEF(
 /*******************************************************************************
  * Block Transport Metrics
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEF(
-    generalist,
-    is_phototaxiing_to_goal,
-    *static_cast<fsm::d0::free_block_to_nest_fsm*>(polled_task::mechanism()),
-    const);
+bool generalist::is_phototaxiing_to_goal(bool include_ca) const {
+  return static_cast<fsm::d0::free_block_to_nest_fsm*>(polled_task::mechanism())->is_phototaxiing_to_goal(include_ca);
+} /* is_phototaxiing_to_goal() */
 
 NS_END(d0, tasks, fordyca);

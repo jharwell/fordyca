@@ -110,19 +110,21 @@ void crw_controller::control_step(void) {
 /*******************************************************************************
  * Goal Acquisition Metrics
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, goal_acquired, *m_fsm, const);
-RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, entity_acquired_id, *m_fsm, const);
-RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, is_exploring_for_goal, *m_fsm, const);
-RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, acquisition_goal, *m_fsm, const);
-RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, block_transport_goal, *m_fsm, const);
-RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, acquisition_loc3D, *m_fsm, const);
-RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, vector_loc3D, *m_fsm, const);
-RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, explore_loc3D, *m_fsm, const);
+RCPPSW_WRAP_DEF_OVERRIDE(crw_controller, goal_acquired, *m_fsm, const);
+RCPPSW_WRAP_DEF_OVERRIDE(crw_controller, entity_acquired_id, *m_fsm, const);
+RCPPSW_WRAP_DEF_OVERRIDE(crw_controller, is_exploring_for_goal, *m_fsm, const);
+RCPPSW_WRAP_DEF_OVERRIDE(crw_controller, acquisition_goal, *m_fsm, const);
+RCPPSW_WRAP_DEF_OVERRIDE(crw_controller, block_transport_goal, *m_fsm, const);
+RCPPSW_WRAP_DEF_OVERRIDE(crw_controller, acquisition_loc3D, *m_fsm, const);
+RCPPSW_WRAP_DEF_OVERRIDE(crw_controller, vector_loc3D, *m_fsm, const);
+RCPPSW_WRAP_DEF_OVERRIDE(crw_controller, explore_loc3D, *m_fsm, const);
 
 /*******************************************************************************
  * Block Transportation Metrics
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, is_phototaxiing_to_goal, *m_fsm, const);
+bool crw_controller::is_phototaxiing_to_goal(bool include_ca) const {
+  return m_fsm->is_phototaxiing_to_goal(include_ca);
+} /* is_phototaxiing_to_goal() */
 
 using namespace argos; // NOLINT
 

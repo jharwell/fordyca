@@ -88,21 +88,21 @@ class bitd_dpo_controller : public d0::dpo_controller,
   std::type_index type_index(void) const override { return typeid(*this); }
 
   /* task distribution metrics */
-  RCPPSW_WRAP_OVERRIDE_DECL(int, current_task_depth, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(int, current_task_id, const final);
-  RCPPSW_WRAP_OVERRIDE_DECL(int, current_task_tab, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(int, current_task_depth, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(int, current_task_id, const final);
+  RCPPSW_WRAP_DECL_OVERRIDE(int, current_task_tab, const);
 
   /* goal acquisition metrics */
-  RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const final);
-  RCPPSW_WRAP_OVERRIDE_DECL(csmetrics::goal_acq_metrics::goal_type,
+  RCPPSW_WRAP_DECL_OVERRIDE(bool, goal_acquired, const final);
+  RCPPSW_WRAP_DECL_OVERRIDE(csmetrics::goal_acq_metrics::goal_type,
                             acquisition_goal,
                             const final);
-  RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid,
+  RCPPSW_WRAP_DECL_OVERRIDE(rtypes::type_uuid,
                             entity_acquired_id,
                             const final);
 
   /* block transportation */
-  RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal,
+  RCPPSW_WRAP_DECL_OVERRIDE(fsm::foraging_transport_goal,
                             block_transport_goal,
                             const final);
 
