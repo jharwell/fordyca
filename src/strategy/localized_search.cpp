@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/strategy/explore/localized_search.hpp"
 
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -33,7 +33,7 @@ NS_START(fordyca, strategy, explore);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-localized_search::localized_search(crfootbot::footbot_saa_subsystem* saa,
+localized_search::localized_search(csubsystem::saa_subsystemQ3D* saa,
                                    rmath::rng* rng)
     : foraging_strategy(saa, rng),
       ER_CLIENT_INIT("fordyca.fsm.strategy.localized_search"),

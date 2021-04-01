@@ -164,7 +164,7 @@ class d1_loop_functions : public d0::d0_loop_functions,
    *
    * \note These operations are done in parallel for all robots (lock free).
    */
-  void robot_pre_step(argos::CFootBotEntity& robot);
+  void robot_pre_step(chal::robot& robot);
 
   /**
    * \brief Process a single robot on a timestep, after running its controller.
@@ -175,7 +175,7 @@ class d1_loop_functions : public d0::d0_loop_functions,
    * \note These operations are done in parallel for all robots (with mutual
    *       exclusion as needed).
    */
-  void robot_post_step(argos::CFootBotEntity& robot);
+  void robot_post_step(chal::robot& robot);
 
   /**
    * \brief Extract the numerical ID of the task each robot is currently

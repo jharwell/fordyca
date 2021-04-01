@@ -51,7 +51,7 @@ class crw_adaptor final : public foraging_strategy,
                           public rpdecorator::decorator<csstrategy::crw> {
  public:
   crw_adaptor(const foraging_strategy::params* c_params, rmath::rng* rng);
-  crw_adaptor(crfootbot::footbot_saa_subsystem* saa, rmath::rng* rng);
+  crw_adaptor(csubsystem::saa_subsystemQ3D* saa, rmath::rng* rng);
 
   ~crw_adaptor(void) override = default;
   crw_adaptor(const crw_adaptor&) = delete;

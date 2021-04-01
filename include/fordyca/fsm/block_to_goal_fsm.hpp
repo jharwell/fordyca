@@ -27,7 +27,7 @@
 #include "rcppsw/er/client.hpp"
 
 #include "cosm/fsm/block_transporter.hpp"
-#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
+#include "cosm/subsystem/subsystem_fwd.hpp"
 #include "cosm/foraging/fsm/foraging_util_hfsm.hpp"
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 #include "cosm/ta/taskable.hpp"
@@ -71,7 +71,7 @@ class block_to_goal_fsm
  public:
   block_to_goal_fsm(csfsm::acquire_goal_fsm* goal_fsm,
                     csfsm::acquire_goal_fsm* block_fsm,
-                    crfootbot::footbot_saa_subsystem* saa,
+                    csubsystem::saa_subsystemQ3D* saa,
                     rmath::rng* rng);
   ~block_to_goal_fsm(void) override = default;
 

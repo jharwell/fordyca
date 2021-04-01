@@ -44,6 +44,10 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::foraging::block_dist {
+class base_distributor;
+} /* namespace cosm::foraging::block_dist */
+
 NS_START(fordyca, support);
 
 /*******************************************************************************
@@ -69,7 +73,9 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    * \param cache_dim Dimension of the cache (caches are square so can use a
    *                  scalar).
    */
-  base_cache_creator(cds::arena_grid* grid, rtypes::spatial_dist cache_dim);
+  base_cache_creator(cds::arena_grid* grid,
+                     const rtypes::spatial_dist& cache_dim,
+                     cfbd::base_distributor* block_distributor);
 
   base_cache_creator(const base_cache_creator&) = delete;
   base_cache_creator& operator=(const base_cache_creator&) = delete;
@@ -145,9 +151,10 @@ class base_cache_creator : public rer::client<base_cache_creator> {
                                  const cads::nest_vectorro& nests) const;
 
   /* clang-format off */
-  const rtypes::spatial_dist mc_cache_dim;
+  const rtypes::spatial_dist    mc_cache_dim;
 
-  cds::arena_grid*           m_grid;
+  cfbd::base_distributor*       m_block_distributor;
+  cds::arena_grid*              m_grid;
   /* clang-format on */
 };
 NS_END(support, fordyca);

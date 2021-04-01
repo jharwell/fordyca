@@ -24,7 +24,7 @@
 #include "fordyca/strategy/explore/ledtaxis.hpp"
 
 #include "cosm/arena/repr/light_type_index.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,7 +34,7 @@ NS_START(fordyca, strategy, explore);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-ledtaxis::ledtaxis(crfootbot::footbot_saa_subsystem* saa,
+ledtaxis::ledtaxis(csubsystem::saa_subsystemQ3D* saa,
                    const rutils::color& target,
                    rmath::rng* rng)
     : foraging_strategy(saa, rng),

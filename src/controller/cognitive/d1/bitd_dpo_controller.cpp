@@ -29,8 +29,8 @@
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/repr/config/nest_config.hpp"
-#include "cosm/robots/footbot/config/saa_xml_names.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/hal/subsystem/config/saa_xml_names.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/subsystem/config/sensing_subsystemQ3D_config.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
@@ -120,11 +120,11 @@ void bitd_dpo_controller::shared_init(
    * initialization in the base controller, and needs to happen here when we
    * have an XML repository with the correct configuration in it.
    */
-  using saa_names = crfootbot::config::saa_xml_names;
+  using saa_names = chsubsystem::config::saa_xml_names;
   auto sensing_p =
       config_repo.config_get<csubsystem::config::sensing_subsystemQ3D_config>();
   auto ground = chal::sensors::ground_sensor(
-      GetSensor<argos::CCI_FootBotMotorGroundSensor>(saa_names::ground_sensor),
+      GetSensor<chal::sensors::ground_sensor::impl_type>(saa_names::ground_sensor),
       &sensing_p->ground);
   saa()->sensing()->replace(ground);
 } /* shared_init() */

@@ -96,6 +96,7 @@ void d0_metrics_aggregator::collect_from_controller(const T* const controller) {
    * All d0 controllers provide these.
    */
   collect("spatial::movement", *controller);
+  collect("strategy::nest_acq", *controller->fsm());
   collect("fsm::interference_counts", *controller->fsm());
   collect("blocks::acq_counts", *controller);
   collect("blocks::transporter", *controller);

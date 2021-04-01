@@ -34,7 +34,7 @@
 #include "cosm/fsm/block_transporter.hpp"
 #include "cosm/metrics/config/output_config.hpp"
 #include "cosm/pal/argos_controller2D_adaptor.hpp"
-#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
+#include "cosm/subsystem/subsystem_fwd.hpp"
 #include "cosm/fsm/metrics/block_transporter_metrics.hpp"
 
 
@@ -147,10 +147,6 @@ class foraging_controller
     return &m_block_manip;
   }
   block_manip_recorder_type* block_manip_recorder(void) { return &m_block_manip; }
-
- protected:
-  class crfootbot::footbot_saa_subsystem* saa(void) RCPPSW_PURE;
-  const class crfootbot::footbot_saa_subsystem* saa(void) const RCPPSW_PURE;
 
  private:
   void

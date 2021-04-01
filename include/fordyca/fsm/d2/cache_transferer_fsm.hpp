@@ -58,7 +58,7 @@ NS_START(d2);
 class cache_transferer_fsm final : public block_to_goal_fsm {
  public:
   cache_transferer_fsm(const fsm_ro_params* c_params,
-                       crfootbot::footbot_saa_subsystem* saa,
+                       csubsystem::saa_subsystemQ3D* saa,
                        std::unique_ptr<csstrategy::base_strategy> exp_behavior,
                        rmath::rng* rng);
   ~cache_transferer_fsm(void) override = default;

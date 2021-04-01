@@ -79,7 +79,8 @@ void fordyca_pd_adaptor::pre_kill_cleanup(
         *it,
         rmath::dvec2zvec(foraging->rpos2D(), m_map->grid_resolution().v()),
         m_map->grid_resolution(),
-        carena::arena_map_locking::ekALL_HELD);
+        carena::arena_map_locking::ekALL_HELD,
+        true);
 
     adrop_op.visit(*m_map);
   }

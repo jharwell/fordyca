@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/fsm/d0/dpo_fsm.hpp"
 
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
 #include "fordyca/strategy/foraging_strategy.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
@@ -37,9 +37,9 @@ NS_START(fordyca, fsm, d0);
  * Constructors/Destructors
  ******************************************************************************/
 dpo_fsm::dpo_fsm(const fsm_ro_params* params,
-                 crfootbot::footbot_saa_subsystem* saa,
+                 csubsystem::saa_subsystemQ3D* saa,
                  std::unique_ptr<csstrategy::base_strategy> explore,
-                 std::unique_ptr<csstrategy::base_strategy> nest_acq,
+                 std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
                  rmath::rng* rng)
     : foraging_util_hfsm(saa, nullptr, rng, ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.d0.dpo"),

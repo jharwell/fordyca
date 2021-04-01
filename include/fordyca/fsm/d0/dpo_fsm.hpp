@@ -66,9 +66,9 @@ class dpo_fsm final : public cffsm::foraging_util_hfsm,
                       public cta::taskable {
  public:
   dpo_fsm(const fsm_ro_params * params,
-          crfootbot::footbot_saa_subsystem* saa,
+          csubsystem::saa_subsystemQ3D* saa,
           std::unique_ptr<csstrategy::base_strategy> explore,
-          std::unique_ptr<csstrategy::base_strategy> nest_acq,
+          std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
           rmath::rng* rng);
   ~dpo_fsm(void) override = default;
   dpo_fsm(const dpo_fsm&) = delete;

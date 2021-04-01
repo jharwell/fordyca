@@ -31,7 +31,7 @@
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 #include "cosm/spatial/metrics/interference_metrics.hpp"
 #include "cosm/fsm/block_transporter.hpp"
-#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
+#include "cosm/subsystem/subsystem_fwd.hpp"
 #include "cosm/fsm/metrics/block_transporter_metrics.hpp"
 
 #include "fordyca/fsm/foraging_transport_goal.hpp"
@@ -69,9 +69,9 @@ class crw_fsm final : public cffsm::foraging_util_hfsm,
                       public cfsm::metrics::block_transporter_metrics,
                       public cta::taskable {
  public:
-  crw_fsm(crfootbot::footbot_saa_subsystem* saa,
+  crw_fsm(csubsystem::saa_subsystemQ3D* saa,
           std::unique_ptr<csstrategy::base_strategy> explore,
-          std::unique_ptr<csstrategy::base_strategy> nest_acq,
+          std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
           const rmath::vector2d& nest_loc,
           rmath::rng* rng);
 

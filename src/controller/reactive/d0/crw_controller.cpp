@@ -28,7 +28,7 @@
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/repr/config/nest_config.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/spatial/strategy/nest_acq/factory.hpp"
 
 #include "fordyca/config/foraging_controller_repository.hpp"

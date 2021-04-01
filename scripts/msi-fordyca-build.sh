@@ -47,7 +47,8 @@ cd $REPO_ROOT/fordyca/build
 
 cmake -DCMAKE_BUILD_TYPE=OPT\
       -DLIBRA_ER=NONE\
-      -DCOSM_BUILD_FOR=MSI\
+      -DCOSM_BUILD_FOR=ARGOS_FOOTBOT\
+      -DCOSM_BUILD_ENV=MSI\
       ..
 make -j $N_CORES
 

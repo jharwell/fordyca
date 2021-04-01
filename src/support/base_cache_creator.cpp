@@ -32,6 +32,7 @@
 #include "cosm/foraging/repr/block_cluster.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/repr/nest.hpp"
+#include "cosm/foraging/block_dist/base_distributor.hpp"
 
 #include "fordyca/events/cell2D_empty.hpp"
 
@@ -45,9 +46,11 @@ using cds::arena_grid;
  * Constructors/Destructor
  ******************************************************************************/
 base_cache_creator::base_cache_creator(cds::arena_grid* const grid,
-                                       rtypes::spatial_dist cache_dim)
+                                       const rtypes::spatial_dist& cache_dim,
+                                       cfbd::base_distributor* block_distributor)
     : ER_CLIENT_INIT("fordyca.support.base_cache_creator"),
       mc_cache_dim(cache_dim),
+      m_block_distributor(block_distributor),
       m_grid(grid) {}
 
 /*******************************************************************************
@@ -100,7 +103,7 @@ base_cache_creator::create_single_cache(const rmath::vector2d& center,
   }
 
   /*
-   * Blocks have not been distributed yet, so nothing to do.
+   * If blocks have not been distributed yet, nothing to do.
    */
   if (!pre_dist) {
     ER_INFO("Clearing host cells and block extents for %zu blocks",
@@ -112,11 +115,12 @@ base_cache_creator::create_single_cache(const rmath::vector2d& center,
      * need to grab them in a non-concurrent context.
      */
     for (auto& block : blocks) {
-      ER_DEBUG("Clearing block%d host cell@%s and extents: x=%s,y=%s",
+      ER_DEBUG("Clearing block%d host cell@%s,extents: x=%s,y=%s, removing from cluster",
                block->id().v(),
                rcppsw::to_string(block->danchor2D()).c_str(),
                rcppsw::to_string(block->xdspan()).c_str(),
                rcppsw::to_string(block->ydspan()).c_str());
+
       /* Mark block host cell as empty */
       events::cell2D_empty_visitor cell_op(block->danchor2D());
       cell_op.visit(m_grid->access<arena_grid::kCell>(block->danchor2D()));
@@ -124,6 +128,10 @@ base_cache_creator::create_single_cache(const rmath::vector2d& center,
       /* Clear block extent */
       caops::block_extent_clear_visitor block_op(block);
       block_op.visit(*m_grid);
+
+      /* update parent block cluster with the "pickup" */
+      m_block_distributor->cluster_update_after_pickup(block,
+                                                       block->danchor2D());
     } /* for(block..) */
   }
 
@@ -131,12 +139,18 @@ base_cache_creator::create_single_cache(const rmath::vector2d& center,
    * Loop through all blocks and deposit them in the cache host cell, which
    * will be in the HAS_CACHE state after this loop, but will not yet have a
    * cache as its entity.
+   *
+   * We do NOT update block clusters if this cache happens to be in the middle
+   * of one (e.g., random distributions), because if a block is in a cache, it
+   * can't be in a cluster. We are creating a cache, so all the specificied
+   * blocks will be in it, and therefore not part of a cache.
    */
   for (auto& block : blocks) {
     caops::free_block_drop_visitor op(block,
                                       dcenter,
                                       m_grid->resolution(),
-                                      carena::arena_map_locking::ekALL_HELD);
+                                      carena::arena_map_locking::ekALL_HELD,
+                                      false);
     op.visit(m_grid->access<arena_grid::kCell>(op.coord()));
     op.visit(*block);
   } /* for(block..) */

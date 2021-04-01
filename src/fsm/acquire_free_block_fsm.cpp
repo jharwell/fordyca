@@ -24,9 +24,9 @@
 #include "fordyca/fsm/acquire_free_block_fsm.hpp"
 
 #include "cosm/repr/base_block3D.hpp"
-#include "cosm/robots/footbot/footbot_actuation_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+#include "cosm/subsystem/actuation_subsystem2D.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 
 #include "fordyca/controller/cognitive/block_selector.hpp"
 #include "fordyca/ds/dpo_store.hpp"
@@ -44,7 +44,7 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 acquire_free_block_fsm::acquire_free_block_fsm(
     const fsm_ro_params* c_params,
-    crfootbot::footbot_saa_subsystem* saa,
+    csubsystem::saa_subsystemQ3D* saa,
     std::unique_ptr<csstrategy::base_strategy> exp_behavior,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_free_block"),
@@ -85,8 +85,7 @@ acquire_free_block_fsm::acquire_free_block_fsm(
  * Member Functions
  ******************************************************************************/
 bool acquire_free_block_fsm::block_exploration_term_cb(void) const {
-  return saa()->sensing()->sensor<chal::sensors::ground_sensor>()->detect("bloc"
-                                                                          "k");
+  return saa()->sensing()->ground()->detect("block");
 } /* block_exploration_term_cb() */
 
 bool acquire_free_block_fsm::block_acquired_cb(bool explore_result) const {
@@ -95,8 +94,7 @@ bool acquire_free_block_fsm::block_acquired_cb(bool explore_result) const {
               "No block detected after successful exploration?");
     return true;
   } else {
-    if (saa()->sensing()->sensor<chal::sensors::ground_sensor>()->detect("bloc"
-                                                                         "k")) {
+    if (saa()->sensing()->ground()->detect("block")) {
       return true;
     }
     ER_WARN("Robot arrived at goal, but no block was detected.");

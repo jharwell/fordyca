@@ -16,12 +16,12 @@
   <!-- *************** -->
   <controllers>
 
-    <crw_controller id="ffc"
+    <crw_controller id="fbc"
                           library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
         <!-- <leds implementation="default" medium="leds" /> -->
-        <range_and_bearing implementation="default" />
+        <!-- <range_and_bearing implementation="default" /> -->
       </actuators>
       <sensors>
         <differential_steering implementation="default" />
@@ -236,6 +236,7 @@
             tv_population="tv-population"
             block_distributor="block-distributor"
             block_motion="block-motion"
+            nest_acq_strategy="nest-acq-strategy"
             block_clusters="block-clusters"
             tv_environment="tv-environment"/>
 
@@ -342,7 +343,7 @@
               n_clusters="10"
               />
           <manifest
-              n_cube="50"
+              n_cube="300"
               n_ramp="0"
               unit_dim="0.2"
               />
@@ -396,9 +397,9 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,10,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="16" max_trials="1000">
+      <entity quantity="1" max_trials="1000">
         <foot-bot id="fb" omnidirectional_camera_aperture="89">
-          <controller config="ffc" />
+          <controller config="fbc" />
           <!-- <battery model= "time_motion"/> -->
         </foot-bot>
       </entity>
@@ -411,6 +412,8 @@
   <!-- ******************* -->
   <physics_engines>
     <dynamics2d id="dyn2d0">
+      <!-- <gravity g="10"/> -->
+      <!-- <floor height="0.01" friction="0.05"/> -->
       <!--  <boundaries> -->
       <!--     <top height="1" /> -->
       <!--     <bottom height="0" /> -->
@@ -444,9 +447,9 @@
     <led id="leds" />
   </media>
 
-  ******************
-  * Visualization *
-  ******************
+  <!-- ****************** -->
+  <!-- * Visualization * -->
+  <!-- ****************** -->
   <visualization>
     <qt-opengl autoplay="false">
        <!-- <frame_grabbing directory="frames" -->

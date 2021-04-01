@@ -10,8 +10,7 @@ Usage: $0 [--rroot <dir>]
 -h|--help: Show this message.
 
 This script clones the necessary dependencies for the project from
-scratch, targeting the MSI cluster it is run on. MUST be run from a
-login node (NOT a cluster node).
+scratch, targeting the MSI cluster it is run on.
 
 EOF
     exit 1
@@ -52,6 +51,13 @@ git clone https://github.com/stevengj/nlopt.git
 if [ -d argos3 ]; then rm -rf argos3; fi
 git clone https://github.com/swarm-robotics/argos3.git
 cd argos3
+git checkout devel
+cd ..
+
+# Next, ARGoS epuck
+if [ -d argos3-eepuck3D ]; then rm -rf argos3-eepuck3D; fi
+git clone https://github.com/swarm-robotics/argos3-eepuck3D.git
+cd argos3-eepuck3D
 git checkout devel
 cd ..
 

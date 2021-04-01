@@ -79,9 +79,9 @@ class cached_block_to_nest_fsm final : public cffsm::foraging_util_hfsm,
  public:
   cached_block_to_nest_fsm(
       const fsm_ro_params* c_params,
-      crfootbot::footbot_saa_subsystem* saa,
+      csubsystem::saa_subsystemQ3D* saa,
       std::unique_ptr<csstrategy::base_strategy> explore,
-      std::unique_ptr<csstrategy::base_strategy> nest_acq,
+      std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
       rmath::rng *rng);
   ~cached_block_to_nest_fsm(void) override = default;
 

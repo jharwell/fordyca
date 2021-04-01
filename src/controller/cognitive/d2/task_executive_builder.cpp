@@ -32,7 +32,7 @@
 #include "cosm/ta/config/task_executive_config.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
 #include "cosm/spatial/strategy/nest_acq/factory.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
 #include "fordyca/config/d2/controller_repository.hpp"
 #include "fordyca/config/strategy/strategy_config.hpp"
@@ -60,7 +60,7 @@ NS_START(fordyca, controller, cognitive, d2);
 task_executive_builder::task_executive_builder(
     const controller::cognitive::block_sel_matrix* bsel_matrix,
     const controller::cognitive::cache_sel_matrix* csel_matrix,
-    crfootbot::footbot_saa_subsystem* const saa,
+    csubsystem::saa_subsystemQ3D* const saa,
     foraging_perception_subsystem* const perception)
     : d1::task_executive_builder(bsel_matrix, csel_matrix, saa, perception),
       ER_CLIENT_INIT("fordyca.controller.d2.task_executive_builder") {}

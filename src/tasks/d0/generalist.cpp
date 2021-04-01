@@ -23,7 +23,7 @@ v * \file generalist.cpp
  ******************************************************************************/
 #include "fordyca/tasks/d0/generalist.hpp"
 
-#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 
 #include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/robot_free_block_pickup.hpp"

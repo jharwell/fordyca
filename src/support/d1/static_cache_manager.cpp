@@ -86,6 +86,7 @@ static_cache_manager::create(const cache_create_ro_params& c_params,
       checker::odd_dsize(arena_map()->grid_resolution(), even_multiple);
 
   static_cache_creator creator(&arena_map()->decoratee(),
+                               arena_map()->block_distributor(),
                                mc_cache_locs,
                                odd_dsize);
 

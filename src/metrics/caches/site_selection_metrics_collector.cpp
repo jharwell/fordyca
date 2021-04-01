@@ -73,7 +73,7 @@ void site_selection_metrics_collector::reset(void) {
 
 boost::optional<std::string>
 site_selection_metrics_collector::csv_line_build(void) {
-  if (!(timestep() % interval() == 0)) {
+  if (!(timestep() % interval() == 0UL)) {
     return boost::none;
   }
   std::string line;

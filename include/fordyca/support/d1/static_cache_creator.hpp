@@ -52,6 +52,7 @@ class static_cache_creator : public base_cache_creator,
                              public rer::client<static_cache_creator> {
  public:
   static_cache_creator(cds::arena_grid* grid,
+                       cfbd::base_distributor* block_distributor,
                        const std::vector<rmath::vector2d>& centers,
                        const rtypes::spatial_dist& cache_dim);
   ~static_cache_creator(void) override = default;

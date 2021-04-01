@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <memory>
 
-#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
+#include "cosm/subsystem/subsystem_fwd.hpp"
 #include "cosm/spatial/fsm/acquire_goal_fsm.hpp"
 #include "cosm/ta/taskable.hpp"
 
@@ -68,7 +68,7 @@ class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
                                public csfsm::acquire_goal_fsm {
  public:
   acquire_free_block_fsm(const fsm_ro_params* c_params,
-                         crfootbot::footbot_saa_subsystem* saa,
+                         csubsystem::saa_subsystemQ3D* saa,
                          std::unique_ptr<csstrategy::base_strategy> exp_behavior,
                          rmath::rng* rng);
 

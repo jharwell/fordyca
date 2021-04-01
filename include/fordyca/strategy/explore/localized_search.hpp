@@ -55,7 +55,7 @@ class localized_search : public foraging_strategy,
                    rmath::rng* rng)
       : localized_search(c_params->saa, rng) {}
 
-  localized_search(crfootbot::footbot_saa_subsystem* saa, rmath::rng* rng);
+  localized_search(csubsystem::saa_subsystemQ3D* saa, rmath::rng* rng);
 
   ~localized_search(void) override = default;
   localized_search(const localized_search&) = delete;

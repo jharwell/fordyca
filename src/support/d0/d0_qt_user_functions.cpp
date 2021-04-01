@@ -45,14 +45,14 @@ NS_START(fordyca, support, d0);
  * Constructors/Destructor
  ******************************************************************************/
 d0_qt_user_functions::d0_qt_user_functions(void) {
-  RegisterUserFunction<d0_qt_user_functions, argos::CFootBotEntity>(
+  RegisterUserFunction<d0_qt_user_functions, chal::robot>(
       &d0_qt_user_functions::Draw);
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void d0_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
+void d0_qt_user_functions::Draw(chal::robot& c_entity) {
   auto* mdpo = dynamic_cast<const controller::cognitive::d0::mdpo_controller*>(
       &c_entity.GetControllableEntity().GetController());
   auto* base = dynamic_cast<const controller::foraging_controller*>(

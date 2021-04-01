@@ -43,7 +43,9 @@ NS_START(fordyca, support, d2);
  ******************************************************************************/
 dynamic_cache_creator::dynamic_cache_creator(const params* const p,
                                              rmath::rng* rng)
-    : base_cache_creator(&p->map->decoratee(), p->cache_dim),
+    : base_cache_creator(&p->map->decoratee(),
+                         p->cache_dim,
+                         p->map->block_distributor()),
       ER_CLIENT_INIT("fordyca.support.d2.dynamic_cache_creator"),
       mc_strict_constraints(p->strict_constraints),
       mc_min_blocks(p->min_blocks),

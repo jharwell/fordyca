@@ -53,7 +53,7 @@ class ledtaxis_cache_search : public foraging_strategy,
       : ledtaxis_cache_search(c_params->saa,
                               c_params->ledtaxis_target,
                               rng) {}
-  ledtaxis_cache_search(crfootbot::footbot_saa_subsystem* saa,
+  ledtaxis_cache_search(csubsystem::saa_subsystemQ3D* saa,
                         const rutils::color& ledtaxis_target,
                         rmath::rng* rng)
       : foraging_strategy(saa, rng),

@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/tasks/d1/harvester.hpp"
 
-#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 #include "cosm/ta/config/task_alloc_config.hpp"
 
 #include "fordyca/events/block_found.hpp"

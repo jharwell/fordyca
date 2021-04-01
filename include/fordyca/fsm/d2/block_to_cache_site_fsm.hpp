@@ -55,7 +55,7 @@ class block_to_cache_site_fsm final : public block_to_goal_fsm,
                                       public virtual metrics::caches::site_selection_metrics {
  public:
   block_to_cache_site_fsm(const fsm_ro_params* c_params,
-                          crfootbot::footbot_saa_subsystem* saa,
+                          csubsystem::saa_subsystemQ3D* saa,
                           std::unique_ptr<csstrategy::base_strategy> exp_behavior,
                           rmath::rng* rng);
 

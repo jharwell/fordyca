@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/tasks/d1/collector.hpp"
 
-#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/robot_cached_block_pickup.hpp"

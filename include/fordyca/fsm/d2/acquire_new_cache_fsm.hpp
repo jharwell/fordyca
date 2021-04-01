@@ -28,7 +28,7 @@
 
 #include "cosm/spatial/fsm/acquire_goal_fsm.hpp"
 #include "fordyca/fordyca.hpp"
-#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
+#include "cosm/subsystem/subsystem_fwd.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
 
 /*******************************************************************************
@@ -64,7 +64,7 @@ class acquire_new_cache_fsm final : public rer::client<acquire_new_cache_fsm>,
                               public csfsm::acquire_goal_fsm {
  public:
   acquire_new_cache_fsm(const fsm_ro_params* c_params,
-                        crfootbot::footbot_saa_subsystem* saa,
+                        csubsystem::saa_subsystemQ3D* saa,
                         std::unique_ptr<csstrategy::base_strategy> exp_behavior,
                         rmath::rng* rng);
   ~acquire_new_cache_fsm(void) override = default;

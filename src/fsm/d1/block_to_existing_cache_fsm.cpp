@@ -39,7 +39,7 @@ NS_START(fordyca, fsm, d1);
  ******************************************************************************/
 block_to_existing_cache_fsm::block_to_existing_cache_fsm(
     const fsm_ro_params* const c_params,
-    crfootbot::footbot_saa_subsystem* saa,
+    csubsystem::saa_subsystemQ3D* saa,
     rmath::rng* rng)
     : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, saa, rng),
       m_cache_fsm(

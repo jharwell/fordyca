@@ -47,7 +47,7 @@ class d1_qt_user_functions : public d0::d0_qt_user_functions {
   d1_qt_user_functions(void);
   ~d1_qt_user_functions(void) override = default;
 
-  void Draw(argos::CFootBotEntity& c_entity);
+  void Draw(chal::robot& c_entity);
 };
 
 NS_END(d1, support, fordyca);

@@ -139,7 +139,7 @@ class d2_loop_functions final : public d1::d1_loop_functions,
    *
    * - Set its new position, time, LOS from ARGoS.
    */
-  void robot_pre_step(argos::CFootBotEntity& robot);
+  void robot_pre_step(chal::robot& robot);
 
   /**
    * \brief Process a single robot on a timestep, after running its controller:
@@ -147,7 +147,7 @@ class d2_loop_functions final : public d1::d1_loop_functions,
    * - Have  it interact with the environment.
    * - Collect metrics from it.
    */
-  void robot_post_step(argos::CFootBotEntity& robot);
+  void robot_post_step(chal::robot& robot);
 
   /* clang-format off */
   std::mutex                                 m_dynamic_cache_mtx{};

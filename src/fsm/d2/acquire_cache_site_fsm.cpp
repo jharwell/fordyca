@@ -24,7 +24,7 @@
 #include "fordyca/fsm/d2/acquire_cache_site_fsm.hpp"
 
 #include "cosm/repr/base_block3D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
@@ -42,7 +42,7 @@ NS_START(fordyca, fsm, d2);
  ******************************************************************************/
 acquire_cache_site_fsm::acquire_cache_site_fsm(
     const fsm_ro_params* c_params,
-    crfootbot::footbot_saa_subsystem* saa,
+    csubsystem::saa_subsystemQ3D* saa,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.d2.acquire_cache_site"),
       acquire_goal_fsm(

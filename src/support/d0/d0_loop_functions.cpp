@@ -21,14 +21,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-/*
- * This is needed because without it boost instantiates static assertions that
- * verify that every possible handler<controller> instantiation is valid, which
- * includes checking for d1 controllers being valid for new cache drop/cache
- * site drop events. These will not happen in reality (or shouldn't), and if
- * they do it's 100% OK to crash with an exception.
- */
-#define BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT
 #include "fordyca/support/d0/d0_loop_functions.hpp"
 
 #include <boost/mpl/for_each.hpp>
@@ -185,7 +177,7 @@ void d0_loop_functions::private_init(void) {
    * threads are not set up yet so doing dynamicaly causes a deadlock. Also, it
    * only happens once, so it doesn't really matter if it is slow.
    */
-  cpal::argos_swarm_iterator::controllers<argos::CFootBotEntity,
+  cpal::argos_swarm_iterator::controllers<chal::robot,
                                           controller::foraging_controller,
                                           cpal::iteration_order::ekSTATIC>(
       this, cb, kARGoSRobotType);
@@ -198,11 +190,10 @@ void d0_loop_functions::pre_step(void) {
   ndc_push();
   base_loop_functions::pre_step();
   ndc_pop();
-
   /* Process all robots */
   auto cb = [&](argos::CControllableEntity* robot) {
     ndc_push();
-    robot_pre_step(dynamic_cast<argos::CFootBotEntity&>(robot->GetParent()));
+    robot_pre_step(dynamic_cast<chal::robot&>(robot->GetParent()));
     ndc_pop();
   };
   cpal::argos_swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
@@ -216,7 +207,7 @@ void d0_loop_functions::post_step(void) {
   /* Process all robots: interact with environment then collect metrics */
   auto cb = [&](argos::CControllableEntity* robot) {
     ndc_push();
-    robot_post_step(dynamic_cast<argos::CFootBotEntity&>(robot->GetParent()));
+    robot_post_step(dynamic_cast<chal::robot&>(robot->GetParent()));
     ndc_pop();
   };
   cpal::argos_swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
@@ -270,7 +261,7 @@ void d0_loop_functions::reset(void) {
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-void d0_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
+void d0_loop_functions::robot_pre_step(chal::robot& robot) {
   auto* controller = static_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
 
@@ -293,7 +284,7 @@ void d0_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
                        m_los_update_map->at(controller->type_index()));
 } /* robot_pre_step() */
 
-void d0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
+void d0_loop_functions::robot_post_step(chal::robot& robot) {
   auto controller = static_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
   /*

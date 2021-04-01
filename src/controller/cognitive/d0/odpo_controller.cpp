@@ -25,7 +25,7 @@
 
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/repr/base_block3D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
 #include "fordyca/controller/cognitive/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/cognitive/oracular_info_receptor.hpp"

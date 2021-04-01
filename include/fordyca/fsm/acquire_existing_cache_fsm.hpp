@@ -32,6 +32,7 @@
 #include "rcppsw/types/type_uuid.hpp"
 
 #include "cosm/spatial/fsm/acquire_goal_fsm.hpp"
+#include "cosm/subsystem/subsystem_fwd.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
@@ -39,10 +40,6 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::robots::footbot {
-class footbot_saa_subsystem;
-} /* namespace cosm::robots::footbot */
-
 NS_START(fordyca);
 
 namespace controller::cognitive {
@@ -79,7 +76,7 @@ class acquire_existing_cache_fsm : public rer::client<acquire_existing_cache_fsm
    */
   acquire_existing_cache_fsm(
       const fsm_ro_params* c_params,
-      crfootbot::footbot_saa_subsystem* saa,
+      csubsystem::saa_subsystemQ3D* saa,
       std::unique_ptr<csstrategy::base_strategy> exp_behavior,
       rmath::rng* rng,
       bool for_pickup);

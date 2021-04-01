@@ -15,8 +15,7 @@ Usage: $0 [--rroot <dir>] [--bbranch <branch>] [--fbranch <branch>]
 -h|--help: Show this message.
 
 This script clones the necessary dependencies for the FORDYCA project
-from scratch, targeting the MSI cluster it is run on. MUST be run from
-a cluster node (NOT a login node).
+from scratch, targeting the MSI cluster it is run on.
 
 EOF
     exit 1

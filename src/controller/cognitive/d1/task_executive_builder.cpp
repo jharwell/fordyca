@@ -28,8 +28,7 @@
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/arena/repr/light_type_index.hpp"
 #include "cosm/repr/base_block3D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/ta/bi_tdgraph_allocator.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/config/task_alloc_config.hpp"
@@ -63,7 +62,7 @@ NS_START(fordyca, controller, cognitive, d1);
 task_executive_builder::task_executive_builder(
     const controller::cognitive::block_sel_matrix* bsel_matrix,
     const controller::cognitive::cache_sel_matrix* csel_matrix,
-    crfootbot::footbot_saa_subsystem* const saa,
+    csubsystem::saa_subsystemQ3D* const saa,
     foraging_perception_subsystem* const perception)
     : ER_CLIENT_INIT("fordyca.controller.d1.task_executive_builder"),
       mc_csel_matrix(csel_matrix),

@@ -36,9 +36,10 @@ using carepr::base_cache;
  ******************************************************************************/
 static_cache_creator::static_cache_creator(
     cds::arena_grid* const grid,
+    cfbd::base_distributor* block_distributor,
     const std::vector<rmath::vector2d>& centers,
     const rtypes::spatial_dist& cache_dim)
-    : base_cache_creator(grid, cache_dim),
+    : base_cache_creator(grid, cache_dim, block_distributor),
       ER_CLIENT_INIT("fordyca.support.d1.static_cache_creator"),
       mc_centers(centers) {}
 

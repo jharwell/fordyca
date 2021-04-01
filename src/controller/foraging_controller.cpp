@@ -33,13 +33,13 @@
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/metrics/config/output_config.hpp"
 #include "cosm/repr/base_block3D.hpp"
-#include "cosm/robots/footbot/config/saa_xml_names.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/steer2D/config/force_calculator_config.hpp"
 #include "cosm/subsystem/config/actuation_subsystem2D_config.hpp"
 #include "cosm/subsystem/config/sensing_subsystemQ3D_config.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/tv/robot_dynamics_applicator.hpp"
+#include "cosm/hal/subsystem/config/saa_xml_names.hpp"
 
 #include "fordyca/config/foraging_controller_repository.hpp"
 
@@ -129,77 +129,76 @@ void foraging_controller::output_init(const cmconfig::output_config* outputp) {
 void foraging_controller::saa_init(
     const csubsystem::config::actuation_subsystem2D_config* actuation_p,
     const csubsystem::config::sensing_subsystemQ3D_config* sensing_p) {
-  using saa_names = crfootbot::config::saa_xml_names;
+  using saa_names = chsubsystem::config::saa_xml_names;
 
-#ifdef FORDYCA_WITH_FOOTBOT_RAB
-  /* auto rabs = chal::sensors::wifi_sensor( */
-  /*     GetSensor<argos::CCI_RangeAndBearingSensor>(saa_names::rab_saa)); */
+#if defined(FORDYCA_WITH_ROBOT_RAB) && (COSM_HAL_TARGET == COSM_HAL_TARGET_ARGOS_FOOTBOT)
+  auto rabs = chsensors::wifi_sensor(
+      GetSensor<chsensors::wifi_sensor::impl_type>(saa_names::rab_saa));
   auto rabs = nullptr;
-#else
-  auto rabs = chal::sensors::wifi_sensor(nullptr);
-#endif /* FORDYCA_WITH_FOOTBOT_RAB */
+#endif /* FORDYCA_WITH_ROBOT_RAB */
 
-#ifdef FORDYCA_WITH_FOOTBOT_BATTERY
-  auto battery = chal::sensors::battery_sensor(
-      GetSensor<argos::CCI_BatterySensor>(saa_names::battery_sensor));
-#else
-  auto battery = chal::sensors::battery_sensor(nullptr);
-#endif /* FORDYCA_WITH_FOOTBOT_BATTERY */
+#if defined(FORDYCA_WITH_ROBOT_BATTERY) && (COSM_HAL_TARGET == COSM_HAL_TARGET_ARGOS_FOOTBOT)
+  auto battery = chsensors::battery_sensor(
+      GetSensor<chsensors::battery_sensor::impl_type>(saa_names::battery_sensor));
+#endif /* FORDYCA_WITH_ROBOT_BATTERY */
 
-#ifdef FORDYCA_WITH_FOOTBOT_CAMERA
-  auto blobs = chal::sensors::colored_blob_camera_sensor(
-      GetSensor<argos::CCI_ColoredBlobOmnidirectionalCameraSensor>(
+#ifdef FORDYCA_WITH_ROBOT_CAMERA
+  auto blobs = chsensors::colored_blob_camera_sensor(
+      GetSensor<chsensors::colored_blob_camera_sensor::impl_type>(
           saa_names::camera_sensor));
 #else
-  auto blobs = chal::sensors::colored_blob_camera_sensor(nullptr);
+  auto blobs = chsensors::colored_blob_camera_sensor(nullptr);
 #endif
 
-  auto position = chal::sensors::position_sensor(
-      GetSensor<argos::CCI_PositioningSensor>(saa_names::position_sensor));
-  auto proximity = chal::sensors::proximity_sensor(
-      GetSensor<argos::CCI_FootBotProximitySensor>(saa_names::prox_sensor),
+  auto position = chsensors::position_sensor(
+      GetSensor<chsensors::position_sensor::impl_type>(saa_names::position_sensor));
+  auto proximity = chsensors::proximity_sensor(
+      GetSensor<chsensors::proximity_sensor::impl_type>(saa_names::prox_sensor),
       &sensing_p->proximity);
-  auto light = chal::sensors::light_sensor(
-      GetSensor<argos::CCI_FootBotLightSensor>(saa_names::light_sensor));
-  auto ground = chal::sensors::ground_sensor(
-      GetSensor<argos::CCI_FootBotMotorGroundSensor>(saa_names::ground_sensor),
+  auto light = chsensors::light_sensor(
+      GetSensor<chsensors::light_sensor::impl_type>(saa_names::light_sensor));
+  auto ground = chsensors::ground_sensor(
+      GetSensor<chsensors::ground_sensor::impl_type>(saa_names::ground_sensor),
       &sensing_p->ground);
 
-  auto diff_drives = chal::sensors::diff_drive_sensor(
-      GetSensor<argos::CCI_DifferentialSteeringSensor>(
+  auto diff_drives = chsensors::diff_drive_sensor(
+      GetSensor<chsensors::diff_drive_sensor::impl_type>(
           saa_names::diff_steering_saa));
 
   auto sensors = csubsystem::sensing_subsystemQ3D::sensor_map{
+#if defined(FORDYCA_WITH_ROBOT_RAB) && (COSM_HAL_TARGET == COSM_HAL_TARGET_ARGOS_FOOTBOT)
     csubsystem::sensing_subsystemQ3D::map_entry_create(rabs),
+#endif
+
+#if defined(FORDYCA_WITH_ROBOT_BATTERY) && (COSM_HAL_TARGET == COSM_HAL_TARGET_ARGOS_FOOTBOT)
     csubsystem::sensing_subsystemQ3D::map_entry_create(battery),
+#endif
     csubsystem::sensing_subsystemQ3D::map_entry_create(proximity),
     csubsystem::sensing_subsystemQ3D::map_entry_create(blobs),
     csubsystem::sensing_subsystemQ3D::map_entry_create(light),
     csubsystem::sensing_subsystemQ3D::map_entry_create(ground),
-    csubsystem::sensing_subsystemQ3D::map_entry_create(diff_drives)
+    csubsystem::sensing_subsystemQ3D::map_entry_create(diff_drives),
+    csubsystem::sensing_subsystemQ3D::map_entry_create(position)
   };
 
   auto diff_drivea = ckin2D::governed_diff_drive(
       &actuation_p->diff_drive,
-      chal::actuators::diff_drive_actuator(
-          GetActuator<argos::CCI_DifferentialSteeringActuator>(
+      chactuators::diff_drive_actuator(
+          GetActuator<chactuators::diff_drive_actuator::impl_type>(
               saa_names::diff_steering_saa)),
       ckin2D::governed_diff_drive::drive_type::ekFSM_DRIVE);
 
-#ifdef FORDYCA_WITH_FOOTBOT_LEDS
-  auto leds = chal::actuators::led_actuator(
-      GetActuator<argos::CCI_LEDsActuator>(saa_names::leds_saa));
+#ifdef FORDYCA_WITH_ROBOT_LEDS
+  auto leds = chactuators::led_actuator(
+      GetActuator<chactuators::led_actuator::impl_type>(saa_names::leds_saa));
 #else
-  auto leds = chal::actuators::led_actuator(nullptr);
-#endif /* FORDYCA_WITH_FOOTBOT_LEDS */
+  auto leds = chactuators::led_actuator(nullptr);
+#endif /* FORDYCA_WITH_ROBOT_LEDS */
 
-#ifdef FORDYCA_WITH_FOOTBOT_RAB
-  auto raba = chal::actuators::wifi_actuator(
-      GetActuator<argos::CCI_RangeAndBearingActuator>(saa_names::rab_saa));
-
-#else
-  auto raba = chal::actuators::wifi_actuator(nullptr);
-#endif /* FORDYCA_WITH_FOOTBOT_RABS */
+#if defined(FORDYCA_WITH_ROBOT_RAB) && (COSM_HAL_TARGET == COSM_HAL_TARGET_ARGOS_FOOTBOT)
+  auto raba = chactuators::wifi_actuator(
+      GetActuator<chactuators::wifi_actuator::impl_type>(saa_names::rab_saa));
+#endif /* FORDYCA_WITH_ROBOT_RAB */
 
   auto actuators = csubsystem::actuation_subsystem2D::actuator_map{
     /*
@@ -210,11 +209,15 @@ void foraging_controller::saa_init(
      */
     csubsystem::actuation_subsystem2D::map_entry_create(diff_drivea),
     csubsystem::actuation_subsystem2D::map_entry_create(leds),
+
+#if defined(FORDYCA_WITH_ROBOT_RAB) && (COSM_HAL_TARGET == COSM_HAL_TARGET_ARGOS_FOOTBOT)
     csubsystem::actuation_subsystem2D::map_entry_create(raba)
+#endif
   };
 
-  base_controller2D::saa(std::make_unique<crfootbot::footbot_saa_subsystem>(
-      position, sensors, actuators, &actuation_p->steering));
+  base_controller2D::saa(std::make_unique<csubsystem::saa_subsystemQ3D>(sensors,
+                                                                        actuators,
+                                                                        &actuation_p->steering));
 } /* saa_init() */
 
 rtypes::type_uuid foraging_controller::entity_id(void) const {
@@ -235,15 +238,6 @@ void foraging_controller::irv_init(const ctv::robot_dynamics_applicator* rda) {
         rda->bc_throttler(entity_id()));
   }
 } /* irv_init() */
-
-class crfootbot::footbot_saa_subsystem* foraging_controller::saa(void) {
-  return static_cast<crfootbot::footbot_saa_subsystem*>(base_controller2D::saa());
-}
-const class crfootbot::footbot_saa_subsystem*
-foraging_controller::saa(void) const {
-  return static_cast<const crfootbot::footbot_saa_subsystem*>(
-      base_controller2D::saa());
-}
 
 /*******************************************************************************
  * Movement Metrics

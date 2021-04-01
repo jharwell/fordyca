@@ -30,7 +30,7 @@
 
 #include "fordyca/fordyca.hpp"
 #include "rcppsw/er/client.hpp"
-#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
+#include "cosm/subsystem/subsystem_fwd.hpp"
 #include "rcppsw/math/rng.hpp"
 
 /*******************************************************************************
@@ -74,7 +74,7 @@ class task_executive_builder : public rer::client<task_executive_builder> {
  public:
   task_executive_builder(const controller::cognitive::block_sel_matrix* bsel_matrix,
                       const controller::cognitive::cache_sel_matrix* csel_matrix,
-                      crfootbot::footbot_saa_subsystem* saa,
+                      csubsystem::saa_subsystemQ3D* saa,
                       foraging_perception_subsystem* perception) RCPPSW_COLD;
 
   ~task_executive_builder(void) override RCPPSW_COLD;
@@ -91,7 +91,7 @@ class task_executive_builder : public rer::client<task_executive_builder> {
   RCPPSW_COLD const foraging_perception_subsystem* perception(void) const { return m_perception; }
   RCPPSW_COLD foraging_perception_subsystem* perception(void) { return m_perception; }
 
-  RCPPSW_COLD crfootbot::footbot_saa_subsystem* saa(void) const {
+  RCPPSW_COLD csubsystem::saa_subsystemQ3D* saa(void) const {
     return m_saa;
   }
 
@@ -124,7 +124,7 @@ class task_executive_builder : public rer::client<task_executive_builder> {
   const controller::cognitive::cache_sel_matrix* const mc_csel_matrix;
   const controller::cognitive::block_sel_matrix* const mc_bsel_matrix;
 
-  crfootbot::footbot_saa_subsystem* const              m_saa;
+  csubsystem::saa_subsystemQ3D* const              m_saa;
   foraging_perception_subsystem* const                 m_perception;
 
   /* clang-format on */

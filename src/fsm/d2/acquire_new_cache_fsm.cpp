@@ -24,7 +24,7 @@
 #include "fordyca/fsm/d2/acquire_new_cache_fsm.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
 #include "fordyca/controller/cognitive/d2/new_cache_selector.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
@@ -43,7 +43,7 @@ using cselm = controller::cognitive::cache_sel_matrix;
  ******************************************************************************/
 acquire_new_cache_fsm::acquire_new_cache_fsm(
     const fsm_ro_params* c_params,
-    crfootbot::footbot_saa_subsystem* saa,
+    csubsystem::saa_subsystemQ3D* saa,
     std::unique_ptr<csstrategy::base_strategy> exp_behavior,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.d2.acquire_new_cache"),

@@ -24,8 +24,7 @@
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
@@ -45,7 +44,7 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 acquire_existing_cache_fsm::acquire_existing_cache_fsm(
     const fsm_ro_params* c_params,
-    crfootbot::footbot_saa_subsystem* saa,
+    csubsystem::saa_subsystemQ3D* saa,
     std::unique_ptr<csstrategy::base_strategy> exp_behavior,
     rmath::rng* rng,
     bool for_pickup)
@@ -148,8 +147,7 @@ bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) const {
     ER_FATAL_SENTINEL("Robot acquired cache via exploration");
     return false;
   } else {
-    if (saa()->sensing()->sensor<chal::sensors::ground_sensor>()->detect("cach"
-                                                                         "e")) {
+    if (saa()->sensing()->ground()->detect("cache")) {
       return true;
     }
     ER_WARN("Robot arrived at goal, but no cache was detected");

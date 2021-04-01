@@ -60,7 +60,7 @@ class utility_cache_search : public localized_search {
                              rng) {}
   utility_cache_search(const controller::cognitive::cache_sel_matrix* csel_matrix,
                        const ds::dpo_store* store,
-                       crfootbot::footbot_saa_subsystem* saa,
+                       csubsystem::saa_subsystemQ3D* saa,
                        rmath::rng* rng)
       : localized_search(saa, rng),
         mc_matrix(csel_matrix),

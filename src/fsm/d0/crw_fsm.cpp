@@ -23,9 +23,9 @@
  ******************************************************************************/
 #include "fordyca/fsm/d0/crw_fsm.hpp"
 
-#include "cosm/robots/footbot/footbot_actuation_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+#include "cosm/subsystem/actuation_subsystem2D.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 #include "cosm/spatial/strategy/base_strategy.hpp"
 
 #include "fordyca/fsm/foraging_signal.hpp"
@@ -38,9 +38,9 @@ NS_START(fordyca, fsm, d0);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-crw_fsm::crw_fsm(crfootbot::footbot_saa_subsystem* const saa,
+crw_fsm::crw_fsm(csubsystem::saa_subsystemQ3D* const saa,
                  std::unique_ptr<csstrategy::base_strategy> explore,
-                 std::unique_ptr<csstrategy::base_strategy> nest_acq,
+                 std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
                  const rmath::vector2d& nest_loc,
                  rmath::rng* rng)
     : foraging_util_hfsm(saa, std::move(nest_acq), rng, ekST_MAX_STATES),
@@ -181,6 +181,7 @@ bool crw_fsm::is_phototaxiing_to_goal(bool include_ca) const {
     return foraging_transport_goal::ekNEST == block_transport_goal() &&
         !exp_interference();
   }
+
 } /* is_phototaxiing_to_goal() */
 
 /*******************************************************************************
@@ -234,8 +235,7 @@ void crw_fsm::run(void) {
 } /* run() */
 
 bool crw_fsm::block_detected(void) const {
-  return saa()->sensing()->sensor<chal::sensors::ground_sensor>()->detect("bloc"
-                                                                          "k");
+  return saa()->sensing()->ground()->detect("block");
 } /* block_detected() */
 
 foraging_transport_goal crw_fsm::block_transport_goal(void) const {

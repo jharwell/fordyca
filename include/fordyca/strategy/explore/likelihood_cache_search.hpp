@@ -54,7 +54,7 @@ class likelihood_cache_search : public localized_search {
   likelihood_cache_search(const foraging_strategy::params* const c_params,
                           rmath::rng* rng)
       : likelihood_cache_search(c_params->saa, c_params->dpo_store, rng) {}
-  likelihood_cache_search(crfootbot::footbot_saa_subsystem* saa,
+  likelihood_cache_search(csubsystem::saa_subsystemQ3D* saa,
                           const ds::dpo_store* store,
                           rmath::rng* rng)
       : localized_search(saa, rng),

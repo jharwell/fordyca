@@ -23,9 +23,7 @@
  ******************************************************************************/
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 
-#include "cosm/robots/footbot/footbot_actuation_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/spatial/fsm/acquire_goal_fsm.hpp"
 
 #include "fordyca/fsm/foraging_acq_goal.hpp"
@@ -42,7 +40,7 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 block_to_goal_fsm::block_to_goal_fsm(csfsm::acquire_goal_fsm* const goal_fsm,
                                      csfsm::acquire_goal_fsm* const block_fsm,
-                                     crfootbot::footbot_saa_subsystem* saa,
+                                     csubsystem::saa_subsystemQ3D* saa,
                                      rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.block_to_goal"),
       foraging_util_hfsm(saa, nullptr, rng, ekST_MAX_STATES),

@@ -29,7 +29,6 @@
 #include <vector>
 
 #include <argos3/core/simulator/loop_functions.h>
-#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/config/rng_config.hpp"
