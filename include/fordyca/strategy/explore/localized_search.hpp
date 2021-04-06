@@ -66,7 +66,7 @@ class localized_search : public foraging_strategy,
   bool entered_interference(void) const override final RCPPSW_PURE;
   bool exited_interference(void) const override final RCPPSW_PURE;
   rtypes::timestep interference_duration(void) const override final;
-  rmath::vector3z interference_loc3D(void) const override final;
+  rmath::vector3z interference_loc3D(void) const override final RCPPSW_PURE;
 
   /* taskable overrides */
 

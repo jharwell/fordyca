@@ -101,9 +101,9 @@ class block_to_goal_fsm
   exp_status is_exploring_for_goal(void) const override final RCPPSW_PURE;
   bool goal_acquired(void) const override RCPPSW_PURE;
   csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override;
-  rmath::vector3z acquisition_loc3D(void) const override final;
-  rmath::vector3z explore_loc3D(void) const override final;
-  rmath::vector3z vector_loc3D(void) const override final;
+  rmath::vector3z acquisition_loc3D(void) const override final RCPPSW_PURE;
+  rmath::vector3z explore_loc3D(void) const override final RCPPSW_PURE;
+  rmath::vector3z vector_loc3D(void) const override final RCPPSW_PURE;
 
   /**
    * \brief Reset the FSM

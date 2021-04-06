@@ -412,7 +412,7 @@ void d1_loop_functions::post_step(void) {
   auto* collector =
       m_metrics_agg->get<cfmetrics::block_transportee_metrics_collector>("blocks::"
                                                                          "transpor"
-                                                                         "ter");
+                                                                         "tee");
 
   /*
    * Update arena map. Free block pickups and nest block drops are covered

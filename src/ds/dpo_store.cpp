@@ -139,8 +139,8 @@ dpo_store::block_update(dpo_entity<crepr::base_block3D> block_in) {
        * location beforehand.
        */
       rmath::vector2z old_loc = it1->ent()->danchor2D();
+      RCPPSW_UNUSED auto id = block_in.ent()->id();
       m_blocks.obj_add({ block_in.ent()->id(), std::move(block_in) });
-      RCPPSW_UNUSED rtypes::type_uuid id = block_in.ent()->id();
       ER_TRACE("Add block%d@%s (n_blocks=%zu)",
                id.v(),
                block_in.ent()->danchor2D().to_str().c_str(),

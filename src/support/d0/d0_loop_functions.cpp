@@ -217,7 +217,7 @@ void d0_loop_functions::post_step(void) {
   auto* collector =
       m_metrics_agg->get<cfmetrics::block_transportee_metrics_collector>("blocks::"
                                                                        "transpor"
-                                                                       "ter");
+                                                                       "tee");
 
   /* update arena map */
   arena_map()->post_step_update(

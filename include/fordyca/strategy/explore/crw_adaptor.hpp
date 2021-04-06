@@ -27,7 +27,7 @@
 #include <memory>
 #include "rcppsw/patterns/decorator/decorator.hpp"
 
-#include "cosm/spatial/strategy/crw.hpp"
+#include "cosm/spatial/strategy/explore/crw.hpp"
 #include "fordyca/strategy/foraging_strategy.hpp"
 
 /*******************************************************************************
@@ -48,7 +48,7 @@ NS_START(fordyca, strategy, explore);
  * csstrategy::base_strategy.
  */
 class crw_adaptor final : public foraging_strategy,
-                          public rpdecorator::decorator<csstrategy::crw> {
+                          public rpdecorator::decorator<csstrategy::explore::crw> {
  public:
   crw_adaptor(const foraging_strategy::params* c_params, rmath::rng* rng);
   crw_adaptor(csubsystem::saa_subsystemQ3D* saa, rmath::rng* rng);

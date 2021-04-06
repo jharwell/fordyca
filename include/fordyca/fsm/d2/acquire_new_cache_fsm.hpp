@@ -79,7 +79,7 @@ class acquire_new_cache_fsm final : public rer::client<acquire_new_cache_fsm>,
   csmetrics::goal_acq_metrics::goal_type acquisition_goal_internal(void) const RCPPSW_CONST;
   boost::optional<acquire_goal_fsm::candidate_type> cache_select(void);
   bool candidates_exist(void) const RCPPSW_PURE;
-  bool cache_acquired_cb(bool explore_result) const;
+  bool cache_acquired_cb(bool explore_result) const RCPPSW_PURE;
 
   /* clang-format off */
   const controller::cognitive::cache_sel_matrix* const mc_matrix;
