@@ -106,8 +106,8 @@ static_cache_manager::create(const cache_create_ro_params& c_params,
                  res.created.end(),
                  std::back_inserter(sanity_caches),
                  [&](const auto& c) { return c.get(); });
-  auto free_blocks = carena::free_blocks_calculator()(c_all_blocks,
-                                                      sanity_caches);
+  auto free_blocks = carena::free_blocks_calculator(initial)(c_all_blocks,
+                                                             sanity_caches);
   ER_ASSERT(creator.creation_sanity_checks(sanity_caches,
                                            free_blocks,
                                            c_params.clusters,

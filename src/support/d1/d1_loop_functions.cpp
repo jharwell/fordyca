@@ -207,7 +207,7 @@ void d1_loop_functions::private_init(void) {
   auto* output = config()->config_get<cmconfig::output_config>();
   auto* arena = config()->config_get<caconfig::arena_map_config>();
 
-  /* initialize cache handling and create initial cache */
+  /* initialize cache handling and create initial cache(s) */
   cache_handling_init(
       config()->config_get<config::caches::caches_config>(),
       &config()->config_get<caconfig::arena_map_config>()->blocks.dist);
@@ -226,6 +226,7 @@ void d1_loop_functions::private_init(void) {
       &arena->grid,
       output_root(),
       arena_map()->block_distributor()->block_clustersro().size());
+
   /* this starts at 0, and ARGoS starts at 1, so sync up */
   m_metrics_agg->timestep_inc_all();
 
@@ -320,13 +321,12 @@ void d1_loop_functions::cache_handling_init(
   }
   cache_create_ro_params ccp = { .current_caches = arena_map()->caches(),
                                  .clusters = clusters,
-                                 .t = rtypes::timestep(
-                                     GetSpace().GetSimulationClock()) };
+                                 .t = rtypes::timestep(GetSpace().GetSimulationClock()) };
 
   cpal::argos_sm_adaptor::led_medium(chsubsystem::config::saa_xml_names::leds_saa);
   bool pre_dist = (nullptr == arena_map()->block_distributor());
   if (auto created =
-          m_cache_manager->create(ccp, arena_map()->free_blocks(), pre_dist)) {
+          m_cache_manager->create(ccp, arena_map()->free_blocks(true), pre_dist)) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }
@@ -603,7 +603,7 @@ void d1_loop_functions::static_cache_monitor(void) {
 
   if (auto created =
           m_cache_manager->create_conditional(ccp,
-                                              arena_map()->free_blocks(),
+                                              arena_map()->free_blocks(false),
                                               m_cache_counts.n_harvesters,
                                               m_cache_counts.n_collectors)) {
     arena_map()->caches_add(*created, this);

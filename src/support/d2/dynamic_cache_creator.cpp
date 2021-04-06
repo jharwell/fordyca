@@ -167,7 +167,8 @@ bool dynamic_cache_creator::cache_i_verify(
     const cads::acache_vectorro& c_caches,
     const cds::block3D_vectorno& c_all_blocks,
     const cfds::block3D_cluster_vectorro& c_clusters) const {
-  auto free_blocks = carena::free_blocks_calculator()(c_all_blocks, c_caches);
+  auto free_blocks = carena::free_blocks_calculator(false)(c_all_blocks,
+                                                           c_caches);
 
   bool sanity_ok = creation_sanity_checks(c_caches,
                                           free_blocks,
