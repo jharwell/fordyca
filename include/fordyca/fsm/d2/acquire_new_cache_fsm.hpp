@@ -39,13 +39,7 @@ NS_START(fordyca);
 namespace controller::cognitive { class cache_sel_matrix; }
 namespace ds { class dpo_store; }
 
-NS_START(fsm);
-
-namespace strategy {
-class foraging_strategy;
-} /* namespace strategy */
-
-NS_START(d2);
+NS_START(fsm, d2);
 
 /*******************************************************************************
  * Class Definitions

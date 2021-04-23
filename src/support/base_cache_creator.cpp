@@ -190,14 +190,14 @@ base_cache_creator::create_single_cache(const rmath::vector2d& center,
 
   /* Update host cell */
   cell.entity(ret.get());
-  cell.color(ret.get()->color());
+  cell.color(ret->color());
 
   return ret;
 } /* create_single_cache() */
 
 void base_cache_creator::cache_extents_configure(
     const cads::acache_vectoro& caches) {
-  for (auto& cache : caches) {
+  for (const auto & cache : caches) {
     caops::cache_extent_set_visitor e(cache.get());
     e.visit(*m_grid);
   } /* for(cache..) */
@@ -208,7 +208,7 @@ bool base_cache_creator::creation_sanity_checks(
     const cds::block3D_vectorno& c_free_blocks,
     const cfds::block3D_cluster_vectorro& c_clusters,
     const cads::nest_vectorro& c_nests) const {
-  for (auto& c : c_caches) {
+  for (const auto & c : c_caches) {
     ER_CHECK(sanity_check_internal_consistency(c),
              "Cache%d@%s/%s not internally consistent",
              c->id().v(),
@@ -216,17 +216,17 @@ bool base_cache_creator::creation_sanity_checks(
              rcppsw::to_string(c->dcenter2D()).c_str());
     ;
   }
-  for (auto& c : c_caches) {
+  for (const auto & c : c_caches) {
     ER_CHECK(sanity_check_free_block_overlap(c, c_free_blocks),
              "One or more caches overlap with free blocks");
   } /* for(&c..) */
 
-  for (auto& c : c_caches) {
+  for (const auto & c : c_caches) {
     ER_CHECK(sanity_check_block_cluster_overlap(c, c_clusters),
              "One or more caches overlap with one or more block clusters");
   } /* for(&c..) */
 
-  for (auto& c : c_caches) {
+  for (const auto & c : c_caches) {
     ER_CHECK(sanity_check_nest_overlap(c, c_nests),
              "One or more caches overlap with one or more nests");
   } /* for(&c..) */
@@ -259,7 +259,7 @@ bool base_cache_creator::sanity_check_internal_consistency(
            "Cache does not have enough blocks: %zu < %zu",
            cache->n_blocks(),
            carepr::base_cache::kMinBlocks);
-  for (auto& pair : cache->blocks()) {
+  for (const auto & pair : cache->blocks()) {
     auto* b = pair.second;
     ER_CHECK(b->danchor2D() == cache->dcenter2D(),
              "Block%d@%s not in cache host cell@%s",
@@ -280,7 +280,7 @@ bool base_cache_creator::sanity_check_free_block_overlap(
   auto xspan = cache->xrspan();
   auto yspan = cache->yrspan();
 
-  for (auto& b : free_blocks) {
+  for (const auto & b : free_blocks) {
     ER_CHECK(!(xspan.overlaps_with(b->xrspan()) &&
                yspan.overlaps_with(b->yrspan())),
              "Cache%d xspan=%s,yspan=%s overlaps block%d "
@@ -302,7 +302,7 @@ error:
 bool base_cache_creator::sanity_check_block_cluster_overlap(
     const carepr::arena_cache* cache,
     const cfds::block3D_cluster_vectorro& clusters) const {
-  for (auto& cluster : clusters) {
+  for (const auto & cluster : clusters) {
     ER_CHECK(!(cache->xrspan().overlaps_with(cluster->xrspan()) &&
                cache->yrspan().overlaps_with(cluster->yrspan())),
              "Cache%d xspan=%s,yspan=%s overlaps cluster w/xspan=%s,yspan=%s",
@@ -321,7 +321,7 @@ error:
 bool base_cache_creator::sanity_check_nest_overlap(
     const carepr::arena_cache* cache,
     const cads::nest_vectorro& nests) const {
-  for (auto& nest : nests) {
+  for (const auto & nest : nests) {
     ER_CHECK(!(cache->xrspan().overlaps_with(nest->xrspan()) &&
                cache->yrspan().overlaps_with(nest->yrspan())),
              "Cache%d xspan=%s,yspan=%s overlaps nest%d w/xspan=%s,yspan=%s",
@@ -340,16 +340,16 @@ error:
 
 bool base_cache_creator::sanity_check_cross_consistency(
     const cads::acache_vectorro& caches) const {
-  for (auto& c1 : caches) {
+  for (const auto & c1 : caches) {
     auto c1_xspan = c1->xrspan();
     auto c1_yspan = c1->yrspan();
 
     /* check caches contain different blocks and no duplicates */
-    for (auto& c2 : caches) {
+    for (const auto & c2 : caches) {
       if (c1->id() == c2->id()) {
         continue;
       }
-      for (auto& pair : c1->blocks()) {
+      for (const auto & pair : c1->blocks()) {
         auto* b = pair.second;
         ER_CHECK(c1->blocks().end() ==
                      std::adjacent_find(c1->blocks().begin(), c1->blocks().end()),
@@ -372,12 +372,12 @@ error:
 
 bool base_cache_creator::sanity_check_cache_overlap(
     const cads::acache_vectorro& caches) const {
-  for (auto& c1 : caches) {
+  for (const auto & c1 : caches) {
     auto c1_xspan = c1->xrspan();
     auto c1_yspan = c1->yrspan();
 
     /* Check caches do not overlap */
-    for (auto& c2 : caches) {
+    for (const auto & c2 : caches) {
       if (c1->id() == c2->id()) {
         continue;
       }

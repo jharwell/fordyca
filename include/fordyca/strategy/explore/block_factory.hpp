@@ -50,8 +50,8 @@ class block_factory :
                                         const foraging_strategy::params*,
                                         rmath::rng*> {
  public:
-  static constexpr char kCRW[] = "CRW";
-  static constexpr char kLikelihoodSearch[] = "likelihood_search";
+  inline static const std::string kCRW = "CRW";
+  inline static const std::string kLikelihoodSearch = "likelihood_search";
 
   block_factory(void);
 };

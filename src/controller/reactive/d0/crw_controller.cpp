@@ -66,8 +66,8 @@ void crw_controller::init(ticpp::Element& node) {
 
   fstrategy::foraging_strategy::params p(
       saa(), nullptr, nullptr, nullptr, rutils::color());
-  auto* nest = repo.config_get<crepr::config::nest_config>();
-  auto* strat_config = repo.config_get<fcstrategy::strategy_config>();
+  const auto * nest = repo.config_get<crepr::config::nest_config>();
+  const auto * strat_config = repo.config_get<fcstrategy::strategy_config>();
 
   m_fsm = std::make_unique<fsm::d0::crw_fsm>(
       saa(),

@@ -197,7 +197,6 @@ class bitd_dpo_controller : public d0::dpo_controller,
    */
   void task_start_cb(cta::polled_task* task);
 
- protected:
   void current_task(tasks::base_foraging_task* t) { m_current_task = t; }
 
  private:

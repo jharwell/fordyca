@@ -51,7 +51,7 @@ block_acq_validator::block_acq_validator(
  ******************************************************************************/
 bool block_acq_validator::operator()(const rmath::vector2d& loc,
                                      const rtypes::type_uuid& id) const {
-  auto block = mc_map->find(id);
+  const auto *block = mc_map->find(id);
 
   /* Sanity checks for acqusition */
   if (nullptr == block) {
@@ -60,7 +60,7 @@ bool block_acq_validator::operator()(const rmath::vector2d& loc,
             loc.to_str().c_str());
     return false;
   }
-  auto& config = boost::get<config::block_sel::block_pickup_policy_config>(
+  const auto & config = boost::get<config::block_sel::block_pickup_policy_config>(
       mc_matrix->find(bselm::kPickupPolicy)->second);
 
   /*

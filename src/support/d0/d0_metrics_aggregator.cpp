@@ -111,7 +111,7 @@ void d0_metrics_aggregator::collect_from_controller(const T* const controller) {
   collect_if("blocks::acq_locs2D",
              *controller,
              [&](const rmetrics::base_metrics& metrics) {
-               auto& m =
+               const auto & m =
                    dynamic_cast<const csmetrics::goal_acq_metrics&>(metrics);
                return fsm::foraging_acq_goal::ekBLOCK == m.acquisition_goal() &&
                       m.goal_acquired();
@@ -124,21 +124,21 @@ void d0_metrics_aggregator::collect_from_controller(const T* const controller) {
   collect_if("blocks::acq_explore_locs2D",
              *controller,
              [&](const rmetrics::base_metrics& metrics) {
-               auto& m =
+               const auto & m =
                    dynamic_cast<const csmetrics::goal_acq_metrics&>(metrics);
                return m.is_exploring_for_goal().is_exploring;
              });
   collect_if("blocks::acq_vector_locs2D",
              *controller,
              [&](const rmetrics::base_metrics& metrics) {
-               auto& m =
+               const auto & m =
                    dynamic_cast<const csmetrics::goal_acq_metrics&>(metrics);
                return m.is_vectoring_to_goal();
              });
   /*
    * Only controllers with MDPO perception provide these.
    */
-  auto mdpo = dynamic_cast<const metrics::perception::mdpo_perception_metrics*>(
+  const auto *mdpo = dynamic_cast<const metrics::perception::mdpo_perception_metrics*>(
       controller->perception());
   if (nullptr != mdpo) {
     collect("perception::mdpo", *mdpo);
@@ -146,7 +146,7 @@ void d0_metrics_aggregator::collect_from_controller(const T* const controller) {
   /*
    * Only controllers with DPO perception provide these.
    */
-  auto dpo = dynamic_cast<const metrics::perception::dpo_perception_metrics*>(
+  const auto *dpo = dynamic_cast<const metrics::perception::dpo_perception_metrics*>(
       controller->perception());
   if (nullptr != dpo) {
     collect("perception::dpo", *dpo);

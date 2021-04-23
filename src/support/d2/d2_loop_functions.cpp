@@ -153,8 +153,8 @@ void d2_loop_functions::shared_init(ticpp::Element& node) {
 
 void d2_loop_functions::private_init(void) {
   /* initialize stat collecting */
-  auto* output = config()->config_get<cmconfig::output_config>();
-  auto* arena = config()->config_get<caconfig::arena_map_config>();
+  const auto * output = config()->config_get<cmconfig::output_config>();
+  const auto * arena = config()->config_get<caconfig::arena_map_config>();
 
   m_metrics_agg = std::make_unique<d2_metrics_aggregator>(
       &output->metrics,
@@ -165,7 +165,7 @@ void d2_loop_functions::private_init(void) {
   m_metrics_agg->timestep_inc_all();
 
   /* initialize cache handling */
-  auto* cachep = config()->config_get<config::caches::caches_config>();
+  const auto * cachep = config()->config_get<config::caches::caches_config>();
   cache_handling_init(cachep);
 
   /*
@@ -210,10 +210,9 @@ void d2_loop_functions::private_init(void) {
    * threads are not set up yet so doing dynamicaly causes a deadlock. Also, it
    * only happens once, so it doesn't really matter if it is slow.
    */
-  cpal::argos_swarm_iterator::controllers<chal::robot,
-                                          controller::foraging_controller,
+  cpal::argos_swarm_iterator::controllers<controller::foraging_controller,
                                           cpal::iteration_order::ekSTATIC>(
-      this, cb, kARGoSRobotType);
+      this, cb, cpal::kARGoSRobotType);
 } /* private_init() */
 
 void d2_loop_functions::cache_handling_init(
@@ -222,7 +221,8 @@ void d2_loop_functions::cache_handling_init(
             "FATAL: Caches not enabled in d2 loop functions");
   m_cache_manager =
       std::make_unique<dynamic_cache_manager>(cachep, arena_map(), rng());
-  argos_sm_adaptor::led_medium(chsubsystem::config::saa_xml_names().leds_saa);
+  using saa_names = chsubsystem::config::saa_xml_names;
+  argos_sm_adaptor::led_medium(saa_names::leds_saa);
   cache_creation_handle(false);
 } /* cache_handlng_init() */
 
@@ -243,10 +243,9 @@ std::vector<int> d2_loop_functions::robot_tasks_extract(uint) const {
     v.push_back(boost::apply_visitor(
         applicator, m_task_extractor_map->at(controller->type_index())));
   };
-  cpal::argos_swarm_iterator::controllers<chal::robot,
-                                          controller::foraging_controller,
+  cpal::argos_swarm_iterator::controllers<controller::foraging_controller,
                                           cpal::iteration_order::ekSTATIC>(
-      this, cb, kARGoSRobotType);
+      this, cb, cpal::kARGoSRobotType);
   return v;
 } /* robot_tasks_extract() */
 
@@ -294,7 +293,7 @@ void d2_loop_functions::post_step(void) {
   }
 
   /* update arena map */
-  auto* collector =
+  const auto * collector =
       m_metrics_agg->get<cfmetrics::block_transportee_metrics_collector>("blocks::"
                                                                        "transpor"
                                                                          "tee");
@@ -322,7 +321,7 @@ void d2_loop_functions::post_step(void) {
    * process as they have been depleted and do not exist anymore in the \ref
    * arena_map::cacheso() array.
    */
-  for (auto& c : arena_map()->zombie_caches()) {
+  for (const auto & c : arena_map()->zombie_caches()) {
     m_metrics_agg->collect_from_cache(c.get());
     c->reset_metrics();
   } /* for(&c..) */
@@ -368,7 +367,7 @@ void d2_loop_functions::destroy(void) {
  * General Member Functions
  ******************************************************************************/
 void d2_loop_functions::robot_pre_step(chal::robot& robot) {
-  auto controller = dynamic_cast<controller::foraging_controller*>(
+  auto *controller = dynamic_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
 
   /*
@@ -395,7 +394,7 @@ void d2_loop_functions::robot_pre_step(chal::robot& robot) {
 } /* robot_pre_step() */
 
 void d2_loop_functions::robot_post_step(chal::robot& robot) {
-  auto controller = dynamic_cast<controller::foraging_controller*>(
+  auto *controller = dynamic_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
 
   /*
@@ -470,7 +469,7 @@ void d2_loop_functions::robot_post_step(chal::robot& robot) {
 } /* robot_post_step() */
 
 bool d2_loop_functions::cache_creation_handle(bool on_drop) {
-  auto* cachep = config()->config_get<config::caches::caches_config>();
+  const auto * cachep = config()->config_get<config::caches::caches_config>();
   /*
    * If dynamic cache creation is configured to occur only upon a robot dropping
    * a block, then we do not perform cache creation unless that event occurred.

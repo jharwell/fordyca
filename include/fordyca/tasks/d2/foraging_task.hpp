@@ -62,10 +62,10 @@ class foraging_task
                 std::unique_ptr<cta::taskable> mechanism);
   ~foraging_task(void) override = default;
 
-  static constexpr char kCacheStarterName[] = "Cache Starter";
-  static constexpr char kCacheFinisherName[] = "Cache Finisher";
-  static constexpr char kCacheTransfererName[] = "Cache Transferer";
-  static constexpr char kCacheCollectorName[] = "Cache Collector";
+  inline static const std::string kCacheStarterName = "Cache Starter";
+  inline static const std::string kCacheFinisherName = "Cache Finisher";
+  inline static const std::string kCacheTransfererName = "Cache Transferer";
+  inline static const std::string kCacheCollectorName = "Cache Collector";
 
   static bool task_in_d2(const polled_task* task) RCPPSW_PURE;
 

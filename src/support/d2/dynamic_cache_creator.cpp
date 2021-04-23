@@ -201,7 +201,7 @@ cads::acache_vectorno dynamic_cache_creator::avoidance_caches_calc(
     const cads::acache_vectorno& c_previous_caches,
     const cads::acache_vectoro& c_created_caches) const {
   cads::acache_vectorno avoid = c_previous_caches;
-  for (auto& c : c_created_caches) {
+  for (const auto & c : c_created_caches) {
     avoid.push_back(c.get());
   } /* for(&c..) */
   return avoid;

@@ -72,7 +72,7 @@ struct d1_subtask_status_extractor
   using controller_type = Controller;
 
   std::pair<bool, bool> operator()(const Controller* const c) const {
-    auto task = dynamic_cast<const cta::polled_task*>(c->current_task());
+    const auto *task = dynamic_cast<const cta::polled_task*>(c->current_task());
     return std::make_pair(
         task->name() == tasks::d1::foraging_task::kHarvesterName,
         task->name() == tasks::d1::foraging_task::kCollectorName);
@@ -96,7 +96,7 @@ struct d1_subtask_status_extractor_adaptor
   template <typename Controller>
   std::pair<bool, bool>
   operator()(const d1_subtask_status_extractor<Controller>& extractor) const {
-    auto cast = dynamic_cast<
+    const auto *cast = dynamic_cast<
         const typename d1_subtask_status_extractor<Controller>::controller_type*>(
         mc_controller);
     return extractor(cast);
@@ -183,7 +183,7 @@ void d1_loop_functions::init(ticpp::Element& node) {
   ER_INFO("Initializing...");
 
   config_parse(node);
-  auto* aconfig = config()->config_get<caconfig::arena_map_config>();
+  const auto * aconfig = config()->config_get<caconfig::arena_map_config>();
   if (cfbd::dispatcher::kDistPowerlaw == aconfig->blocks.dist.dist_type) {
     delay_arena_map_init(true);
   }
@@ -204,8 +204,8 @@ void d1_loop_functions::shared_init(ticpp::Element& node) {
 
 void d1_loop_functions::private_init(void) {
   /* initialize stat collecting */
-  auto* output = config()->config_get<cmconfig::output_config>();
-  auto* arena = config()->config_get<caconfig::arena_map_config>();
+  const auto * output = config()->config_get<cmconfig::output_config>();
+  const auto * arena = config()->config_get<caconfig::arena_map_config>();
 
   /* initialize cache handling and create initial cache(s) */
   cache_handling_init(
@@ -216,7 +216,7 @@ void d1_loop_functions::private_init(void) {
    * Initialize arena map and distribute blocks after creating initial
    * caches. This is only needed for powerlaw distributions.
    */
-  auto* vconfig = config()->config_get<cvconfig::visualization_config>();
+  const auto * vconfig = config()->config_get<cvconfig::visualization_config>();
   if (delay_arena_map_init()) {
     arena_map_init(vconfig);
   }
@@ -276,14 +276,13 @@ void d1_loop_functions::private_init(void) {
    * threads are not set up yet so doing dynamicaly causes a deadlock. Also, it
    * only happens once, so it doesn't really matter if it is slow.
    */
-  cpal::argos_swarm_iterator::controllers<chal::robot,
-                                          controller::foraging_controller,
+  cpal::argos_swarm_iterator::controllers<controller::foraging_controller,
                                           cpal::iteration_order::ekSTATIC>(
-      this, cb, kARGoSRobotType);
+      this, cb, cpal::kARGoSRobotType);
 } /* private_init() */
 
 void d1_loop_functions::oracle_init(void) {
-  auto* oraclep = config()->config_get<coconfig::aggregate_oracle_config>();
+  const auto * oraclep = config()->config_get<coconfig::aggregate_oracle_config>();
   if (nullptr == oraclep || nullptr == oracle()) {
     return;
   }
@@ -293,11 +292,11 @@ void d1_loop_functions::oracle_init(void) {
      * using--any robot will do.
      */
     chal::robot& robot0 = *argos::any_cast<chal::robot*>(
-        GetSpace().GetEntitiesByType(kARGoSRobotType).begin()->second);
+        GetSpace().GetEntitiesByType(cpal::kARGoSRobotType).begin()->second);
     const auto& controller0 =
         dynamic_cast<controller::cognitive::d1::bitd_dpo_controller&>(
             robot0.GetControllableEntity().GetController());
-    auto* bigraph = controller0.executive()->graph();
+    const auto * bigraph = controller0.executive()->graph();
     oracle()->tasking_oracle(
         std::make_unique<coracle::tasking_oracle>(&oraclep->tasking, bigraph));
   }
@@ -350,10 +349,9 @@ std::vector<int> d1_loop_functions::robot_tasks_extract(uint) const {
     v.push_back(boost::apply_visitor(
         applicator, m_task_extractor_map->at(controller->type_index())));
   };
-  cpal::argos_swarm_iterator::controllers<chal::robot,
-                                          controller::foraging_controller,
+  cpal::argos_swarm_iterator::controllers<controller::foraging_controller,
                                           cpal::iteration_order::ekSTATIC>(
-      this, cb, kARGoSRobotType);
+      this, cb, cpal::kARGoSRobotType);
   return v;
 } /* robot_tasks_extract() */
 
@@ -409,7 +407,7 @@ void d1_loop_functions::post_step(void) {
   m_cache_counts.n_collectors = 0;
 
   /* update arena map */
-  auto* collector =
+  const auto * collector =
       m_metrics_agg->get<cfmetrics::block_transportee_metrics_collector>("blocks::"
                                                                          "transpor"
                                                                          "tee");
@@ -438,7 +436,7 @@ void d1_loop_functions::post_step(void) {
    * process as they have been depleted and do not exist anymore in the \ref
    * arena_map::cacheso() array.
    */
-  for (auto& c : arena_map()->zombie_caches()) {
+  for (const auto & c : arena_map()->zombie_caches()) {
     m_metrics_agg->collect_from_cache(c.get());
     c->reset_metrics();
   } /* for(&c..) */
@@ -494,7 +492,7 @@ void d1_loop_functions::destroy(void) {
  * General Member Functions
  ******************************************************************************/
 void d1_loop_functions::robot_pre_step(chal::robot& robot) {
-  auto controller = static_cast<controller::foraging_controller*>(
+  auto *controller = static_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
 
   /*
@@ -521,7 +519,7 @@ void d1_loop_functions::robot_pre_step(chal::robot& robot) {
 } /* robot_pre_step() */
 
 void d1_loop_functions::robot_post_step(chal::robot& robot) {
-  auto controller = static_cast<controller::foraging_controller*>(
+  auto *controller = static_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
 
   /*

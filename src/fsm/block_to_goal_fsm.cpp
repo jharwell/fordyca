@@ -251,7 +251,7 @@ void block_to_goal_fsm::init(void) {
 } /* init() */
 
 void block_to_goal_fsm::task_start(cta::taskable_argument* const arg) {
-  auto* a = dynamic_cast<const tasks::foraging_signal_argument*>(arg);
+  const auto * a = dynamic_cast<const tasks::foraging_signal_argument*>(arg);
   ER_ASSERT(nullptr != a, "Bad argument passed");
   inject_event(a->signal(), rpfsm::event_type::ekNORMAL);
 }

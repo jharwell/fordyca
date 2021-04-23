@@ -37,18 +37,12 @@
 #include "fordyca/fsm/foraging_transport_goal.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
-#include "fordyca/fsm/foraging_transport_goal.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, fsm);
-namespace strategy {
-class foraging_strategy;
-} /* namespace strategy */
-
-NS_START(d0);
+NS_START(fordyca, fsm, d0);
 
 /*******************************************************************************
  * Class Definitions

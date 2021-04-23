@@ -54,10 +54,6 @@ class dpo_store;
 
 NS_START(fsm);
 
-namespace strategy {
-class foraging_strategy;
-} /* namespace strategy */
-
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/

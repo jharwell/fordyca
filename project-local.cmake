@@ -1,6 +1,9 @@
 ################################################################################
 # Configuration Options                                                        #
 ################################################################################
+# We are building a shared library
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 set(FORDYCA_WITH_ROBOT_RAB "NO" CACHE STRING "Enable robots to read/write over the RAB medium via sensors/actuators.")
 set(FORDYCA_WITH_ROBOT_BATTERY "NO" CACHE STRING "Enable robots to use the battery.")
 set(FORDYCA_WITH_ROBOT_LEDS "NO" CACHE STRING "Enable robots to use their LEDs.")
@@ -113,8 +116,7 @@ add_dependencies(${target} rcppsw cosm)
 set(${target}_INCLUDE_DIRS
   "${${target}_INC_PATH}"
   ${rcppsw_INCLUDE_DIRS}
-  ${cosm_INCLUDE_DIRS}
-  /usr/include/eigen3)
+  ${cosm_INCLUDE_DIRS})
 
 set(${target}_SYS_INCLUDE_DIRS
   ${cosm_SYS_INCLUDE_DIRS}

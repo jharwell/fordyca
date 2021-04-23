@@ -127,7 +127,7 @@ manipulation_metrics_collector::csv_line_build(void) {
 
 void manipulation_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
-  auto& m = dynamic_cast<const ccmetrics::manipulation_metrics&>(metrics);
+  const auto & m = dynamic_cast<const ccmetrics::manipulation_metrics&>(metrics);
 
   for (uint i = 0; i < block_manip_events::ekMAX_EVENTS; ++i) {
     m_interval[i].events += m.status(i);

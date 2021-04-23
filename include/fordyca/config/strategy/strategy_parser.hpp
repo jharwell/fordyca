@@ -58,7 +58,7 @@ class strategy_parser final : public rconfig::xml::xml_config_parser {
    * \brief The root tag that all XML configuration for strategy should lie
    * under in the XML tree.
    */
-  static constexpr char kXMLRoot[] = "strategy";
+  inline static const std::string kXMLRoot = "strategy";
 
   void parse(const ticpp::Element& node) override;
   std::string xml_root(void) const override { return kXMLRoot; }

@@ -46,8 +46,8 @@ block_op_penalty_id_calculator::block_op_penalty_id_calculator(
  ******************************************************************************/
 rtypes::type_uuid block_op_penalty_id_calculator::operator()(
     const controller::foraging_controller& controller,
-    block_op_src src,
-    op_filter_result filter) const {
+    const block_op_src& src,
+    const op_filter_result& filter) const {
   rtypes::type_uuid id = rtypes::constants::kNoUUID;
   switch (src) {
     case block_op_src::ekFREE_PICKUP:

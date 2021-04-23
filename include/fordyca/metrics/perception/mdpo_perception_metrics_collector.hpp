@@ -68,7 +68,7 @@ class mdpo_perception_metrics_collector final : public rmetrics::base_metrics_co
   boost::optional<std::string> csv_line_build(void) override;
 
   struct stats {
-    std::atomic_uint    states[cfsm::cell2D_state::ekST_MAX_STATES];
+    std::array<std::atomic_uint, cfsm::cell2D_state::ekST_MAX_STATES> states;
     std::atomic<double> known_percent{0.0};
     std::atomic<double> unknown_percent{0.0};
     std::atomic_uint    robots{0};

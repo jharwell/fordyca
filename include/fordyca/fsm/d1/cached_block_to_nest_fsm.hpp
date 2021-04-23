@@ -48,13 +48,7 @@ namespace ds {
 class dpo_store;
 } // namespace ds
 
-NS_START(fsm);
-
-namespace strategy {
-class foraging_strategy;
-} /* namespace strategy */
-
-NS_START(d1);
+NS_START(fsm, d1);
 
 /*******************************************************************************
  * Class Definitions

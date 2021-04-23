@@ -55,7 +55,7 @@ class explore_parser final : public rconfig::xml::xml_config_parser {
    * \brief The root tag that all XML configuration for explore should lie
    * under in the XML tree.
    */
-  static constexpr char kXMLRoot[] = "explore";
+  inline static const std::string kXMLRoot = "explore";
 
   void parse(const ticpp::Element& node) override;
   std::string xml_root(void) const override { return kXMLRoot; }

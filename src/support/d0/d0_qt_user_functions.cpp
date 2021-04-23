@@ -53,9 +53,9 @@ d0_qt_user_functions::d0_qt_user_functions(void) {
  * Member Functions
  ******************************************************************************/
 void d0_qt_user_functions::Draw(chal::robot& c_entity) {
-  auto* mdpo = dynamic_cast<const controller::cognitive::d0::mdpo_controller*>(
+  const auto * mdpo = dynamic_cast<const controller::cognitive::d0::mdpo_controller*>(
       &c_entity.GetControllableEntity().GetController());
-  auto* base = dynamic_cast<const controller::foraging_controller*>(
+  const auto * base = dynamic_cast<const controller::foraging_controller*>(
       &c_entity.GetControllableEntity().GetController());
 
   if (base->display_id()) {
@@ -67,7 +67,7 @@ void d0_qt_user_functions::Draw(chal::robot& c_entity) {
         .draw(base->block(), base->GetId().size());
   }
   if (nullptr != mdpo && mdpo->display_los()) {
-    auto* los = mdpo->perception()->los();
+    const auto * los = mdpo->perception()->los();
     auto res = mdpo->mdpo_perception()->map()->resolution();
     std::vector<rmath::vector2d> points = {
       rmath::zvec2dvec(los->abs_ll(), res.v()) - mdpo->rpos2D(),

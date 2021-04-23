@@ -54,7 +54,7 @@ class tv_manager_parser final : public rconfig::xml::xml_config_parser {
    * \brief The root tag that all temporal variance parameters should lie under
    * in the XML tree.
    */
-  static constexpr char kXMLRoot[] = "temporal_variance";
+  inline static const std::string kXMLRoot = "temporal_variance";
 
   void parse(const ticpp::Element& node) override;
   bool validate(void) const override RCPPSW_CONST;

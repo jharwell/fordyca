@@ -50,10 +50,10 @@ class cache_factory :
                                         const foraging_strategy::params*,
                                         rmath::rng*> {
  public:
-  static constexpr char kCRW[] = "CRW";
-  static constexpr char kLikelihoodSearch[] = "likelihood_search";
-  static constexpr char kUtilitySearch[] = "utility_search";
-  static constexpr char kLEDTaxisSearch[] = "ledtaxis_search";
+  inline static const std::string kCRW = "CRW";
+  inline static const std::string kLikelihoodSearch = "likelihood_search";
+  inline static const std::string kUtilitySearch = "utility_search";
+  inline static const std::string kLEDTaxisSearch = "ledtaxis_search";
 
   cache_factory(void);
 };

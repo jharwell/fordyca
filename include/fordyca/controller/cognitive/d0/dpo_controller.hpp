@@ -31,10 +31,6 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace fordyca::controller {
-class foraging_perception_subsystem;
-} /* namespace fordyca::controller */
-
 NS_START(fordyca);
 
 namespace fsm { namespace d0 { class dpo_fsm; }}

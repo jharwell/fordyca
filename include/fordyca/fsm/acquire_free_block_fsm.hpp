@@ -40,10 +40,6 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace fsm::strategy {
-class foraging_strategy;
-} /* namespace fsm::strategy */
-
 namespace ds {
 class dpo_store;
 }

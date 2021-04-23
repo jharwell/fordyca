@@ -82,12 +82,12 @@ void foraging_controller::init(ticpp::Element& node) {
   }
 
   /* initialize RNG */
-  auto rngp = repo.config_get<rmath::config::rng_config>();
+  const auto *rngp = repo.config_get<rmath::config::rng_config>();
   base_controller2D::rng_init((nullptr == rngp) ? -1 : rngp->seed,
-                              kARGoSRobotType);
+                              cpal::kARGoSRobotType);
 
   /* initialize output */
-  auto* outputp = repo.config_get<cmconfig::output_config>();
+  const auto * outputp = repo.config_get<cmconfig::output_config>();
   base_controller2D::output_init(outputp->output_root, outputp->output_dir);
 
   /* initialize sensing and actuation (SAA) subsystem */
@@ -134,7 +134,6 @@ void foraging_controller::saa_init(
 #if defined(FORDYCA_WITH_ROBOT_RAB) && (COSM_HAL_TARGET == COSM_HAL_TARGET_ARGOS_FOOTBOT)
   auto rabs = chsensors::wifi_sensor(
       GetSensor<chsensors::wifi_sensor::impl_type>(saa_names::rab_saa));
-  auto rabs = nullptr;
 #endif /* FORDYCA_WITH_ROBOT_RAB */
 
 #if defined(FORDYCA_WITH_ROBOT_BATTERY) && (COSM_HAL_TARGET == COSM_HAL_TARGET_ARGOS_FOOTBOT)
@@ -149,7 +148,6 @@ void foraging_controller::saa_init(
 #else
   auto blobs = chsensors::colored_blob_camera_sensor(nullptr);
 #endif
-
   auto position = chsensors::position_sensor(
       GetSensor<chsensors::position_sensor::impl_type>(saa_names::position_sensor));
   auto proximity = chsensors::proximity_sensor(

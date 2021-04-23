@@ -64,7 +64,7 @@ class foraging_task
  public:
   using variant_type = boost::variant<generalist*>;
 
-  static constexpr char kGeneralistName[] = "Generalist";
+  inline static const std::string kGeneralistName = "Generalist";
 
   foraging_task(const std::string& name,
                 const cta::config::task_alloc_config* config,

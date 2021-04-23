@@ -200,7 +200,7 @@ void mdpo_perception_subsystem::process_los_caches(
       rmath::vector2z d = c_los->access(i, j).loc();
       if (!c_los->access(i, j).state_has_cache() &&
           map()->access<occupancy_grid::kCell>(d).state_has_cache()) {
-        auto cache = map()->access<occupancy_grid::kCell>(d).cache();
+        auto *cache = map()->access<occupancy_grid::kCell>(d).cache();
         ER_DEBUG("Correct cache%d@%s/%s discrepency",
                  cache->id().v(),
                  cache->rcenter2D().to_str().c_str(),

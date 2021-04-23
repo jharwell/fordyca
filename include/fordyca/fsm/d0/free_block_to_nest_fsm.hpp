@@ -44,10 +44,6 @@ NS_START(fordyca);
 
 namespace ds { class dpo_semantic_map; }
 
-namespace fsm::strategy {
-class foraging_strategy;
-} /* namespace fsm::strategy */
-
 NS_START(fsm, d0);
 
 /*******************************************************************************

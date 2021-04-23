@@ -200,9 +200,9 @@ class existing_cache_block_drop_interactor
   bool pre_process_check(const TController& controller) const {
     const auto& penalty = m_penalty_handler->penalty_next();
     auto acq_goal = controller.current_task()->acquisition_goal();
-    auto* task = dynamic_cast<const events::existing_cache_interactor*>(
+    const auto * task = dynamic_cast<const events::existing_cache_interactor*>(
         controller.current_task());
-    RCPPSW_UNUSED auto* polled =
+    RCPPSW_UNUSED const auto * polled =
         dynamic_cast<const cta::polled_task*>(controller.current_task());
 
     ER_CHECK(penalty.controller() == &controller,

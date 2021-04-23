@@ -53,7 +53,6 @@ class arena_cache;
 
 NS_START(fordyca);
 
-namespace controller { namespace d1 { class bitd_mdpo_controller; }}
 namespace support { class base_cache_manager; }
 NS_START(support, d1);
 
@@ -109,7 +108,7 @@ class d1_metrics_aggregator : public d0::d0_metrics_aggregator,
       /*
        * Only controllers with MDPO perception provide these.
        */
-      auto mdpo = dynamic_cast<const metrics::perception::mdpo_perception_metrics*>(
+      const auto *mdpo = dynamic_cast<const metrics::perception::mdpo_perception_metrics*>(
           controller->perception());
       if (nullptr != mdpo) {
         collect("perception::mdpo", *mdpo);
@@ -117,7 +116,7 @@ class d1_metrics_aggregator : public d0::d0_metrics_aggregator,
       /*
        * Only controllers with DPO perception provide these.
        */
-      auto dpo = dynamic_cast<const metrics::perception::dpo_perception_metrics*>(
+      const auto *dpo = dynamic_cast<const metrics::perception::dpo_perception_metrics*>(
           controller->perception());
       if (nullptr != dpo) {
         collect("perception::dpo", *dpo);
@@ -152,7 +151,7 @@ class d1_metrics_aggregator : public d0::d0_metrics_aggregator,
     collect("fsm::movement", *controller);
     collect("blocks::manipulation", *controller->block_manip_recorder());
 
-    auto task = dynamic_cast<const cta::polled_task*>(controller->current_task());
+    const auto *task = dynamic_cast<const cta::polled_task*>(controller->current_task());
     if (nullptr == task) {
       return;
     }
@@ -161,14 +160,14 @@ class d1_metrics_aggregator : public d0::d0_metrics_aggregator,
     collect_if("fsm::interference_locs2D",
                *task->mechanism(),
                [&](const rmetrics::base_metrics& metrics) {
-                 auto& m = dynamic_cast<const csmetrics::interference_metrics&>(metrics);
+                 const auto & m = dynamic_cast<const csmetrics::interference_metrics&>(metrics);
                  return m.exp_interference();
                });
     collect_if(
         "blocks::acq_counts",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
+          const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
               metrics);
           return fsm::foraging_acq_goal::ekBLOCK == m.acquisition_goal();
         });
@@ -176,7 +175,7 @@ class d1_metrics_aggregator : public d0::d0_metrics_aggregator,
         "blocks::acq_locs2D",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
+          const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
               metrics);
           return fsm::foraging_acq_goal::ekBLOCK == m.acquisition_goal() &&
               m.goal_acquired();
@@ -190,7 +189,7 @@ class d1_metrics_aggregator : public d0::d0_metrics_aggregator,
         "blocks::acq_explore_locs2D",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
+          const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
               metrics);
           return fsm::foraging_acq_goal::ekBLOCK == m.acquisition_goal() &&
               m.is_exploring_for_goal().is_exploring;
@@ -199,7 +198,7 @@ class d1_metrics_aggregator : public d0::d0_metrics_aggregator,
         "blocks::acq_vector_locs2D",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
+          const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
               metrics);
           return fsm::foraging_acq_goal::ekBLOCK == m.acquisition_goal() &&
               m.is_vectoring_to_goal();
@@ -209,7 +208,7 @@ class d1_metrics_aggregator : public d0::d0_metrics_aggregator,
         "caches::acq_counts",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
+          const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
               metrics);
           return fsm::foraging_acq_goal::ekEXISTING_CACHE == m.acquisition_goal();
         });
@@ -217,7 +216,7 @@ class d1_metrics_aggregator : public d0::d0_metrics_aggregator,
         "caches::acq_locs2D",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
+          const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
               metrics);
           return fsm::foraging_acq_goal::ekEXISTING_CACHE == m.acquisition_goal() &&
               m.goal_acquired();
@@ -231,7 +230,7 @@ class d1_metrics_aggregator : public d0::d0_metrics_aggregator,
         "caches::acq_explore_locs2D",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
+          const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
               metrics);
           return fsm::foraging_acq_goal::ekEXISTING_CACHE == m.acquisition_goal() &&
               m.is_exploring_for_goal().is_exploring;
@@ -240,7 +239,7 @@ class d1_metrics_aggregator : public d0::d0_metrics_aggregator,
         "caches::acq_vector_locs2D",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
+          const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
               metrics);
           return fsm::foraging_acq_goal::ekEXISTING_CACHE == m.acquisition_goal() &&
               m.is_vectoring_to_goal();

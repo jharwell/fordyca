@@ -97,7 +97,7 @@ boost::optional<std::string> mdpo_perception_metrics_collector::csv_line_build()
 
 void mdpo_perception_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
-  auto& m = dynamic_cast<const mdpo_perception_metrics&>(metrics);
+  const auto & m = dynamic_cast<const mdpo_perception_metrics&>(metrics);
   m_interval.states[cfsm::cell2D_state::ekST_EMPTY] +=
       m.cell_state_inaccuracies(cfsm::cell2D_state::ekST_EMPTY);
   m_interval.states[cfsm::cell2D_state::ekST_HAS_BLOCK] +=

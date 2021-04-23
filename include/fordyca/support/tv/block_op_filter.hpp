@@ -172,7 +172,7 @@ class block_op_filter : public rer::client<block_op_filter> {
 
       if (rtypes::constants::kNoUUID != prox.id) {
         result.status = op_filter_status::ekCACHE_PROXIMITY;
-        result.id == prox.id;
+        result.id = prox.id;
       } else {
         result.status = op_filter_status::ekSATISFIED;
       }

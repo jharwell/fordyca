@@ -95,7 +95,7 @@ bool cache_site_selector::verify_site(const rmath::vector2d& site,
   const nest_constraint_data* ndata = &std::get<1>(m_constraints)[0];
 
   /* check distances to known caches */
-  for (auto& c : known_caches.const_values_range()) {
+  for (const auto & c : known_caches.const_values_range()) {
     ER_CHECK(rtypes::spatial_dist((c.ent()->rcenter2D() - site).length()) >=
                  std::get<0>(m_constraints)[0].cache_prox,
              "Cache site@%s too close to cache%d (%f <= %f)",
@@ -168,7 +168,7 @@ void cache_site_selector::opt_initialize(const opt_init_conditions* cond,
 
 void cache_site_selector::constraints_create(const ds::dp_cache_map& known_caches,
                                              const rmath::vector2d& nest_loc) {
-  for (auto& c : known_caches.const_values_range()) {
+  for (const auto & c : known_caches.const_values_range()) {
     std::get<0>(m_constraints)
         .push_back({ c.ent(),
                      this,

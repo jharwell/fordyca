@@ -119,10 +119,10 @@ void dpo_controller::init(ticpp::Element& node) {
 
 void dpo_controller::shared_init(
     const config::d0::dpo_controller_repository& config_repo) {
-  auto* perception = config_repo.config_get<cspconfig::perception_config>();
-  auto* block_matrix =
+  const auto * perception = config_repo.config_get<cspconfig::perception_config>();
+  const auto * block_matrix =
       config_repo.config_get<config::block_sel::block_sel_matrix_config>();
-  auto* nest = config_repo.config_get<crepr::config::nest_config>();
+  const auto * nest = config_repo.config_get<crepr::config::nest_config>();
 
   /* DPO perception subsystem */
   m_perception = std::make_unique<dpo_perception_subsystem>(perception);
@@ -134,7 +134,7 @@ void dpo_controller::shared_init(
 
 void dpo_controller::private_init(
     const config::d0::dpo_controller_repository& config_repo) {
-  auto* strat_config = config_repo.config_get<fcstrategy::strategy_config>();
+  const auto * strat_config = config_repo.config_get<fcstrategy::strategy_config>();
 
   fstrategy::foraging_strategy::params strategy_params(
       saa(), nullptr, nullptr, nullptr, rutils::color());

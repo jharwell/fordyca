@@ -108,7 +108,7 @@ void mdpo_controller::shared_init(
 
 void mdpo_controller::private_init(
     const config::d0::mdpo_controller_repository& config_repo) {
-    auto* strat_config = config_repo.config_get<fcstrategy::strategy_config>();
+    const auto * strat_config = config_repo.config_get<fcstrategy::strategy_config>();
 
   fstrategy::foraging_strategy::params strategy_params(
       saa(), nullptr, nullptr, perception()->dpo_store(), rutils::color());

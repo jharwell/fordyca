@@ -92,7 +92,7 @@ bool cache_acq_validator::operator()(const rmath::vector2d& loc,
 
 bool cache_acq_validator::pickup_policy_validate(const carepr::base_cache* cache,
                                                  const rtypes::timestep& t) const {
-  auto& config = boost::get<config::cache_sel::cache_pickup_policy_config>(
+  const auto & config = boost::get<config::cache_sel::cache_pickup_policy_config>(
       mc_csel_matrix->find(cselm::kPickupPolicy)->second);
 
   if (cselm::kPickupPolicyTime == config.policy && t < config.timestep) {
