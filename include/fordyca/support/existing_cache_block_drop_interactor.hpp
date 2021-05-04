@@ -26,6 +26,8 @@
  ******************************************************************************/
 #include <argos3/core/simulator/entity/floor_entity.h>
 
+#include "rcppsw/utils/maskable_enum.hpp"
+
 #include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/arena/operations/cache_block_drop.hpp"
 
@@ -109,7 +111,8 @@ class existing_cache_block_drop_interactor
      * Grid and block mutexes are also required, but only within the actual \ref
      * cached_block_pickup event visit to the arena map.
      */
-    m_map->cache_mtx()->lock();
+    m_map->lock_wr(m_map->cache_mtx());
+    m_map->lock_rd(m_map->block_mtx());
 
     /*
      * If two collector robots enter a cache that only contains 2 blocks on the
@@ -139,13 +142,15 @@ class existing_cache_block_drop_interactor
        * We now know we aren't going to update arena state, because the cache
        * associated with the penalty doesn't exist anymore.
        */
-      m_map->cache_mtx()->unlock();
+      m_map->unlock_rd(m_map->block_mtx());
+      m_map->unlock_wr(m_map->cache_mtx());
 
       events::cache_vanished_visitor vanished_op(penalty.id());
       vanished_op.visit(controller);
     } else {
       execute_cache_block_drop(controller, penalty);
-      m_map->cache_mtx()->unlock();
+      m_map->unlock_rd(m_map->block_mtx());
+      m_map->unlock_wr(m_map->cache_mtx());
     }
 
     m_penalty_handler->penalty_remove(penalty);
@@ -178,7 +183,7 @@ class existing_cache_block_drop_interactor
         m_map->blocks()[block_id.v()],
         *cache_it,
         m_map->grid_resolution(),
-        carena::arena_map_locking::ekCACHES_HELD);
+        carena::locking::ekCACHES_HELD | carena::locking::ekBLOCKS_HELD);
     events::robot_cache_block_drop_visitor rdrop_op(
         controller.block_release(), *cache_it, m_map->grid_resolution());
 
@@ -200,9 +205,9 @@ class existing_cache_block_drop_interactor
   bool pre_process_check(const TController& controller) const {
     const auto& penalty = m_penalty_handler->penalty_next();
     auto acq_goal = controller.current_task()->acquisition_goal();
-    const auto * task = dynamic_cast<const events::existing_cache_interactor*>(
+    const auto* task = dynamic_cast<const events::existing_cache_interactor*>(
         controller.current_task());
-    RCPPSW_UNUSED const auto * polled =
+    RCPPSW_UNUSED const auto* polled =
         dynamic_cast<const cta::polled_task*>(controller.current_task());
 
     ER_CHECK(penalty.controller() == &controller,

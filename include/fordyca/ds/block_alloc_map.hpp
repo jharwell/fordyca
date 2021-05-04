@@ -69,6 +69,7 @@ class block_alloc_map {
   /* clang-format on */
 
  public:
+  RCPPSW_WRAP_DECLDEF(at, decoratee(), const);
   RCPPSW_WRAP_DECLDEF(operator[], decoratee());
   RCPPSW_WRAP_DECLDEF(begin, decoratee());
   RCPPSW_WRAP_DECLDEF(end, decoratee());

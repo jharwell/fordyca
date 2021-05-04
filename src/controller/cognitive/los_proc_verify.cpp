@@ -48,7 +48,7 @@ bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
    * here. The fix is to only assert() if there is not a cache that contains the
    * block's location, and it is therefore not occluded.
    */
-  for (const auto & cache : c_dpo->caches().const_values_range()) {
+  for (const auto& cache : c_dpo->caches().const_values_range()) {
     for (auto* block : mc_los->blocks()) {
       if (!cache.ent()->contains_point2D(block->ranchor2D())) {
         ER_ASSERT(c_dpo->contains(block),
@@ -67,7 +67,7 @@ bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
    *   location, and ID.
    */
   for (auto& c1 : mc_los->caches()) {
-    const auto *exists = c_dpo->find(c1);
+    const auto* exists = c_dpo->find(c1);
     ER_ASSERT(nullptr != exists,
               "LOS Cache%d@%s does not exist in DPO store",
               c1->id().v(),
@@ -100,7 +100,8 @@ bool los_proc_verify::operator()(const ds::dpo_semantic_map* const c_map) const 
    * corresponding cell in the map also contains the same block.
    */
   for (auto* block : mc_los->blocks()) {
-    const auto & cell = c_map->access<ds::occupancy_grid::kCell>(block->danchor2D());
+    const auto& cell =
+        c_map->access<ds::occupancy_grid::kCell>(block->danchor2D());
 
     ER_ASSERT(cell.state_has_block(),
               "Cell@%s not in HAS_BLOCK state",
@@ -119,8 +120,8 @@ bool los_proc_verify::operator()(const ds::dpo_semantic_map* const c_map) const 
   for (uint i = 0; i < mc_los->xsize(); ++i) {
     for (uint j = 0; j < mc_los->ysize(); ++j) {
       rmath::vector2z d = mc_los->access(i, j).loc();
-      const auto & cell1 = mc_los->access(i, j);
-      const auto & cell2 = c_map->access<ds::occupancy_grid::kCell>(d);
+      const auto& cell1 = mc_los->access(i, j);
+      const auto& cell2 = c_map->access<ds::occupancy_grid::kCell>(d);
 
       if (cell1.state_has_block() || cell1.state_is_empty()) {
         ER_ASSERT(cell1.fsm().current_state() == cell2.fsm().current_state(),

@@ -97,7 +97,7 @@ site_selection_metrics_collector::csv_line_build(void) {
 
 void site_selection_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
-  const auto & m = dynamic_cast<const site_selection_metrics&>(metrics);
+  const auto& m = dynamic_cast<const site_selection_metrics&>(metrics);
   nlopt::result res = m.nlopt_result();
   if (!m.site_select_exec()) {
     return;

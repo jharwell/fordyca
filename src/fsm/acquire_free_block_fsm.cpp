@@ -106,7 +106,8 @@ boost::optional<csfsm::acquire_goal_fsm::candidate_type>
 acquire_free_block_fsm::block_select(void) const {
   controller::cognitive::block_selector selector(mc_matrix);
 
-  if (const auto *best = selector(mc_store->blocks(), saa()->sensing()->rpos2D())) {
+  if (const auto* best =
+          selector(mc_store->blocks(), saa()->sensing()->rpos2D())) {
     return boost::make_optional(acquire_goal_fsm::candidate_type(
         best->rcenter2D(), kBLOCK_ARRIVAL_TOL, best->id()));
   } else {

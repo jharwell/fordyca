@@ -51,7 +51,7 @@ std::vector<rmath::vector2d> static_cache_locs_calculator::operator()(
   std::vector<rmath::vector2d> cache_rlocs;
   ER_ASSERT(1 == arena_map->nests().size(),
             "Multiple nests incompatible with static cache management");
-  const auto * nest = arena_map->nest(rtypes::type_uuid(0));
+  const auto* nest = arena_map->nest(rtypes::type_uuid(0));
 
   /*
    * For the single source, dual source, quad source block distributions, each

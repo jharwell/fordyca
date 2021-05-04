@@ -28,16 +28,16 @@
 #include "cosm/arena/config/arena_map_config.hpp"
 #include "cosm/controller/operations/applicator.hpp"
 #include "cosm/foraging/block_dist/base_distributor.hpp"
+#include "cosm/foraging/block_dist/dispatcher.hpp"
 #include "cosm/foraging/metrics/block_transportee_metrics_collector.hpp"
 #include "cosm/foraging/oracle/foraging_oracle.hpp"
+#include "cosm/hal/subsystem/config/saa_xml_names.hpp"
 #include "cosm/interactors/applicator.hpp"
 #include "cosm/oracle/config/aggregate_oracle_config.hpp"
 #include "cosm/pal/argos_convergence_calculator.hpp"
 #include "cosm/pal/argos_swarm_iterator.hpp"
-#include "cosm/hal/subsystem/config/saa_xml_names.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
-#include "cosm/foraging/block_dist/dispatcher.hpp"
 
 #include "fordyca/controller/cognitive/d1/bitd_dpo_controller.hpp"
 #include "fordyca/controller/cognitive/d1/bitd_mdpo_controller.hpp"
@@ -72,7 +72,7 @@ struct d1_subtask_status_extractor
   using controller_type = Controller;
 
   std::pair<bool, bool> operator()(const Controller* const c) const {
-    const auto *task = dynamic_cast<const cta::polled_task*>(c->current_task());
+    const auto* task = dynamic_cast<const cta::polled_task*>(c->current_task());
     return std::make_pair(
         task->name() == tasks::d1::foraging_task::kHarvesterName,
         task->name() == tasks::d1::foraging_task::kCollectorName);
@@ -96,7 +96,7 @@ struct d1_subtask_status_extractor_adaptor
   template <typename Controller>
   std::pair<bool, bool>
   operator()(const d1_subtask_status_extractor<Controller>& extractor) const {
-    const auto *cast = dynamic_cast<
+    const auto* cast = dynamic_cast<
         const typename d1_subtask_status_extractor<Controller>::controller_type*>(
         mc_controller);
     return extractor(cast);
@@ -183,7 +183,7 @@ void d1_loop_functions::init(ticpp::Element& node) {
   ER_INFO("Initializing...");
 
   config_parse(node);
-  const auto * aconfig = config()->config_get<caconfig::arena_map_config>();
+  const auto* aconfig = config()->config_get<caconfig::arena_map_config>();
   if (cfbd::dispatcher::kDistPowerlaw == aconfig->blocks.dist.dist_type) {
     delay_arena_map_init(true);
   }
@@ -204,8 +204,8 @@ void d1_loop_functions::shared_init(ticpp::Element& node) {
 
 void d1_loop_functions::private_init(void) {
   /* initialize stat collecting */
-  const auto * output = config()->config_get<cmconfig::output_config>();
-  const auto * arena = config()->config_get<caconfig::arena_map_config>();
+  const auto* output = config()->config_get<cmconfig::output_config>();
+  const auto* arena = config()->config_get<caconfig::arena_map_config>();
 
   /* initialize cache handling and create initial cache(s) */
   cache_handling_init(
@@ -216,7 +216,7 @@ void d1_loop_functions::private_init(void) {
    * Initialize arena map and distribute blocks after creating initial
    * caches. This is only needed for powerlaw distributions.
    */
-  const auto * vconfig = config()->config_get<cvconfig::visualization_config>();
+  const auto* vconfig = config()->config_get<cvconfig::visualization_config>();
   if (delay_arena_map_init()) {
     arena_map_init(vconfig);
   }
@@ -282,7 +282,7 @@ void d1_loop_functions::private_init(void) {
 } /* private_init() */
 
 void d1_loop_functions::oracle_init(void) {
-  const auto * oraclep = config()->config_get<coconfig::aggregate_oracle_config>();
+  const auto* oraclep = config()->config_get<coconfig::aggregate_oracle_config>();
   if (nullptr == oraclep || nullptr == oracle()) {
     return;
   }
@@ -296,7 +296,7 @@ void d1_loop_functions::oracle_init(void) {
     const auto& controller0 =
         dynamic_cast<controller::cognitive::d1::bitd_dpo_controller&>(
             robot0.GetControllableEntity().GetController());
-    const auto * bigraph = controller0.executive()->graph();
+    const auto* bigraph = controller0.executive()->graph();
     oracle()->tasking_oracle(
         std::make_unique<coracle::tasking_oracle>(&oraclep->tasking, bigraph));
   }
@@ -320,12 +320,14 @@ void d1_loop_functions::cache_handling_init(
   }
   cache_create_ro_params ccp = { .current_caches = arena_map()->caches(),
                                  .clusters = clusters,
-                                 .t = rtypes::timestep(GetSpace().GetSimulationClock()) };
+                                 .t = rtypes::timestep(
+                                     GetSpace().GetSimulationClock()) };
 
-  cpal::argos_sm_adaptor::led_medium(chsubsystem::config::saa_xml_names::leds_saa);
+  cpal::argos_sm_adaptor::led_medium(
+      chsubsystem::config::saa_xml_names::leds_saa);
   bool pre_dist = (nullptr == arena_map()->block_distributor());
-  if (auto created =
-          m_cache_manager->create(ccp, arena_map()->free_blocks(true), pre_dist)) {
+  if (auto created = m_cache_manager->create(
+          ccp, arena_map()->free_blocks(true), pre_dist)) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }
@@ -388,12 +390,12 @@ void d1_loop_functions::post_step(void) {
    * allowed 1 usage of ARGoS threads per PreStep()/PostStep() function call.
    */
   auto cb = [&](argos::CControllableEntity* robot) {
-              ndc_push();
-              robot_post_step(dynamic_cast<chal::robot&>(robot->GetParent()));
-              caches_recreation_task_counts_collect(
-                  &static_cast<controller::foraging_controller&>(robot->GetController()));
-              ndc_pop();
-            };
+    ndc_push();
+    robot_post_step(dynamic_cast<chal::robot&>(robot->GetParent()));
+    caches_recreation_task_counts_collect(
+        &static_cast<controller::foraging_controller&>(robot->GetController()));
+    ndc_pop();
+  };
   cpal::argos_swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
 
   ndc_push();
@@ -407,9 +409,11 @@ void d1_loop_functions::post_step(void) {
   m_cache_counts.n_collectors = 0;
 
   /* update arena map */
-  const auto * collector =
-      m_metrics_agg->get<cfmetrics::block_transportee_metrics_collector>("blocks::"
-                                                                         "transpor"
+  const auto* collector =
+      m_metrics_agg->get<cfmetrics::block_transportee_metrics_collector>("blocks:"
+                                                                         ":"
+                                                                         "transpo"
+                                                                         "r"
                                                                          "tee");
 
   /*
@@ -420,9 +424,7 @@ void d1_loop_functions::post_step(void) {
   arena_map()->post_step_update(
       rtypes::timestep(GetSpace().GetSimulationClock()),
       collector->cum_transported(),
-      block_op(),
       nullptr != conv_calculator() ? conv_calculator()->converged() : false);
-  block_op(false);
 
   /* Collect metrics from/about existing caches */
   for (auto* c : arena_map()->caches()) {
@@ -436,7 +438,7 @@ void d1_loop_functions::post_step(void) {
    * process as they have been depleted and do not exist anymore in the \ref
    * arena_map::cacheso() array.
    */
-  for (const auto & c : arena_map()->zombie_caches()) {
+  for (const auto& c : arena_map()->zombie_caches()) {
     m_metrics_agg->collect_from_cache(c.get());
     c->reset_metrics();
   } /* for(&c..) */
@@ -475,7 +477,9 @@ void d1_loop_functions::reset(void) {
     .t = rtypes::timestep(GetSpace().GetSimulationClock())
   };
 
-  if (auto created = m_cache_manager->create(ccp, arena_map()->blocks(), false)) {
+  if (auto created = m_cache_manager->create(ccp,
+                                             arena_map()->blocks(),
+                                             false)) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }
@@ -492,7 +496,7 @@ void d1_loop_functions::destroy(void) {
  * General Member Functions
  ******************************************************************************/
 void d1_loop_functions::robot_pre_step(chal::robot& robot) {
-  auto *controller = static_cast<controller::foraging_controller*>(
+  auto* controller = static_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
 
   /*
@@ -519,7 +523,7 @@ void d1_loop_functions::robot_pre_step(chal::robot& robot) {
 } /* robot_pre_step() */
 
 void d1_loop_functions::robot_post_step(chal::robot& robot) {
-  auto *controller = static_cast<controller::foraging_controller*>(
+  auto* controller = static_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
 
   /*
@@ -557,16 +561,6 @@ void d1_loop_functions::robot_post_step(chal::robot& robot) {
    */
   if (interactor_status::ekNO_EVENT != status && nullptr != oracle()) {
     oracle()->update(arena_map());
-  }
-
-  /*
-   * Mark that a block operation has occured this timestep, and additional
-   * processing is needed AFTER all robots have finished their control steps.
-   */
-  if ((interactor_status::ekFREE_BLOCK_DROP | interactor_status::ekTASK_ABORT) & status) {
-    block_op_mtx()->lock();
-    block_op(true);
-    block_op_mtx()->unlock();
   }
 
   /*

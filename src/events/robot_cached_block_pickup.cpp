@@ -136,7 +136,7 @@ void robot_cached_block_pickup::visit(ds::dpo_store& store) {
             rcppsw::to_string(mc_cache->rcenter2D()).c_str(),
             rcppsw::to_string(mc_cache->dcenter2D()).c_str());
 
-  auto *pcache = store.find(mc_cache);
+  auto* pcache = store.find(mc_cache);
 
   /*
    * In general this should be true, but it cannot be an assert, because for

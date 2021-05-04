@@ -42,7 +42,9 @@ void strategy_parser::parse(const ticpp::Element& node) {
     m_config->explore = *m_explore.config_get<explore_parser::config_type>();
   }
   if (m_nest_acq.is_parsed()) {
-    m_config->nest_acq = *m_nest_acq.config_get<csstrategy::config::xml::nest_acq_parser::config_type>();
+    m_config->nest_acq =
+        *m_nest_acq
+             .config_get<csstrategy::config::xml::nest_acq_parser::config_type>();
   }
 } /* parse() */
 

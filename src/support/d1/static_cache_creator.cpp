@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/support/d1/static_cache_creator.hpp"
 
+#include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
 
 /*******************************************************************************
@@ -35,11 +36,10 @@ using carepr::base_cache;
  * Constructors/Destructor
  ******************************************************************************/
 static_cache_creator::static_cache_creator(
-    cds::arena_grid* const grid,
-    cfbd::base_distributor* block_distributor,
+    carena::caching_arena_map* const map,
     const std::vector<rmath::vector2d>& centers,
     const rtypes::spatial_dist& cache_dim)
-    : base_cache_creator(grid, cache_dim, block_distributor),
+    : base_cache_creator(map, cache_dim),
       ER_CLIENT_INIT("fordyca.support.d1.static_cache_creator"),
       mc_centers(centers) {}
 
@@ -48,16 +48,16 @@ static_cache_creator::static_cache_creator(
  ******************************************************************************/
 static_cache_creator::creation_result
 static_cache_creator::create_all(const cache_create_ro_params& c_params,
-                                 const ds::block_alloc_map& c_alloc_map,
+                                 ds::block_alloc_map&& c_alloc_map,
                                  bool pre_dist) {
   creation_result res;
-  for (const auto& alloc_i : c_alloc_map) {
-    ER_DEBUG("Cache%d allocked blocks: [%s] (%zu)",
+  for (auto& alloc_i : c_alloc_map) {
+    ER_DEBUG("Cache%d alloced blocks: [%s] (%zu)",
              alloc_i.first,
              rcppsw::to_string(alloc_i.second).c_str(),
              mc_centers.size());
     auto rcenter = mc_centers[alloc_i.first];
-    auto dcenter = rmath::dvec2zvec(rcenter, grid()->resolution().v());
+    auto dcenter = rmath::dvec2zvec(rcenter, map()->grid_resolution().v());
     auto exists =
         std::find_if(c_params.current_caches.begin(),
                      c_params.current_caches.end(),
@@ -88,7 +88,10 @@ static_cache_creator::create_all(const cache_create_ro_params& c_params,
             rcppsw::to_string(alloc_i.second).c_str(),
             alloc_i.second.size());
     auto cache =
-        create_single_cache(rcenter, alloc_i.second, c_params.t, pre_dist);
+        create_single_cache(rcenter,
+                            std::move(alloc_i.second),
+                            c_params.t,
+                            pre_dist);
     res.created.push_back(std::move(cache));
   } /* for(&alloc_i..) */
 

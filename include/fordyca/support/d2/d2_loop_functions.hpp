@@ -113,14 +113,14 @@ class d2_loop_functions final : public d1::d1_loop_functions,
   /**
    * \brief Handle creation of dynamic caches during initialization, reset, or
    * when triggered by events during simulation.
-   *3a
+   *
    * \param on_drop \c TRUE if caches are to be (potentially) created as a
    * result of a robot block drop. If \c FALSE, then consider dynamic cache
    * creation in other situations.
    *
    * \return \c TRUE if one or more caches were created, \c FALSE otherwise.
    */
-  bool cache_creation_handle(bool on_drop);
+  bool cache_creation_handle(bool on_drop) RCPPSW_COLD;
 
   /**
    * \brief Extract the numerical ID of the task each robot is currently

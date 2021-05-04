@@ -101,7 +101,7 @@ boost::optional<std::string> lifecycle_metrics_collector::csv_line_build(void) {
 } /* csv_line_build() */
 
 void lifecycle_metrics_collector::collect(const rmetrics::base_metrics& metrics) {
-  const auto & m = static_cast<const lifecycle_metrics&>(metrics);
+  const auto& m = static_cast<const lifecycle_metrics&>(metrics);
   auto ages = m.cache_depletion_ages();
   auto sum = std::accumulate(ages.begin(), ages.end(), rtypes::timestep(0));
 

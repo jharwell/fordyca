@@ -24,7 +24,6 @@
 #include "fordyca/support/d2/dynamic_cache_creator.hpp"
 
 #include "cosm/arena/caching_arena_map.hpp"
-#include "cosm/arena/free_blocks_calculator.hpp"
 #include "cosm/arena/operations/cache_extent_clear.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/repr/base_block3D.hpp"
@@ -32,6 +31,7 @@
 
 #include "fordyca/events/cell2D_empty.hpp"
 #include "fordyca/support/d2/cache_center_calculator.hpp"
+#include "fordyca/support/cache_creation_verifier.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -43,13 +43,11 @@ NS_START(fordyca, support, d2);
  ******************************************************************************/
 dynamic_cache_creator::dynamic_cache_creator(const params* const p,
                                              rmath::rng* rng)
-    : base_cache_creator(&p->map->decoratee(),
-                         p->cache_dim,
-                         p->map->block_distributor()),
+    : base_cache_creator(p->map, p->cache_dim),
       ER_CLIENT_INIT("fordyca.support.d2.dynamic_cache_creator"),
-      mc_strict_constraints(p->strict_constraints),
       mc_min_blocks(p->min_blocks),
       mc_min_dist(p->min_dist),
+      mc_strict_constraints(p->strict_constraints),
       m_rng(rng),
       m_map(p->map) {}
 
@@ -98,10 +96,13 @@ dynamic_cache_creator::create_all(const cache_create_ro_params& c_params,
                      [&](const auto& c) { return c.get(); });
       sanity_caches.push_back(cache_i.cache.get());
 
-      if (!cache_i_verify(cache_i.cache.get(),
-                          sanity_caches,
-                          all_blocks,
-                          c_params.clusters)) {
+      auto verifier = cache_creation_verifier(m_map,
+                                              cache_dim(),
+                                              mc_strict_constraints);
+      if (!verifier.verify_single(cache_i.cache.get(),
+                                  sanity_caches,
+                                  all_blocks,
+                                  c_params.clusters)) {
         cache_delete(cache_i);
       } else {
         auto shared =
@@ -133,7 +134,7 @@ dynamic_cache_creator::cache_i_result dynamic_cache_creator::cache_i_create(
 
   /* First, try find a conflict free cache center (host cell) */
   auto calculator = cache_center_calculator(
-      grid(), cache_dim(), m_map->nests(), c_params.clusters);
+      &map()->decoratee(), cache_dim(), m_map->nests(), c_params.clusters);
   auto center = calculator(c_alloc_blocks, c_avoid, m_rng);
   if (!center) {
     return {};
@@ -144,8 +145,10 @@ dynamic_cache_creator::cache_i_result dynamic_cache_creator::cache_i_create(
    * blocks within the extent of the cache-to-be, and add them into the block
    * list for the new cache (absorption).
    */
-  auto absorb_blocks = absorb_blocks_calc(
-      c_absorbable_blocks, c_alloc_blocks, *center, cache_dim());
+  auto absorb_blocks = cache_i_alloc_from_absorbable(c_absorbable_blocks,
+                                                     c_alloc_blocks,
+                                                     *center,
+                                                     cache_dim());
   ER_DEBUG("Absorb blocks=[%s]", rcppsw::to_string(absorb_blocks).c_str());
 
   /* blocks for cache i = allocated blocks + absorb blocks */
@@ -158,81 +161,12 @@ dynamic_cache_creator::cache_i_result dynamic_cache_creator::cache_i_create(
 
   ER_DEBUG("Cache blocks=[%s]", rcppsw::to_string(cache_i_blocks).c_str());
 
-  auto cache = create_single_cache(*center, cache_i_blocks, c_params.t, false);
+  auto cache = create_single_cache(*center,
+                                   std::move(cache_i_blocks),
+                                   c_params.t,
+                                   false);
   return { true, std::move(cache), cache_i_blocks };
 } /* cache_i_create() */
-
-bool dynamic_cache_creator::cache_i_verify(
-    RCPPSW_UNUSED const carepr::arena_cache* cache,
-    const cads::acache_vectorro& c_caches,
-    const cds::block3D_vectorno& c_all_blocks,
-    const cfds::block3D_cluster_vectorro& c_clusters) const {
-  auto free_blocks = carena::free_blocks_calculator(false)(c_all_blocks,
-                                                           c_caches);
-
-  bool sanity_ok = creation_sanity_checks(c_caches,
-                                          free_blocks,
-                                          c_clusters,
-                                          m_map->nests());
-  if (!sanity_ok) {
-    if (mc_strict_constraints) {
-      ER_WARN("Bad cache%d@%s/%s creation--discard (strict constraints)",
-              cache->id().v(),
-              rcppsw::to_string(cache->rcenter2D()).c_str(),
-              rcppsw::to_string(cache->dcenter2D()).c_str());
-      return false;
-    } else {
-      ER_WARN("Bad cache%d@%s/%s creation--keep (loose constraints)",
-              cache->id().v(),
-              rcppsw::to_string(cache->rcenter2D()).c_str(),
-              rcppsw::to_string(cache->dcenter2D()).c_str());
-      return true;
-    }
-  } else {
-    ER_INFO("Cache%d@%s/%s creation sanity checks OK",
-            cache->id().v(),
-            rcppsw::to_string(cache->rcenter2D()).c_str(),
-            rcppsw::to_string(cache->dcenter2D()).c_str());
-    return true;
-  }
-} /* cache_i_verify() */
-
-cads::acache_vectorno dynamic_cache_creator::avoidance_caches_calc(
-    const cads::acache_vectorno& c_previous_caches,
-    const cads::acache_vectoro& c_created_caches) const {
-  cads::acache_vectorno avoid = c_previous_caches;
-  for (const auto & c : c_created_caches) {
-    avoid.push_back(c.get());
-  } /* for(&c..) */
-  return avoid;
-} /* avoidance_caches_calc() */
-
-cds::block3D_htno dynamic_cache_creator::absorb_blocks_calc(
-    const cds::block3D_htno& c_absorbable_blocks,
-    const cds::block3D_vectorno& c_cache_i_blocks,
-    const rmath::vector2d& c_center,
-    const rtypes::spatial_dist& c_cache_dim) const {
-  cds::block3D_htno absorb_blocks;
-  rmath::vector2d cache_dim(c_cache_dim.v(), c_cache_dim.v());
-  using checker = cspatial::conflict_checker;
-
-  std::copy_if(c_absorbable_blocks.begin(),
-               c_absorbable_blocks.end(),
-               std::inserter(absorb_blocks, absorb_blocks.begin()),
-               [&](const auto& pair) RCPPSW_PURE {
-                 auto* block = pair.second;
-                 auto status = checker::placement2D(
-                     c_center - cache_dim / 2.0, cache_dim, block);
-
-                 return /* block overlaps cache i */
-                     status.x && status.y &&
-                     /* block is not already allocated to cache i */
-                     c_cache_i_blocks.end() == std::find(c_cache_i_blocks.begin(),
-                                                         c_cache_i_blocks.end(),
-                                                         block);
-               });
-  return absorb_blocks;
-} /* absorb_blocks_calc() */
 
 cds::block3D_vectorno dynamic_cache_creator::cache_i_blocks_alloc(
     const cds::block3D_vectorno& c_usable_blocks,
@@ -284,7 +218,48 @@ cds::block3D_vectorno dynamic_cache_creator::cache_i_blocks_alloc(
   return cache_i_blocks;
 } /* cache_i_blocks_alloc() */
 
+
+cds::block3D_htno dynamic_cache_creator::cache_i_alloc_from_absorbable(
+    const cds::block3D_htno& c_absorbable_blocks,
+    const cds::block3D_vectorno& c_cache_i_blocks,
+    const rmath::vector2d& c_center,
+    const rtypes::spatial_dist& c_cache_dim) const {
+  cds::block3D_htno absorb_blocks;
+  rmath::vector2d cache_dim(c_cache_dim.v(), c_cache_dim.v());
+  using checker = cspatial::conflict_checker;
+
+  std::copy_if(c_absorbable_blocks.begin(),
+               c_absorbable_blocks.end(),
+               std::inserter(absorb_blocks, absorb_blocks.begin()),
+               [&](const auto& pair) RCPPSW_PURE {
+                 auto* block = pair.second;
+                 auto status = checker::placement2D(
+                     c_center - cache_dim / 2.0, cache_dim, block);
+
+                 return
+                     /* block overlaps cache i */
+                     status.x && status.y &&
+                     /* block is not already allocated to cache i */
+                     c_cache_i_blocks.end() == std::find(c_cache_i_blocks.begin(),
+                                                         c_cache_i_blocks.end(),
+                                                         block);
+               });
+  return absorb_blocks;
+} /* cache_i_alloc_from_absorbable() */
+
+cads::acache_vectorno dynamic_cache_creator::avoidance_caches_calc(
+    const cads::acache_vectorno& c_previous_caches,
+    const cads::acache_vectoro& c_created_caches) const {
+  cads::acache_vectorno avoid = c_previous_caches;
+  for (const auto& c : c_created_caches) {
+    avoid.push_back(c.get());
+  } /* for(&c..) */
+  return avoid;
+} /* avoidance_caches_calc() */
+
 void dynamic_cache_creator::cache_delete(const cache_i_result& cache_i) {
+  ER_INFO("Delete created cache%d", cache_i.cache->id().v());
+
   /* clear out all cache host cell AND cells that were in CACHE_EXTENT */
   events::cell2D_empty_visitor hc(cache_i.cache->dcenter2D());
   caops::cache_extent_clear_visitor ec(cache_i.cache.get());
@@ -299,7 +274,7 @@ void dynamic_cache_creator::cache_delete(const cache_i_result& cache_i) {
      * since dynamic cache creation always happens in a non-concurrent
      * context.
      */
-    m_map->distribute_single_block(b, carena::arena_map_locking::ekALL_HELD);
+    m_map->distribute_single_block(b, carena::locking::ekALL_HELD);
   } /* for(*b..) */
 } /* cache_delete() */
 

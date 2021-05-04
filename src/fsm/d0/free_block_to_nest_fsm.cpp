@@ -75,9 +75,7 @@ free_block_to_nest_fsm::free_block_to_nest_fsm(
           c_params->bsel_matrix->find(bsel_matrix::kNestLoc)->second)),
       m_block_fsm(c_params, saa, std::move(explore), rng) {}
 
-RCPPSW_HFSM_STATE_DEFINE(free_block_to_nest_fsm,
-                         start,
-                         rpfsm::event_data* data) {
+RCPPSW_HFSM_STATE_DEFINE(free_block_to_nest_fsm, start, rpfsm::event_data* data) {
   /* first time running FSM */
   if (rpfsm::event_type::ekNORMAL == data->type()) {
     internal_event(ekST_ACQUIRE_BLOCK);
@@ -224,7 +222,7 @@ bool free_block_to_nest_fsm::is_phototaxiing_to_goal(bool include_ca) const {
     return foraging_transport_goal::ekNEST == block_transport_goal();
   } else {
     return foraging_transport_goal::ekNEST == block_transport_goal() &&
-        !exp_interference();
+           !exp_interference();
   }
 } /* is_phototaxiing_to_goal() */
 

@@ -53,6 +53,7 @@ void caches_parser::parse(const ticpp::Element& node) {
   }
 
   XML_PARSE_ATTR(cnode, m_config, dimension);
+  XML_PARSE_ATTR_DFLT(cnode, m_config, strict_constraints, true);
 } /* parse() */
 
 bool caches_parser::validate(void) const {

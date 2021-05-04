@@ -71,8 +71,8 @@ void base_loop_functions::init(ticpp::Element& node) {
   output_init(m_config.config_get<cmconfig::output_config>());
 
   /* initialize arena map and distribute blocks */
-  const auto * aconfig = config()->config_get<caconfig::arena_map_config>();
-  const auto * vconfig = config()->config_get<cvconfig::visualization_config>();
+  const auto* aconfig = config()->config_get<caconfig::arena_map_config>();
+  const auto* vconfig = config()->config_get<cvconfig::visualization_config>();
   arena_map_create<carena::caching_arena_map>(aconfig);
   if (!delay_arena_map_init()) {
     arena_map_init(vconfig);

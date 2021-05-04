@@ -114,16 +114,15 @@ class block_op_filter : public rer::client<block_op_filter> {
       result.status = op_filter_status::ekROBOT_INTERNAL_UNREADY;
     } else {
       /*
-       * OK to lock around this calculation, because relatively few robots will
-       * have the correct internal state for a free block pickup each timestep,
-       * and we don't need exclusive access to the arena map at this point--only
-       * a guarantee that the blocks/caches arrays will not be modified while we
-       * are checking them.
+       * Relatively few robots will have the correct internal state for a free
+       * block pickup each timestep, and we don't need exclusive access to the
+       * arena map at this point--only a guarantee that the blocks/caches arrays
+       * will not be modified while we are checking them.
        */
       mc_map->lock_rd(mc_map->cache_mtx());
       mc_map->lock_rd(mc_map->block_mtx());
       auto block_id = mc_map->robot_on_block(controller.rpos2D(),
-                                            controller.entity_acquired_id());
+                                             controller.entity_acquired_id());
       mc_map->unlock_rd(mc_map->block_mtx());
       mc_map->unlock_rd(mc_map->cache_mtx());
 

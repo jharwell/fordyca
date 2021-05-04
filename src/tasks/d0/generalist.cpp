@@ -128,7 +128,8 @@ RCPPSW_WRAP_DEF_OVERRIDE(
  * Block Transport Metrics
  ******************************************************************************/
 bool generalist::is_phototaxiing_to_goal(bool include_ca) const {
-  return static_cast<fsm::d0::free_block_to_nest_fsm*>(polled_task::mechanism())->is_phototaxiing_to_goal(include_ca);
+  return static_cast<fsm::d0::free_block_to_nest_fsm*>(polled_task::mechanism())
+      ->is_phototaxiing_to_goal(include_ca);
 } /* is_phototaxiing_to_goal() */
 
 NS_END(d0, tasks, fordyca);

@@ -28,13 +28,13 @@
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/arena/repr/light_type_index.hpp"
 #include "cosm/repr/base_block3D.hpp"
+#include "cosm/spatial/strategy/nest_acq/factory.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/ta/bi_tdgraph_allocator.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/config/task_alloc_config.hpp"
 #include "cosm/ta/config/task_executive_config.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
-#include "cosm/spatial/strategy/nest_acq/factory.hpp"
 
 #include "fordyca/config/d1/controller_repository.hpp"
 #include "fordyca/config/strategy/strategy_config.hpp"
@@ -79,8 +79,10 @@ task_executive_builder::tasking_map task_executive_builder::d1_tasks_create(
     const config::d1::controller_repository& config_repo,
     cta::ds::bi_tdgraph* const graph,
     rmath::rng* rng) {
-  const auto * task_config = config_repo.config_get<cta::config::task_alloc_config>();
-  const auto * strat_config = config_repo.config_get<fcstrategy::strategy_config>();
+  const auto* task_config =
+      config_repo.config_get<cta::config::task_alloc_config>();
+  const auto* strat_config =
+      config_repo.config_get<fcstrategy::strategy_config>();
   auto cache_color = carepr::light_type_index()[carepr::light_type_index::kCache];
   fstrategy::foraging_strategy::params strategy_cachep(
       saa(), nullptr, mc_csel_matrix, m_perception->dpo_store(), cache_color);
@@ -94,34 +96,28 @@ task_executive_builder::tasking_map task_executive_builder::d1_tasks_create(
   fsexplore::cache_factory cache_factory;
   csstrategy::nest_acq::factory nest_acq_factory;
 
-  fsm::fsm_ro_params params = {
-    .bsel_matrix = block_sel_matrix(),
-    .csel_matrix = mc_csel_matrix,
-    .store = m_perception->dpo_store(),
-    .strategy_config = *strat_config
-  };
+  fsm::fsm_ro_params params = { .bsel_matrix = block_sel_matrix(),
+                                .csel_matrix = mc_csel_matrix,
+                                .store = m_perception->dpo_store(),
+                                .strategy_config = *strat_config };
 
   auto generalist_fsm = std::make_unique<fsm::d0::free_block_to_nest_fsm>(
       &params,
       saa(),
-      block_factory.create(strat_config->explore.block_strategy,
-                           &strategy_blockp,
-                           rng),
+      block_factory.create(
+          strat_config->explore.block_strategy, &strategy_blockp, rng),
       nest_acq_factory.create(strat_config->nest_acq.strategy, saa(), rng),
       rng);
   auto collector_fsm = std::make_unique<fsm::d1::cached_block_to_nest_fsm>(
       &params,
       saa(),
-      cache_factory.create(strat_config->explore.cache_strategy,
-                           &strategy_cachep,
-                           rng),
+      cache_factory.create(
+          strat_config->explore.cache_strategy, &strategy_cachep, rng),
       nest_acq_factory.create(strat_config->nest_acq.strategy, saa(), rng),
       rng);
 
   auto harvester_fsm =
-      std::make_unique<fsm::d1::block_to_existing_cache_fsm>(&params,
-                                                             saa(),
-                                                             rng);
+      std::make_unique<fsm::d1::block_to_existing_cache_fsm>(&params, saa(), rng);
 
   auto collector = std::make_unique<tasks::d1::collector>(
       task_config, std::move(collector_fsm));
@@ -152,7 +148,8 @@ void task_executive_builder::d1_exec_est_init(
     const tasking_map& map,
     cta::ds::bi_tdgraph* const graph,
     rmath::rng* rng) {
-  const auto * task_config = config_repo.config_get<cta::config::task_alloc_config>();
+  const auto* task_config =
+      config_repo.config_get<cta::config::task_alloc_config>();
   if (!task_config->exec_est.seed_enabled) {
     return;
   }
@@ -160,9 +157,9 @@ void task_executive_builder::d1_exec_est_init(
    * Generalist is not partitionable in depth 0 initialization, so this has
    * not been done.
    */
-  auto *harvester = map.find("harvester")->second;
-  auto *collector = map.find("collector")->second;
-  auto *generalist = map.find("generalist")->second;
+  auto* harvester = map.find("harvester")->second;
+  auto* collector = map.find("collector")->second;
+  auto* generalist = map.find("generalist")->second;
 
   if (0 == rng->uniform(0, 1)) {
     graph->root_tab()->last_subtask(harvester);
@@ -194,8 +191,8 @@ void task_executive_builder::d1_subtasks_init(const tasking_map& map,
    * Generalist is not partitionable in depth 0 initialization, so this has
    * not been done.
    */
-  auto *harvester = map.find("harvester")->second;
-  auto *collector = map.find("collector")->second;
+  auto* harvester = map.find("harvester")->second;
+  auto* collector = map.find("collector")->second;
 
   if (0 == rng->uniform(0, 1)) {
     graph->root_tab()->last_subtask(harvester);
@@ -207,10 +204,11 @@ void task_executive_builder::d1_subtasks_init(const tasking_map& map,
 std::unique_ptr<cta::bi_tdgraph_executive> task_executive_builder::operator()(
     const config::d1::controller_repository& config_repo,
     rmath::rng* rng) {
-  const auto * task_config = config_repo.config_get<cta::config::task_alloc_config>();
+  const auto* task_config =
+      config_repo.config_get<cta::config::task_alloc_config>();
   auto variant =
       std::make_unique<cta::ds::ds_variant>(cta::ds::bi_tdgraph(task_config));
-  auto *graph = boost::get<cta::ds::bi_tdgraph>(variant.get());
+  auto* graph = boost::get<cta::ds::bi_tdgraph>(variant.get());
   auto map = d1_tasks_create(config_repo, graph, rng);
   const auto* execp =
       config_repo.config_get<cta::config::task_executive_config>();

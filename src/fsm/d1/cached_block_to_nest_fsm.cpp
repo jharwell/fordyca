@@ -26,9 +26,9 @@
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
-#include "fordyca/strategy/foraging_strategy.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
+#include "fordyca/strategy/foraging_strategy.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -227,11 +227,11 @@ cached_block_to_nest_fsm::acquisition_goal(void) const {
  * Block Transport Metrics
  ******************************************************************************/
 bool cached_block_to_nest_fsm::is_phototaxiing_to_goal(bool include_ca) const {
-    if (include_ca) {
+  if (include_ca) {
     return foraging_transport_goal::ekNEST == block_transport_goal();
   } else {
     return foraging_transport_goal::ekNEST == block_transport_goal() &&
-        !exp_interference();
+           !exp_interference();
   }
 } /* is_phototaxiing_to_goal() */
 

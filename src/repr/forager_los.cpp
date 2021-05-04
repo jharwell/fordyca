@@ -59,7 +59,7 @@ cads::bcache_vectorno forager_los::caches(void) const {
     for (size_t j = 0; j < ysize(); ++j) {
       const cds::cell2D& cell = access(i, j);
       if (cell.state_has_cache() || cell.state_in_cache_extent()) {
-        auto *cache = cell.cache();
+        auto* cache = cell.cache();
         ER_ASSERT(nullptr != cache,
                   "Cell@%s in HAS_CACHE/CACHE_EXTENT state, but does not have "
                   "cache",

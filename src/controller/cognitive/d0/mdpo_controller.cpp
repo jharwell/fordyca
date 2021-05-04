@@ -26,9 +26,9 @@
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
-#include "cosm/subsystem/saa_subsystemQ3D.hpp"
-#include "cosm/subsystem/perception/config/perception_config.hpp"
 #include "cosm/spatial/strategy/nest_acq/factory.hpp"
+#include "cosm/subsystem/perception/config/perception_config.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
 #include "fordyca/config/d0/mdpo_controller_repository.hpp"
 #include "fordyca/config/strategy/strategy_config.hpp"
@@ -108,7 +108,8 @@ void mdpo_controller::shared_init(
 
 void mdpo_controller::private_init(
     const config::d0::mdpo_controller_repository& config_repo) {
-    const auto * strat_config = config_repo.config_get<fcstrategy::strategy_config>();
+  const auto* strat_config =
+      config_repo.config_get<fcstrategy::strategy_config>();
 
   fstrategy::foraging_strategy::params strategy_params(
       saa(), nullptr, nullptr, perception()->dpo_store(), rutils::color());
@@ -119,12 +120,10 @@ void mdpo_controller::private_init(
   dpo_controller::fsm(std::make_unique<fsm::d0::dpo_fsm>(
       &fsm_ro_params,
       saa(),
-      fsexplore::block_factory().create(strat_config->explore.block_strategy,
-                                        &strategy_params,
-                                        rng()),
-      csstrategy::nest_acq::factory().create(strat_config->nest_acq.strategy,
-                                             saa(),
-                                             rng()),
+      fsexplore::block_factory().create(
+          strat_config->explore.block_strategy, &strategy_params, rng()),
+      csstrategy::nest_acq::factory().create(
+          strat_config->nest_acq.strategy, saa(), rng()),
       rng()));
 
   /* Set MDPO FSM supervision */

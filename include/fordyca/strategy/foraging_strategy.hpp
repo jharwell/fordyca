@@ -37,7 +37,7 @@ NS_START(fordyca);
 namespace controller::cognitive {
 class cache_sel_matrix;
 class block_sel_matrix;
-} /* namespace controller */
+} // namespace controller::cognitive
 
 namespace ds {
 class dpo_store;
@@ -59,9 +59,9 @@ class foraging_strategy : public csstrategy::base_strategy {
  public:
   struct params {
     params(csubsystem::saa_subsystemQ3D* const saa_in,
-           const controller::cognitive::block_sel_matrix *const bsel_matrix_in,
-           const controller::cognitive::cache_sel_matrix *const csel_matrix_in,
-           const ds::dpo_store *const dpo_store_in,
+           const controller::cognitive::block_sel_matrix* const bsel_matrix_in,
+           const controller::cognitive::cache_sel_matrix* const csel_matrix_in,
+           const ds::dpo_store* const dpo_store_in,
            const rutils::color& ledtaxis_target_in)
         : saa(saa_in),
           bsel_matrix(bsel_matrix_in),
@@ -70,14 +70,13 @@ class foraging_strategy : public csstrategy::base_strategy {
           ledtaxis_target(ledtaxis_target_in) {}
 
     csubsystem::saa_subsystemQ3D* saa;
-    const controller::cognitive::block_sel_matrix *bsel_matrix;
-    const controller::cognitive::cache_sel_matrix *csel_matrix;
-    const ds::dpo_store *dpo_store;
+    const controller::cognitive::block_sel_matrix* bsel_matrix;
+    const controller::cognitive::cache_sel_matrix* csel_matrix;
+    const ds::dpo_store* dpo_store;
     rutils::color ledtaxis_target;
   };
 
-  foraging_strategy(csubsystem::saa_subsystemQ3D* saa,
-                                       rmath::rng* rng)
+  foraging_strategy(csubsystem::saa_subsystemQ3D* saa, rmath::rng* rng)
       : base_strategy(saa, rng) {}
 
   foraging_strategy(const foraging_strategy&) = delete;

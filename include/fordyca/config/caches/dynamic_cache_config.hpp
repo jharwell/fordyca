@@ -72,18 +72,6 @@ struct dynamic_cache_config final : public rconfig::base_config {
    * which may not be desirable.
    */
   bool   robot_drop_only{false};
-
-  /**
-   * \brief If \c TRUE, then dynamic cache creation will be strict, meaning
-   * that any caches that fail validation after creation will be discarded.
-   *
-   * If \c FALSE, then dynamically created caches will be kept even if they
-   * violate constraints, which MIGHT be OK, or MIGHT cause
-   * issues/segfaults. Provided as an option so that it will be possible to more
-   * precisely duplicate the results of papers run with earlier versions of
-   * FORDYCA which had more bugs.
-   */
-  bool   strict_constraints{true};
 };
 
 NS_END(caches, config, fordyca);

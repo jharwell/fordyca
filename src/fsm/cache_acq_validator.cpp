@@ -92,23 +92,23 @@ bool cache_acq_validator::operator()(const rmath::vector2d& loc,
 
 bool cache_acq_validator::pickup_policy_validate(const carepr::base_cache* cache,
                                                  const rtypes::timestep& t) const {
-  const auto & config = boost::get<config::cache_sel::cache_pickup_policy_config>(
+  const auto& config = boost::get<config::cache_sel::cache_pickup_policy_config>(
       mc_csel_matrix->find(cselm::kPickupPolicy)->second);
 
   if (cselm::kPickupPolicyTime == config.policy && t < config.timestep) {
     ER_DEBUG("Cache%d invalid for acquisition: policy=%s, %zu < %zu",
-            cache->id().v(),
-            config.policy.c_str(),
-            t.v(),
-            config.timestep.v());
+             cache->id().v(),
+             config.policy.c_str(),
+             t.v(),
+             config.timestep.v());
     return false;
   } else if (cselm::kPickupPolicyCacheSize == config.policy &&
              cache->n_blocks() < config.cache_size) {
     ER_DEBUG("Cache%d invalid for acquisition: policy=%s, %zu < %zu",
-            cache->id().v(),
-            config.policy.c_str(),
-            cache->n_blocks(),
-            config.cache_size);
+             cache->id().v(),
+             config.policy.c_str(),
+             cache->n_blocks(),
+             config.cache_size);
     return false;
   } else if (cselm::kPickupPolicyCacheDuration == config.policy &&
              t - cache->creation_ts() < config.timestep) {

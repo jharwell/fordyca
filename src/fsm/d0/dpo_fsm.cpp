@@ -25,8 +25,8 @@
 
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
-#include "fordyca/strategy/foraging_strategy.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
+#include "fordyca/strategy/foraging_strategy.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -54,11 +54,7 @@ dpo_fsm::dpo_fsm(const fsm_ro_params* params,
                                              nullptr,
                                              &entry_leaving_nest,
                                              nullptr)),
-      m_block_fsm(params,
-                  saa,
-                  std::move(explore),
-                  std::move(nest_acq),
-                  rng) {
+      m_block_fsm(params, saa, std::move(explore), std::move(nest_acq), rng) {
   hfsm::change_parent(ekST_LEAVING_NEST, &start);
 }
 

@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include <memory>
 
-#include "cosm/subsystem/subsystem_fwd.hpp"
 #include "cosm/spatial/fsm/acquire_goal_fsm.hpp"
+#include "cosm/subsystem/subsystem_fwd.hpp"
 #include "cosm/ta/taskable.hpp"
 
 #include "fordyca/controller/cognitive/block_sel_matrix.hpp"

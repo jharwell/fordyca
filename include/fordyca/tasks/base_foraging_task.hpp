@@ -27,10 +27,10 @@
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
 #include "cosm/fsm/block_transporter.hpp"
+#include "cosm/fsm/metrics/block_transporter_metrics.hpp"
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 #include "cosm/ta/abort_probability.hpp"
 #include "cosm/ta/logical_task.hpp"
-#include "cosm/fsm/metrics/block_transporter_metrics.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/foraging_transport_goal.hpp"

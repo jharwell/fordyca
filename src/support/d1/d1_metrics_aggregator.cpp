@@ -86,9 +86,10 @@ d1_metrics_aggregator::d1_metrics_aggregator(
  ******************************************************************************/
 void d1_metrics_aggregator::collect_from_cache(
     const carepr::arena_cache* const cache) {
-  const auto *util_m =
+  const auto* util_m =
       dynamic_cast<const cametrics::caches::utilization_metrics*>(cache);
-  const auto *loc_m = dynamic_cast<const cametrics::caches::location_metrics*>(cache);
+  const auto* loc_m =
+      dynamic_cast<const cametrics::caches::location_metrics*>(cache);
   collect("caches::utilization", *util_m);
   collect("caches::locations", *loc_m);
 } /* collect_from_cache() */

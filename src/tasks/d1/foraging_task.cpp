@@ -23,8 +23,8 @@
  ******************************************************************************/
 #include "fordyca/tasks/d1/foraging_task.hpp"
 
-#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 #include "cosm/foraging/fsm/foraging_util_hfsm.hpp"
+#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 #include "cosm/ta/config/task_alloc_config.hpp"
 
 /*******************************************************************************

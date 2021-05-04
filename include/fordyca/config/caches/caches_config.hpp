@@ -49,6 +49,17 @@ struct caches_config final : public rconfig::base_config {
    * static and dynamic) ?
    */
   rtypes::spatial_dist dimension{0.0};
+
+  /**
+   * \brief If \c TRUE, then cache creation will be strict, meaning that any
+   * dynamically created caches that fail validation after creation will be
+   * discarded, and any statically created caches that fail validation will
+   * trigger an assert.
+   *
+   * If \c FALSE, then all caches will be kept after creation.
+   */
+  bool   strict_constraints{true};
+
   static_cache_config  static_{}; // NOLINT
   dynamic_cache_config dynamic{};
 };

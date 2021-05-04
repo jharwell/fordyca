@@ -40,10 +40,9 @@ NS_START(fordyca, fsm, d2);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-acquire_cache_site_fsm::acquire_cache_site_fsm(
-    const fsm_ro_params* c_params,
-    csubsystem::saa_subsystemQ3D* saa,
-    rmath::rng* rng)
+acquire_cache_site_fsm::acquire_cache_site_fsm(const fsm_ro_params* c_params,
+                                               csubsystem::saa_subsystemQ3D* saa,
+                                               rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.d2.acquire_cache_site"),
       acquire_goal_fsm(
           saa,
@@ -102,9 +101,8 @@ acquire_cache_site_fsm::site_select(void) {
     m_sel_success = true;
     m_sel_exec = true;
     m_nlopt_res = selector.nlopt_res();
-    return boost::make_optional(acquire_goal_fsm::candidate_type(*best,
-                                                                 kCACHE_SITE_ARRIVAL_TOL,
-                                                                 -1));
+    return boost::make_optional(
+        acquire_goal_fsm::candidate_type(*best, kCACHE_SITE_ARRIVAL_TOL, -1));
   } else {
     ER_WARN("No cache site selected for acquisition--possible internal error");
     m_sel_success = false;

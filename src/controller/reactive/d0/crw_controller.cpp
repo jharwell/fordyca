@@ -28,8 +28,8 @@
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/repr/config/nest_config.hpp"
-#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/spatial/strategy/nest_acq/factory.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
 #include "fordyca/config/foraging_controller_repository.hpp"
 #include "fordyca/fsm/d0/crw_fsm.hpp"
@@ -66,17 +66,14 @@ void crw_controller::init(ticpp::Element& node) {
 
   fstrategy::foraging_strategy::params p(
       saa(), nullptr, nullptr, nullptr, rutils::color());
-  const auto * nest = repo.config_get<crepr::config::nest_config>();
-  const auto * strat_config = repo.config_get<fcstrategy::strategy_config>();
+  const auto* nest = repo.config_get<crepr::config::nest_config>();
+  const auto* strat_config = repo.config_get<fcstrategy::strategy_config>();
 
   m_fsm = std::make_unique<fsm::d0::crw_fsm>(
       saa(),
-      fsexplore::block_factory().create(fsexplore::block_factory::kCRW,
-                                        &p,
-                                        rng()),
-      csstrategy::nest_acq::factory().create(strat_config->nest_acq.strategy,
-                                             saa(),
-                                             rng()),
+      fsexplore::block_factory().create(fsexplore::block_factory::kCRW, &p, rng()),
+      csstrategy::nest_acq::factory().create(
+          strat_config->nest_acq.strategy, saa(), rng()),
       nest->center,
       rng());
   /* Set CRW FSM supervision */

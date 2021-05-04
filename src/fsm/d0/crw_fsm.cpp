@@ -23,10 +23,10 @@
  ******************************************************************************/
 #include "fordyca/fsm/d0/crw_fsm.hpp"
 
+#include "cosm/spatial/strategy/base_strategy.hpp"
 #include "cosm/subsystem/actuation_subsystem2D.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/subsystem/sensing_subsystemQ3D.hpp"
-#include "cosm/spatial/strategy/base_strategy.hpp"
 
 #include "fordyca/fsm/foraging_signal.hpp"
 
@@ -179,7 +179,7 @@ bool crw_fsm::is_phototaxiing_to_goal(bool include_ca) const {
     return foraging_transport_goal::ekNEST == block_transport_goal();
   } else {
     return foraging_transport_goal::ekNEST == block_transport_goal() &&
-        !exp_interference();
+           !exp_interference();
   }
 
 } /* is_phototaxiing_to_goal() */

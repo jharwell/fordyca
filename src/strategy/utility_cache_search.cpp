@@ -26,8 +26,8 @@
 #include <numeric>
 
 #include "cosm/repr/base_block3D.hpp"
-#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/spatial/fsm/point_argument.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"

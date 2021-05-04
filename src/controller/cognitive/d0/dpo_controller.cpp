@@ -29,9 +29,9 @@
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/repr/config/nest_config.hpp"
-#include "cosm/subsystem/saa_subsystemQ3D.hpp"
-#include "cosm/subsystem/perception/config/perception_config.hpp"
 #include "cosm/spatial/strategy/nest_acq/factory.hpp"
+#include "cosm/subsystem/perception/config/perception_config.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
 #include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
 #include "fordyca/config/d0/dpo_controller_repository.hpp"
@@ -119,10 +119,10 @@ void dpo_controller::init(ticpp::Element& node) {
 
 void dpo_controller::shared_init(
     const config::d0::dpo_controller_repository& config_repo) {
-  const auto * perception = config_repo.config_get<cspconfig::perception_config>();
-  const auto * block_matrix =
+  const auto* perception = config_repo.config_get<cspconfig::perception_config>();
+  const auto* block_matrix =
       config_repo.config_get<config::block_sel::block_sel_matrix_config>();
-  const auto * nest = config_repo.config_get<crepr::config::nest_config>();
+  const auto* nest = config_repo.config_get<crepr::config::nest_config>();
 
   /* DPO perception subsystem */
   m_perception = std::make_unique<dpo_perception_subsystem>(perception);
@@ -134,25 +134,22 @@ void dpo_controller::shared_init(
 
 void dpo_controller::private_init(
     const config::d0::dpo_controller_repository& config_repo) {
-  const auto * strat_config = config_repo.config_get<fcstrategy::strategy_config>();
+  const auto* strat_config =
+      config_repo.config_get<fcstrategy::strategy_config>();
 
   fstrategy::foraging_strategy::params strategy_params(
       saa(), nullptr, nullptr, nullptr, rutils::color());
-  fsm::fsm_ro_params fsm_ro_params = {
-    .bsel_matrix = block_sel_matrix(),
-    .csel_matrix = nullptr,
-    .store = perception()->dpo_store(),
-    .strategy_config = *strat_config
-  };
+  fsm::fsm_ro_params fsm_ro_params = { .bsel_matrix = block_sel_matrix(),
+                                       .csel_matrix = nullptr,
+                                       .store = perception()->dpo_store(),
+                                       .strategy_config = *strat_config };
   m_fsm = std::make_unique<fsm::d0::dpo_fsm>(
       &fsm_ro_params,
       saa(),
-      fsexplore::block_factory().create(strat_config->explore.block_strategy,
-                                        &strategy_params,
-                                        rng()),
-      csstrategy::nest_acq::factory().create(strat_config->nest_acq.strategy,
-                                             saa(),
-                                             rng()),
+      fsexplore::block_factory().create(
+          strat_config->explore.block_strategy, &strategy_params, rng()),
+      csstrategy::nest_acq::factory().create(
+          strat_config->nest_acq.strategy, saa(), rng()),
       rng());
 
   /* Set DPO FSM supervision */

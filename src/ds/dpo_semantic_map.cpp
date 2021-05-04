@@ -70,7 +70,7 @@ void dpo_semantic_map::decay_all(void) {
   decoratee().update();
   m_store.decay_all();
 
-  for (const auto & b : m_store.blocks().const_values_range()) {
+  for (const auto& b : m_store.blocks().const_values_range()) {
     const rmath::vector2z& loc = b.ent()->danchor2D();
     crepr::pheromone_density& map_density =
         decoratee().access<occupancy_grid::kPheromone>(loc);

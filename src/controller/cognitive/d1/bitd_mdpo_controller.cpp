@@ -26,8 +26,8 @@
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
-#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/subsystem/perception/config/perception_config.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 
 #include "fordyca/config/d1/controller_repository.hpp"

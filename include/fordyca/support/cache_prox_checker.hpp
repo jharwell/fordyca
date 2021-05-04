@@ -147,20 +147,19 @@ class cache_prox_checker : public rer::client<cache_prox_checker> {
               bool need_lock = true) const {
     mc_map->maybe_lock_rd(mc_map->cache_mtx(), need_lock);
 
-      /*
+    /*
        * Because caches can be dynamically created/destroyed, we cannot rely on
        * the index position of cache i to be the same as its ID, so we need to
        * search for the correct cache.
        */
-      auto it =
-          std::find_if(mc_map->caches().begin(),
-                       mc_map->caches().end(),
-                       [&](const auto& c) { return c->id() == cache_id; });
+    auto it = std::find_if(mc_map->caches().begin(),
+                           mc_map->caches().end(),
+                           [&](const auto& c) { return c->id() == cache_id; });
 
-      events::cache_proximity_visitor prox_op(*it);
-      prox_op.visit(controller);
-      mc_map->maybe_unlock_rd(mc_map->cache_mtx(), need_lock);
-      return true;
+    events::cache_proximity_visitor prox_op(*it);
+    prox_op.visit(controller);
+    mc_map->maybe_unlock_rd(mc_map->cache_mtx(), need_lock);
+    return true;
   }
 
  private:

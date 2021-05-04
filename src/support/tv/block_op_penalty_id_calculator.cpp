@@ -55,8 +55,8 @@ rtypes::type_uuid block_op_penalty_id_calculator::operator()(
        * We don't call the base class function for this because of the lack of
        * locking around the BOTH block op filtering and penalty ID calculation
        * to make them atomic, and the conditions for free pickup might not be
-       * met anymore. Plus, we already have the ID from the block op filter
-       * calculation, and there can be a LOT of blocks in the area to check.
+       * met anymore. If they are not, it will be caught after the pickup
+       * penalty has been served.
        */
       id = filter.id;
       break;

@@ -108,9 +108,9 @@ boost::optional<acquire_existing_cache_fsm::acq_loc_type>
 acquire_existing_cache_fsm::calc_acq_location(void) {
   existing_cache_selector selector(mc_for_pickup, mc_matrix, &mc_store->caches());
 
-  if (const auto *best = selector(mc_store->caches(),
-                           saa()->sensing()->rpos2D(),
-                           saa()->sensing()->tick())) {
+  if (const auto* best = selector(mc_store->caches(),
+                                  saa()->sensing()->rpos2D(),
+                                  saa()->sensing()->tick())) {
     ER_INFO("Selected existing cache%d@%s/%s for acquisition",
             best->id().v(),
             rcppsw::to_string(best->rcenter2D()).c_str(),

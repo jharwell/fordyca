@@ -60,7 +60,7 @@ class strategy_parser final : public rconfig::xml::xml_config_parser {
    */
   inline static const std::string kXMLRoot = "strategy";
 
-  void parse(const ticpp::Element& node) override;
+  void parse(const ticpp::Element& node) override RCPPSW_COLD;
   std::string xml_root(void) const override { return kXMLRoot; }
 
  private:

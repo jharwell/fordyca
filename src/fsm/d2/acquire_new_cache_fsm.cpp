@@ -26,11 +26,11 @@
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
+#include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/controller/cognitive/d2/new_cache_selector.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
-#include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -93,7 +93,7 @@ acquire_new_cache_fsm::cache_select(void) {
   controller::cognitive::d2::new_cache_selector selector(mc_matrix);
 
   /* A "new" cache is the same as a single block  */
-  if (const auto *best =
+  if (const auto* best =
           selector(mc_store->blocks(), mc_store->caches(), sensing()->rpos2D())) {
     ER_INFO("Select new cache%d@%s/%s for acquisition",
             best->id().v(),
@@ -102,9 +102,8 @@ acquire_new_cache_fsm::cache_select(void) {
 
     auto tol = boost::get<rtypes::spatial_dist>(
         mc_matrix->find(cselm::kNewCacheDropTolerance)->second);
-    return boost::make_optional(acquire_goal_fsm::candidate_type(best->rcenter2D(),
-                                                                 tol.v(),
-                                                                 best->id()));
+    return boost::make_optional(
+        acquire_goal_fsm::candidate_type(best->rcenter2D(), tol.v(), best->id()));
   } else {
     /*
      * If this happens, all the blocks we know of are ineligible for us to
@@ -117,7 +116,7 @@ acquire_new_cache_fsm::cache_select(void) {
 bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
   ER_ASSERT(!explore_result, "New cache acquisition via exploration?");
   rmath::vector2d position = saa()->sensing()->rpos2D();
-  for (const auto & b : mc_store->blocks().const_values_range()) {
+  for (const auto& b : mc_store->blocks().const_values_range()) {
     if ((b.ent()->rcenter2D() - position).length() <= kNEW_CACHE_ARRIVAL_TOL) {
       return true;
     }
