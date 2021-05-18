@@ -54,7 +54,7 @@ class block_op_penalty_handler final : public ctv::temporal_penalty_handler,
                                        public rer::client<block_op_penalty_handler> {
  public:
   block_op_penalty_handler(carena::caching_arena_map* const map,
-                           const rct::config::waveform_config* const config,
+                           const ctv::config::temporal_penalty_config* const config,
                            const std::string& name)
       : temporal_penalty_handler(config, name),
         ER_CLIENT_INIT("fordyca.support.tv.block_op_penalty_handler"),
@@ -121,18 +121,18 @@ class block_op_penalty_handler final : public ctv::temporal_penalty_handler,
      */
     rtypes::type_uuid id = m_id_calc(controller, src, filter);
 
-    rtypes::timestep orig_duration = penalty_calc(t);
-    rtypes::timestep RCPPSW_UNUSED duration = penalty_add(&controller,
-                                                        id,
-                                                        orig_duration,
-                                                        t);
+    rtypes::timestep orig = penalty_calc(t);
+    rtypes::timestep RCPPSW_UNUSED adjusted = penalty_add(&controller,
+                                                          id,
+                                                          orig,
+                                                          t);
 
     ER_INFO("%s: block%d start=%zu, penalty=%zu, adjusted penalty=%zu src=%d",
             controller.GetId().c_str(),
             id.v(),
             t.v(),
-            orig_duration.v(),
-            duration.v(),
+            orig.v(),
+            adjusted.v(),
             static_cast<int>(src));
 
     return filter.status;

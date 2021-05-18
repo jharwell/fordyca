@@ -52,7 +52,7 @@ class cache_op_penalty_handler final
       public rer::client<cache_op_penalty_handler> {
  public:
   cache_op_penalty_handler(carena::caching_arena_map* const map,
-                           const rct::config::waveform_config* const config,
+                           const ctv::config::temporal_penalty_config* const config,
                            const std::string& name)
       : temporal_penalty_handler(config, name),
         ER_CLIENT_INIT("fordyca.support.tv.cache_op_penalty_handler"),

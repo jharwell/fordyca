@@ -6,7 +6,8 @@
   <!-- * General configuration * -->
   <!-- ************************* -->
   <framework>
-    <system threads="0" method="balance_quantity" />
+    <system threads="1" method="balance_quantity"
+            pin_threads_to_cores="true"/>
     <experiment length="10000"
                 ticks_per_second="5"
                 random_seed="123" />
@@ -284,7 +285,8 @@
                 phase="0"/>
           </motion_throttle>
         <blocks>
-          <manipulation_penalty>
+          <manipulation_penalty
+              unique_finish="true">
             <waveform
                 type="Null"
                 frequency="0.01"
@@ -397,7 +399,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,10,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="1" max_trials="1000">
+      <entity quantity="16" max_trials="1000">
         <foot-bot id="fb" omnidirectional_camera_aperture="89">
           <controller config="fbc" />
           <!-- <battery model= "time_motion"/> -->
@@ -450,17 +452,17 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <visualization>
-    <qt-opengl autoplay="false">
-       <!-- <frame_grabbing directory="frames" -->
-       <!--                 base_name="frame_" -->
-       <!--                 format="png" -->
-       <!--                 quality="100" -->
-       <!--                 headless_grabbing="true" -->
-       <!--                 headless_frame_size="1600x1200" -->
-       <!--                 /> -->
-      <user_functions label="d0_qt_user_functions" />
-    </qt-opengl>
-  </visualization>
+  <!-- <visualization> -->
+  <!--   <qt-opengl autoplay="false"> -->
+  <!--      <!-\- <frame_grabbing directory="frames" -\-> -->
+  <!--      <!-\-                 base_name="frame_" -\-> -->
+  <!--      <!-\-                 format="png" -\-> -->
+  <!--      <!-\-                 quality="100" -\-> -->
+  <!--      <!-\-                 headless_grabbing="true" -\-> -->
+  <!--      <!-\-                 headless_frame_size="1600x1200" -\-> -->
+  <!--      <!-\-                 /> -\-> -->
+  <!--     <user_functions label="d0_qt_user_functions" /> -->
+  <!--   </qt-opengl> -->
+  <!-- </visualization> -->
 
 </argos-configuration>

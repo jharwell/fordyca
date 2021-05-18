@@ -29,9 +29,22 @@
 NS_START(fordyca, config, tv);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+env_dynamics_parser::env_dynamics_parser(void)
+     {
+       m_motion.xml_root("motion_throttle");
+       m_block_manip.xml_root("manipulation_penalty");
+       m_block_carry.xml_root("carry_throttle");
+       m_cache_usage.xml_root("usage_penalty");
+}
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void env_dynamics_parser::parse(const ticpp::Element& node) {
+  using penalty_config_type = ctv::config::xml::temporal_penalty_parser::config_type;
+
   /* No environmental dynamics configured */
   if (nullptr == node.FirstChild(kXMLRoot, false)) {
     return;
@@ -41,39 +54,36 @@ void env_dynamics_parser::parse(const ticpp::Element& node) {
   m_config = std::make_unique<config_type>();
 
   /* motion dynamics configured */
-  if (nullptr != tvnode.FirstChild("motion_throttle", false)) {
-    m_motion.parse(node_get(tvnode, "motion_throttle"));
-    const auto* config =
-        m_motion.config_get<rct::config::xml::waveform_parser::config_type>();
-    m_config->rda.motion_throttle = *config;
+  if (nullptr != tvnode.FirstChild(m_motion.xml_root(), false)) {
+    m_motion.parse(tvnode);
+    const auto* config = m_motion.config_get<penalty_config_type>();
+    m_config->rda.motion_throttle = config->waveform;
   }
   /* block dynamics configured */
   if (nullptr != tvnode.FirstChild("blocks", false)) {
     ticpp::Element bnode = node_get(tvnode, "blocks");
 
-    if (nullptr != bnode.FirstChild("manipulation_penalty", false)) {
-      m_block_manip.parse(node_get(bnode, "manipulation_penalty"));
-      m_config->block_manip_penalty =
-          *m_block_manip
-               .config_get<rct::config::xml::waveform_parser::config_type>();
-    }
-    if (nullptr != bnode.FirstChild("carry_throttle", false)) {
-      m_block_carry.parse(node_get(bnode, "carry_throttle"));
-      const auto* config =
-          m_block_carry
-              .config_get<rct::config::xml::waveform_parser::config_type>();
-      m_config->rda.block_carry_throttle = *config;
-    }
+      m_block_manip.parse(bnode);
+      if (m_block_manip.is_parsed()) {
+        const auto* config =
+            m_block_manip.config_get<penalty_config_type>();
+        m_config->block_manip_penalty = *config;
+      }
+
+      m_block_carry.parse(bnode);
+      if (m_block_carry.is_parsed()) {
+        const auto* config = m_block_carry.config_get<penalty_config_type>();
+        m_config->rda.block_carry_throttle = config->waveform;
+      }
   }
 
   /* cache dynamics configured */
   if (nullptr != tvnode.FirstChild("caches", false)) {
     ticpp::Element cnode = node_get(tvnode, "caches");
-    if (nullptr != cnode.FirstChild("usage_penalty", false)) {
-      m_cache_usage.parse(node_get(cnode, "usage_penalty"));
-      m_config->cache_usage_penalty =
-          *m_cache_usage
-               .config_get<rct::config::xml::waveform_parser::config_type>();
+    m_cache_usage.parse(cnode);
+    if (m_cache_usage.is_parsed()) {
+      const auto* config = m_cache_usage.config_get<penalty_config_type>();
+      m_config->cache_usage_penalty = *config;
     }
   }
 } /* parse() */

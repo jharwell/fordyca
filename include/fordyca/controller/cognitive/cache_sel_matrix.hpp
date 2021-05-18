@@ -94,8 +94,8 @@ class cache_sel_matrix final
   inline static const std::string kNewCacheDropTolerance = "new_cache_tol";
 
   /**
-   * \brief std::string thatust be satisfied before a robot will be
-   * able to pickup from *ANY* cache.
+   * \brief Policy that must be satisfied before a robot will be able to pickup
+   * from *ANY* cache.
    */
   inline static const std::string kPickupPolicy = "pickup_policy";
   inline static const std::string kPickupPolicyNull = "";

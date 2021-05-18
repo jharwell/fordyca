@@ -43,7 +43,7 @@ NS_START(fordyca, config, tv);
  * \brief Configuration for the \ref env_dynamics.
  */
 struct env_dynamics_config final : public ctv::config::base_env_dynamics_config {
-  rct::config::waveform_config cache_usage_penalty{};
+  ctv::config::temporal_penalty_config cache_usage_penalty{};
 };
 
 NS_END(tv, config, fordyca);

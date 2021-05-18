@@ -60,16 +60,26 @@ endif()
 ################################################################################
 # Define link libraries
 set(${target}_LIBRARIES
-  cosm
+  cosm-${COSM_HAL_TARGET}
   ${cosm_LIBRARIES}
   nlopt
-  stdc++fs
   rt)
 
 # Define link search dirs
 set(${target}_LIBRARY_DIRS
-  ${rcppsw_LIBRARY_DIRS}
   ${cosm_LIBRARY_DIRS})
+
+# Define include dirs
+set(${target}_INCLUDE_DIRS
+  "${${target}_INC_PATH}"
+  ${cosm_INCLUDE_DIRS}
+  )
+
+# Define system include dirs
+set(${target}_SYS_INCLUDE_DIRS
+  ${cosm_SYS_INCLUDE_DIRS}
+  ${NLOPT_INCLUDE_DIRS}
+  )
 
 if ("${COSM_BUILD_FOR}" MATCHES "ARGOS")
   set(argos3_LIBRARIES
@@ -87,51 +97,27 @@ if ("${COSM_BUILD_FOR}" MATCHES "ARGOS")
     ${${target}_LIBRARIES}
     ${argos3_LIBRARIES}
     )
-
-  set(${target}_LIBRARY_DIRS
-    ${${target}_LIBRARY_DIRS}
-    /usr/lib/argos3
-    /usr/local/lib/argos3
-    ${COSM_DEPS_PREFIX}/lib/argos3
-    )
   if ("${COSM_BUILD_ENV}" MATCHES "MSI")
     # For nlopt
     set(${target}_LIBRARY_DIRS
       ${$target}_LIBRARY_DIRS}
-      ${COSM_DEPS_PREFIX}/lib/argos3
-      ${COSM_DEPS_PREFIX}/lib64)
+      ${COSM_DEPS_PREFIX}/lib64
+      )
   endif()
 endif()
 
 # Force failures at build time rather than runtime
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
 
-link_directories(${${target}_LIBRARY_DIRS})
+# Define the FORDYCA library
 add_library(${target} SHARED ${${target}_ROOT_SRC})
-add_dependencies(${target} rcppsw cosm)
 
-################################################################################
-# Includes                                                                     #
-################################################################################
-set(${target}_INCLUDE_DIRS
-  "${${target}_INC_PATH}"
-  ${rcppsw_INCLUDE_DIRS}
-  ${cosm_INCLUDE_DIRS})
-
-set(${target}_SYS_INCLUDE_DIRS
-  ${cosm_SYS_INCLUDE_DIRS}
-  ${NLOPT_INCLUDE_DIRS})
+add_dependencies(${target} rcppsw cosm-${COSM_HAL_TARGET})
 
 target_include_directories(${target} PUBLIC ${${target}_INCLUDE_DIRS})
-
-target_include_directories(${target} SYSTEM PUBLIC
-  /usr/include/lua5.3 # Not needed for compiling, but for emacs rtags
-  /usr/local/include
-  ${nlopt_INCLUDE_DIRS}
-  ${${target}_SYS_INCLUDE_DIRS}
-  )
-
-target_link_libraries(${target} ${${target}_LIBRARIES} cosm nlopt)
+target_include_directories(${target} SYSTEM PUBLIC ${${target}_SYS_INCLUDE_DIRS})
+target_link_libraries(${target} ${${target}_LIBRARIES})
+target_link_directories(${target} PUBLIC ${${target}_LIBRARY_DIRS})
 
 ################################################################################
 # Compile Options/Definitions                                                  #
