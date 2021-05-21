@@ -7,7 +7,7 @@ export GINIROOT=/home/gini
 export SWARMROOT=$GINIROOT/shared/swarm
 
 # Load modules
-module load cmake/3.10.2
+module load cmake/3.16.2
 module load qt/5.9.1
 module load boost/1.72.0/gnu-9.2.0
 module load gcc/9.2.0

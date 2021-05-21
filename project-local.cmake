@@ -112,7 +112,7 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
 # Define the FORDYCA library
 add_library(${target} SHARED ${${target}_ROOT_SRC})
 
-add_dependencies(${target} rcppsw cosm-${COSM_HAL_TARGET})
+add_dependencies(${target} cosm-${COSM_HAL_TARGET})
 
 target_include_directories(${target} PUBLIC ${${target}_INCLUDE_DIRS})
 target_include_directories(${target} SYSTEM PUBLIC ${${target}_SYS_INCLUDE_DIRS})

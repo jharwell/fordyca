@@ -123,21 +123,22 @@ base_cache_creator::create_single_cache(const rmath::vector2d& center,
       pickup_op.visit(*m_map);
     } /* for(block..) */
 
-    /*
-     * Loop through all blocks and deposit them in the cache host cell, which
-     * will be in the HAS_CACHE state after this loop, but will not yet have a
-     * cache as its entity.
-     */
-    for (auto& block : blocks) {
-      caops::free_block_drop_visitor drop_op(block,
-                                             dcenter,
-                                             m_map->grid_resolution(),
-                                             carena::locking::ekALL_HELD);
-
-      drop_op.visit(cell);
-      drop_op.visit(*block);
-    } /* for(block..) */
   }
+  /*
+   * Loop through all blocks and deposit them in the cache host cell, which
+   * will be in the HAS_CACHE state after this loop, but will not yet have a
+   * cache as its entity.
+   */
+  for (auto& block : blocks) {
+    caops::free_block_drop_visitor drop_op(block,
+                                           dcenter,
+                                           m_map->grid_resolution(),
+                                           carena::locking::ekALL_HELD);
+
+    drop_op.visit(cell);
+    drop_op.visit(*block);
+  } /* for(block..) */
+
   ER_DEBUG("All %zu blocks now in host cell%s",
            blocks.size(),
            rcppsw::to_string(dcenter).c_str());
