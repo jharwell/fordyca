@@ -73,8 +73,7 @@ class block_op_filter : public rer::client<block_op_filter> {
    * \return (\c TRUE, penalty_status) iff the controller should be filtered out
    * and the reason why. (\c FALSE, -1) otherwise.
    */
-  template <typename TController>
-  op_filter_result operator()(const TController& controller,
+  op_filter_result operator()(const controller::foraging_controller& controller,
                               block_op_src src,
                               boost::optional<rtypes::spatial_dist> cache_prox) {
     /*
@@ -106,8 +105,7 @@ class block_op_filter : public rer::client<block_op_filter> {
    * \brief Filter out spurious penalty initializations for free block pickup
    * (i.e. controller not ready/not intending to pickup a free block).
    */
-  template <typename TController>
-  op_filter_result free_pickup_filter(const TController& controller) const {
+  op_filter_result free_pickup_filter(const controller::foraging_controller& controller) const {
     op_filter_result result;
     if (!(controller.goal_acquired() &&
           fsm::foraging_acq_goal::ekBLOCK == controller.acquisition_goal())) {
@@ -121,6 +119,7 @@ class block_op_filter : public rer::client<block_op_filter> {
        */
       mc_map->lock_rd(mc_map->cache_mtx());
       mc_map->lock_rd(mc_map->block_mtx());
+
       auto block_id = mc_map->robot_on_block(controller.rpos2D(),
                                              controller.entity_acquired_id());
       mc_map->unlock_rd(mc_map->block_mtx());
@@ -140,8 +139,7 @@ class block_op_filter : public rer::client<block_op_filter> {
    * \brief Filter out spurious penalty initializations for nest block drop
    * (i.e. controller not ready/not intending to drop a block in the nest).
    */
-  template <typename TController>
-  op_filter_result nest_drop_filter(const TController& controller) const {
+  op_filter_result nest_drop_filter(const controller::foraging_controller& controller) const {
     op_filter_result result;
     if (!(controller.in_nest() && controller.goal_acquired() &&
           fsm::foraging_transport_goal::ekNEST == controller.block_transport_goal())) {
@@ -157,8 +155,7 @@ class block_op_filter : public rer::client<block_op_filter> {
    * (i.e. controller not ready/not intending to drop a block), or another
    * block/cache is too close.
    */
-  template <typename TController>
-  op_filter_result cache_site_drop_filter(const TController& controller,
+  op_filter_result cache_site_drop_filter(const controller::foraging_controller& controller,
                                           const rtypes::spatial_dist& cache_prox) const {
     op_filter_result result;
     if (!(controller.goal_acquired() &&
@@ -185,8 +182,7 @@ class block_op_filter : public rer::client<block_op_filter> {
    * (i.e. controller not ready/not intending to drop a block), or
    * is too close to another cache to do a free block drop at the chosen site.
    */
-  template <typename TController>
-  op_filter_result new_cache_drop_filter(const TController& controller,
+  op_filter_result new_cache_drop_filter(const controller::foraging_controller& controller,
                                          const rtypes::spatial_dist& cache_prox) const {
     op_filter_result result;
     if (!(controller.goal_acquired() &&

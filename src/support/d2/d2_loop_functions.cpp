@@ -305,7 +305,7 @@ void d2_loop_functions::post_step(void) {
    * aborts are not, and we need to handle those.
    */
   arena_map()->post_step_update(
-      rtypes::timestep(GetSpace().GetSimulationClock()),
+      timestep(),
       collector->cum_transported(),
       nullptr != conv_calculator() ? conv_calculator()->converged() : false);
 
@@ -375,7 +375,7 @@ void d2_loop_functions::robot_pre_step(chal::robot& robot) {
    * control step because we need access to information only available in the
    * loop functions.
    */
-  controller->sensing_update(rtypes::timestep(GetSpace().GetSimulationClock()),
+  controller->sensing_update(timestep(),
                              arena_map()->grid_resolution());
 
   /* Send robot its new LOS */
@@ -413,7 +413,8 @@ void d2_loop_functions::robot_post_step(chal::robot& robot) {
   auto iapplicator = cinteractors::applicator<controller::foraging_controller,
                                               robot_arena_interactor,
                                               carena::caching_arena_map>(
-      controller, rtypes::timestep(GetSpace().GetSimulationClock()));
+                                                  controller,
+                                                  timestep());
   auto status = boost::apply_visitor(
       iapplicator, m_interactor_map->at(controller->type_index()));
   if (interactor_status::ekNO_EVENT != status) {
@@ -471,7 +472,7 @@ bool d2_loop_functions::cache_creation_handle(bool on_drop) {
   cache_create_ro_params ccp = {
     .current_caches = arena_map()->caches(),
     .clusters = arena_map()->block_distributor()->block_clustersro(),
-    .t = rtypes::timestep(GetSpace().GetSimulationClock())
+    .t = timestep()
   };
 
   if (auto created =

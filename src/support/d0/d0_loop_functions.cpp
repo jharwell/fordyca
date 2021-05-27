@@ -223,7 +223,7 @@ void d0_loop_functions::post_step(void) {
 
   /* update arena map */
   arena_map()->post_step_update(
-      rtypes::timestep(GetSpace().GetSimulationClock()),
+      timestep(),
       collector->cum_transported(),
       nullptr != conv_calculator() ? conv_calculator()->converged() : false);
 
@@ -271,7 +271,7 @@ void d0_loop_functions::robot_pre_step(chal::robot& robot) {
    * control step because we need access to information only available in the
    * loop functions.
    */
-  controller->sensing_update(rtypes::timestep(GetSpace().GetSimulationClock()),
+  controller->sensing_update(timestep(),
                              arena_map()->grid_resolution());
 
   /* Send robot its new LOS */
@@ -301,7 +301,8 @@ void d0_loop_functions::robot_post_step(chal::robot& robot) {
   auto iapplicator = cinteractors::applicator<controller::foraging_controller,
                                               d0::robot_arena_interactor,
                                               carena::caching_arena_map>(
-      controller, rtypes::timestep(GetSpace().GetSimulationClock()));
+                                                  controller,
+                                                  timestep());
   auto status = boost::apply_visitor(
       iapplicator, m_interactor_map->at(controller->type_index()));
 

@@ -38,7 +38,7 @@ NS_START(fordyca, support, tv);
  * Struct Definitions
  ******************************************************************************/
 struct op_filter_result {
-  enum op_filter_status status{op_filter_status::ekROBOT_INTERNAL_UNREADY};
+  op_filter_status status{op_filter_status::ekROBOT_INTERNAL_UNREADY};
   rtypes::type_uuid     id{rtypes::constants::kNoUUID};
 };
 

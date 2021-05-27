@@ -51,9 +51,6 @@
   <category name="fordyca.fsm.acquire_goal_fsm" >
     <priority value ="trace" />
   </category>
-  <category name="fordyca.fsm.expstrat.crw" >
-    <priority value ="info" />
-  </category>
   <category name="fordyca.support.block_dist" >
     <priority value ="info" />
   </category>

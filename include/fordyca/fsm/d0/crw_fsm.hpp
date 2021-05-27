@@ -98,7 +98,7 @@ class crw_fsm final : public cffsm::foraging_util_hfsm,
   void task_start(cta::taskable_argument*) override {}
   bool task_finished(void) const override { return m_task_finished; }
   bool task_running(void) const override { return !m_task_finished; }
-  void task_reset(void) override { init(); }
+  void task_reset(void) override;
 
   /**
    * \brief (Re)-initialize the FSM.
@@ -116,7 +116,7 @@ class crw_fsm final : public cffsm::foraging_util_hfsm,
   enum fsm_states {
     ekST_START, /* Initial state */
     ekST_ACQUIRE_BLOCK,
-    ekST_TRANSPORT_TO_NEST,        /* Block found--bring it back to the nest */
+    ekST_TRANSPORT_TO_NEST,     /* Block found--bring it back to the nest */
     ekST_LEAVING_NEST,          /* Block dropped in nest--time to go */
     ekST_WAIT_FOR_BLOCK_PICKUP,
     ekST_WAIT_FOR_BLOCK_DROP,
@@ -130,7 +130,8 @@ class crw_fsm final : public cffsm::foraging_util_hfsm,
   RCPPSW_HFSM_STATE_INHERIT(cffsm::foraging_util_hfsm, leaving_nest,
                      rpfsm::event_data);
 
-  RCPPSW_HFSM_ENTRY_INHERIT_ND(cffsm::foraging_util_hfsm, entry_transport_to_nest);
+  RCPPSW_HFSM_ENTRY_INHERIT_ND(cffsm::foraging_util_hfsm,
+                               entry_transport_to_nest);
   RCPPSW_HFSM_ENTRY_INHERIT_ND(cffsm::foraging_util_hfsm, entry_leaving_nest);
   RCPPSW_HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_wait_for_signal);
 
@@ -160,6 +161,7 @@ class crw_fsm final : public cffsm::foraging_util_hfsm,
   const rmath::vector2d       mc_nest_loc;
 
   bool                        m_task_finished{false};
+  size_t                      m_pickup_wait_count{0};
   csfsm::explore_for_goal_fsm m_explore_fsm;
   /* clang-format on */
 };

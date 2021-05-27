@@ -88,8 +88,7 @@ RCPPSW_HFSM_STATE_DEFINE(crw_fsm, start, rpfsm::event_data* data) {
   }
   if (rpfsm::event_type::ekCHILD == data->type()) {
     if (fsm::foraging_signal::ekLEFT_NEST == data->signal()) {
-      m_explore_fsm.task_start(nullptr);
-      m_task_finished = false;
+      task_reset();
       internal_event(ekST_ACQUIRE_BLOCK);
       return fsm::foraging_signal::ekHANDLED;
     } else if (fsm::foraging_signal::ekENTERED_NEST == data->signal()) {
@@ -102,10 +101,15 @@ RCPPSW_HFSM_STATE_DEFINE(crw_fsm, start, rpfsm::event_data* data) {
 }
 
 RCPPSW_HFSM_STATE_DEFINE_ND(crw_fsm, acquire_block) {
-  if (m_explore_fsm.task_finished()) {
-    internal_event(ekST_WAIT_FOR_BLOCK_PICKUP);
-  } else {
+  if (!m_explore_fsm.task_running()) {
+    m_explore_fsm.task_reset();
+    m_explore_fsm.task_start(nullptr);
+  }
+  if (m_explore_fsm.task_running()) {
     m_explore_fsm.task_execute();
+    if (m_explore_fsm.task_finished()) {
+      internal_event(ekST_WAIT_FOR_BLOCK_PICKUP);
+    }
   }
   return fsm::foraging_signal::ekHANDLED;
 }
@@ -118,10 +122,13 @@ RCPPSW_HFSM_STATE_DEFINE(crw_fsm,
     ER_INFO("Block pickup signal received");
     internal_event(ekST_TRANSPORT_TO_NEST,
                    std::make_unique<nest_transport_data>(mc_nest_loc));
+    m_pickup_wait_count = 0;
   } else if (fsm::foraging_signal::ekBLOCK_VANISHED == data->signal()) {
-    m_explore_fsm.task_reset();
+    ER_INFO("Block vanished signal received");
     internal_event(ekST_ACQUIRE_BLOCK);
   }
+  ER_ASSERT(++m_pickup_wait_count < 10,
+            "Waited too long for block pickup signal");
   return fsm::foraging_signal::ekHANDLED;
 }
 
@@ -223,7 +230,6 @@ void crw_fsm::init(void) {
 } /* init() */
 
 void crw_fsm::run(void) {
-  m_task_finished = false;
   if (event_data_hold() && (nullptr != event_data())) {
     auto* data = event_data();
     data->signal(fsm::foraging_signal::ekRUN);
@@ -253,5 +259,15 @@ csmetrics::goal_acq_metrics::goal_type crw_fsm::acquisition_goal(void) const {
   }
   return fsm::to_goal_type(foraging_acq_goal::ekNONE);
 } /* block_transport_goal() */
+
+/*******************************************************************************
+ * Taskable Interface
+ ******************************************************************************/
+void crw_fsm::task_reset(void) {
+  init();
+  m_explore_fsm.task_reset();
+  m_task_finished = false;
+  inta_tracker()->inta_reset();
+} /* task_reset() */
 
 NS_END(d0, fsm, fordyca);

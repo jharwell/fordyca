@@ -83,8 +83,7 @@ class block_op_penalty_handler final : public ctv::temporal_penalty_handler,
    * \param prox_dist The minimum distance that the cache site needs to be from
    *                  all caches in the arena.
    */
-  template<typename TController>
-  op_filter_status penalty_init(const TController& controller,
+  op_filter_status penalty_init(const controller::foraging_controller& controller,
                                 const rtypes::timestep& t,
                                 block_op_src src,
                                 const boost::optional<rtypes::spatial_dist>& cache_prox) {

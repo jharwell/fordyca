@@ -102,7 +102,7 @@ class foraging_controller
   foraging_controller(const foraging_controller&) = delete;
   foraging_controller& operator=(const foraging_controller&) = delete;
 
-  /* foraging_controller2D overrides */
+  /* argos_controller2D overrides */
   void init(ticpp::Element& node) override RCPPSW_COLD;
   void reset(void) override RCPPSW_COLD;
   rtypes::type_uuid entity_id(void) const override final;
