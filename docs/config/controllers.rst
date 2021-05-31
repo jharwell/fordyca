@@ -3,61 +3,170 @@ Controller XML Configuration
 
 The following controllers are available:
 
-+--------------+-------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| Controller   | Required Loop functions | Notes                                                                                                                                 |
-+--------------+-------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| crw          | depth0                  | CRW = Correlated Random Walk.                                                                                                         |
-+--------------+-------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| dpo          | depth0                  | DPO = Mapped Decaying Pheromone Object. Uses pheromones to track objects within the arena.                                            |
-+--------------+-------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| mdpo         | depth0                  | MDPO = Mapped Decaying Pheromone Object. DPO + mapped extent of the arena tracking relevance of individual cells within it.           |
-+--------------+-------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| odpo         | depth0                  | ODPO = Oracular DPO. Has perfect information about blocks in thye arena.                                                              |
-+--------------+-------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| omdpo        | depth0                  | OMDPO = Oracular MDPO. Has perfect information about blocks in the arena.                                                             |
-+--------------+-------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| bitd\_dpo    | depth1                  | Greedy task partitioning + DPO. Requires static caches to also be enabled.                                                            |
-+--------------+-------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| bitd\_odpo   | depth1                  | Greedy task partitioning + DPO + oracle (perfect knowledge, as configured). Requires static caches, oracle to be enabled.             |
-+--------------+-------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| bitd\_mdpo   | depth1                  | Greedy task partitioning + MDPO. Requires static caches, oracle to be enabled.                                                        |
-+--------------+-------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| bitd\_omdpo  | depth1                  | Greedy task partitioning + MDPO + oracle (perfect knowledge, as configured). Requires static caches, oracle to be enabled.            |
-+--------------+-------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| birtd\_dpo   | depth2                  | Recursive greedy task partitioning + DPO. Requires dynamic caches to be enabled.                                                      |
-+--------------+-------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| birtd\_mdpo  | depth2                  | Recursive greedy task partitioning + MDPO. Requires dynamic caches to be enabled.                                                     |
-+--------------+-------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| birtd\_odpo  | depth2                  | Recursive greedy task partitioning + DPO + oracle (perfect knowledge, as configured). Requires dynamic caches, oracle to be enabled.  |
-+--------------+-------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| birtd\_omdpo | depth2                  | Recursive greedy task partitioning + MDPO + oracle (perfect knowledge, as configured). Requires dynamic caches, oracle to be enabled. |
-+--------------+-------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+.. list-table::
+   :widths: 25,50,50
+   :header-rows: 1
+
+   * - Controller
+
+     - Required Loop Functions
+
+     - Notes
+
+   * - crw
+
+     - d0
+
+     - CRW = Correlated Random Walk.
+
+   * - dpo
+
+     - d0
+
+     - DPO = Mapped Decaying Pheromone Object. Uses pheromones to track objects within the arena.
 
 
-The following root XML tags are defined under ``<params>``:
+   * - mdpo
 
-+---------------------------+----------------------------+----------------------------------------------------------------+
-| Root XML tag              | Mandatory For?             | Description                                                    |
-+---------------------------+----------------------------+----------------------------------------------------------------+
-| ``perception``            | All but CRW                | See :xref:`COSM` docs also; only augmented slightly here.      |
-+---------------------------+----------------------------+----------------------------------------------------------------+
-| ``block_sel_matrix``      | All but CRW                | Parameters used by robots when selecting which block to acquire|
-|                           |                            | as part of the task they are currently executing.              |
-+---------------------------+----------------------------+----------------------------------------------------------------+
-| ``cache_sel_matrix``      | Depth1, depth2 controllers | Parameters used by robots when selecting which cache to acquire|
-|                           |                            | as part of the task they are currently executing.              |
-+---------------------------+----------------------------+----------------------------------------------------------------+
-| ``sensing_subsystemQ3D``  | All controllers            | See :xref:`COSM` docs.                                         |
-+---------------------------+----------------------------+----------------------------------------------------------------+
-| ``actuation_subsystem2D`` | All controllers            | See :xref:`COSM` docs.                                         |
-+---------------------------+----------------------------+----------------------------------------------------------------+
-| ``exploration``           | All but CRW                | Parameters for robot exploration in the absence of knowledge of|
-|                           |                            | an instance of the goal type.                                  |
-+---------------------------+----------------------------+----------------------------------------------------------------+
-| ``task_executive``        | Depth1, depth2 controllers | See :xref:`COSM` docs.                                         |
-+---------------------------+---------------------------------------------------------------------------------------------+
-| ``task_alloc``            | Depth1, depth2 controllers | See :xref:`COSM` docs.                                         |
-+---------------------------+---------------------------------------------------------------------------------------------+
+     - d0
+
+     - MDPO = Mapped Decaying Pheromone Object. DPO + mapped extent of the arena
+       tracking relevance of individual cells within it.
+
+   * -  odpo
+
+     - d0
+
+     - ODPO = Oracular DPO. Has perfect information about blocks in thye arena.
+
+   * -  omdpo
+
+     - d0
+
+     - OMDPO = Oracular MDPO. Has perfect information about blocks in the arena.
+
+   * -  bitd\_dpo
+
+     - d1
+
+     - Greedy task partitioning + DPO. Requires static caches to also be enabled.
+
+   * -  bitd\_odpo
+
+     - d1
+
+     - Greedy task partitioning + DPO + oracle (perfect knowledge, as
+       configured). Requires static caches, oracle to be enabled.
+
+   * -  bitd\_mdpo
+
+     - d1
+
+     - Greedy task partitioning + MDPO. Requires static caches, oracle to be
+       enabled.
+
+   * -  bitd\_omdpo
+
+     - d1
+
+     - Greedy task partitioning + MDPO + oracle (perfect knowledge, as
+       configured). Requires static caches, oracle to be enabled.
+
+   * -  birtd\_dpo
+
+     - d2
+
+     - Recursive greedy task partitioning + DPO. Requires dynamic caches to be
+       enabled.
+
+   * -  birtd\_mdpo
+
+     - d2
+
+     - Recursive greedy task partitioning + MDPO. Requires dynamic caches to be
+       enabled.
+
+   * -  birtd\_odpo
+
+     - d2
+
+     - Recursive greedy task partitioning + DPO + oracle (perfect knowledge, as
+       configured). Requires dynamic caches, oracle to be enabled.
+
+   * -  birtd\_omdpo
+
+     - d2
+
+     - Recursive greedy task partitioning + MDPO + oracle (perfect knowledge, as
+       configured). Requires dynamic caches, oracle to be enabled.
+
+
+
+The following root XML tags are defined under ``<params>`` Parameters for robot exploration, collision avoidance,
+                                                           Parameters for robot
+                                                           exploration,
+                                                           collision avoidance,
+
+.. list-table::
+   :widths: 25,50,50
+   :header-rows: 1
+
+   * - Root XML Tag
+
+     - Mantory For ?
+
+     - Notes
+
+   * - ``perception``
+
+     - All but CRW
+
+     - See :xref:`COSM` docs also; only augmented slightly here.
+
+   * - ``block_sel_matrix``
+
+     - All but CRW
+
+     - Parameters used by robots when selecting which block to acquire
+       as part of the task they are currently executing.
+
+   * - ``cache_sel_matrix``
+
+     - All d1, d2 controllers
+
+     - Parameters used by robots when selecting which cache to acquire as part
+       of the task they are currently executing.
+
+   * - ``sensing_subsystemQ3D``
+
+     - All controllers
+
+     - See :xref:`COSM` docs.
+
+   * - ``actuation_subsystem2D``
+
+     - All controllers
+
+     - See :xref:`COSM` docs.
+
+   * - ``strategy``
+
+     - All controllers
+
+     - Parameters for robot exploration, collision avoidance, etc. strategies.
+
+   * - ``task_executive``
+
+     - d1, d2 controllers
+
+     - See :xref:`COSM` docs.
+
+   * - ``task_alloc``
+
+     - d1, d2 controllers
+
+     - See :xref:`COSM` docs.
+
 
 ``block_sel_matrix``
 --------------------
@@ -141,7 +250,7 @@ XML configuration:
     - ``cluster_proximity`` - Only allow blocks which are within ``prox_dist``
       from the average of the positions of the blocks currently known to a robot
       to be picked up. Only makes sense for object distributions in which
-      objects are clumped into clusters; used to help depth2 robots not to
+      objects are clumped into clusters; used to help d2 robots not to
       pickup the blocks other robots have dropped in order to start caches.
 
     - ``""`` - An empty string to disable if the the tag ``pickup_policy`` is
@@ -153,7 +262,7 @@ XML configuration:
 ``cache_sel_matrix``
 --------------------
 
-- Required by: [depth1, depth2] controllers.
+- Required by: [d1, d2] controllers.
 - Required child attributes if present: all.
 - Required child tags if present: none.
 - Optional child attributes: none.
@@ -199,7 +308,7 @@ XML configuration:
 ``cache_sel_matrix/pickup_policy``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- Required by: [depth1, depth2] controllers.
+- Required by: [d1, d2] controllers.
 - Required child attributes if present: ``policy``.
 - Required child tags if present: none.
 - Optional child attributes: [``timestep``, ``cache_size`` ].
@@ -212,7 +321,7 @@ XML configuration:
     <cache_sel_matrix>
         ...
         <pickup_policy
-            policy=""
+            policy="time|cache_size|cache_duration"
             timestep="INTEGER"
             cache_size="INTEGER"/>
         ...
@@ -226,57 +335,92 @@ XML configuration:
     ``cache_size`` blocks in them. Robots intending to drop blocks in caches are
     not restricted.
 
-  - ``timestep`` - Only allow robots to pickup from caches after ``timestep``
+  - ``cache_duration`` - Only allow robots to pickup from caches after they have
+    existed for at least ``time`` timesteps.
+
+  - ``time`` - Only allow robots to pickup from caches after ``timestep``
     timesteps have elapsed during simulation. Robots intending to drop blocks in
     caches are not restricted.
 
   - Can also be an empty string to disable the cache pickup policy if the
     ``pickup_policy`` tag is present.
 
-``exploration``
----------------
+``strategy``
+-------------
 
-- Required by: All but CRW controller.
-- Required child attributes if present: ``block_strategy``.
-- Required child tags if present: none.
-- Optional child attributes: ``cache_strategy``.
-- Optional child tags: none.
+- Required by: All controllers.
+- Required child attributes if present: None.
+- Required child tags if present: [ ``explore``, ``nest_acq`` ].
+- Optional child attributes: None.
+- Optional child tags: None.
 
 XML configuration:
 
 .. code-block:: XML
 
-   <exploration>
-       block_strategy="CRW|likelihood_search"
-       cache_strategy="CRW|likelihood_search|utility_search|ledtaxis_search"
-   </exploration>
+   <strategy>
+       <explore>
+       ...
+       </explore>
+       <nest_acq>
+       ...
+       </nest_cq>
+   </strategy>
+
+``strategy/explore``
+^^^^^^^^^^^^^^^^^^^^
+
+- Required by: All but CRW.
+- Required child attributes if present: ``block_strategy``.
+- Required child tags if present: None.
+- Optional child attributes: ``cache_strategy``.
+- Optional child tags: None.
+
+XML configuration:
+
+.. code-block:: XML
+
+   <strategy>
+       <explore
+          block_strategy="CRW|likelihood_search"
+          cache_strategy="CRW|likelihood_search|utility_search|ledtaxis_search"
+       </explore>
+       ...
+   </strategy>
+
+``strategy/nest_acq``
+^^^^^^^^^^^^^^^^^^^^^
+
+- Required by: All controllers.
+- Required child attributes if present: ``strategy``.
+- Required child tags if present: None.
+- Optional child attributes: None.
+- Optional child tags: None.
+
+XML configuration:
+
+.. code-block:: XML
+
+   <strategy>
+       <nest_acq
+          strategy="wander|random_thresh|wander_random_thresh"
+       </nest_acq>
+       ...
+   </strategy>
 
 
-- ``block_strategy`` - The strategy robots should use to located blocks when
-  they do not currently know of any and need to find one for the task they are
-  currently doing. Valid values are:
+- ``strategy`` - The strategy robots should use once they have entered the nest
+  with an object to choose a precise location to drop it at. Valid values are:
 
-  - ``CRW`` - Correlated Random Walk
+  - ``wander`` - Perform phototaxis+wander, avoiding collisions as needed, for a
+    random number of timesteps before acquiring the nest.
 
-  - ``likelihood_search`` - Go to the location of the last known block and then
-    begin performing CRW there.
+  - ``random_thresh`` - Perform phototaxis+collision avoidance, choosing a
+    random point along the vector pointing from where the robot enters the nest
+    to the center to treat as the center/use as the nest acquisition point, and
+    phototaxis to that point.
 
-- ``cache_strategy`` - The strategy robots should use to located caches when
-  they do not currently know of any and need to find one for the task they are
-  currently doing. Required for [ ``depth1, depth2`` ] controllers, ignored
-  otherwise.
-
-  - ``CRW`` - Correlated Random Walk
-
-  - ``likelihood_search`` - Go to the location of the last known block and then
-    begin performing CRW there.
-
-  - ``utility_search`` - Use the average location of the known blocks/robot's
-    current location as input into the cache site selection algorithm, then go
-    to the location it returns and begin performing CRW there.
-
-  - ``ledtaxis_search`` - Use the sensing information given off by a cache to
-    perform LEDtaxis towards it, and then perform CRW once a robot is
+  - ``wander_random_thresh`` - ``random_thresh`` + ``wander``.
 
 Additional notes to :xref:`COSM` controller docs
 ================================================
@@ -289,7 +433,7 @@ Additional notes to :xref:`COSM` controller docs
 ``task_alloc/stoch_nbhd1``
 ---------------------------------
 
-- ``tab_sel`` child tag required by depth2 controllers
+- ``tab_sel`` child tag required by d2 controllers
 
 ``task_alloc/task_exec_estimates``
 ----------------------------------

@@ -1,7 +1,7 @@
 /**
- * \file cache_factory.cpp
+ * \file strategy_parser.cpp
  *
- * \copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2021 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,26 +21,31 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/expstrat/cache_factory.hpp"
-
-#include "fordyca/fsm/expstrat/crw_adaptor.hpp"
-#include "fordyca/fsm/expstrat/ledtaxis_cache_search.hpp"
-#include "fordyca/fsm/expstrat/likelihood_cache_search.hpp"
-#include "fordyca/fsm/expstrat/utility_cache_search.hpp"
+#include "fordyca/config/strategy/strategy_parser.hpp"
 
 /*******************************************************************************
- * Namespaces/Decls
+ * Namespaces
  ******************************************************************************/
-NS_START(fordyca, fsm, expstrat);
+NS_START(fordyca, config, strategy);
 
 /*******************************************************************************
- * Constructors/Destructors
+ * Member Functions
  ******************************************************************************/
-cache_factory::cache_factory(void) {
-  register_type<crw_adaptor>(kCRW);
-  register_type<likelihood_cache_search>(kLikelihoodSearch);
-  register_type<utility_cache_search>(kUtilitySearch);
-  register_type<ledtaxis_cache_search>(kLEDTaxisSearch);
-}
+void strategy_parser::parse(const ticpp::Element& node) {
+  ticpp::Element snode = node_get(node, kXMLRoot);
+  m_config = std::make_unique<config_type>();
 
-NS_END(expstrat, fsm, fordyca);
+  m_explore.parse(snode);
+  m_nest_acq.parse(snode);
+
+  if (m_explore.is_parsed()) {
+    m_config->explore = *m_explore.config_get<explore_parser::config_type>();
+  }
+  if (m_nest_acq.is_parsed()) {
+    m_config->nest_acq =
+        *m_nest_acq
+             .config_get<csstrategy::config::xml::nest_acq_parser::config_type>();
+  }
+} /* parse() */
+
+NS_END(config, fordyca, strategy);

@@ -71,8 +71,8 @@ void base_loop_functions::init(ticpp::Element& node) {
   output_init(m_config.config_get<cmconfig::output_config>());
 
   /* initialize arena map and distribute blocks */
-  auto* aconfig = config()->config_get<caconfig::arena_map_config>();
-  auto* vconfig = config()->config_get<cvconfig::visualization_config>();
+  const auto* aconfig = config()->config_get<caconfig::arena_map_config>();
+  const auto* vconfig = config()->config_get<cvconfig::visualization_config>();
   arena_map_create<carena::caching_arena_map>(aconfig);
   if (!delay_arena_map_init()) {
     arena_map_init(vconfig);
@@ -135,10 +135,9 @@ void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
     c->irv_init(m_tv_manager->dynamics<ctv::dynamics_type::ekENVIRONMENT>()
                     ->rda_adaptor());
   };
-  cpal::argos_swarm_iterator::controllers<argos::CFootBotEntity,
-                                          controller::foraging_controller,
+  cpal::argos_swarm_iterator::controllers<controller::foraging_controller,
                                           cpal::iteration_order::ekSTATIC>(
-      this, cb, kARGoSRobotType);
+      this, cb, cpal::kARGoSRobotType);
 } /* tv_init() */
 
 void base_loop_functions::output_init(const cmconfig::output_config* output) {
@@ -170,10 +169,10 @@ void base_loop_functions::oracle_init(
  * ARGoS Hooks
  ******************************************************************************/
 void base_loop_functions::pre_step(void) {
-  auto t = rtypes::timestep(GetSpace().GetSimulationClock());
+  timestep(rtypes::timestep(GetSpace().GetSimulationClock()));
 
   /* update the arena map, which MIGHT require a redraw of the floor */
-  auto status = arena_map()->pre_step_update(t);
+  auto status = arena_map()->pre_step_update(timestep());
   if (carena::update_status::ekBLOCK_MOTION == status) {
     floor()->SetChanged();
   }
@@ -183,7 +182,7 @@ void base_loop_functions::pre_step(void) {
    * throttling/are subjected to the correct penalties, etc.
    */
   if (nullptr != m_tv_manager) {
-    m_tv_manager->update(t);
+    m_tv_manager->update(timestep());
   }
 
   if (nullptr != oracle()) {

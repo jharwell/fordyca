@@ -94,11 +94,10 @@ class cache_op_filter : public rer::client<cache_op_filter> {
       result.status = op_filter_status::ekROBOT_INTERNAL_UNREADY;
     } else {
       /*
-       * OK to lock around this calculation, because relatively few robots will
-       * have the correct internal state for a cache operation each timestep,
-       * and we don't need exclusive access to the arena map at this point--only
-       * a guarantee that the cache array will not be modified while we are
-       * checking it.
+       * Relatively few robots will have the correct internal state for a cache
+       * operation each timestep, and we don't need exclusive access to the
+       * arena map at this point--only a guarantee that the cache array will not
+       * be modified while we are checking it.
        */
       mc_map->lock_rd(mc_map->cache_mtx());
       auto cache_id = mc_map->robot_on_cache(controller.rpos2D());

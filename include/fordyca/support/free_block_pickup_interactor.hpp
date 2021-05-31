@@ -32,6 +32,7 @@
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/metrics/blocks/block_manip_events.hpp"
 #include "fordyca/support/tv/block_op_src.hpp"
+#include "fordyca/support/tv/op_filter_status.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,6 +57,8 @@ class free_block_pickup_interactor final :
  public:
   using typename cinteractors::
       base_arena_block_pickup<TController, TControllerSpecMap>::arena_map_type;
+  using typename cinteractors::
+  base_arena_block_pickup<TController, TControllerSpecMap>::robot_block_vanished_visitor_type;
   using typename cinteractors::base_arena_block_pickup<
       TController,
       TControllerSpecMap>::penalty_handler_type;
@@ -75,11 +78,29 @@ class free_block_pickup_interactor final :
   free_block_pickup_interactor&
   operator=(const free_block_pickup_interactor&) = delete;
 
-  void robot_penalty_init(const TController& controller,
-                          const rtypes::timestep& t,
-                          penalty_handler_type* handler) override {
-    handler->penalty_init(
-        controller, t, tv::block_op_src::ekFREE_PICKUP, boost::none);
+  tv::op_filter_status robot_penalty_init(const TController& controller,
+                                          const rtypes::timestep& t,
+                                          penalty_handler_type* handler) override {
+    return handler->penalty_init(controller,
+                                 t,
+                                 tv::block_op_src::ekFREE_PICKUP,
+                                 boost::none);
+  }
+
+  void robot_post_penalty_init_hook(TController& controller,
+                                    const tv::op_filter_status& status) const override {
+    /*
+     * If we try to initialize a penalty, but find out we are not on a block AND
+     * that the robot is ready, then somehow the robot has drifted/been pushed
+     * off of the block it was on when it became ready such that the arena map
+     * does not think it is on a block anymore. We send it a block vanished
+     * event so that it will try again to acquire a block, to avoid it waiting
+     * FOREVER for a pickup signal that will never come.
+     */
+    if (tv::op_filter_status::ekROBOT_NOT_ON_BLOCK == status) {
+      robot_block_vanished_visitor_type vanished(rtypes::constants::kNoUUID);
+      vanished.visit(controller);
+    }
   }
 
   bool robot_goal_acquired(const TController& controller) const override {

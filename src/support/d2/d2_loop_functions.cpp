@@ -21,14 +21,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-/*
- * This is needed because without it boost instantiates static assertions that
- * verify that every possible handler<controller> instantiation is valid, which
- * includes checking for d2 controllers being valid for new cache drop/cache
- * site drop events. These will not happen in reality (or shouldn't), and if
- * they do it's 100% OK to crash with an exception.
- */
-#define BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT
 #include "fordyca/support/d2/d2_loop_functions.hpp"
 
 #include <boost/mpl/for_each.hpp>
@@ -41,10 +33,10 @@
 #include "cosm/foraging/block_dist/base_distributor.hpp"
 #include "cosm/foraging/metrics/block_transportee_metrics_collector.hpp"
 #include "cosm/foraging/oracle/foraging_oracle.hpp"
+#include "cosm/hal/subsystem/config/saa_xml_names.hpp"
 #include "cosm/interactors/applicator.hpp"
 #include "cosm/pal/argos_convergence_calculator.hpp"
 #include "cosm/pal/argos_swarm_iterator.hpp"
-#include "cosm/robots/footbot/config/saa_xml_names.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
 
@@ -161,8 +153,8 @@ void d2_loop_functions::shared_init(ticpp::Element& node) {
 
 void d2_loop_functions::private_init(void) {
   /* initialize stat collecting */
-  auto* output = config()->config_get<cmconfig::output_config>();
-  auto* arena = config()->config_get<caconfig::arena_map_config>();
+  const auto* output = config()->config_get<cmconfig::output_config>();
+  const auto* arena = config()->config_get<caconfig::arena_map_config>();
 
   m_metrics_agg = std::make_unique<d2_metrics_aggregator>(
       &output->metrics,
@@ -173,7 +165,7 @@ void d2_loop_functions::private_init(void) {
   m_metrics_agg->timestep_inc_all();
 
   /* initialize cache handling */
-  auto* cachep = config()->config_get<config::caches::caches_config>();
+  const auto* cachep = config()->config_get<config::caches::caches_config>();
   cache_handling_init(cachep);
 
   /*
@@ -218,10 +210,9 @@ void d2_loop_functions::private_init(void) {
    * threads are not set up yet so doing dynamicaly causes a deadlock. Also, it
    * only happens once, so it doesn't really matter if it is slow.
    */
-  cpal::argos_swarm_iterator::controllers<argos::CFootBotEntity,
-                                          controller::foraging_controller,
+  cpal::argos_swarm_iterator::controllers<controller::foraging_controller,
                                           cpal::iteration_order::ekSTATIC>(
-      this, cb, kARGoSRobotType);
+      this, cb, cpal::kARGoSRobotType);
 } /* private_init() */
 
 void d2_loop_functions::cache_handling_init(
@@ -230,7 +221,8 @@ void d2_loop_functions::cache_handling_init(
             "FATAL: Caches not enabled in d2 loop functions");
   m_cache_manager =
       std::make_unique<dynamic_cache_manager>(cachep, arena_map(), rng());
-  argos_sm_adaptor::led_medium(crfootbot::config::saa_xml_names().leds_saa);
+  using saa_names = chsubsystem::config::saa_xml_names;
+  argos_sm_adaptor::led_medium(saa_names::leds_saa);
   cache_creation_handle(false);
 } /* cache_handlng_init() */
 
@@ -251,10 +243,9 @@ std::vector<int> d2_loop_functions::robot_tasks_extract(uint) const {
     v.push_back(boost::apply_visitor(
         applicator, m_task_extractor_map->at(controller->type_index())));
   };
-  cpal::argos_swarm_iterator::controllers<argos::CFootBotEntity,
-                                          controller::foraging_controller,
+  cpal::argos_swarm_iterator::controllers<controller::foraging_controller,
                                           cpal::iteration_order::ekSTATIC>(
-      this, cb, kARGoSRobotType);
+      this, cb, cpal::kARGoSRobotType);
   return v;
 } /* robot_tasks_extract() */
 
@@ -269,7 +260,7 @@ void d2_loop_functions::pre_step() {
   /* Process all robots */
   auto cb = [&](argos::CControllableEntity* robot) {
     ndc_push();
-    robot_pre_step(dynamic_cast<argos::CFootBotEntity&>(robot->GetParent()));
+    robot_pre_step(dynamic_cast<chal::robot&>(robot->GetParent()));
     ndc_pop();
   };
   cpal::argos_swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
@@ -283,7 +274,7 @@ void d2_loop_functions::post_step(void) {
   /* Process all robots: environment interactions then collect metrics */
   auto cb = [&](argos::CControllableEntity* robot) {
     ndc_push();
-    robot_post_step(dynamic_cast<argos::CFootBotEntity&>(robot->GetParent()));
+    robot_post_step(dynamic_cast<chal::robot&>(robot->GetParent()));
     ndc_pop();
   };
   cpal::argos_swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
@@ -302,21 +293,21 @@ void d2_loop_functions::post_step(void) {
   }
 
   /* update arena map */
-  auto* collector =
-      m_metrics_agg->get<cfmetrics::block_transportee_metrics_collector>("blocks::"
-                                                                       "transpor"
-                                                                         "ter");
+  const auto* collector =
+      m_metrics_agg->get<cfmetrics::block_transportee_metrics_collector>("blocks:"
+                                                                         ":"
+                                                                         "transpo"
+                                                                         "r"
+                                                                         "tee");
   /*
    * Update arena map. Free block pickups and nest block drops are covered
    * internally by the arena map in terms of updating block clusters, but task
    * aborts are not, and we need to handle those.
    */
   arena_map()->post_step_update(
-      rtypes::timestep(GetSpace().GetSimulationClock()),
+      timestep(),
       collector->cum_transported(),
-      block_op(),
       nullptr != conv_calculator() ? conv_calculator()->converged() : false);
-  block_op(false);
 
   /* Collect metrics from/about existing caches */
   for (auto* c : arena_map()->caches()) {
@@ -330,7 +321,7 @@ void d2_loop_functions::post_step(void) {
    * process as they have been depleted and do not exist anymore in the \ref
    * arena_map::cacheso() array.
    */
-  for (auto& c : arena_map()->zombie_caches()) {
+  for (const auto& c : arena_map()->zombie_caches()) {
     m_metrics_agg->collect_from_cache(c.get());
     c->reset_metrics();
   } /* for(&c..) */
@@ -375,8 +366,8 @@ void d2_loop_functions::destroy(void) {
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-void d2_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
-  auto controller = dynamic_cast<controller::foraging_controller*>(
+void d2_loop_functions::robot_pre_step(chal::robot& robot) {
+  auto* controller = dynamic_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
 
   /*
@@ -384,7 +375,7 @@ void d2_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
    * control step because we need access to information only available in the
    * loop functions.
    */
-  controller->sensing_update(rtypes::timestep(GetSpace().GetSimulationClock()),
+  controller->sensing_update(timestep(),
                              arena_map()->grid_resolution());
 
   /* Send robot its new LOS */
@@ -402,8 +393,8 @@ void d2_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
                        m_los_update_map->at(controller->type_index()));
 } /* robot_pre_step() */
 
-void d2_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
-  auto controller = dynamic_cast<controller::foraging_controller*>(
+void d2_loop_functions::robot_post_step(chal::robot& robot) {
+  auto* controller = dynamic_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
 
   /*
@@ -422,7 +413,8 @@ void d2_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
   auto iapplicator = cinteractors::applicator<controller::foraging_controller,
                                               robot_arena_interactor,
                                               carena::caching_arena_map>(
-      controller, rtypes::timestep(GetSpace().GetSimulationClock()));
+                                                  controller,
+                                                  timestep());
   auto status = boost::apply_visitor(
       iapplicator, m_interactor_map->at(controller->type_index()));
   if (interactor_status::ekNO_EVENT != status) {
@@ -451,16 +443,6 @@ void d2_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
     }
   }
 
-  /*
-   * Mark that a block operation has occured this timestep, and additional
-   * processing is needed AFTER all robots have finished their control steps.
-   */
-  if ((interactor_status::ekFREE_BLOCK_DROP | interactor_status::ekTASK_ABORT) & status) {
-    block_op_mtx()->lock();
-    block_op(true);
-    block_op_mtx()->unlock();
-  }
-
   /* get stats from this robot before its state changes */
   auto mapplicator = ccops::applicator<controller::foraging_controller,
                                        ccops::metrics_extract,
@@ -478,7 +460,7 @@ void d2_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
 } /* robot_post_step() */
 
 bool d2_loop_functions::cache_creation_handle(bool on_drop) {
-  auto* cachep = config()->config_get<config::caches::caches_config>();
+  const auto* cachep = config()->config_get<config::caches::caches_config>();
   /*
    * If dynamic cache creation is configured to occur only upon a robot dropping
    * a block, then we do not perform cache creation unless that event occurred.
@@ -490,10 +472,11 @@ bool d2_loop_functions::cache_creation_handle(bool on_drop) {
   cache_create_ro_params ccp = {
     .current_caches = arena_map()->caches(),
     .clusters = arena_map()->block_distributor()->block_clustersro(),
-    .t = rtypes::timestep(GetSpace().GetSimulationClock())
+    .t = timestep()
   };
 
-  if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
+  if (auto created =
+          m_cache_manager->create(ccp, arena_map()->free_blocks(false))) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
     return true;

@@ -21,14 +21,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-/*
- * This is needed because without it boost instantiates static assertions that
- * verify that every possible handler<controller> instantiation is valid, which
- * includes checking for d1 controllers being valid for new cache drop/cache
- * site drop events. These will not happen in reality (or shouldn't), and if
- * they do it's 100% OK to crash with an exception.
- */
-#define BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT
 #include "fordyca/support/d0/d0_loop_functions.hpp"
 
 #include <boost/mpl/for_each.hpp>
@@ -41,6 +33,7 @@
 #include "cosm/interactors/applicator.hpp"
 #include "cosm/pal/argos_convergence_calculator.hpp"
 #include "cosm/pal/argos_swarm_iterator.hpp"
+#include "cosm/pal/pal.hpp"
 
 #include "fordyca/controller/cognitive/d0/dpo_controller.hpp"
 #include "fordyca/controller/cognitive/d0/mdpo_controller.hpp"
@@ -144,8 +137,8 @@ void d0_loop_functions::shared_init(ticpp::Element& node) {
 
 void d0_loop_functions::private_init(void) {
   /* initialize output and metrics collection */
-  auto* output = config()->config_get<cmconfig::output_config>();
-  auto* arena = config()->config_get<caconfig::arena_map_config>();
+  const auto* output = config()->config_get<cmconfig::output_config>();
+  const auto* arena = config()->config_get<caconfig::arena_map_config>();
   m_metrics_agg = std::make_unique<d0_metrics_aggregator>(
       &output->metrics,
       &arena->grid,
@@ -185,10 +178,9 @@ void d0_loop_functions::private_init(void) {
    * threads are not set up yet so doing dynamicaly causes a deadlock. Also, it
    * only happens once, so it doesn't really matter if it is slow.
    */
-  cpal::argos_swarm_iterator::controllers<argos::CFootBotEntity,
-                                          controller::foraging_controller,
+  cpal::argos_swarm_iterator::controllers<controller::foraging_controller,
                                           cpal::iteration_order::ekSTATIC>(
-      this, cb, kARGoSRobotType);
+      this, cb, cpal::kARGoSRobotType);
 } /* private_init() */
 
 /*******************************************************************************
@@ -198,11 +190,10 @@ void d0_loop_functions::pre_step(void) {
   ndc_push();
   base_loop_functions::pre_step();
   ndc_pop();
-
   /* Process all robots */
   auto cb = [&](argos::CControllableEntity* robot) {
     ndc_push();
-    robot_pre_step(dynamic_cast<argos::CFootBotEntity&>(robot->GetParent()));
+    robot_pre_step(dynamic_cast<chal::robot&>(robot->GetParent()));
     ndc_pop();
   };
   cpal::argos_swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
@@ -216,23 +207,24 @@ void d0_loop_functions::post_step(void) {
   /* Process all robots: interact with environment then collect metrics */
   auto cb = [&](argos::CControllableEntity* robot) {
     ndc_push();
-    robot_post_step(dynamic_cast<argos::CFootBotEntity&>(robot->GetParent()));
+    robot_post_step(dynamic_cast<chal::robot&>(robot->GetParent()));
     ndc_pop();
   };
   cpal::argos_swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
 
   ndc_push();
 
-  auto* collector =
-      m_metrics_agg->get<cfmetrics::block_transportee_metrics_collector>("blocks::"
-                                                                       "transpor"
-                                                                       "ter");
+  const auto* collector =
+      m_metrics_agg->get<cfmetrics::block_transportee_metrics_collector>("blocks:"
+                                                                         ":"
+                                                                         "transpo"
+                                                                         "r"
+                                                                         "tee");
 
   /* update arena map */
   arena_map()->post_step_update(
-      rtypes::timestep(GetSpace().GetSimulationClock()),
+      timestep(),
       collector->cum_transported(),
-      false, /* all pickup/drop block ops handled internally by arena map */
       nullptr != conv_calculator() ? conv_calculator()->converged() : false);
 
   /* Collect metrics from loop functions */
@@ -270,7 +262,7 @@ void d0_loop_functions::reset(void) {
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-void d0_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
+void d0_loop_functions::robot_pre_step(chal::robot& robot) {
   auto* controller = static_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
 
@@ -279,7 +271,7 @@ void d0_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
    * control step because we need access to information only available in the
    * loop functions.
    */
-  controller->sensing_update(rtypes::timestep(GetSpace().GetSimulationClock()),
+  controller->sensing_update(timestep(),
                              arena_map()->grid_resolution());
 
   /* Send robot its new LOS */
@@ -293,8 +285,8 @@ void d0_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
                        m_los_update_map->at(controller->type_index()));
 } /* robot_pre_step() */
 
-void d0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
-  auto controller = static_cast<controller::foraging_controller*>(
+void d0_loop_functions::robot_post_step(chal::robot& robot) {
+  auto* controller = static_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
   /*
    * Watch the robot interact with its environment after physics have been
@@ -309,7 +301,8 @@ void d0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
   auto iapplicator = cinteractors::applicator<controller::foraging_controller,
                                               d0::robot_arena_interactor,
                                               carena::caching_arena_map>(
-      controller, rtypes::timestep(GetSpace().GetSimulationClock()));
+                                                  controller,
+                                                  timestep());
   auto status = boost::apply_visitor(
       iapplicator, m_interactor_map->at(controller->type_index()));
 

@@ -113,14 +113,14 @@ class d2_loop_functions final : public d1::d1_loop_functions,
   /**
    * \brief Handle creation of dynamic caches during initialization, reset, or
    * when triggered by events during simulation.
-   *3a
+   *
    * \param on_drop \c TRUE if caches are to be (potentially) created as a
    * result of a robot block drop. If \c FALSE, then consider dynamic cache
    * creation in other situations.
    *
    * \return \c TRUE if one or more caches were created, \c FALSE otherwise.
    */
-  bool cache_creation_handle(bool on_drop);
+  bool cache_creation_handle(bool on_drop) RCPPSW_COLD;
 
   /**
    * \brief Extract the numerical ID of the task each robot is currently
@@ -139,7 +139,7 @@ class d2_loop_functions final : public d1::d1_loop_functions,
    *
    * - Set its new position, time, LOS from ARGoS.
    */
-  void robot_pre_step(argos::CFootBotEntity& robot);
+  void robot_pre_step(chal::robot& robot);
 
   /**
    * \brief Process a single robot on a timestep, after running its controller:
@@ -147,7 +147,7 @@ class d2_loop_functions final : public d1::d1_loop_functions,
    * - Have  it interact with the environment.
    * - Collect metrics from it.
    */
-  void robot_post_step(argos::CFootBotEntity& robot);
+  void robot_post_step(chal::robot& robot);
 
   /* clang-format off */
   std::mutex                                 m_dynamic_cache_mtx{};

@@ -107,31 +107,6 @@ class dynamic_cache_creator : public base_cache_creator,
   };
 
   /**
-   * \brief Do the actual creation of a cache, once blocks have been allocated
-   * for it.
-   *
-   * \return \c TRUE if creation was successful, and \c FALSE otherwise.
-   */
-  cache_i_result cache_i_create(const cache_create_ro_params& c_params,
-                                const cds::block3D_vectorno& c_alloc_blocks,
-                                const cds::block3D_htno& c_absorbable_blocks,
-                                cads::acache_vectoro* created_caches);
-  bool cache_i_verify(const carepr::arena_cache* cache,
-                      const cads::acache_vectorro& c_caches,
-                      const cds::block3D_vectorno& c_all_blocks,
-                      const cfds::block3D_cluster_vectorro& c_clusters) const;
-
-  /**
-   * \brief If a newly created cache failed verification checks, delete it.
-   *
-   * 1. Clear host cell.
-   * 2. Redistribute the blocks that have been deposited in the host cell.
-   *
-   * Then the actual cache can safely be deleted.
-   */
-  void cache_delete(const cache_i_result& cache_i);
-
-  /**
    * \brief Calculate the blocks to be used in the creation of a single new
    * cache.
    *
@@ -153,11 +128,11 @@ class dynamic_cache_creator : public base_cache_creator,
    * \param center           The cache center.
    * \param cache_dim        The cache dimension.
    *
-   * You *need* cache_i blocks, because if you omit them then you can have
+   * You *need* cache_i_blocks, because if you omit them then you can have
    * blocks getting added to created caches twice, which causes all sorts of
    * problems. See FORDYCA#578.
    */
-  cds::block3D_htno absorb_blocks_calc(
+  cds::block3D_htno cache_i_alloc_from_absorbable(
       const cds::block3D_htno& c_absorbable_blocks,
       const cds::block3D_vectorno& c_cache_i_blocks,
       const rmath::vector2d& c_center,
@@ -172,10 +147,31 @@ class dynamic_cache_creator : public base_cache_creator,
       const cads::acache_vectorno& c_previous_caches,
       const cads::acache_vectoro& c_created_caches) const;
 
+
+  /**
+   * \brief Do the actual creation of a cache, once blocks have been allocated
+   * for it.
+   *
+   * \return \c TRUE if creation was successful, and \c FALSE otherwise.
+   */
+  cache_i_result cache_i_create(const cache_create_ro_params& c_params,
+                                const cds::block3D_vectorno& c_alloc_blocks,
+                                const cds::block3D_htno& c_absorbable_blocks,
+                                cads::acache_vectoro* created_caches);
+  /**
+   * \brief If a newly created cache failed verification checks, delete it.
+   *
+   * 1. Clear host cell.
+   * 2. Redistribute the blocks that have been deposited in the host cell.
+   *
+   * Then the actual cache can safely be deleted.
+   */
+  void cache_delete(const cache_i_result& cache_i);
+
   /* clang-format off */
-  const bool                 mc_strict_constraints;
   const uint                 mc_min_blocks;
   const rtypes::spatial_dist mc_min_dist;
+  const bool                 mc_strict_constraints;
 
   rmath::rng*                m_rng;
   carena::caching_arena_map* m_map;

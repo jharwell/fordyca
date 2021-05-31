@@ -1,7 +1,7 @@
 /**
- * \file block_factory.cpp
+ * \file explore_parser.cpp
  *
- * \copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,22 +21,25 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/expstrat/block_factory.hpp"
-
-#include "fordyca/fsm/expstrat/crw_adaptor.hpp"
-#include "fordyca/fsm/expstrat/likelihood_block_search.hpp"
+#include "fordyca/config/strategy/explore_parser.hpp"
 
 /*******************************************************************************
- * Namespaces/Decls
+ * Namespaces
  ******************************************************************************/
-NS_START(fordyca, fsm, expstrat);
+NS_START(fordyca, config, strategy);
 
 /*******************************************************************************
- * Constructors/Destructors
+ * Member Functions
  ******************************************************************************/
-block_factory::block_factory(void) {
-  register_type<crw_adaptor>(kCRW);
-  register_type<likelihood_block_search>(kLikelihoodSearch);
-}
+void explore_parser::parse(const ticpp::Element& node) {
+  if (nullptr == node.FirstChild(kXMLRoot, false)) {
+    return;
+  }
+  ticpp::Element vnode = node_get(node, kXMLRoot);
+  m_config = std::make_unique<config_type>();
 
-NS_END(expstrat, fsm, fordyca);
+  XML_PARSE_ATTR(vnode, m_config, block_strategy);
+  XML_PARSE_ATTR_DFLT(vnode, m_config, cache_strategy, std::string());
+} /* parse() */
+
+NS_END(config, fordyca, strategy);

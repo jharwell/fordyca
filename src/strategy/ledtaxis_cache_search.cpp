@@ -21,15 +21,15 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/expstrat/ledtaxis_cache_search.hpp"
+#include "fordyca/strategy/explore/ledtaxis_cache_search.hpp"
 
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, fsm, expstrat);
+NS_START(fordyca, strategy, explore);
 
 /*******************************************************************************
  * Member Functions
@@ -112,4 +112,4 @@ rmath::vector3z ledtaxis_cache_search::interference_loc3D(void) const {
   }
 } /* interference_loc3D() */
 
-NS_END(expstrat, fsm, fordyca);
+NS_END(explore, strategy, fordyca);

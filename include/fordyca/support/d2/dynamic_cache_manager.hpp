@@ -24,13 +24,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <boost/optional.hpp>
+#include <algorithm>
 
 #include "rcppsw/math/rng.hpp"
 #include "rcppsw/er/client.hpp"
 
 #include "cosm/ds/block3D_vector.hpp"
-#include "cosm/ds/block3D_ht.hpp"
 #include "cosm/arena/ds/cache_vector.hpp"
 #include "cosm/foraging/ds/block_cluster_vector.hpp"
 
@@ -82,26 +81,28 @@ class dynamic_cache_manager final : public base_cache_manager,
    * caches);
    */
   rtypes::spatial_dist cache_proximity_dist(void) const {
-    return std::max(mc_cache_config.dimension * 2,
-                    mc_cache_config.dynamic.min_dist);
+    return std::max(config()->dimension * 2, config()->dynamic.min_dist);
   }
 
  private:
-  struct creation_blocks {
-    cds::block3D_vectorno usable{};
-    cds::block3D_htno absorbable{};
-  };
-
   /*
-   * \brief Calculate the blocks eligible to be considered for dynamic cache
+   * \brief Filter blocks eligible to be considered for cache
    * creation. Only blocks that are not:
    *
    * - Currently carried by a robot
    * - Currently part of a cache
+   * - Currently part of a block cluster.
    *
    * are eligible to be USED during cache creation this timestep.
-   *
-   * Only blocks that are not:
+   */
+  bool block_alloc_usable_filter(
+      const crepr::base_block3D* block,
+      const cads::acache_vectorno& existing_caches,
+      const cfds::block3D_cluster_vectorro& clusters);
+
+  /*
+   * \brief Calculate the blocks eligible to be considered for absorbtion during
+   * cache creation. Only blocks that are not:
    *
    * - Currently carried by a robot
    * - Currently part of a cache
@@ -112,17 +113,12 @@ class dynamic_cache_manager final : public base_cache_manager,
    * distribution), then block extents from ramp blocks in the cluster are not
    * considered during the creation process otherwise.
    */
-  boost::optional<creation_blocks> creation_blocks_alloc(
+  bool block_alloc_absorbable_filter(
+      const crepr::base_block3D* block,
       const cads::acache_vectorno& existing_caches,
-      const cfds::block3D_cluster_vectorro& clusters,
-      const cds::block3D_vectorno& all_blocks);
-
-  bool creation_blocks_alloc_check(const creation_blocks& c_blocks,
-                                   const cads::acache_vectorno& c_existing_caches) const;
+      const cfds::block3D_cluster_vectorro&);
 
   /* clang-format off */
-  const config::caches::caches_config mc_cache_config;
-
   rmath::rng*                         m_rng;
   carena::caching_arena_map*          m_map;
   /* clang-format on */

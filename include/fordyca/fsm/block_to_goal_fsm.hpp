@@ -26,12 +26,12 @@
  ******************************************************************************/
 #include "rcppsw/er/client.hpp"
 
+#include "cosm/foraging/fsm/foraging_util_hfsm.hpp"
 #include "cosm/fsm/block_transporter.hpp"
-#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
-#include "cosm/spatial/fsm/util_hfsm.hpp"
-#include "cosm/spatial/metrics/goal_acq_metrics.hpp"
-#include "cosm/ta/taskable.hpp"
 #include "cosm/fsm/metrics/block_transporter_metrics.hpp"
+#include "cosm/spatial/metrics/goal_acq_metrics.hpp"
+#include "cosm/subsystem/subsystem_fwd.hpp"
+#include "cosm/ta/taskable.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/foraging_transport_goal.hpp"
@@ -61,17 +61,16 @@ class acquire_free_block_fsm;
  * or via random exploration), pickup the block and bring it to its chosen
  * goal. Once it has done that it will signal that its task is complete.
  */
-class block_to_goal_fsm
-    : public rer::client<block_to_goal_fsm>,
-      public csfsm::util_hfsm,
-      public cta::taskable,
-      public csmetrics::goal_acq_metrics,
-      public cfsm::block_transporter<foraging_transport_goal>,
-      public cfsm::metrics::block_transporter_metrics {
+class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
+                          public cffsm::foraging_util_hfsm,
+                          public cta::taskable,
+                          public csmetrics::goal_acq_metrics,
+                          public cfsm::block_transporter<foraging_transport_goal>,
+                          public cfsm::metrics::block_transporter_metrics {
  public:
   block_to_goal_fsm(csfsm::acquire_goal_fsm* goal_fsm,
                     csfsm::acquire_goal_fsm* block_fsm,
-                    crfootbot::footbot_saa_subsystem* saa,
+                    csubsystem::saa_subsystemQ3D* saa,
                     rmath::rng* rng);
   ~block_to_goal_fsm(void) override = default;
 
@@ -101,9 +100,9 @@ class block_to_goal_fsm
   exp_status is_exploring_for_goal(void) const override final RCPPSW_PURE;
   bool goal_acquired(void) const override RCPPSW_PURE;
   csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override;
-  rmath::vector3z acquisition_loc3D(void) const override final;
-  rmath::vector3z explore_loc3D(void) const override final;
-  rmath::vector3z vector_loc3D(void) const override final;
+  rmath::vector3z acquisition_loc3D(void) const override final RCPPSW_PURE;
+  rmath::vector3z explore_loc3D(void) const override final RCPPSW_PURE;
+  rmath::vector3z vector_loc3D(void) const override final RCPPSW_PURE;
 
   /**
    * \brief Reset the FSM

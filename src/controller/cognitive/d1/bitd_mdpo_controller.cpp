@@ -26,8 +26,8 @@
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/subsystem/perception/config/perception_config.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 
 #include "fordyca/config/d1/controller_repository.hpp"
@@ -71,8 +71,7 @@ void bitd_mdpo_controller::init(ticpp::Element& node) {
 
 void bitd_mdpo_controller::control_step(void) {
   ndc_pusht();
-  ER_ASSERT(!(nullptr != block() &&
-              rtypes::constants::kNoUUID == block()->md()->robot_id()),
+  ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
             block()->md()->robot_id().v());

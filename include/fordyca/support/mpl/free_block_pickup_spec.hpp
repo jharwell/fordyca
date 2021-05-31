@@ -35,6 +35,7 @@
 #include "fordyca/support/interactor_status.hpp"
 #include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/robot_free_block_pickup.hpp"
+#include "fordyca/support/tv/op_filter_status.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -50,10 +51,11 @@ struct free_pickup_spec_value {
   using interactor_status_type = interactor_status;
   using robot_block_vanished_visitor_type = events::block_vanished_visitor;
   using robot_block_pickup_visitor_type = events::robot_free_block_pickup_visitor;
+  using penalty_init_status_type = tv::op_filter_status;
 };
 
 /*
- * First argument is the map as it is built, second in the thing to insert,
+ * First argument is the map as it is built, second is the thing to insert,
  * built from each type in the specified typelist.
  */
 using free_pickup_inserter = boost::mpl::insert<boost::mpl::_1,

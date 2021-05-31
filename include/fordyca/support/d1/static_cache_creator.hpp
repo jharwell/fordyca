@@ -51,7 +51,7 @@ NS_START(fordyca, support, d1);
 class static_cache_creator : public base_cache_creator,
                              public rer::client<static_cache_creator> {
  public:
-  static_cache_creator(cds::arena_grid* grid,
+  static_cache_creator(carena::caching_arena_map* map,
                        const std::vector<rmath::vector2d>& centers,
                        const rtypes::spatial_dist& cache_dim);
   ~static_cache_creator(void) override = default;
@@ -66,7 +66,7 @@ class static_cache_creator : public base_cache_creator,
    *                     of ALL static caches this timestep.
    */
   creation_result create_all(const cache_create_ro_params& c_params,
-                             const ds::block_alloc_map& c_alloc_map,
+                             ds::block_alloc_map&& c_alloc_map,
                              bool pre_dist);
 
  private:

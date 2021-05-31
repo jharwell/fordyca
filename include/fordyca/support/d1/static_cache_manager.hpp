@@ -27,7 +27,6 @@
 #include <vector>
 #include <boost/optional.hpp>
 
-#include "fordyca/config/caches/caches_config.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "cosm/ds/block3D_vector.hpp"
 #include "cosm/foraging/ds/block_cluster_vector.hpp"
@@ -78,12 +77,12 @@ class static_cache_manager final : public base_cache_manager,
    */
   boost::optional<cads::acache_vectoro> create(
       const cache_create_ro_params& c_params,
-      const cds::block3D_vectorno&  c_all_blocks,
+      const cds::block3D_vectorno& c_all_blocks,
       bool initial);
 
   boost::optional<cads::acache_vectoro> create_conditional(
       const cache_create_ro_params& c_params,
-      const cds::block3D_vectorno&  c_all_blocks,
+      const cds::block3D_vectorno& c_all_blocks,
       size_t n_harvesters,
       size_t n_collectors);
 
@@ -96,53 +95,86 @@ class static_cache_manager final : public base_cache_manager,
   /**
    * \brief Allocate blocks for static cache(s) re-creation.
    *
-   * \param c_existing_caches The caches that currently exist in the arena.
-   * \param c_all_blocks Vector of all blocks in the arena.
+   * \param c_usable_blocks Vector of blocks available to use to create caches.
+   * \param c_absorbable_blocks Vector of blocks available to absorb into newly
+   *                            created caches (i.e., blocks which are in the
+   *                            extent of the cache-to-be but which were not
+   *                            initially allocated to it for creation. )
    *
    * \return A map of (cache id, block vector) for all caches. There may not be
    * enough free blocks in the arena to meet the desired initial size of at
    * least one cache, which is not an error (all blocks can currently be carried
    * by robots, for example).
    */
-  ds::block_alloc_map blocks_alloc(const cads::acache_vectorno& existing_caches,
-                                   const cds::block3D_vectorno& all_c_blocks) const;
+  ds::block_alloc_map blocks_alloc(
+      const cds::block3D_vectorno& c_usable_blocks,
+      const cds::block3D_htno& c_absorbable_blocks) const;
 
   /**
    * \brief Allocate the blocks that should be used when re-creating cache i.
    *
-   * Only blocks that are not:
-   *
-   * - Already part of an existing cache
-   * - Currently carried by a robot
-   * - Currently placed on the cell where cache i is to be created
-   * - Placed on the cell where any other cache besides cache i *might* be
-   *   recreated. We have to allocate blocks so that ALL static caches can be
-   *   recreated on the same timestep if needed
-   * - Already allocated for the re-creation of a different static cache
-   *
-   * are eligible.
-   *
-   * \param c_existing_caches Vector of existing static caches.
    * \param c_alloc_map Blocks that have already been allocated to the
    *                    re-creation of other static caches this timestep.
-   * \param c_all_blocks All blocks available for cache creation (already
-   *                     allocated blocks are not filtered out).
    * \param c_center The location the new cache is to be created at, in real
    *                 coordinates.
-   * \param n_blocks How many blocks to try to allocate for cache i.
+   * \param required_blocks How many blocks to try to allocate for cache i.
    */
   boost::optional<cds::block3D_vectorno> cache_i_blocks_alloc(
-      const cads::acache_vectorno& c_existing_caches,
+      const cds::block3D_vectorno& c_usable_blocks,
+      const cds::block3D_htno& c_absorbable_blocks,
       const ds::block_alloc_map& c_alloc_map,
-      const cds::block3D_vectorno& c_all_blocks,
       const rmath::vector2d& c_center,
-      size_t n_blocks) const;
+      size_t cache_index,
+      size_t required_blocks) const;
 
   bool cache_i_blocks_alloc_check(const cds::block3D_vectorno& cache_i_blocks,
                                   const rmath::vector2d& c_center) const;
 
+  /*
+   * \brief Filter blocks eligible to be considered for cache
+   * creation. Only blocks that are not:
+   *
+   * - Currently carried by a robot
+   * - Currently part of a cache
+   *
+   * are eligible to be USED during cache creation this timestep.
+   */
+  bool block_alloc_usable_filter(
+      const crepr::base_block3D* block,
+      const cads::acache_vectorno& existing_caches,
+      const cfds::block3D_cluster_vectorro&) const;
+
+  cds::block3D_vectorno cache_i_alloc_from_usable(
+      const cds::block3D_vectorno& c_usable_blocks,
+      const ds::block_alloc_map& c_alloc_map,
+      size_t required_blocks) const;
+
+  /*
+   * \brief Calculate the blocks eligible to be considered for absorbtion during
+   * cache creation. Absorbable blocks must:
+   *
+   * - Not be currently carried by a robot
+   * - Not currently part of another cache
+   *
+   * are eligible to be ABSORBED during cache creation this timestep. Blocks in
+   * clusters need to be eligible for absorbtion because if a cache-to-be is
+   * location on the RIGHT of a cluster (e.g. quad source/powerlaw
+   * distribution), then block extents from ramp blocks in the cluster are not
+   * considered during the creation process otherwise.
+   */
+  bool block_alloc_absorbable_filter(
+      const crepr::base_block3D* block,
+      const cads::acache_vectorno& existing_caches,
+      const cfds::block3D_cluster_vectorro&);
+
+  cds::block3D_htno cache_i_alloc_from_absorbable(
+      const cds::block3D_htno& c_absorbable_blocks,
+      const cds::block3D_vectorno& c_cache_i_blocks,
+      const ds::block_alloc_map& c_alloc_map,
+      const rmath::vector2d& c_center) const;
+
+
   /* clang-format off */
-  const config::caches::caches_config mc_cache_config;
   const std::vector<rmath::vector2d>  mc_cache_locs;
   rmath::rng*                         m_rng;
   /* clang-format on */

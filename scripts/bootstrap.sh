@@ -126,6 +126,34 @@ fi;
 
 cd ../../
 
+# Install extended E-puck ARGoS model
+if [ -d argos3-eepuck3D ]; then rm -rf argos3-eepuck3D; fi
+git clone https://github.com/swarm-robotics/argos3-eepuck3D.git
+cd argos3-eepuck3D
+mkdir -p build && cd build
+
+git checkout devel
+
+# This code expects ARGoS to be installed system wide, so we have to
+# tell it that where the necessary ARGoS cmake, pkgconfig, files are.
+cmake -DCMAKE_BUILD_TYPE=Release\
+      -DCMAKE_CXX_COMPILER=g++-9\
+      -DCMAKE_LIBRARY_PATH=$prefix/lib\
+      -DCMAKE_PREFIX_PATH=$prefix/include\
+      -DCMAKE_MODULE_PATH=$prefix/share\
+      -DCMAKE_INSTALL_PREFIX=$prefix\
+      ../src
+
+make -j $n_cores
+
+if [ "YES" = "$argos_sys_install" ]; then
+    sudo make install;
+else
+    make install;
+fi;
+
+cd ../../
+
 # Bootstrap RCPPSW
 if [ -d rcppsw ]; then rm -rf rcppsw; fi
 git clone https://github.com/swarm-robotics/rcppsw.git

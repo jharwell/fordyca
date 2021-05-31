@@ -23,10 +23,10 @@
  ******************************************************************************/
 #include "fordyca/fsm/d0/crw_fsm.hpp"
 
-#include "cosm/robots/footbot/footbot_actuation_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
-#include "cosm/spatial/expstrat/base_expstrat.hpp"
+#include "cosm/spatial/strategy/base_strategy.hpp"
+#include "cosm/subsystem/actuation_subsystem2D.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 
 #include "fordyca/fsm/foraging_signal.hpp"
 
@@ -38,11 +38,12 @@ NS_START(fordyca, fsm, d0);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-crw_fsm::crw_fsm(crfootbot::footbot_saa_subsystem* const saa,
-                 std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+crw_fsm::crw_fsm(csubsystem::saa_subsystemQ3D* const saa,
+                 std::unique_ptr<csstrategy::base_strategy> explore,
+                 std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
                  const rmath::vector2d& nest_loc,
                  rmath::rng* rng)
-    : util_hfsm(saa, rng, ekST_MAX_STATES),
+    : foraging_util_hfsm(saa, std::move(nest_acq), rng, ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.d0.crw"),
       RCPPSW_HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       RCPPSW_HFSM_CONSTRUCT_STATE(leaving_nest, &start),
@@ -72,7 +73,7 @@ crw_fsm::crw_fsm(crfootbot::footbot_saa_subsystem* const saa,
                                              nullptr)),
       mc_nest_loc(nest_loc),
       m_explore_fsm(saa,
-                    std::move(exp_behavior),
+                    std::move(explore),
                     rng,
                     std::bind(&crw_fsm::block_detected, this)) {}
 
@@ -87,8 +88,7 @@ RCPPSW_HFSM_STATE_DEFINE(crw_fsm, start, rpfsm::event_data* data) {
   }
   if (rpfsm::event_type::ekCHILD == data->type()) {
     if (fsm::foraging_signal::ekLEFT_NEST == data->signal()) {
-      m_explore_fsm.task_start(nullptr);
-      m_task_finished = false;
+      task_reset();
       internal_event(ekST_ACQUIRE_BLOCK);
       return fsm::foraging_signal::ekHANDLED;
     } else if (fsm::foraging_signal::ekENTERED_NEST == data->signal()) {
@@ -101,10 +101,15 @@ RCPPSW_HFSM_STATE_DEFINE(crw_fsm, start, rpfsm::event_data* data) {
 }
 
 RCPPSW_HFSM_STATE_DEFINE_ND(crw_fsm, acquire_block) {
-  if (m_explore_fsm.task_finished()) {
-    internal_event(ekST_WAIT_FOR_BLOCK_PICKUP);
-  } else {
+  if (!m_explore_fsm.task_running()) {
+    m_explore_fsm.task_reset();
+    m_explore_fsm.task_start(nullptr);
+  }
+  if (m_explore_fsm.task_running()) {
     m_explore_fsm.task_execute();
+    if (m_explore_fsm.task_finished()) {
+      internal_event(ekST_WAIT_FOR_BLOCK_PICKUP);
+    }
   }
   return fsm::foraging_signal::ekHANDLED;
 }
@@ -117,10 +122,13 @@ RCPPSW_HFSM_STATE_DEFINE(crw_fsm,
     ER_INFO("Block pickup signal received");
     internal_event(ekST_TRANSPORT_TO_NEST,
                    std::make_unique<nest_transport_data>(mc_nest_loc));
+    m_pickup_wait_count = 0;
   } else if (fsm::foraging_signal::ekBLOCK_VANISHED == data->signal()) {
-    m_explore_fsm.task_reset();
+    ER_INFO("Block vanished signal received");
     internal_event(ekST_ACQUIRE_BLOCK);
   }
+  ER_ASSERT(++m_pickup_wait_count < 10,
+            "Waited too long for block pickup signal");
   return fsm::foraging_signal::ekHANDLED;
 }
 
@@ -173,8 +181,14 @@ rtypes::type_uuid crw_fsm::entity_acquired_id(void) const {
 /*******************************************************************************
  * Block Transport Metrics
  ******************************************************************************/
-bool crw_fsm::is_phototaxiing_to_goal(void) const {
-  return (foraging_transport_goal::ekNEST == block_transport_goal());
+bool crw_fsm::is_phototaxiing_to_goal(bool include_ca) const {
+  if (include_ca) {
+    return foraging_transport_goal::ekNEST == block_transport_goal();
+  } else {
+    return foraging_transport_goal::ekNEST == block_transport_goal() &&
+           !exp_interference();
+  }
+
 } /* is_phototaxiing_to_goal() */
 
 /*******************************************************************************
@@ -182,24 +196,24 @@ bool crw_fsm::is_phototaxiing_to_goal(void) const {
  ******************************************************************************/
 bool crw_fsm::exp_interference(void) const {
   return (m_explore_fsm.task_running() && m_explore_fsm.exp_interference()) ||
-         csfsm::util_hfsm::exp_interference();
+         cffsm::foraging_util_hfsm::exp_interference();
 } /* exp_interference() */
 
 bool crw_fsm::entered_interference(void) const {
   return (m_explore_fsm.task_running() && m_explore_fsm.entered_interference()) ||
-         csfsm::util_hfsm::entered_interference();
+         cffsm::foraging_util_hfsm::entered_interference();
 } /* entered_interference() */
 
 bool crw_fsm::exited_interference(void) const {
   return (m_explore_fsm.task_running() && m_explore_fsm.exited_interference()) ||
-         csfsm::util_hfsm::exited_interference();
+         cffsm::foraging_util_hfsm::exited_interference();
 } /* exited_interference() */
 
 rtypes::timestep crw_fsm::interference_duration(void) const {
   if (m_explore_fsm.task_running()) {
     return m_explore_fsm.interference_duration();
   } else {
-    return csfsm::util_hfsm::interference_duration();
+    return cffsm::foraging_util_hfsm::interference_duration();
   }
 } /* interference_duration() */
 
@@ -211,12 +225,11 @@ rmath::vector3z crw_fsm::interference_loc3D(void) const {
  * General Member Functions
  ******************************************************************************/
 void crw_fsm::init(void) {
-  csfsm::util_hfsm::init();
+  cffsm::foraging_util_hfsm::init();
   m_explore_fsm.init();
 } /* init() */
 
 void crw_fsm::run(void) {
-  m_task_finished = false;
   if (event_data_hold() && (nullptr != event_data())) {
     auto* data = event_data();
     data->signal(fsm::foraging_signal::ekRUN);
@@ -228,8 +241,7 @@ void crw_fsm::run(void) {
 } /* run() */
 
 bool crw_fsm::block_detected(void) const {
-  return saa()->sensing()->sensor<chal::sensors::ground_sensor>()->detect("bloc"
-                                                                          "k");
+  return saa()->sensing()->ground()->detect("block");
 } /* block_detected() */
 
 foraging_transport_goal crw_fsm::block_transport_goal(void) const {
@@ -247,5 +259,15 @@ csmetrics::goal_acq_metrics::goal_type crw_fsm::acquisition_goal(void) const {
   }
   return fsm::to_goal_type(foraging_acq_goal::ekNONE);
 } /* block_transport_goal() */
+
+/*******************************************************************************
+ * Taskable Interface
+ ******************************************************************************/
+void crw_fsm::task_reset(void) {
+  init();
+  m_explore_fsm.task_reset();
+  m_task_finished = false;
+  inta_tracker()->inta_reset();
+} /* task_reset() */
 
 NS_END(d0, fsm, fordyca);

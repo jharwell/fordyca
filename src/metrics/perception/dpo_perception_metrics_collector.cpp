@@ -71,7 +71,7 @@ void dpo_perception_metrics_collector::reset(void) {
 
 boost::optional<std::string>
 dpo_perception_metrics_collector::csv_line_build(void) {
-  if (!(timestep() % interval() == 0)) {
+  if (!(timestep() % interval() == 0UL)) {
     return boost::none;
   }
   std::string line;
@@ -91,7 +91,7 @@ dpo_perception_metrics_collector::csv_line_build(void) {
 
 void dpo_perception_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
-  auto& m = dynamic_cast<const dpo_perception_metrics&>(metrics);
+  const auto& m = dynamic_cast<const dpo_perception_metrics&>(metrics);
   ++m_interval.robot_count;
   ++m_cum.robot_count;
 

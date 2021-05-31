@@ -25,9 +25,9 @@
 
 #include "cosm/arena/repr/light_type_index.hpp"
 
-#include "fordyca/fsm/expstrat/block_factory.hpp"
-#include "fordyca/fsm/expstrat/cache_factory.hpp"
-#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
+#include "fordyca/strategy/explore/block_factory.hpp"
+#include "fordyca/strategy/explore/cache_factory.hpp"
+#include "fordyca/strategy/foraging_strategy.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,15 +39,15 @@ NS_START(fordyca, fsm, d1);
  ******************************************************************************/
 block_to_existing_cache_fsm::block_to_existing_cache_fsm(
     const fsm_ro_params* const c_params,
-    crfootbot::footbot_saa_subsystem* saa,
+    csubsystem::saa_subsystemQ3D* saa,
     rmath::rng* rng)
     : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, saa, rng),
       m_cache_fsm(
           c_params,
           saa,
-          expstrat::cache_factory().create(
-              c_params->exp_config.cache_strategy,
-              std::make_unique<expstrat::foraging_expstrat::params>(
+          fsexplore::cache_factory().create(
+              c_params->strategy_config.explore.cache_strategy,
+              std::make_unique<fstrategy::foraging_strategy::params>(
                   saa,
                   nullptr,
                   c_params->csel_matrix,
@@ -59,9 +59,9 @@ block_to_existing_cache_fsm::block_to_existing_cache_fsm(
           false),
       m_block_fsm(c_params,
                   saa,
-                  expstrat::block_factory().create(
-                      c_params->exp_config.block_strategy,
-                      std::make_unique<expstrat::foraging_expstrat::params>(
+                  fsexplore::block_factory().create(
+                      c_params->strategy_config.explore.block_strategy,
+                      std::make_unique<fstrategy::foraging_strategy::params>(
                           saa,
                           nullptr,
                           nullptr,

@@ -24,15 +24,14 @@
 #include "fordyca/fsm/acquire_free_block_fsm.hpp"
 
 #include "cosm/repr/base_block3D.hpp"
-#include "cosm/robots/footbot/footbot_actuation_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+#include "cosm/subsystem/actuation_subsystem2D.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 
 #include "fordyca/controller/cognitive/block_selector.hpp"
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/block_acq_validator.hpp"
-#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
 
 /*******************************************************************************
@@ -45,8 +44,8 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 acquire_free_block_fsm::acquire_free_block_fsm(
     const fsm_ro_params* c_params,
-    crfootbot::footbot_saa_subsystem* saa,
-    std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+    csubsystem::saa_subsystemQ3D* saa,
+    std::unique_ptr<csstrategy::base_strategy> exp_behavior,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_free_block"),
       acquire_goal_fsm(
@@ -86,8 +85,7 @@ acquire_free_block_fsm::acquire_free_block_fsm(
  * Member Functions
  ******************************************************************************/
 bool acquire_free_block_fsm::block_exploration_term_cb(void) const {
-  return saa()->sensing()->sensor<chal::sensors::ground_sensor>()->detect("bloc"
-                                                                          "k");
+  return saa()->sensing()->ground()->detect("block");
 } /* block_exploration_term_cb() */
 
 bool acquire_free_block_fsm::block_acquired_cb(bool explore_result) const {
@@ -96,8 +94,7 @@ bool acquire_free_block_fsm::block_acquired_cb(bool explore_result) const {
               "No block detected after successful exploration?");
     return true;
   } else {
-    if (saa()->sensing()->sensor<chal::sensors::ground_sensor>()->detect("bloc"
-                                                                         "k")) {
+    if (saa()->sensing()->ground()->detect("block")) {
       return true;
     }
     ER_WARN("Robot arrived at goal, but no block was detected.");
@@ -109,7 +106,8 @@ boost::optional<csfsm::acquire_goal_fsm::candidate_type>
 acquire_free_block_fsm::block_select(void) const {
   controller::cognitive::block_selector selector(mc_matrix);
 
-  if (auto best = selector(mc_store->blocks(), saa()->sensing()->rpos2D())) {
+  if (const auto* best =
+          selector(mc_store->blocks(), saa()->sensing()->rpos2D())) {
     return boost::make_optional(acquire_goal_fsm::candidate_type(
         best->rcenter2D(), kBLOCK_ARRIVAL_TOL, best->id()));
   } else {
@@ -127,7 +125,7 @@ bool acquire_free_block_fsm::block_acq_valid(const rmath::vector2d& loc,
 } /* block_acq_valid() */
 
 /*******************************************************************************
- * Non-Member Functions
+ * Goal Acquisition Metrics
  ******************************************************************************/
 csmetrics::goal_acq_metrics::goal_type
 acquire_free_block_fsm::acq_goal_internal(void) {

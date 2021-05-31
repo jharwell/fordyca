@@ -101,7 +101,6 @@ class dpo_perception_subsystem final
   void los_tracking_sync(const repr::forager_los* c_los,
                          const cds::block3D_vectorno& los_blocks);
 
- private:
   /* clang-format off */
   std::unique_ptr<ds::dpo_store> m_store;
   /* clang-format on */

@@ -58,7 +58,7 @@ existing_cache_selector::operator()(const ds::dp_cache_map& existing_caches,
   ER_ASSERT(!existing_caches.empty(), "No known existing caches");
 
   double max_utility = 0.0;
-  for (auto& c : existing_caches.const_values_range()) {
+  for (const auto& c : existing_caches.const_values_range()) {
     fsm::cache_acq_validator validator(mc_cache_map, mc_matrix, mc_is_pickup);
 
     if (!validator(c.ent()->rcenter2D(), c.ent()->id(), t) ||
@@ -91,7 +91,7 @@ existing_cache_selector::operator()(const ds::dp_cache_map& existing_caches,
             rcppsw::to_string(best->dcenter2D()).c_str(),
             best->n_blocks(),
             max_utility);
-  ER_CHECKW(nullptr != best,
+  ER_CHECKD(nullptr != best,
             "No best existing cache found: all known caches excluded!");
   return best;
 } /* operator()() */

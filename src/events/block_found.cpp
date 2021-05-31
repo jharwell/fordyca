@@ -74,7 +74,7 @@ void block_found::visit(ds::dpo_store& store) {
   } /* while(it..) */
 
   crepr::pheromone_density density(store.pheromone_rho());
-  auto known = store.find(m_block);
+  auto* known = store.find(m_block);
   if (nullptr != known) {
     /*
      * If the block we just "found" is already known and has a different

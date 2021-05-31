@@ -35,13 +35,7 @@ NS_START(fordyca);
 
 namespace ds { class dpo_store; }
 
-NS_START(fsm);
-
-namespace expstrat {
-class foraging_expstrat;
-} /* namespace expstrat */
-
-NS_START(d2);
+NS_START(fsm, d2);
 
 /*******************************************************************************
  * Class Definitions
@@ -58,8 +52,8 @@ NS_START(d2);
 class cache_transferer_fsm final : public block_to_goal_fsm {
  public:
   cache_transferer_fsm(const fsm_ro_params* c_params,
-                       crfootbot::footbot_saa_subsystem* saa,
-                       std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+                       csubsystem::saa_subsystemQ3D* saa,
+                       std::unique_ptr<csstrategy::base_strategy> exp_behavior,
                        rmath::rng* rng);
   ~cache_transferer_fsm(void) override = default;
 
@@ -72,7 +66,7 @@ class cache_transferer_fsm final : public block_to_goal_fsm {
 
   /* block transportation */
   foraging_transport_goal block_transport_goal(void) const override RCPPSW_PURE;
-  bool is_phototaxiing_to_goal(void) const override { return false; }
+  bool is_phototaxiing_to_goal(bool) const override { return false; }
 
   bool is_acquiring_dest_cache(void) const RCPPSW_PURE;
   bool is_acquiring_src_cache(void) const RCPPSW_PURE;

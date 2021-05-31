@@ -160,7 +160,7 @@ Extend the arena map capabilities in :xref:`COSM` with caches:
 ^^^^^^^^^^^^^^^^^^^^
 
 - Required by: [depth1, depth2 controllers].
-- Required child attributes if present: [ ``dimension`` ].
+- Required child attributes if present: [ ``dimension``, ``strict_constraints`` ].
 - Required child tags if present: none.
 - Optional child attributes: none.
 - Optional child tags: [ ``static``, ``dynamic`` ].
@@ -172,7 +172,8 @@ XML configuration:
    <arena_map>
        ...
        <caches
-           dimension="FLOAT">
+           dimension="FLOAT"
+           strict_constraints="true">
            <static>
                ...
            </static>
@@ -183,8 +184,35 @@ XML configuration:
        ...
    </arena_map>
 
-- ``dimension`` - The dimension of the cache. Should be greater than the dimension
-  for blocks.
+- ``dimension`` - The dimension of the cache. Should be greater than the
+  dimension for blocks.
+
+- ``strict_constraints`` - If `true`, then created caches will not be checked
+  for overlap with block clusters in the arena after creation (this happens in
+  non-error contexts with static caches and RN block distributions, for
+  example). Other sanity checks will still be performed and appropriate error
+  messages issued; however, an "OK" return code will always be returned.
+
+  For dynamic cache creation, if `true`, cache creation will be strict, meaning
+  that any caches that fail validation after creation will be discarded. This
+  can happen because when robots select cache sites they only consider the
+  distance between the `center` of existing caches/blocks/nests/etc, and do not
+  take the extent into consideration. Depending on what the values of the
+  various proximity constraints robots use when searching for a cache site,
+  validation can fail after cache creation.
+
+  For dynamic cache creation, if `false`, then dynamically created caches will
+  be kept regardless if they violate constraints or not, which MIGHT be OK, or
+  MIGHT cause issues/segfaults. Provided as an option so that it will be
+  possible to more precisely duplicate the results of papers run with earlier
+  versions of FORDYCA which had more bugs.
+
+  For static cache creation, caches are never discarded; however if one or more
+  caches fail validation after creation, an assert will be triggered if set to
+  `true`.
+
+  Default if omitted: `true`.
+
 
 ``arena_map/caches/static``
 """""""""""""""""""""""""""
@@ -224,14 +252,13 @@ the ``enable`` attribute is required; all other attributes are parsed iff
   probability of static cache respawn will grow once the conditions for
   respawning are met.
 
-``arena_map/caches/dynamic``
+``arena_map/caches/dynamib``
 """"""""""""""""""""""""""""
 
 - Required by: [depth2 controllers].
 - Required child attributes if present: ``enable``.
 - Required child tags if present: none.
-- Optional child attributes: [ ``min_dist``, ``min_blocks``,
-  ``robot_drop_only``, ``strict_constraints`` ].
+- Optional child attributes: [ ``min_dist``, ``min_blocks``, ``robot_drop_only`` ].
 - Optional child tags: none.
 
 XML configuration:
@@ -244,8 +271,7 @@ XML configuration:
            enable="false"
            min_dist="FLOAT"
            min_blocks="INTEGER"
-           robot_drop_only="false"
-           strict_constraints="true"/>
+           robot_drop_only="false" />
        ...
    </caches>
 
@@ -261,17 +287,3 @@ XML configuration:
   robot block drops rather than drops due to abort/block distribution after
   collection. Default if omitted: `false`.
 
-- ``strict_constraints`` - If `true`, then dynamic cache creation will be
-  strict, meaning that any caches that fail validation after creation will be
-  discarded. This can happen because when robots select cache sites they only
-  consider the distance between the `center` of existing
-  caches/blocks/nests/etc, and do not take the extent into
-  consideration. Depending on what the values of the various proximity
-  constraints robots use when searching for a cache site, validation can fail
-  after cache creation.
-
-  If `false`, then dynamically created caches will be kept regardless if they
-  violate constraints or not, which MIGHT be OK, or MIGHT cause
-  issues/segfaults. Provided as an option so that it will be possible to more
-  precisely duplicate the results of papers run with earlier versions of FORDYCA
-  which had more bugs. Default if omitted: `true`.

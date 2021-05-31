@@ -45,9 +45,6 @@ NS_START(fordyca, support);
  *
  * \brief Check if a controller is too close to a cache for a block drop of some
  * kind.
- *
- * \note This can't be part of the other event utils, because you can't forward
- * declare things because it has to be a template function.
  */
 class cache_prox_checker : public rer::client<cache_prox_checker> {
  public:
@@ -137,22 +134,32 @@ class cache_prox_checker : public rer::client<cache_prox_checker> {
               prox_status.loc.to_str().c_str(),
               prox_status.distance.length(),
               mc_prox_dist.v());
+      notify(controller, prox_status.id, false);
 
-      /*
+      mc_map->unlock_rd(mc_map->cache_mtx());
+      return true;
+    }
+  }
+
+  template <typename TController>
+  bool notify(TController& controller,
+              const rtypes::type_uuid& cache_id,
+              bool need_lock = true) const {
+    mc_map->maybe_lock_rd(mc_map->cache_mtx(), need_lock);
+
+    /*
        * Because caches can be dynamically created/destroyed, we cannot rely on
        * the index position of cache i to be the same as its ID, so we need to
        * search for the correct cache.
        */
-      auto it =
-          std::find_if(mc_map->caches().begin(),
-                       mc_map->caches().end(),
-                       [&](const auto& c) { return c->id() == prox_status.id; });
+    auto it = std::find_if(mc_map->caches().begin(),
+                           mc_map->caches().end(),
+                           [&](const auto& c) { return c->id() == cache_id; });
 
-      events::cache_proximity_visitor prox_op(*it);
-      prox_op.visit(controller);
-      mc_map->unlock_rd(mc_map->cache_mtx());
-      return true;
-    }
+    events::cache_proximity_visitor prox_op(*it);
+    prox_op.visit(controller);
+    mc_map->maybe_unlock_rd(mc_map->cache_mtx(), need_lock);
+    return true;
   }
 
  private:

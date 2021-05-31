@@ -153,7 +153,7 @@ When creating your class, you `must` override:
         * \brief The root tag that all XML configuration for exploration should lie
         * under in the XML tree.
         */
-       static constexpr char kXMLRoot[] = "subwidget";
+       inline static const std::string kXMLRoot = "subwidget";
 
        void parse(const ticpp::Element& node) override;
        std::string xml_root(void) const override { return kXMLRoot; }

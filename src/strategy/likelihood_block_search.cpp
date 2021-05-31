@@ -1,7 +1,7 @@
 /**
- * \file exploration_parser.cpp
+ * \file likelihood_block_search.cpp
  *
- * \copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,25 +21,28 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/config/exploration_parser.hpp"
+#include "fordyca/strategy/explore/likelihood_block_search.hpp"
+
+#include "cosm/spatial/fsm/point_argument.hpp"
+
+#include "fordyca/ds/dpo_store.hpp"
+#include "fordyca/fsm/arrival_tol.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, config);
+NS_START(fordyca, strategy, explore);
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void exploration_parser::parse(const ticpp::Element& node) {
-  if (nullptr == node.FirstChild(kXMLRoot, false)) {
-    return;
+void likelihood_block_search::task_start(cta::taskable_argument*) {
+  if (auto loc = mc_store->last_block_loc()) {
+    csfsm::point_argument v(fsm::kBLOCK_ARRIVAL_TOL, *loc);
+    localized_search::task_start(&v);
+  } else {
+    localized_search::task_start(nullptr);
   }
-  ticpp::Element vnode = node_get(node, kXMLRoot);
-  m_config = std::make_unique<config_type>();
+} /* task_start() */
 
-  XML_PARSE_ATTR(vnode, m_config, block_strategy);
-  XML_PARSE_ATTR_DFLT(vnode, m_config, cache_strategy, std::string());
-} /* parse() */
-
-NS_END(config, fordyca);
+NS_END(explore, strategy, fordyca);

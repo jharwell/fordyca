@@ -101,10 +101,23 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
       }
     } else {
       auto prox_dist = boost::make_optional(m_cache_manager->cache_proximity_dist());
-      m_penalty_handler->penalty_init(controller,
-                                      t,
-                                      tv::block_op_src::ekCACHE_SITE_DROP,
-                                      prox_dist);
+      auto penalty_status = m_penalty_handler->penalty_init(controller,
+                                                    t,
+                                                    tv::block_op_src::ekCACHE_SITE_DROP,
+                                                    prox_dist);
+
+      /*
+       * The checking is redundant here, because it was already done during
+       * penalty_init(), but it doesn't hurt. What we DO need from
+       * check_and_notify() is the "notify" part. Without it, robots which try
+       * to start caches too close to existing caches NEVER get the signal that
+       * they are too close, and just sit waiting until they abort.
+       *
+       * See FORDYCA#684.
+       */
+      if (tv::op_filter_status::ekCACHE_PROXIMITY == penalty_status) {
+        m_prox_checker.check_and_notify(controller, "cache_site");
+      }
     }
     return status;
   }
@@ -148,7 +161,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
     caops::free_block_drop_visitor adrop_op(m_map->blocks()[penalty.id().v()],
                                             loc,
                                             m_map->grid_resolution(),
-                                            carena::arena_map_locking::ekNONE_HELD);
+                                            carena::locking::ekNONE_HELD);
     events::robot_free_block_drop_visitor rdrop_op(controller.block_release(),
                                                    loc,
                                                    m_map->grid_resolution());
@@ -165,9 +178,9 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
   bool pre_process_check(const TController& controller) const {
     const auto& penalty = m_penalty_handler->penalty_next();
     auto acq_goal = controller.current_task()->acquisition_goal();
-    auto* task = dynamic_cast<const events::dynamic_cache_interactor*>(
+    const auto * task = dynamic_cast<const events::dynamic_cache_interactor*>(
         controller.current_task());
-    RCPPSW_UNUSED auto* polled = dynamic_cast<const cta::polled_task*>(
+    RCPPSW_UNUSED const auto * polled = dynamic_cast<const cta::polled_task*>(
         controller.current_task());
 
     ER_CHECK(penalty.controller() == &controller,

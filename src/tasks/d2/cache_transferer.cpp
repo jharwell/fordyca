@@ -115,54 +115,54 @@ void cache_transferer::accept(events::detail::cache_vanished& visitor) {
 /*******************************************************************************
  * Block Acquisition Metrics
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_transferer,
     is_exploring_for_goal,
     *static_cast<fsm::d2::cache_transferer_fsm*>(polled_task::mechanism()),
     const);
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_transferer,
     is_vectoring_to_goal,
     *static_cast<fsm::d2::cache_transferer_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_transferer,
     goal_acquired,
     *static_cast<fsm::d2::cache_transferer_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_transferer,
     acquisition_goal,
     *static_cast<fsm::d2::cache_transferer_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_transferer,
     block_transport_goal,
     *static_cast<fsm::d2::cache_transferer_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_transferer,
     acquisition_loc3D,
     *static_cast<fsm::d2::cache_transferer_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_transferer,
     vector_loc3D,
     *static_cast<fsm::d2::cache_transferer_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_transferer,
     explore_loc3D,
     *static_cast<fsm::d2::cache_transferer_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_transferer,
     entity_acquired_id,
     *static_cast<fsm::d2::cache_transferer_fsm*>(polled_task::mechanism()),

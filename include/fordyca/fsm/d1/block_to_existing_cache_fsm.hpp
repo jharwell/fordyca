@@ -29,15 +29,12 @@
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 #include "fordyca/fsm/acquire_free_block_fsm.hpp"
-#include "fordyca/config/exploration_config.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace controller { class block_sel_matrix; }
-NS_START(fsm, d1);
+NS_START(fordyca, fsm, d1);
 
 /*******************************************************************************
  * Class Definitions
@@ -54,7 +51,7 @@ NS_START(fsm, d1);
  * complete.
  *
  * This FSM takes \ref config::exploration_config as an argument because it
- * needs to be able to use the \ref expstrat::factory to create exploration
+ * needs to be able to use the \ref strategy::factory to create exploration
  * strategies for BOTH blocks and caches, and so you can't cleanly pass the
  * result of factory creation at a higher level into the constructor, like you
  * can with other FSMs.
@@ -62,7 +59,7 @@ NS_START(fsm, d1);
 class block_to_existing_cache_fsm final : public block_to_goal_fsm {
  public:
    block_to_existing_cache_fsm(const fsm_ro_params* c_params,
-                               crfootbot::footbot_saa_subsystem* saa,
+                               csubsystem::saa_subsystemQ3D* saa,
                                rmath::rng* rng);
 
   ~block_to_existing_cache_fsm(void) override = default;
@@ -77,7 +74,7 @@ class block_to_existing_cache_fsm final : public block_to_goal_fsm {
 
   /* block transportation */
   foraging_transport_goal block_transport_goal(void) const override RCPPSW_PURE;
-  bool is_phototaxiing_to_goal(void) const override { return false; }
+  bool is_phototaxiing_to_goal(bool) const override { return false; }
 
  private:
   /* clang-format off */

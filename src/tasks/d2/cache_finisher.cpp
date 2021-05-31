@@ -90,54 +90,54 @@ void cache_finisher::active_interface_update(int) {
 /*******************************************************************************
  * Block Acquisition Metrics
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_finisher,
     is_exploring_for_goal,
     *static_cast<fsm::d2::block_to_new_cache_fsm*>(polled_task::mechanism()),
     const);
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_finisher,
     is_vectoring_to_goal,
     *static_cast<fsm::d2::block_to_new_cache_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_finisher,
     goal_acquired,
     *static_cast<fsm::d2::block_to_new_cache_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_finisher,
     acquisition_goal,
     *static_cast<fsm::d2::block_to_new_cache_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_finisher,
     block_transport_goal,
     *static_cast<fsm::d2::block_to_new_cache_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_finisher,
     acquisition_loc3D,
     *static_cast<fsm::d2::block_to_new_cache_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_finisher,
     explore_loc3D,
     *static_cast<fsm::d2::block_to_new_cache_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_finisher,
     vector_loc3D,
     *static_cast<fsm::d2::block_to_new_cache_fsm*>(polled_task::mechanism()),
     const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
+RCPPSW_WRAP_DEF_OVERRIDE(
     cache_finisher,
     entity_acquired_id,
     *static_cast<fsm::d2::block_to_new_cache_fsm*>(polled_task::mechanism()),

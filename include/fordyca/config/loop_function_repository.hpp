@@ -47,7 +47,7 @@ NS_START(fordyca, config);
  */
 class loop_function_repository : public cpal::config::xml::base_sm_repository {
  public:
-  loop_function_repository(void) noexcept;
+  loop_function_repository(void) noexcept RCPPSW_COLD;
 };
 
 NS_END(config, fordyca);

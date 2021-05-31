@@ -24,7 +24,9 @@
  * Includes
  ******************************************************************************/
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_user_functions.h>
-#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
+
+#include "cosm/hal/robot.hpp"
+
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
@@ -59,7 +61,7 @@ class d0_qt_user_functions : public argos::CQTOpenGLUserFunctions {
 
   ~d0_qt_user_functions(void) override = default;
 
-  void Draw(argos::CFootBotEntity& c_entity);
+  void Draw(chal::robot& c_entity);
 };
 
 NS_END(d0, fordyca, support);

@@ -21,13 +21,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/expstrat/utility_cache_search.hpp"
+#include "fordyca/strategy/explore/utility_cache_search.hpp"
 
 #include <numeric>
 
 #include "cosm/repr/base_block3D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/spatial/fsm/point_argument.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
@@ -36,7 +36,7 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, fsm, expstrat);
+NS_START(fordyca, strategy, explore);
 
 /*******************************************************************************
  * Member Functions
@@ -55,13 +55,13 @@ void utility_cache_search::task_start(cta::taskable_argument*) {
   } else {
     position = saa()->sensing()->rpos2D();
   }
-  d2::cache_site_selector sel(mc_matrix);
+  fsm::d2::cache_site_selector sel(mc_matrix);
   if (auto site = sel(mc_store->caches(), position, rng())) {
-    csfsm::point_argument v(kCACHE_ARRIVAL_TOL, *site);
+    csfsm::point_argument v(fsm::kCACHE_ARRIVAL_TOL, *site);
     localized_search::task_start(&v);
   } else {
     localized_search::task_start(nullptr);
   }
 } /* task_start() */
 
-NS_END(expstrat, fsm, fordyca);
+NS_END(explore, strategy, fordyca);

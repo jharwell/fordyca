@@ -29,7 +29,7 @@
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/math/vector2.hpp"
 
-#include "fordyca/config/exploration_config.hpp"
+#include "fordyca/config/strategy/strategy_config.hpp"
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
@@ -59,10 +59,10 @@ NS_START(fsm);
  * by the FSM at run-time; not all FSMs need all members.
  */
 struct fsm_ro_params {
-  const controller::cognitive::block_sel_matrix* bsel_matrix;
-  const controller::cognitive::cache_sel_matrix* csel_matrix;
+  const fccognitive::block_sel_matrix* bsel_matrix;
+  const fccognitive::cache_sel_matrix* csel_matrix;
   const ds::dpo_store* store;
-  const fordyca::config::exploration_config exp_config;
+  const fcstrategy::strategy_config strategy_config;
 };
 
 NS_END(fsm, fordyca);

@@ -18,15 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_EXPSTRAT_UTILITY_CACHE_SEARCH_HPP_
-#define INCLUDE_FORDYCA_FSM_EXPSTRAT_UTILITY_CACHE_SEARCH_HPP_
+#ifndef INCLUDE_FORDYCA_STRATEGY_EXPLORE_UTILITY_CACHE_SEARCH_HPP_
+#define INCLUDE_FORDYCA_STRATEGY_EXPLORE_UTILITY_CACHE_SEARCH_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <memory>
 
-#include "fordyca/fsm/expstrat/localized_search.hpp"
+#include "fordyca/strategy/explore/localized_search.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,14 +36,14 @@ namespace ds {
 class dpo_store;
 } /* namespace ds */
 
-NS_START(fsm, expstrat);
+NS_START(strategy, explore);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * \class utility_cache_search
- * \ingroup fsm expstrat
+ * \ingroup strategy explore
  *
  * \brief Using \ref cache_site_selector and the average location of all known
  * blocks (or the robot's current location if there are not any known blocks),
@@ -52,7 +52,7 @@ NS_START(fsm, expstrat);
  */
 class utility_cache_search : public localized_search {
  public:
-  utility_cache_search(const foraging_expstrat::params* const c_params,
+  utility_cache_search(const foraging_strategy::params* const c_params,
                        rmath::rng* rng)
       : utility_cache_search(c_params->csel_matrix,
                              c_params->dpo_store,
@@ -60,7 +60,7 @@ class utility_cache_search : public localized_search {
                              rng) {}
   utility_cache_search(const controller::cognitive::cache_sel_matrix* csel_matrix,
                        const ds::dpo_store* store,
-                       crfootbot::footbot_saa_subsystem* saa,
+                       csubsystem::saa_subsystemQ3D* saa,
                        rmath::rng* rng)
       : localized_search(saa, rng),
         mc_matrix(csel_matrix),
@@ -74,7 +74,7 @@ class utility_cache_search : public localized_search {
   void task_start(cta::taskable_argument*) override;
 
   /* prototype overrides */
-  std::unique_ptr<csexpstrat::base_expstrat> clone(void) const override {
+  std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
     return std::make_unique<utility_cache_search>(mc_matrix,
                                                   mc_store,
                                                   saa(),
@@ -88,6 +88,6 @@ class utility_cache_search : public localized_search {
   /* clang-format on */
 };
 
-NS_END(expstrat, fsm, fordyca);
+NS_END(explore, strategy, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_EXPSTRAT_UTILITY_CACHE_SEARCH_HPP_ */
+#endif /* INCLUDE_FORDYCA_STRATEGY_EXPLORE_UTILITY_CACHE_SEARCH_HPP_ */

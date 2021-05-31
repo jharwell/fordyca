@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <memory>
 
-#include "cosm/spatial/fsm/util_hfsm.hpp"
+#include "cosm/foraging/fsm/foraging_util_hfsm.hpp"
 #include "cosm/fsm/block_transporter.hpp"
 #include "cosm/fsm/metrics/block_transporter_metrics.hpp"
 
@@ -58,7 +58,7 @@ NS_START(fsm, d0);
  * way to the nest and dropped it in the nest, it will repeat the same sequence
  * (i.e. it loops indefinitely).
  */
-class dpo_fsm final : public csfsm::util_hfsm,
+class dpo_fsm final : public cffsm::foraging_util_hfsm,
                       public rer::client<dpo_fsm>,
                       public csmetrics::goal_acq_metrics,
                       public cfsm::metrics::block_transporter_metrics,
@@ -66,8 +66,9 @@ class dpo_fsm final : public csfsm::util_hfsm,
                       public cta::taskable {
  public:
   dpo_fsm(const fsm_ro_params * params,
-          crfootbot::footbot_saa_subsystem* saa,
-          std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+          csubsystem::saa_subsystemQ3D* saa,
+          std::unique_ptr<csstrategy::base_strategy> explore,
+          std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
           rmath::rng* rng);
   ~dpo_fsm(void) override = default;
   dpo_fsm(const dpo_fsm&) = delete;
@@ -85,29 +86,29 @@ class dpo_fsm final : public csfsm::util_hfsm,
   void task_reset(void) override { init(); }
 
   /* collision metrics */
-  RCPPSW_WRAP_OVERRIDE_DECL(bool, exp_interference, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(bool, entered_interference, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(bool, exited_interference, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rtypes::timestep, interference_duration, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, interference_loc3D, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(bool, exp_interference, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(bool, entered_interference, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(bool, exited_interference, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(rtypes::timestep, interference_duration, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, interference_loc3D, const);
 
   /* goal acquisition metrics */
-  RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(csmetrics::goal_acq_metrics::goal_type,
+  RCPPSW_WRAP_DECL_OVERRIDE(exp_status, is_exploring_for_goal, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(bool, is_vectoring_to_goal, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(bool, goal_acquired, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(csmetrics::goal_acq_metrics::goal_type,
                             acquisition_goal,
                             const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, acquisition_loc3D, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, explore_loc3D, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, vector_loc3D, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid, entity_acquired_id, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, acquisition_loc3D, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, explore_loc3D, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, vector_loc3D, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(rtypes::type_uuid, entity_acquired_id, const);
 
   /* block transportation */
-  RCPPSW_WRAP_OVERRIDE_DECL(foraging_transport_goal,
+  RCPPSW_WRAP_DECL_OVERRIDE(foraging_transport_goal,
                             block_transport_goal,
                             const);
-  RCPPSW_WRAP_OVERRIDE_DECL(bool, is_phototaxiing_to_goal, const);
+  bool is_phototaxiing_to_goal(bool include_ca) const override RCPPSW_PURE;
 
   void init(void) override;
 
@@ -126,9 +127,9 @@ class dpo_fsm final : public csfsm::util_hfsm,
 
  private:
   /* inherited states */
-  RCPPSW_HFSM_STATE_INHERIT(csfsm::util_hfsm, leaving_nest,
+  RCPPSW_HFSM_STATE_INHERIT(cffsm::foraging_util_hfsm, leaving_nest,
                      rpfsm::event_data);
-  RCPPSW_HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_leaving_nest);
+  RCPPSW_HFSM_ENTRY_INHERIT_ND(cffsm::foraging_util_hfsm, entry_leaving_nest);
 
   /* foraging states */
   RCPPSW_HFSM_STATE_DECLARE(dpo_fsm, start, rpfsm::event_data);

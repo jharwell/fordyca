@@ -7,7 +7,7 @@ export GINIROOT=/home/gini
 export SWARMROOT=$GINIROOT/shared/swarm
 
 # Load modules
-module load cmake/3.10.2
+module load cmake/3.16.2
 module load qt/5.9.1
 module load boost/1.72.0/gnu-9.2.0
 module load gcc/9.2.0
@@ -36,3 +36,6 @@ gcc_prefix=$(gcc -v 2>&1  |grep prefix | awk -F'=' '{print $2}' | awk '{print $1
 export PATH=$PATH:$SWARMROOT/bin
 export ARGOS_PLUGIN_PATH=$SWARMROOT/$MSIARCH/lib/argos3
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$SWARMROOT/$MSIARCH/lib/argos3:$gcc_prefix/lib64
+
+# Always generate core dumps if they happen
+ulimit -c unlimited

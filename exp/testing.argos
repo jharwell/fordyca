@@ -6,7 +6,8 @@
   <!-- * General configuration * -->
   <!-- ************************* -->
   <framework>
-    <system threads="0" method="balance_quantity" />
+    <system threads="1" method="balance_quantity"
+            pin_threads_to_cores="true"/>
     <experiment length="10000"
                 ticks_per_second="5"
                 random_seed="123" />
@@ -16,12 +17,12 @@
   <!-- *************** -->
   <controllers>
 
-    <crw_controller id="ffc"
+    <crw_controller id="fbc"
                           library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
         <!-- <leds implementation="default" medium="leds" /> -->
-        <range_and_bearing implementation="default" />
+        <!-- <range_and_bearing implementation="default" /> -->
       </actuators>
       <sensors>
         <differential_steering implementation="default" />
@@ -86,8 +87,8 @@
           <stoch_nbhd1
               tab_init_policy="max_depth">
             <task_partition
-                always_partition="true"
-                never_partition="false">
+                always_partition="false"
+                never_partition="true">
               <src_sigmoid_sel
                   input_src="exec">
                 <sigmoid_sel
@@ -140,6 +141,7 @@
             cache_prox_dist="1.6"
             nest_prox_dist="3.0"
             block_prox_dist="1.0"
+            new_cache_tol="1.2"
             site_xrange="2:10"
             site_yrange="2.5:3">
           <pickup_policy
@@ -147,9 +149,14 @@
               timestep="20000"
               cache_size="3"/>
         </cache_sel_matrix>
-        <exploration
-            block_strategy="CRW"
-            cache_strategy="utility_search"/>
+        <strategy>
+          <explore
+              block_strategy="CRW"
+              cache_strategy="utility_search"/>
+          <nest_acq
+              strategy="random_thresh"
+              />
+        </strategy>
         <sensing_subsystemQ3D>
           <!-- -5pi/6 : 5pi/6 -->
           <proximity_sensor fov="-2.61:2.61"
@@ -230,15 +237,17 @@
             tv_population="tv-population"
             block_distributor="block-distributor"
             block_motion="block-motion"
+            nest_acq_strategy="nest-acq-strategy"
             block_clusters="block-clusters"
             tv_environment="tv-environment"/>
 
-        <create output_interval="10"
-                block_acq_locs="block-acq-locs"
-                block_acq_explore_locs="block-acq-explore-locs"
-                cache_acq_locs="cache-acq-locs"
-                cache_acq_explore_locs="cache-acq-explore-locs"
-                cache_acq_vector_locs="cache-acq-vector-locs"
+        <truncate output_interval="10"
+                block_acq_locs2D="block-acq-locs"
+                block_acq_explore_locs2D="block-acq-explore-locs"
+                block_acq_vector_locs2D="block-acq-vector-locs"
+                cache_acq_locs2D="cache-acq-locs"
+                cache_acq_explore_locs2D="cache-acq-explore-locs"
+                cache_acq_vector_locs2D="cache-acq-vector-locs"
                 cache_locations="cache-locations"
                 swarm_dist2D_pos="swarm-dist-pos2D"/>
       </metrics>
@@ -276,7 +285,8 @@
                 phase="0"/>
           </motion_throttle>
         <blocks>
-          <manipulation_penalty>
+          <manipulation_penalty
+              unique_finish="true">
             <waveform
                 type="Null"
                 frequency="0.01"
@@ -320,7 +330,7 @@
             policy="Null"
             random_walk_prob="1.0"/>
         <distribution
-            dist_type="single_source"
+            dist_type="random"
             strict_success="false">
 
           <!-- <redist_governor -->
@@ -342,7 +352,10 @@
         </distribution>
       </blocks>
       <nests>
-        <nest dims="2.4, 2.4" center="6, 6" />
+        <nest dims="2.4, 2.4"
+              center="6, 6"
+              light_height="10.0"
+              light_intensity="5.0"/>
       </nests>
     </arena_map>
     <caches dimension="1.0">
@@ -384,11 +397,11 @@
       <body position="0,6,0" orientation="0,0,0" />
     </box>
     <distribute>
-      <position method="uniform" min="1,1,0" max="10,5,0" />
+      <position method="uniform" min="1,1,0" max="10,10,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
       <entity quantity="16" max_trials="1000">
         <foot-bot id="fb" omnidirectional_camera_aperture="89">
-          <controller config="ffc" />
+          <controller config="fbc" />
           <!-- <battery model= "time_motion"/> -->
         </foot-bot>
       </entity>
@@ -401,6 +414,8 @@
   <!-- ******************* -->
   <physics_engines>
     <dynamics2d id="dyn2d0">
+      <!-- <gravity g="10"/> -->
+      <!-- <floor height="0.01" friction="0.05"/> -->
       <!--  <boundaries> -->
       <!--     <top height="1" /> -->
       <!--     <bottom height="0" /> -->

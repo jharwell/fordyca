@@ -67,7 +67,7 @@ class d2_metrics_aggregator final : public d1::d1_metrics_aggregator,
   void collect_from_controller(const Controller* c) {
     d1::d1_metrics_aggregator::collect_from_controller(c);
 
-    auto task = dynamic_cast<const cta::polled_task*>(c->current_task());
+    const auto *task = dynamic_cast<const cta::polled_task*>(c->current_task());
 
     /* only Cache Starter implements these metrics */
     if (nullptr != task &&

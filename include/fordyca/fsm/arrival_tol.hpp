@@ -49,13 +49,13 @@ static constexpr double kCACHE_ARRIVAL_TOL = 0.02;
  * relaxed than the tolerance for cache arrivals, as we are creating a cache,
  * and things can be much more approximate.
  */
-static constexpr double kNEW_CACHE_ARRIVAL_TOL = 0.4;
+static constexpr double kNEW_CACHE_ARRIVAL_TOL = 0.8;
 
 /**
  * \brief The tolerance within which a robot's location has to be in order to
  * be considered to have arrived at the specified cache site.
  */
-static constexpr double kCACHE_SITE_ARRIVAL_TOL = 0.02;
+static constexpr double kCACHE_SITE_ARRIVAL_TOL = 0.8;
 
 NS_END(fordyca, fsm);
 

@@ -28,11 +28,12 @@
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/repr/config/nest_config.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/spatial/strategy/nest_acq/factory.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
 #include "fordyca/config/foraging_controller_repository.hpp"
 #include "fordyca/fsm/d0/crw_fsm.hpp"
-#include "fordyca/fsm/expstrat/block_factory.hpp"
+#include "fordyca/strategy/explore/block_factory.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -63,14 +64,16 @@ void crw_controller::init(ticpp::Element& node) {
     std::exit(EXIT_FAILURE);
   }
 
-  fsm::expstrat::foraging_expstrat::params p(
+  fstrategy::foraging_strategy::params p(
       saa(), nullptr, nullptr, nullptr, rutils::color());
-  auto* nest = repo.config_get<crepr::config::nest_config>();
+  const auto* nest = repo.config_get<crepr::config::nest_config>();
+  const auto* strat_config = repo.config_get<fcstrategy::strategy_config>();
 
   m_fsm = std::make_unique<fsm::d0::crw_fsm>(
       saa(),
-      fsm::expstrat::block_factory().create(
-          fsm::expstrat::block_factory::kCRW, &p, rng()),
+      fsexplore::block_factory().create(fsexplore::block_factory::kCRW, &p, rng()),
+      csstrategy::nest_acq::factory().create(
+          strat_config->nest_acq.strategy, saa(), rng()),
       nest->center,
       rng());
   /* Set CRW FSM supervision */
@@ -88,8 +91,7 @@ void crw_controller::reset(void) {
 
 void crw_controller::control_step(void) {
   ndc_pusht();
-  ER_ASSERT(!(nullptr != block() &&
-              rtypes::constants::kNoUUID == block()->md()->robot_id()),
+  ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
             block()->md()->robot_id().v());
@@ -105,19 +107,21 @@ void crw_controller::control_step(void) {
 /*******************************************************************************
  * Goal Acquisition Metrics
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, goal_acquired, *m_fsm, const);
-RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, entity_acquired_id, *m_fsm, const);
-RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, is_exploring_for_goal, *m_fsm, const);
-RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, acquisition_goal, *m_fsm, const);
-RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, block_transport_goal, *m_fsm, const);
-RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, acquisition_loc3D, *m_fsm, const);
-RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, vector_loc3D, *m_fsm, const);
-RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, explore_loc3D, *m_fsm, const);
+RCPPSW_WRAP_DEF_OVERRIDE(crw_controller, goal_acquired, *m_fsm, const);
+RCPPSW_WRAP_DEF_OVERRIDE(crw_controller, entity_acquired_id, *m_fsm, const);
+RCPPSW_WRAP_DEF_OVERRIDE(crw_controller, is_exploring_for_goal, *m_fsm, const);
+RCPPSW_WRAP_DEF_OVERRIDE(crw_controller, acquisition_goal, *m_fsm, const);
+RCPPSW_WRAP_DEF_OVERRIDE(crw_controller, block_transport_goal, *m_fsm, const);
+RCPPSW_WRAP_DEF_OVERRIDE(crw_controller, acquisition_loc3D, *m_fsm, const);
+RCPPSW_WRAP_DEF_OVERRIDE(crw_controller, vector_loc3D, *m_fsm, const);
+RCPPSW_WRAP_DEF_OVERRIDE(crw_controller, explore_loc3D, *m_fsm, const);
 
 /*******************************************************************************
  * Block Transportation Metrics
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, is_phototaxiing_to_goal, *m_fsm, const);
+bool crw_controller::is_phototaxiing_to_goal(bool include_ca) const {
+  return m_fsm->is_phototaxiing_to_goal(include_ca);
+} /* is_phototaxiing_to_goal() */
 
 using namespace argos; // NOLINT
 

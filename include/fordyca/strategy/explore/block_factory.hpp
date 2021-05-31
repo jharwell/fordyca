@@ -1,5 +1,5 @@
 /**
- * \file likelihood_block_search.cpp
+ * \file block_factory.hpp
  *
  * \copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,31 +18,44 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_STRATEGY_EXPLORE_BLOCK_FACTORY_HPP_
+#define INCLUDE_FORDYCA_STRATEGY_EXPLORE_BLOCK_FACTORY_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/expstrat/likelihood_block_search.hpp"
+#include <string>
 
-#include "cosm/spatial/fsm/point_argument.hpp"
-
-#include "fordyca/ds/dpo_store.hpp"
-#include "fordyca/fsm/arrival_tol.hpp"
+#include "rcppsw/patterns/factory/factory.hpp"
+#include "fordyca/fordyca.hpp"
+#include "fordyca/strategy/foraging_strategy.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, fsm, expstrat);
+NS_START(fordyca, strategy, explore);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-void likelihood_block_search::task_start(cta::taskable_argument*) {
-  if (auto loc = mc_store->last_block_loc()) {
-    csfsm::point_argument v(kBLOCK_ARRIVAL_TOL, *loc);
-    localized_search::task_start(&v);
-  } else {
-    localized_search::task_start(nullptr);
-  }
-} /* task_start() */
+/**
+ * \class block_factory
+ * \ingroup strategy explore
+ *
+ * \brief Factory for creating block exploration strategies.
+ */
+class block_factory :
+    public rpfactory::releasing_factory<csstrategy::base_strategy,
+                                        std::string, /* key type */
+                                        const foraging_strategy::params*,
+                                        rmath::rng*> {
+ public:
+  inline static const std::string kCRW = "CRW";
+  inline static const std::string kLikelihoodSearch = "likelihood_search";
 
-NS_END(expstrat, fsm, fordyca);
+  block_factory(void);
+};
+
+NS_END(explore, strategy, fordyca);
+
+#endif /* INCLUDE_FORDYCA_STRATEGY_EXPLORE_BLOCK_FACTORY_HPP_ */

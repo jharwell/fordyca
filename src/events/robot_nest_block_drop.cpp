@@ -66,7 +66,7 @@ robot_nest_block_drop::robot_nest_block_drop(crepr::base_block3D* block,
 void robot_nest_block_drop::dispatch_nest_interactor(
     tasks::base_foraging_task* const task) {
   RCPPSW_UNUSED auto* polled = dynamic_cast<cta::polled_task*>(task);
-  auto interactor = dynamic_cast<events::nest_interactor*>(task);
+  auto* interactor = dynamic_cast<events::nest_interactor*>(task);
   ER_ASSERT(nullptr != interactor,
             "Non nest-interactor task %s causing nest block drop",
             polled->name().c_str());

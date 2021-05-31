@@ -23,8 +23,6 @@
  ******************************************************************************/
 #include "fordyca/fsm/d2/block_to_cache_site_fsm.hpp"
 
-#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
-
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -35,8 +33,8 @@ NS_START(fordyca, fsm, d2);
  ******************************************************************************/
 block_to_cache_site_fsm::block_to_cache_site_fsm(
     const fsm_ro_params* c_params,
-    crfootbot::footbot_saa_subsystem* saa,
-    std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+    csubsystem::saa_subsystemQ3D* saa,
+    std::unique_ptr<csstrategy::base_strategy> exp_behavior,
     rmath::rng* rng)
     : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, saa, rng),
       m_cache_fsm(c_params, saa, rng),

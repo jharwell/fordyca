@@ -54,8 +54,8 @@ NS_START(fordyca, tasks, d1);
 class foraging_task : public base_foraging_task,
                       public cta::polled_task {
  public:
-  static constexpr char kCollectorName[] = "Collector";
-  static constexpr char kHarvesterName[] = "Harvester";
+  inline static const std::string kCollectorName = "Collector";
+  inline static const std::string kHarvesterName = "Harvester";
 
   foraging_task(const std::string& name,
                 const struct cta::config::task_alloc_config *config,
@@ -64,7 +64,7 @@ class foraging_task : public base_foraging_task,
 
   static bool task_in_d1(const polled_task* task) RCPPSW_PURE;
 
-    /* task overrides */
+  /* task overrides */
   rtypes::timestep current_time(void) const override RCPPSW_PURE;
 };
 

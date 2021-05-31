@@ -74,22 +74,22 @@ class collector : public foraging_task,
   void accept(events::detail::robot_cache_block_drop&) override {}
 
   /* goal acquisition metrics */
-  RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(csmetrics::goal_acq_metrics::goal_type,
+  RCPPSW_WRAP_DECL_OVERRIDE(bool, goal_acquired, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(exp_status, is_exploring_for_goal, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(bool, is_vectoring_to_goal, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(csmetrics::goal_acq_metrics::goal_type,
                             acquisition_goal,
                             const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, acquisition_loc3D, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, explore_loc3D, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, vector_loc3D, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid, entity_acquired_id, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, acquisition_loc3D, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, explore_loc3D, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, vector_loc3D, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(rtypes::type_uuid, entity_acquired_id, const);
 
   /* block transportation */
-  RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal,
+  RCPPSW_WRAP_DECL_OVERRIDE(fsm::foraging_transport_goal,
                             block_transport_goal,
                             const);
-  RCPPSW_WRAP_OVERRIDE_DECL(bool, is_phototaxiing_to_goal, const);
+  bool is_phototaxiing_to_goal(bool include_ca) const override RCPPSW_PURE;
 
   /* task metrics */
   bool task_at_interface(void) const override RCPPSW_PURE;

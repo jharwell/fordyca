@@ -67,7 +67,7 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
   dpo_semantic_map(const cspconfig::perception_config* c_config,
                    const std::string& robot_id);
 
-  RCPPSW_DECORATE_FUNC(pheromone_repeat_deposit, const);
+  RCPPSW_DECORATE_DECLDEF(pheromone_repeat_deposit, const);
 
   /**
    * \brief Access a particular element in the discretized grid representing the
@@ -111,15 +111,15 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
   /**
    * \brief Reset all the cells in the percieved arena.
    */
-  RCPPSW_DECORATE_FUNC(reset)
-  RCPPSW_DECORATE_FUNC(xdsize, const)
-  RCPPSW_DECORATE_FUNC(ydsize, const)
-  RCPPSW_DECORATE_FUNC(xrsize, const)
-  RCPPSW_DECORATE_FUNC(yrsize, const)
-  RCPPSW_DECORATE_FUNC(known_cells_inc)
-  RCPPSW_DECORATE_FUNC(known_cells_dec)
-  RCPPSW_DECORATE_FUNC(known_cell_count, const)
-  RCPPSW_DECORATE_FUNC(resolution, const)
+  RCPPSW_DECORATE_DECLDEF(reset)
+  RCPPSW_DECORATE_DECLDEF(xdsize, const)
+  RCPPSW_DECORATE_DECLDEF(ydsize, const)
+  RCPPSW_DECORATE_DECLDEF(xrsize, const)
+  RCPPSW_DECORATE_DECLDEF(yrsize, const)
+  RCPPSW_DECORATE_DECLDEF(known_cells_inc)
+  RCPPSW_DECORATE_DECLDEF(known_cells_dec)
+  RCPPSW_DECORATE_DECLDEF(known_cell_count, const)
+  RCPPSW_DECORATE_DECLDEF(resolution, const)
 
   bool cache_remove(carepr::base_cache* victim);
   bool block_remove(crepr::base_block3D* victim);

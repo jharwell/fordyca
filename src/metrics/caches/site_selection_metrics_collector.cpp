@@ -73,7 +73,7 @@ void site_selection_metrics_collector::reset(void) {
 
 boost::optional<std::string>
 site_selection_metrics_collector::csv_line_build(void) {
-  if (!(timestep() % interval() == 0)) {
+  if (!(timestep() % interval() == 0UL)) {
     return boost::none;
   }
   std::string line;
@@ -97,7 +97,7 @@ site_selection_metrics_collector::csv_line_build(void) {
 
 void site_selection_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
-  auto& m = dynamic_cast<const site_selection_metrics&>(metrics);
+  const auto& m = dynamic_cast<const site_selection_metrics&>(metrics);
   nlopt::result res = m.nlopt_result();
   if (!m.site_select_exec()) {
     return;

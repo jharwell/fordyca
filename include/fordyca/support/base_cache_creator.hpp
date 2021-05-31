@@ -24,11 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <boost/optional.hpp>
-#include <list>
 #include <memory>
-#include <utility>
-#include <vector>
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
@@ -36,14 +32,18 @@
 #include "rcppsw/types/timestep.hpp"
 
 #include "cosm/arena/ds/nest_vector.hpp"
-#include "cosm/ds/arena_grid.hpp"
 #include "cosm/ds/block3D_vector.hpp"
+#include "cosm/ds/block3D_ht.hpp"
 
 #include "fordyca/support/cache_create_ro_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::arena {
+class caching_arena_map;
+} /* namespace cosm::arena */
+
 NS_START(fordyca, support);
 
 /*******************************************************************************
@@ -65,11 +65,12 @@ class base_cache_creator : public rer::client<base_cache_creator> {
   /**
    * \brief Initialize a new cache creator.
    *
-   * \param grid Reference to arena grid.
+   * \param map Reference to arena map.
    * \param cache_dim Dimension of the cache (caches are square so can use a
    *                  scalar).
    */
-  base_cache_creator(cds::arena_grid* grid, rtypes::spatial_dist cache_dim);
+  base_cache_creator(carena::caching_arena_map* map,
+                     const rtypes::spatial_dist& cache_dim);
 
   base_cache_creator(const base_cache_creator&) = delete;
   base_cache_creator& operator=(const base_cache_creator&) = delete;
@@ -81,34 +82,9 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    */
   void cache_extents_configure(const cads::acache_vectoro& caches);
 
-  /**
-   * \brief Basic sanity checks on newly created caches:
-   *
-   * - No block contained in one cache is contained in another.
-   * - No two newly created caches overlap.
-   * - No block that is not currently contained in a cache overlaps any cache.
-   * - No cache overlaps a block cluster.
-   *
-   * \param c_caches The created caches.
-   * \param c_free_blocks Blocks that are not carried by a robot or part of a
-   *                     newly created cache.
-   * \param c_clusters Current block clusters in the arena.
-   * \param c_nests The nests in the arena.
-   *
-   * \return \c TRUE iff no errors/inconsistencies are found, \c FALSE
-   * otherwise. If \c FALSE, then the problem MUST be with the most newly
-   * created cache, since all previously created caches already have passed all
-   * checks.
-   */
-  bool
-  creation_sanity_checks(const cads::acache_vectorro& c_caches,
-                         const cds::block3D_vectorno& c_free_blocks,
-                         const cfds::block3D_cluster_vectorro& c_clusters,
-                         const cads::nest_vectorro& c_nests) const RCPPSW_PURE;
-
  protected:
-  const cds::arena_grid* grid(void) const { return m_grid; }
-  cds::arena_grid* grid(void) { return m_grid; }
+  const carena::caching_arena_map* map(void) const { return m_map; }
+  carena::caching_arena_map* map(void) { return m_map; }
 
   /**
    * \brief Create a single cache in the arena from the specified set of blocks
@@ -122,32 +98,17 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    */
   std::unique_ptr<carepr::arena_cache>
   create_single_cache(const rmath::vector2d& center,
-                      cds::block3D_vectorno blocks,
+                      cds::block3D_vectorno&& blocks,
                       const rtypes::timestep& t,
                       bool pre_dist);
 
   rtypes::spatial_dist cache_dim(void) const { return mc_cache_dim; }
 
  private:
-  bool sanity_check_internal_consistency(const carepr::arena_cache* cache) const
-      RCPPSW_PURE;
-  bool
-  sanity_check_cross_consistency(const cads::acache_vectorro& c_caches) const;
-  bool sanity_check_cache_overlap(const cads::acache_vectorro& c_caches) const;
-  bool
-  sanity_check_free_block_overlap(const carepr::arena_cache* cache,
-                                  const cds::block3D_vectorno& free_blocks) const;
-  bool sanity_check_block_cluster_overlap(
-      const carepr::arena_cache* cache,
-      const cfds::block3D_cluster_vectorro& clusters) const;
-
-  bool sanity_check_nest_overlap(const carepr::arena_cache* cache,
-                                 const cads::nest_vectorro& nests) const;
-
   /* clang-format off */
   const rtypes::spatial_dist mc_cache_dim;
 
-  cds::arena_grid*           m_grid;
+  carena::caching_arena_map* m_map;
   /* clang-format on */
 };
 NS_END(support, fordyca);

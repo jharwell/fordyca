@@ -144,7 +144,6 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
       const rmath::vector2d& c_center,
       rmath::rng* rng) const;
 
- private:
   /* clang-format off */
   const rtypes::spatial_dist         mc_cache_dim;
   const cads::nest_vectorro          mc_nests;

@@ -28,7 +28,7 @@
 
 #include "cosm/spatial/fsm/acquire_goal_fsm.hpp"
 #include "fordyca/fordyca.hpp"
-#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
+#include "cosm/subsystem/subsystem_fwd.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
 
 /*******************************************************************************
@@ -39,13 +39,7 @@ NS_START(fordyca);
 namespace controller::cognitive { class cache_sel_matrix; }
 namespace ds { class dpo_store; }
 
-NS_START(fsm);
-
-namespace expstrat {
-class foraging_expstrat;
-} /* namespace expstrat */
-
-NS_START(d2);
+NS_START(fsm, d2);
 
 /*******************************************************************************
  * Class Definitions
@@ -64,8 +58,8 @@ class acquire_new_cache_fsm final : public rer::client<acquire_new_cache_fsm>,
                               public csfsm::acquire_goal_fsm {
  public:
   acquire_new_cache_fsm(const fsm_ro_params* c_params,
-                        crfootbot::footbot_saa_subsystem* saa,
-                        std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+                        csubsystem::saa_subsystemQ3D* saa,
+                        std::unique_ptr<csstrategy::base_strategy> exp_behavior,
                         rmath::rng* rng);
   ~acquire_new_cache_fsm(void) override = default;
 
@@ -77,9 +71,9 @@ class acquire_new_cache_fsm final : public rer::client<acquire_new_cache_fsm>,
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
   csmetrics::goal_acq_metrics::goal_type acquisition_goal_internal(void) const RCPPSW_CONST;
-  boost::optional<acquire_goal_fsm::candidate_type> cache_select(void) const;
+  boost::optional<acquire_goal_fsm::candidate_type> cache_select(void);
   bool candidates_exist(void) const RCPPSW_PURE;
-  bool cache_acquired_cb(bool explore_result) const;
+  bool cache_acquired_cb(bool explore_result) const RCPPSW_PURE;
 
   /* clang-format off */
   const controller::cognitive::cache_sel_matrix* const mc_matrix;

@@ -42,14 +42,14 @@ namespace controller = controller::cognitive::d1;
  * Constructors/Destructor
  ******************************************************************************/
 d1_qt_user_functions::d1_qt_user_functions(void) {
-  RegisterUserFunction<d1_qt_user_functions, argos::CFootBotEntity>(
+  RegisterUserFunction<d1_qt_user_functions, chal::robot>(
       &d1_qt_user_functions::Draw);
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void d1_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
+void d1_qt_user_functions::Draw(chal::robot& c_entity) {
   d0_qt_user_functions::Draw(c_entity);
 
   auto& controller = dynamic_cast<controller::bitd_dpo_controller&>(

@@ -98,10 +98,6 @@ class d1_loop_functions : public d0::d0_loop_functions,
    */
   void shared_init(ticpp::Element& node) RCPPSW_COLD;
 
-  bool block_op(void) const { return m_block_op; }
-  void block_op(bool block_op) { m_block_op = block_op; }
-  std::mutex* block_op_mtx(void) { return &m_block_op_mtx; }
-
  private:
   struct cache_counts {
     std::atomic_uint n_harvesters{0};
@@ -164,7 +160,7 @@ class d1_loop_functions : public d0::d0_loop_functions,
    *
    * \note These operations are done in parallel for all robots (lock free).
    */
-  void robot_pre_step(argos::CFootBotEntity& robot);
+  void robot_pre_step(chal::robot& robot);
 
   /**
    * \brief Process a single robot on a timestep, after running its controller.
@@ -175,7 +171,7 @@ class d1_loop_functions : public d0::d0_loop_functions,
    * \note These operations are done in parallel for all robots (with mutual
    *       exclusion as needed).
    */
-  void robot_post_step(argos::CFootBotEntity& robot);
+  void robot_post_step(chal::robot& robot);
 
   /**
    * \brief Extract the numerical ID of the task each robot is currently
@@ -206,9 +202,6 @@ class d1_loop_functions : public d0::d0_loop_functions,
       const controller::foraging_controller* controller);
 
   /* clang-format off */
-  bool                                                m_block_op{false};
-  std::mutex                                          m_block_op_mtx{};
-
   std::unique_ptr<interactor_map_type>                m_interactor_map;
   std::unique_ptr<metric_extractor_map_type>          m_metric_extractor_map;
   std::unique_ptr<los_updater_map_type>               m_los_update_map;

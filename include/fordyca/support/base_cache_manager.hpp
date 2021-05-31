@@ -26,16 +26,21 @@
  ******************************************************************************/
 #include <mutex>
 #include <vector>
+#include <boost/optional.hpp>
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/types/spatial_dist.hpp"
 #include "rcppsw/types/timestep.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 #include "cosm/arena/ds/cache_vector.hpp"
 #include "cosm/ds/block3D_vector.hpp"
+#include "cosm/ds/block3D_ht.hpp"
+#include "cosm/foraging/ds/block_cluster_vector.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/metrics/caches/lifecycle_metrics.hpp"
+#include "fordyca/config/caches/caches_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -59,8 +64,11 @@ NS_START(fordyca, support);
 class base_cache_manager : public metrics::caches::lifecycle_metrics,
                            public rer::client<base_cache_manager> {
  public:
-  explicit base_cache_manager(carena::caching_arena_map* const map)
-      : ER_CLIENT_INIT("fordyca.support.cache_manager"), m_map(map) {}
+  base_cache_manager(const config::caches::caches_config* config,
+                     carena::caching_arena_map* const map)
+      : ER_CLIENT_INIT("fordyca.support.cache_manager"),
+        mc_config(*config),
+        m_map(map) {}
   ~base_cache_manager(void) override = default;
 
   base_cache_manager(const base_cache_manager&) = delete;
@@ -89,6 +97,25 @@ class base_cache_manager : public metrics::caches::lifecycle_metrics,
   std::mutex& mtx(void) { return m_mutex; }
 
  protected:
+  struct creation_blocks {
+    cds::block3D_vectorno usable{};
+    cds::block3D_htno absorbable{};
+  };
+  using block_alloc_filter_type = std::function<bool(
+      const crepr::base_block3D* block,
+      const cads::acache_vectorno& existing_caches,
+      const cfds::block3D_cluster_vectorro& clusters)>;
+
+  boost::optional<creation_blocks> creation_blocks_alloc(
+      const cds::block3D_vectorno& all_blocks,
+      const cads::acache_vectorno& existing_caches,
+      const cfds::block3D_cluster_vectorro& clusters,
+      const block_alloc_filter_type& usable_filter,
+      const block_alloc_filter_type& absorbable_filter);
+
+  bool creation_blocks_alloc_check(const creation_blocks& c_allocated,
+                                   const cads::acache_vectorno& c_existing_caches) const;
+
   /**
    * \brief Check the dimension that a derived class wants to use to create
    * caches with, and modify it if necessary.
@@ -114,13 +141,18 @@ class base_cache_manager : public metrics::caches::lifecycle_metrics,
    */
   void bloctree_update(const cads::acache_vectoro& caches);
 
+  const config::caches::caches_config* config(void) const { return &mc_config; }
+
  private:
   /* clang-format off */
-  size_t                            m_caches_created{0};
-  size_t                            m_caches_discarded{0};
-  std::vector<rtypes::timestep>     m_depletion_ages{};
-  carena::caching_arena_map * const m_map;
-  std::mutex                        m_mutex{};
+  const config::caches::caches_config mc_config;
+
+  size_t                              m_caches_created{0};
+  size_t                              m_caches_discarded{0};
+  std::vector<rtypes::timestep>       m_depletion_ages{};
+
+  carena::caching_arena_map * const   m_map;
+  std::mutex                          m_mutex{};
   /* clang-format on */
 };
 

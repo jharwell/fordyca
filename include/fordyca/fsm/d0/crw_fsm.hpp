@@ -26,29 +26,23 @@
  ******************************************************************************/
 #include <memory>
 
-#include "cosm/spatial/fsm/util_hfsm.hpp"
+#include "cosm/foraging/fsm/foraging_util_hfsm.hpp"
 #include "cosm/spatial/fsm/explore_for_goal_fsm.hpp"
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 #include "cosm/spatial/metrics/interference_metrics.hpp"
 #include "cosm/fsm/block_transporter.hpp"
-#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
+#include "cosm/subsystem/subsystem_fwd.hpp"
 #include "cosm/fsm/metrics/block_transporter_metrics.hpp"
 
 #include "fordyca/fsm/foraging_transport_goal.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
-#include "fordyca/fsm/foraging_transport_goal.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, fsm);
-namespace expstrat {
-class foraging_expstrat;
-} /* namespace expstrat */
-
-NS_START(d0);
+NS_START(fordyca, fsm, d0);
 
 /*******************************************************************************
  * Class Definitions
@@ -62,15 +56,16 @@ NS_START(d0);
  * this FSM roams around randomly until it finds a block, and then brings the
  * block back to the nest, and drops it.
  */
-class crw_fsm final : public csfsm::util_hfsm,
+class crw_fsm final : public cffsm::foraging_util_hfsm,
                       public rer::client<crw_fsm>,
                       public csmetrics::goal_acq_metrics,
                       public cfsm::block_transporter<foraging_transport_goal>,
                       public cfsm::metrics::block_transporter_metrics,
                       public cta::taskable {
  public:
-  crw_fsm(crfootbot::footbot_saa_subsystem* saa,
-          std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+  crw_fsm(csubsystem::saa_subsystemQ3D* saa,
+          std::unique_ptr<csstrategy::base_strategy> explore,
+          std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
           const rmath::vector2d& nest_loc,
           rmath::rng* rng);
 
@@ -82,28 +77,28 @@ class crw_fsm final : public csfsm::util_hfsm,
   bool entered_interference(void) const override RCPPSW_PURE;
   bool exited_interference(void) const override RCPPSW_PURE;
   rtypes::timestep interference_duration(void) const override RCPPSW_PURE;
-  rmath::vector3z interference_loc3D(void) const override;
+  rmath::vector3z interference_loc3D(void) const override RCPPSW_PURE;
 
   /* goal acquisition metrics */
   csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCPPSW_PURE;
   exp_status is_exploring_for_goal(void) const override RCPPSW_PURE;
   bool is_vectoring_to_goal(void) const override { return false; }
   bool goal_acquired(void) const override RCPPSW_PURE;
-  rmath::vector3z acquisition_loc3D(void) const override;
+  rmath::vector3z acquisition_loc3D(void) const override RCPPSW_PURE;
   rtypes::type_uuid entity_acquired_id(void) const override RCPPSW_PURE;
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, explore_loc3D, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector3z, vector_loc3D, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, explore_loc3D, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, vector_loc3D, const);
 
   /* block transportation */
   foraging_transport_goal block_transport_goal(void) const override RCPPSW_PURE;
-  bool is_phototaxiing_to_goal(void) const override RCPPSW_PURE;
+  bool is_phototaxiing_to_goal(bool include_ca) const override RCPPSW_PURE;
 
   /* taskable overrides */
   void task_execute(void) override { run(); }
   void task_start(cta::taskable_argument*) override {}
   bool task_finished(void) const override { return m_task_finished; }
   bool task_running(void) const override { return !m_task_finished; }
-  void task_reset(void) override { init(); }
+  void task_reset(void) override;
 
   /**
    * \brief (Re)-initialize the FSM.
@@ -121,7 +116,7 @@ class crw_fsm final : public csfsm::util_hfsm,
   enum fsm_states {
     ekST_START, /* Initial state */
     ekST_ACQUIRE_BLOCK,
-    ekST_TRANSPORT_TO_NEST,        /* Block found--bring it back to the nest */
+    ekST_TRANSPORT_TO_NEST,     /* Block found--bring it back to the nest */
     ekST_LEAVING_NEST,          /* Block dropped in nest--time to go */
     ekST_WAIT_FOR_BLOCK_PICKUP,
     ekST_WAIT_FOR_BLOCK_DROP,
@@ -129,17 +124,18 @@ class crw_fsm final : public csfsm::util_hfsm,
   };
 
   /* inherited states */
-  RCPPSW_HFSM_STATE_INHERIT(csfsm::util_hfsm,
+  RCPPSW_HFSM_STATE_INHERIT(cffsm::foraging_util_hfsm,
                      transport_to_nest,
                      nest_transport_data);
-  RCPPSW_HFSM_STATE_INHERIT(csfsm::util_hfsm, leaving_nest,
+  RCPPSW_HFSM_STATE_INHERIT(cffsm::foraging_util_hfsm, leaving_nest,
                      rpfsm::event_data);
 
-  RCPPSW_HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_transport_to_nest);
-  RCPPSW_HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_leaving_nest);
+  RCPPSW_HFSM_ENTRY_INHERIT_ND(cffsm::foraging_util_hfsm,
+                               entry_transport_to_nest);
+  RCPPSW_HFSM_ENTRY_INHERIT_ND(cffsm::foraging_util_hfsm, entry_leaving_nest);
   RCPPSW_HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_wait_for_signal);
 
-  RCPPSW_HFSM_EXIT_INHERIT(csfsm::util_hfsm, exit_transport_to_nest);
+  RCPPSW_HFSM_EXIT_INHERIT(cffsm::foraging_util_hfsm, exit_transport_to_nest);
 
   /* crw fsm states */
   RCPPSW_HFSM_STATE_DECLARE(crw_fsm, start, rpfsm::event_data);
@@ -165,6 +161,7 @@ class crw_fsm final : public csfsm::util_hfsm,
   const rmath::vector2d       mc_nest_loc;
 
   bool                        m_task_finished{false};
+  size_t                      m_pickup_wait_count{0};
   csfsm::explore_for_goal_fsm m_explore_fsm;
   /* clang-format on */
 };

@@ -83,6 +83,19 @@ cmake -DCMAKE_BUILD_TYPE=Release \
 make -j $N_CORES && make doc && make install
 ln -s $SWARMROOT/bin/argos3-$MSIARCH $SWARMROOT/$MSIARCH/bin/argos3
 
+# Next, ARGoS epuck
+cd argos3-eepuck3D
+rm -rf build
+mkdir -p build && cd build
+cmake -DCMAKE_BUILD_TYPE=Release\
+      -DCMAKE_LIBRARY_PATH=$SWARMROOT/$MSIARCH/lib\
+      -DCMAKE_PREFIX_PATH=$SWARMROOT/$MSIARCH/include\
+      -DCMAKE_MODULE_PATH=$SWARMROOT/$MSIARCH/share\
+      -DCMAKE_INSTALL_PREFIX=$SWARMROOT/$MSIARCH\
+      ../src
+
+make -j $N_CORES && make install
+
 cd ../..
 
 echo -e "********************************************************************************"

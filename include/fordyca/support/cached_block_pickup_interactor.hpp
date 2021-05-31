@@ -26,6 +26,8 @@
  ******************************************************************************/
 #include <argos3/core/simulator/entity/floor_entity.h>
 
+#include "rcppsw/utils/maskable_enum.hpp"
+
 #include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/arena/operations/cached_block_pickup.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
@@ -122,10 +124,11 @@ class cached_block_pickup_interactor
      * a block, then the second one will not get the necessary \ref
      * cache_vanished event. See FORDYCA#594.
      *
-     * Grid and block mutexes are also required, but only within the actual \ref
+     * Grid mutex is also required, but only within the actual \ref
      * cached_block_pickup event visit to the arena map.
      */
-    m_map->cache_mtx()->lock();
+    m_map->lock_wr(m_map->cache_mtx());
+    m_map->lock_wr(m_map->block_mtx());
 
     /*
      * If two collector robots enter a cache that only contains 2 blocks on the
@@ -149,6 +152,9 @@ class cached_block_pickup_interactor
       ER_WARN("%s cannot pickup from from cache%d: No such cache",
               controller.GetId().c_str(),
               p.id().v());
+      m_map->unlock_wr(m_map->block_mtx());
+      m_map->unlock_wr(m_map->cache_mtx());
+
       events::cache_vanished_visitor vanished_op(p.id());
       vanished_op.visit(controller);
     } else {
@@ -178,8 +184,9 @@ class cached_block_pickup_interactor
                 controller.GetId().c_str(),
                 p.id().v());
       }
+      m_map->unlock_wr(m_map->block_mtx());
+      m_map->unlock_wr(m_map->cache_mtx());
     }
-    m_map->cache_mtx()->unlock();
 
     m_penalty_handler->penalty_remove(p);
 
@@ -221,12 +228,18 @@ class cached_block_pickup_interactor
     crepr::base_block3D* to_pickup = (*real_it)->block_select(m_loop->rng());
 
     caops::cached_block_pickup_visitor arena_pickup(
-        *real_it, to_pickup, m_loop, controller.entity_id(), t);
+        *real_it,
+        to_pickup,
+        m_loop,
+        controller.entity_id(),
+        t,
+        carena::locking::ekCACHES_HELD | carena::locking::ekBLOCKS_HELD);
+
     (*real_it)->penalty_served(penalty.penalty());
     controller.block_manip_recorder()->record(
         metrics::blocks::block_manip_events::ekCACHE_PICKUP, penalty.penalty());
 
-    uint old_n_caches = m_map->caches().size();
+    auto old_n_caches = m_map->caches().size();
 
     /* 1st, visit the arena map */
     arena_pickup.visit(*m_map);
@@ -273,9 +286,9 @@ class cached_block_pickup_interactor
     const auto& penalty = m_penalty_handler->penalty_next();
     ER_ASSERT(penalty.controller() == &controller,
               "Out of order cache penalty handling");
-    auto* task = dynamic_cast<const events::existing_cache_interactor*>(
+    const auto* task = dynamic_cast<const events::existing_cache_interactor*>(
         controller.current_task());
-    RCPPSW_UNUSED auto* polled =
+    RCPPSW_UNUSED const auto* polled =
         dynamic_cast<const cta::polled_task*>(controller.current_task());
     ER_CHECK(nullptr != task,
              "Non-cache interface task '%s'!",

@@ -27,11 +27,11 @@
 
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
+#include "cosm/hal/subsystem/config/saa_xml_names.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/repr/config/nest_config.hpp"
-#include "cosm/robots/footbot/config/saa_xml_names.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/subsystem/config/sensing_subsystemQ3D_config.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
 
@@ -65,8 +65,7 @@ bitd_dpo_controller::~bitd_dpo_controller(void) = default;
  ******************************************************************************/
 void bitd_dpo_controller::control_step(void) {
   ndc_pusht();
-  ER_ASSERT(!(nullptr != block() &&
-              rtypes::constants::kNoUUID == block()->md()->robot_id()),
+  ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
             block()->md()->robot_id().v());
@@ -121,11 +120,12 @@ void bitd_dpo_controller::shared_init(
    * initialization in the base controller, and needs to happen here when we
    * have an XML repository with the correct configuration in it.
    */
-  using saa_names = crfootbot::config::saa_xml_names;
+  using saa_names = chsubsystem::config::saa_xml_names;
   auto sensing_p =
       config_repo.config_get<csubsystem::config::sensing_subsystemQ3D_config>();
   auto ground = chal::sensors::ground_sensor(
-      GetSensor<argos::CCI_FootBotMotorGroundSensor>(saa_names::ground_sensor),
+      GetSensor<chal::sensors::ground_sensor::impl_type>(
+          saa_names::ground_sensor),
       &sensing_p->ground);
   saa()->sensing()->replace(ground);
 } /* shared_init() */
@@ -167,7 +167,7 @@ void bitd_dpo_controller::executive(
 /*******************************************************************************
  * Block Transportation
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEFP(bitd_dpo_controller,
+RCPPSW_WRAP_DEFP_OVERRIDE(bitd_dpo_controller,
                           block_transport_goal,
                           current_task(),
                           fsm::foraging_transport_goal::ekNONE,
@@ -176,19 +176,19 @@ RCPPSW_WRAP_OVERRIDE_DEFP(bitd_dpo_controller,
 /*******************************************************************************
  * Goal Acquisition
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEFP(bitd_dpo_controller,
+RCPPSW_WRAP_DEFP_OVERRIDE(bitd_dpo_controller,
                           acquisition_goal,
                           current_task(),
                           fsm::to_goal_type(fsm::foraging_acq_goal::ekNONE),
                           const);
 
-RCPPSW_WRAP_OVERRIDE_DEFP(bitd_dpo_controller,
+RCPPSW_WRAP_DEFP_OVERRIDE(bitd_dpo_controller,
                           goal_acquired,
                           current_task(),
                           false,
                           const);
 
-RCPPSW_WRAP_OVERRIDE_DEFP(bitd_dpo_controller,
+RCPPSW_WRAP_DEFP_OVERRIDE(bitd_dpo_controller,
                           entity_acquired_id,
                           current_task(),
                           rtypes::constants::kNoUUID,

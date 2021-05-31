@@ -1,5 +1,5 @@
 /**
- * \file foraging_expstrat.cpp
+ * \file cache_factory.hpp
  *
  * \copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,34 +18,46 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_STRATEGY_EXPLORE_CACHE_FACTORY_HPP_
+#define INCLUDE_FORDYCA_STRATEGY_EXPLORE_CACHE_FACTORY_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
+#include <string>
 
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "rcppsw/patterns/factory/factory.hpp"
+#include "fordyca/fordyca.hpp"
+#include "fordyca/strategy/foraging_strategy.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, fsm, expstrat);
+NS_START(fordyca, strategy, explore);
 
 /*******************************************************************************
- * Constructors/Destructors
+ * Class Definitions
  ******************************************************************************/
-foraging_expstrat::foraging_expstrat(crfootbot::footbot_saa_subsystem* saa,
-                                     rmath::rng* rng)
-    : base_expstrat(saa, rng) {}
+/**
+ * \class cache_factory
+ * \ingroup strategy explore
+ *
+ * \brief Factory for creating cache exploration strategies.
+ */
+class cache_factory :
+    public rpfactory::releasing_factory<csstrategy::base_strategy,
+                                        std::string, /* key type */
+                                        const foraging_strategy::params*,
+                                        rmath::rng*> {
+ public:
+  inline static const std::string kCRW = "CRW";
+  inline static const std::string kLikelihoodSearch = "likelihood_search";
+  inline static const std::string kUtilitySearch = "utility_search";
+  inline static const std::string kLEDTaxisSearch = "ledtaxis_search";
 
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
-crfootbot::footbot_saa_subsystem* foraging_expstrat::saa(void) const {
-  return static_cast<crfootbot::footbot_saa_subsystem*>(base_expstrat::saa());
-} /* saa() */
+  cache_factory(void);
+};
 
-crfootbot::footbot_saa_subsystem* foraging_expstrat::saa(void) {
-  return static_cast<crfootbot::footbot_saa_subsystem*>(base_expstrat::saa());
-} /* saa() */
+NS_END(explore, strategy, fordyca);
 
-NS_END(expstrat, fsm, fordyca);
+#endif /* INCLUDE_FORDYCA_STRATEGY_EXPLORE_CACHE_FACTORY_HPP_ */

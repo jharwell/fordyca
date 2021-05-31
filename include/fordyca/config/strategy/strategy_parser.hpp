@@ -1,7 +1,7 @@
 /**
- * \file exploration_parser.hpp
+ * \file strategy_parser.hpp
  *
- * \copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2021 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONFIG_EXPLORATION_PARSER_HPP_
-#define INCLUDE_FORDYCA_CONFIG_EXPLORATION_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_CONFIG_STRATEGY_STRATEGY_PARSER_HPP_
+#define INCLUDE_FORDYCA_CONFIG_STRATEGY_STRATEGY_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,35 +29,38 @@
 
 #include "rcppsw/config/xml/xml_config_parser.hpp"
 
-#include "fordyca/config/exploration_config.hpp"
-#include "fordyca/fordyca.hpp"
+#include "cosm/spatial/strategy/config/xml/nest_acq_parser.hpp"
+
+#include "fordyca/config/strategy/strategy_config.hpp"
+#include "fordyca/config/strategy/explore_parser.hpp"
+
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, config);
+NS_START(fordyca, config, strategy);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class exploration_parser
- * \ingroup config
+ * \class strategy_parser
+ * \ingroup config strategy
  *
- * \brief Parses XML configuration for how robots should explore for things into
- * \ref exploration_config.
+ * \brief Parses XML configuration for how robots should DO things into \ref
+ * strategy_config.
  */
-class exploration_parser final : public rconfig::xml::xml_config_parser {
+class strategy_parser final : public rconfig::xml::xml_config_parser {
  public:
-  using config_type = exploration_config;
+  using config_type = strategy_config;
 
   /**
-   * \brief The root tag that all XML configuration for exploration should lie
+   * \brief The root tag that all XML configuration for strategy should lie
    * under in the XML tree.
    */
-  static constexpr char kXMLRoot[] = "exploration";
+  inline static const std::string kXMLRoot = "strategy";
 
-  void parse(const ticpp::Element& node) override;
+  void parse(const ticpp::Element& node) override RCPPSW_COLD;
   std::string xml_root(void) const override { return kXMLRoot; }
 
  private:
@@ -66,10 +69,12 @@ class exploration_parser final : public rconfig::xml::xml_config_parser {
   }
 
   /* clang-format off */
-  std::unique_ptr<config_type> m_config{nullptr};
+  std::unique_ptr<config_type>             m_config{nullptr};
+  csstrategy::config::xml::nest_acq_parser m_nest_acq{};
+  explore_parser                           m_explore{};
   /* clang-format on */
 };
 
-NS_END(config, fordyca);
+NS_END(strategy, config, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONFIG_EXPLORATION_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONFIG_STRATEGY_STRATEGY_PARSER_HPP_ */

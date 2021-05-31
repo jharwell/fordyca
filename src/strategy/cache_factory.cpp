@@ -1,5 +1,5 @@
 /**
- * \file block_factory.hpp
+ * \file cache_factory.cpp
  *
  * \copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,44 +18,29 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_EXPSTRAT_BLOCK_FACTORY_HPP_
-#define INCLUDE_FORDYCA_FSM_EXPSTRAT_BLOCK_FACTORY_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
+#include "fordyca/strategy/explore/cache_factory.hpp"
 
-#include "rcppsw/patterns/factory/factory.hpp"
-#include "fordyca/fordyca.hpp"
-#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
+#include "fordyca/strategy/explore/crw_adaptor.hpp"
+#include "fordyca/strategy/explore/ledtaxis_cache_search.hpp"
+#include "fordyca/strategy/explore/likelihood_cache_search.hpp"
+#include "fordyca/strategy/explore/utility_cache_search.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, fsm, expstrat);
+NS_START(fordyca, strategy, explore);
 
 /*******************************************************************************
- * Class Definitions
+ * Constructors/Destructors
  ******************************************************************************/
-/**
- * \class block_factory
- * \ingroup fsm expstrat
- *
- * \brief Factory for creating block exploration strategies.
- */
-class block_factory :
-    public rpfactory::releasing_factory<csexpstrat::base_expstrat,
-                                        std::string, /* key type */
-                                        const expstrat::foraging_expstrat::params*,
-                                        rmath::rng*> {
- public:
-  static constexpr char kCRW[] = "CRW";
-  static constexpr char kLikelihoodSearch[] = "likelihood_search";
+cache_factory::cache_factory(void) {
+  register_type<crw_adaptor>(kCRW);
+  register_type<likelihood_cache_search>(kLikelihoodSearch);
+  register_type<utility_cache_search>(kUtilitySearch);
+  register_type<ledtaxis_cache_search>(kLEDTaxisSearch);
+}
 
-  block_factory(void);
-};
-
-NS_END(expstrat, fsm, fordyca);
-
-#endif /* INCLUDE_FORDYCA_FSM_EXPSTRAT_BLOCK_FACTORY_HPP_ */
+NS_END(exploration, strategy, fordyca);

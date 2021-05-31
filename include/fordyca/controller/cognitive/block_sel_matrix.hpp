@@ -69,18 +69,18 @@ using block_sel_variant =
  */
 class block_sel_matrix : public std::map<std::string, block_sel_variant> {
  public:
-  static constexpr char kNestLoc[] = "nest_loc";
-  static constexpr char kCubePriority[] = "cube_priority";
-  static constexpr char kRampPriority[] = "ramp_priority";
-  static constexpr char kSelExceptions[] = "sel_exceptions";
+  inline static const std::string kNestLoc = "nest_loc";
+  inline static const std::string kCubePriority = "cube_priority";
+  inline static const std::string kRampPriority = "ramp_priority";
+  inline static const std::string kSelExceptions = "sel_exceptions";
 
   /**
    * \brief The conditions that must be satisfied before a robot will be
    * able to pickup a block (if applicable).
    */
-  static constexpr char kPickupPolicy[] = "pickup_policy";
-  static constexpr char kPickupPolicyNull[] = "";
-  static constexpr char kPickupPolicyClusterProx[] = "cluster_proximity";
+  inline static const std::string kPickupPolicy = "pickup_policy";
+  inline static const std::string kPickupPolicyNull = "";
+  inline static const std::string kPickupPolicyClusterProx = "cluster_proximity";
 
   explicit block_sel_matrix(
       const config::block_sel::block_sel_matrix_config* config,

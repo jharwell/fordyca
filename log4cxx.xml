@@ -19,14 +19,13 @@
   <category name="fordyca.events" >
     <priority value ="all" />
   </category>
-  <category name="rcppsw.ta.executive" >
-    <priority value ="info" />
+
+  <category name="cosm.hal.actuators.led" >
+    <priority value ="fatal" />
   </category>
+
   <category name="cosm.steer2D.force_calculator" >
     <priority value ="info" />
-  </category>
-  <category name="cosm.robots.footbot" >
-    <!-- <priority value ="debug" /> -->
   </category>
   <category name="cosm.tv.population_dynamics" >
     <priority value ="info" />
@@ -40,40 +39,45 @@
   <category name="cosm.foraging.block_dist.multi_cluster" >
     <priority value ="debug" />
   </category>
+  <category name="cosm.foraging.block_motion_handler" >
+    <priority value ="debug" />
+  </category>
   <category name="fordyca.controller" >
     <priority value ="info" />
   </category>
   <category name="fordyca.fsm.cache_acquisition_validator" >
-    <priority value ="all" />
+    <priority value ="info" />
   </category>
   <category name="fordyca.fsm.acquire_goal_fsm" >
     <priority value ="trace" />
   </category>
-  <category name="fordyca.fsm.expstrat.crw" >
-    <priority value ="info" />
-  </category>
   <category name="fordyca.support.block_dist" >
     <priority value ="info" />
   </category>
-  <category name="fordyca.support.depth2.dynamic_cache_creator" >
+  <category name="fordyca.support.d2.dynamic_cache_creator" >
     <priority value ="debug" />
   </category>
-  <category name="fordyca.support.depth1.static_cache_creator" >
+  <category name="fordyca.support.d1.static_cache_creator" >
     <priority value ="debug" />
   </category>
-  <category name="fordyca.support.depth1.static_cache_manager" >
+  <category name="fordyca.support.d1.static_cache_manager" >
     <priority value ="debug" />
   </category>
-    <category name="fordyca.tasks.depth2.cache_starter" >
+    <category name="fordyca.tasks.d2.cache_starter" >
     <priority value ="info" />
   </category>
-  <category name="fordyca.support.depth2.cache_center_calculator" >
+  <category name="fordyca.support.d2.cache_center_calculator" >
     <priority value ="debug" />
   </category>
-  <category name="fordyca.support.base_cache_creator" >
-    <priority value ="trace" />
+
+  <category name="fordyca.support.cache_creation_verifier" >
+    <priority value ="debug" />
   </category>
-  <category name="fordyca.fsm.depth0.free_block_to_nest" >
+
+  <category name="fordyca.support.base_cache_creator" >
+    <priority value ="debug" />
+  </category>
+  <category name="fordyca.fsm.d0.free_block_to_nest" >
     <priority value ="info" />
   </category>
   <category name="fordyca.fsm.existing_cache_selector" >

@@ -67,7 +67,7 @@ env_dynamics_metrics_collector::csv_line_build(void) {
 
 void env_dynamics_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
-  auto& m = dynamic_cast<const env_dynamics_metrics&>(metrics);
+  const auto& m = dynamic_cast<const env_dynamics_metrics&>(metrics);
   m_avg_motion_throttle = m.avg_motion_throttle();
   m_block_manip_penalty = m.arena_block_manip_penalty();
   m_cache_usage_penalty = m.cache_usage_penalty();

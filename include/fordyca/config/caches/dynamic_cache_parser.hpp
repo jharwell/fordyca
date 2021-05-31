@@ -54,7 +54,7 @@ class dynamic_cache_parser final: public rconfig::xml::xml_config_parser {
    * \brief The root tag that all dynamic cache parameters should lie under in
    * the XML tree.
    */
-  static constexpr char kXMLRoot[] = "dynamic";
+  inline static const std::string kXMLRoot = "dynamic";
 
   void parse(const ticpp::Element& node) override RCPPSW_COLD;
   bool validate(void) const override RCPPSW_ATTR(const, cold);

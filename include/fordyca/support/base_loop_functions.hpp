@@ -29,7 +29,6 @@
 #include <vector>
 
 #include <argos3/core/simulator/loop_functions.h>
-#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/config/rng_config.hpp"
@@ -171,7 +170,6 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
 
   /* clang-format off */
   bool                                         m_delay_arena_map_init{false};
-
   config::loop_function_repository             m_config{};
   std::unique_ptr<tv::tv_manager>              m_tv_manager;
   std::unique_ptr<convergence_calculator_type> m_conv_calc;

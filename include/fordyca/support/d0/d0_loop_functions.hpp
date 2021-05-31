@@ -25,15 +25,15 @@
  * Includes
  ******************************************************************************/
 #include <memory>
-#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 
 #include "rcppsw/ds/type_map.hpp"
 #include "rcppsw/ds/grid2D_overlay.hpp"
 
 #include "cosm/controller/operations/robot_los_update.hpp"
 #include "cosm/controller/operations/metrics_extract.hpp"
-#include "fordyca/repr/forager_los.hpp"
+#include "cosm/hal/robot.hpp"
 
+#include "fordyca/repr/forager_los.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 
 /*******************************************************************************
@@ -128,7 +128,7 @@ private:
    *
    * \note These operations are done in parallel for all robots (lock free).
    */
-  void robot_pre_step(argos::CFootBotEntity& robot);
+  void robot_pre_step(chal::robot& robot);
 
   /**
    * \brief Process a single robot on a timestep, after running its controller.
@@ -139,7 +139,7 @@ private:
    * \note These operations are done in parallel for all robots (with mutual
    *       exclusion as needed).
    */
-  void robot_post_step(argos::CFootBotEntity& robot);
+  void robot_post_step(chal::robot& robot);
 
   /* clang-format off */
   std::unique_ptr<d0_metrics_aggregator>      m_metrics_agg;

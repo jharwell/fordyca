@@ -24,26 +24,27 @@
 #include "fordyca/fsm/d2/acquire_new_cache_fsm.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
+#include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/controller/cognitive/d2/new_cache_selector.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
-#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm, d2);
+using cselm = controller::cognitive::cache_sel_matrix;
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 acquire_new_cache_fsm::acquire_new_cache_fsm(
     const fsm_ro_params* c_params,
-    crfootbot::footbot_saa_subsystem* saa,
-    std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+    csubsystem::saa_subsystemQ3D* saa,
+    std::unique_ptr<csstrategy::base_strategy> exp_behavior,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.d2.acquire_new_cache"),
       acquire_goal_fsm(
@@ -88,18 +89,21 @@ bool acquire_new_cache_fsm::candidates_exist(void) const {
 } /* candidates_exsti() */
 
 boost::optional<csfsm::acquire_goal_fsm::candidate_type>
-acquire_new_cache_fsm::cache_select(void) const {
+acquire_new_cache_fsm::cache_select(void) {
   controller::cognitive::d2::new_cache_selector selector(mc_matrix);
 
   /* A "new" cache is the same as a single block  */
-  if (auto best =
+  if (const auto* best =
           selector(mc_store->blocks(), mc_store->caches(), sensing()->rpos2D())) {
     ER_INFO("Select new cache%d@%s/%s for acquisition",
             best->id().v(),
             rcppsw::to_string(best->ranchor2D()).c_str(),
             rcppsw::to_string(best->danchor2D()).c_str());
-    return boost::make_optional(acquire_goal_fsm::candidate_type(
-        best->rcenter2D(), kNEW_CACHE_ARRIVAL_TOL, best->id()));
+
+    auto tol = boost::get<rtypes::spatial_dist>(
+        mc_matrix->find(cselm::kNewCacheDropTolerance)->second);
+    return boost::make_optional(
+        acquire_goal_fsm::candidate_type(best->rcenter2D(), tol.v(), best->id()));
   } else {
     /*
      * If this happens, all the blocks we know of are ineligible for us to
@@ -112,7 +116,7 @@ acquire_new_cache_fsm::cache_select(void) const {
 bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
   ER_ASSERT(!explore_result, "New cache acquisition via exploration?");
   rmath::vector2d position = saa()->sensing()->rpos2D();
-  for (auto& b : mc_store->blocks().const_values_range()) {
+  for (const auto& b : mc_store->blocks().const_values_range()) {
     if ((b.ent()->rcenter2D() - position).length() <= kNEW_CACHE_ARRIVAL_TOL) {
       return true;
     }

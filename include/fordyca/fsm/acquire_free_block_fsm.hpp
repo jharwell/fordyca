@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include <memory>
 
-#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
 #include "cosm/spatial/fsm/acquire_goal_fsm.hpp"
+#include "cosm/subsystem/subsystem_fwd.hpp"
 #include "cosm/ta/taskable.hpp"
 
 #include "fordyca/controller/cognitive/block_sel_matrix.hpp"
@@ -39,10 +39,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-
-namespace fsm::expstrat {
-class foraging_expstrat;
-} /* namespace fsm::expstrat */
 
 namespace ds {
 class dpo_store;
@@ -68,8 +64,8 @@ class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
                                public csfsm::acquire_goal_fsm {
  public:
   acquire_free_block_fsm(const fsm_ro_params* c_params,
-                         crfootbot::footbot_saa_subsystem* saa,
-                         std::unique_ptr<csexpstrat::base_expstrat> exp_behavior,
+                         csubsystem::saa_subsystemQ3D* saa,
+                         std::unique_ptr<csstrategy::base_strategy> exp_behavior,
                          rmath::rng* rng);
 
   ~acquire_free_block_fsm(void) override = default;

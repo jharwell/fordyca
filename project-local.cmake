@@ -1,31 +1,34 @@
 ################################################################################
 # Configuration Options                                                        #
 ################################################################################
-set(FORDYCA_WITH_FOOTBOT_RAB "NO" CACHE STRING "Enable footbot robots to read/write over the RAB medium via sensors/actuators.")
-set(FORDYCA_WITH_FOOTBOT_BATTERY "NO" CACHE STRING "Enable footbot robots to use the battery.")
-set(FORDYCA_WITH_FOOTBOT_LEDS "NO" CACHE STRING "Enable footbot robots to use their LEDs.")
-set(FORDYCA_WITH_FOOTBOT_CAMERA "YES" CACHE STRING "Enable footbot robots to use their camera.")
+# We are building a shared library
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-define_property(CACHED_VARIABLE PROPERTY "FORDYCA_WITH_FOOTBOT_RAB"
-  BRIEF_DOCS "Enable footbot robots to use the RAB medium."
+set(FORDYCA_WITH_ROBOT_RAB "NO" CACHE STRING "Enable robots to read/write over the RAB medium via sensors/actuators.")
+set(FORDYCA_WITH_ROBOT_BATTERY "NO" CACHE STRING "Enable robots to use the battery.")
+set(FORDYCA_WITH_ROBOT_LEDS "NO" CACHE STRING "Enable robots to use their LEDs.")
+set(FORDYCA_WITH_ROBOT_CAMERA "YES" CACHE STRING "Enable robots to use their camera.")
+
+define_property(CACHED_VARIABLE PROPERTY "FORDYCA_WITH_ROBOT_RAB"
+  BRIEF_DOCS "Enable robots to use the RAB medium."
   FULL_DOCS "Default=NO.")
-define_property(CACHED_VARIABLE PROPERTY "FORDYCA_WITH_FOOTBOT_BATTERY"
-  BRIEF_DOCS "Enable footbot robots to use the battery."
+define_property(CACHED_VARIABLE PROPERTY "FORDYCA_WITH_ROBOT_BATTERY"
+  BRIEF_DOCS "Enable robots to use the battery."
   FULL_DOCS "Default=NO.")
-define_property(CACHED_VARIABLE PROPERTY "FORDYCA_WITH_FOOTBOT_LEDS"
-  BRIEF_DOCS "Enable footbot robots to use their LEDs."
+define_property(CACHED_VARIABLE PROPERTY "FORDYCA_WITH_ROBOT_LEDS"
+  BRIEF_DOCS "Enable robots to use their LEDs."
   FULL_DOCS "Default=NO.")
-define_property(CACHED_VARIABLE PROPERTY "FORDYCA_WITH_FOOTBOT_CAMERA"
-  BRIEF_DOCS "Enable footbot robots to use their camera."
+define_property(CACHED_VARIABLE PROPERTY "FORDYCA_WITH_ROBOT_CAMERA"
+  BRIEF_DOCS "Enable robots to use their camera."
   FULL_DOCS "Default=YES.")
 
 # Needed by COSM for population dynamics and swarm iteration
 if (NOT COSM_BUILD_FOR)
-  set(COSM_BUILD_FOR "ARGOS")
+  set(COSM_BUILD_FOR "ARGOS_FOOTBOT")
 endif()
 set(COSM_ARGOS_ROBOT_TYPE "foot-bot")
 set(COSM_ARGOS_ROBOT_NAME_PREFIX "fb")
-set(COSM_ARGOS_CONTROLLER_XML_ID "ffc")
+set(COSM_ARGOS_CONTROLLER_XML_ID "fbc")
 
 ################################################################################
 # External Projects                                                            #
@@ -57,21 +60,32 @@ endif()
 ################################################################################
 # Define link libraries
 set(${target}_LIBRARIES
-  cosm
+  cosm-${COSM_HAL_TARGET}
   ${cosm_LIBRARIES}
   nlopt
-  stdc++fs
   rt)
 
 # Define link search dirs
 set(${target}_LIBRARY_DIRS
-  ${rcppsw_LIBRARY_DIRS}
   ${cosm_LIBRARY_DIRS})
 
-if ("${COSM_BUILD_FOR}" MATCHES "ARGOS" OR "${COSM_BUILD_FOR}" MATCHES "MSI")
+# Define include dirs
+set(${target}_INCLUDE_DIRS
+  "${${target}_INC_PATH}"
+  ${cosm_INCLUDE_DIRS}
+  )
+
+# Define system include dirs
+set(${target}_SYS_INCLUDE_DIRS
+  ${cosm_SYS_INCLUDE_DIRS}
+  ${NLOPT_INCLUDE_DIRS}
+  )
+
+if ("${COSM_BUILD_FOR}" MATCHES "ARGOS")
   set(argos3_LIBRARIES
   argos3core_simulator
   argos3plugin_simulator_footbot
+  argos3plugin_simulator_epuck
   argos3plugin_simulator_entities
   argos3plugin_simulator_dynamics2d
   argos3plugin_simulator_genericrobot
@@ -83,68 +97,43 @@ if ("${COSM_BUILD_FOR}" MATCHES "ARGOS" OR "${COSM_BUILD_FOR}" MATCHES "MSI")
     ${${target}_LIBRARIES}
     ${argos3_LIBRARIES}
     )
-
-  set(${target}_LIBRARY_DIRS
-    ${${target}_LIBRARY_DIRS}
-    /usr/lib/argos3
-    /usr/local/lib/argos3
-    ${COSM_PROJECT_DEPS_PREFIX}/lib/argos3
-    )
-  if ("${COSM_BUILD_FOR}" MATCHES "MSI")
+  if ("${COSM_BUILD_ENV}" MATCHES "MSI")
     # For nlopt
     set(${target}_LIBRARY_DIRS
       ${$target}_LIBRARY_DIRS}
-      ${COSM_PROJECT_DEPS_PREFIX}/lib/argos3
-      ${COSM_PROJECT_DEPS_PREFIX}/lib64)
+      ${COSM_DEPS_PREFIX}/lib64
+      )
   endif()
 endif()
 
 # Force failures at build time rather than runtime
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
 
-link_directories(${${target}_LIBRARY_DIRS})
+# Define the FORDYCA library
 add_library(${target} SHARED ${${target}_ROOT_SRC})
-add_dependencies(${target} rcppsw cosm)
 
-################################################################################
-# Includes                                                                     #
-################################################################################
-set(${target}_INCLUDE_DIRS
-  "${${target}_INC_PATH}"
-  ${rcppsw_INCLUDE_DIRS}
-  ${cosm_INCLUDE_DIRS}
-  /usr/include/eigen3)
-
-set(${target}_SYS_INCLUDE_DIRS
-  ${cosm_SYS_INCLUDE_DIRS}
-  ${NLOPT_INCLUDE_DIRS})
+add_dependencies(${target} cosm-${COSM_HAL_TARGET})
 
 target_include_directories(${target} PUBLIC ${${target}_INCLUDE_DIRS})
-
-target_include_directories(${target} SYSTEM PUBLIC
-  /usr/include/lua5.3 # Not needed for compiling, but for emacs rtags
-  /usr/local/include
-  ${nlopt_INCLUDE_DIRS}
-  ${${target}_SYS_INCLUDE_DIRS}
-  )
-
-target_link_libraries(${target} ${${target}_LIBRARIES} cosm nlopt)
+target_include_directories(${target} SYSTEM PUBLIC ${${target}_SYS_INCLUDE_DIRS})
+target_link_libraries(${target} ${${target}_LIBRARIES})
+target_link_directories(${target} PUBLIC ${${target}_LIBRARY_DIRS})
 
 ################################################################################
 # Compile Options/Definitions                                                  #
 ################################################################################
 if ("${COSM_BUILD_FOR}" MATCHES "ARGOS")
-  if (FORDYCA_WITH_FOOTBOT_RAB)
-    target_compile_definitions(${target} PUBLIC FORDYCA_WITH_FOOTBOT_RAB)
+  if (FORDYCA_WITH_ROBOT_RAB)
+    target_compile_definitions(${target} PUBLIC FORDYCA_WITH_ROBOT_RAB)
   endif()
-  if (FORDYCA_WITH_FOOTBOT_BATTERY)
-    target_compile_definitions(${target} PUBLIC FORDYCA_WITH_FOOTBOT_BATTERY)
+  if (FORDYCA_WITH_ROBOT_BATTERY)
+    target_compile_definitions(${target} PUBLIC FORDYCA_WITH_ROBOT_BATTERY)
   endif()
-  if (FORDYCA_WITH_FOOTBOT_CAMERA)
-    target_compile_definitions(${target} PUBLIC FORDYCA_WITH_FOOTBOT_CAMERA)
+  if (FORDYCA_WITH_ROBOT_CAMERA)
+    target_compile_definitions(${target} PUBLIC FORDYCA_WITH_ROBOT_CAMERA)
   endif()
-  if (FORDYCA_WITH_FOOTBOT_LEDS)
-    target_compile_definitions(${target} PUBLIC FORDYCA_WITH_FOOTBOT_LEDS)
+  if (FORDYCA_WITH_ROBOT_LEDS)
+    target_compile_definitions(${target} PUBLIC FORDYCA_WITH_ROBOT_LEDS)
   endif()
 endif()
 

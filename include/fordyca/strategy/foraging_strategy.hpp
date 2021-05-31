@@ -1,5 +1,5 @@
 /**
- * \file foraging_expstrat.hpp
+ * \file foraging_strategy.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,54 +18,50 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_EXPSTRAT_FORAGING_EXPSTRAT_HPP_
-#define INCLUDE_FORDYCA_FSM_EXPSTRAT_FORAGING_EXPSTRAT_HPP_
+#ifndef INCLUDE_FORDYCA_STRATEGY_EXPLORE_FORAGING_STRATEGY_HPP_
+#define INCLUDE_FORDYCA_STRATEGY_EXPLORE_FORAGING_STRATEGY_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "cosm/spatial/expstrat/base_expstrat.hpp"
-#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
+#include "cosm/spatial/strategy/base_strategy.hpp"
+#include "cosm/subsystem/subsystem_fwd.hpp"
 
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::subsystem {
-class saa_subsystemQ3D;
-} /* namespace cosm::subsystem */
-
 NS_START(fordyca);
 
 namespace controller::cognitive {
 class cache_sel_matrix;
 class block_sel_matrix;
-} /* namespace controller */
+} // namespace controller::cognitive
 
 namespace ds {
 class dpo_store;
 } /* namespace ds */
 
-NS_START(fsm, expstrat);
+NS_START(strategy);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class foraging_expstrat
- * \ingroup fsm expstrat
+ * \class foraging_strategy
+ * \ingroup strategy
  *
- * \brief Base class for different exploration behaviors that controllers can
- * exhibit when looking for stuff.
+ * \brief Base class for different behaviors that controllers can
+ * exhibit when looking for stuff, avoiding collision, etc.
  */
-class foraging_expstrat : public csexpstrat::base_expstrat {
+class foraging_strategy : public csstrategy::base_strategy {
  public:
   struct params {
-    params(crfootbot::footbot_saa_subsystem* const saa_in,
-           const controller::cognitive::block_sel_matrix *const bsel_matrix_in,
-           const controller::cognitive::cache_sel_matrix *const csel_matrix_in,
-           const ds::dpo_store *const dpo_store_in,
+    params(csubsystem::saa_subsystemQ3D* const saa_in,
+           const controller::cognitive::block_sel_matrix* const bsel_matrix_in,
+           const controller::cognitive::cache_sel_matrix* const csel_matrix_in,
+           const ds::dpo_store* const dpo_store_in,
            const rutils::color& ledtaxis_target_in)
         : saa(saa_in),
           bsel_matrix(bsel_matrix_in),
@@ -73,23 +69,20 @@ class foraging_expstrat : public csexpstrat::base_expstrat {
           dpo_store(dpo_store_in),
           ledtaxis_target(ledtaxis_target_in) {}
 
-    crfootbot::footbot_saa_subsystem* saa;
-    const controller::cognitive::block_sel_matrix *bsel_matrix;
-    const controller::cognitive::cache_sel_matrix *csel_matrix;
-    const ds::dpo_store *dpo_store;
+    csubsystem::saa_subsystemQ3D* saa;
+    const controller::cognitive::block_sel_matrix* bsel_matrix;
+    const controller::cognitive::cache_sel_matrix* csel_matrix;
+    const ds::dpo_store* dpo_store;
     rutils::color ledtaxis_target;
   };
 
-  foraging_expstrat(crfootbot::footbot_saa_subsystem* saa, rmath::rng* rng);
+  foraging_strategy(csubsystem::saa_subsystemQ3D* saa, rmath::rng* rng)
+      : base_strategy(saa, rng) {}
 
-  foraging_expstrat(const foraging_expstrat&) = delete;
-  foraging_expstrat& operator=(const foraging_expstrat&) = delete;
-
- protected:
-  crfootbot::footbot_saa_subsystem* saa(void) const RCPPSW_PURE;
-  crfootbot::footbot_saa_subsystem* saa(void) RCPPSW_PURE;
+  foraging_strategy(const foraging_strategy&) = delete;
+  foraging_strategy& operator=(const foraging_strategy&) = delete;
 };
 
-NS_END(expstrat, fsm, fordyca);
+NS_END(strategy, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_EXPSTRAT_FORAGING_EXPSTRAT_HPP_ */
+#endif /* INCLUDE_FORDYCA_STRATEGY_FORAGING_STRATEGY_HPP_ */

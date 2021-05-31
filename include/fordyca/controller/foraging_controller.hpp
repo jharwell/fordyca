@@ -32,11 +32,10 @@
 #include "cosm/controller/irv_recipient_controller.hpp"
 #include "cosm/controller/manip_event_recorder.hpp"
 #include "cosm/fsm/block_transporter.hpp"
+#include "cosm/fsm/metrics/block_transporter_metrics.hpp"
 #include "cosm/metrics/config/output_config.hpp"
 #include "cosm/pal/argos_controller2D_adaptor.hpp"
-#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
-#include "cosm/fsm/metrics/block_transporter_metrics.hpp"
-
+#include "cosm/subsystem/subsystem_fwd.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/foraging_transport_goal.hpp"
@@ -103,7 +102,7 @@ class foraging_controller
   foraging_controller(const foraging_controller&) = delete;
   foraging_controller& operator=(const foraging_controller&) = delete;
 
-  /* foraging_controller2D overrides */
+  /* argos_controller2D overrides */
   void init(ticpp::Element& node) override RCPPSW_COLD;
   void reset(void) override RCPPSW_COLD;
   rtypes::type_uuid entity_id(void) const override final;
@@ -147,10 +146,6 @@ class foraging_controller
     return &m_block_manip;
   }
   block_manip_recorder_type* block_manip_recorder(void) { return &m_block_manip; }
-
- protected:
-  class crfootbot::footbot_saa_subsystem* saa(void) RCPPSW_PURE;
-  const class crfootbot::footbot_saa_subsystem* saa(void) const RCPPSW_PURE;
 
  private:
   void
