@@ -47,9 +47,13 @@
                      repeat_deposit="false"/>
         </perception>
         <nest dims="1.0, 4.0" center="2, 3" />
-        <exploration
-            block_strategy="CRW"
-            cache_strategy="ledtaxis_search"/>
+        <strategy>
+          <explore
+              block_strategy="CRW"/>
+          <nest_acq
+              strategy="random_thresh"
+              />
+          </strategy>
         <sensing_subsystemQ3D>
                      <!-- -5pi/6 : 5pi/6 -->
           <proximity_sensor fov="-2.61:2.61"
@@ -134,7 +138,10 @@
         </distribution>
       </blocks>
       <nests>
-        <nest dims="1.0, 4.0" center="2, 3" />
+        <nest dims="1.0, 4.0"
+              center="2, 3"
+              light_height="5.0"
+              light_intensity="10.0"/>
       </nests>
     </arena_map>
     <visualization robot_id="true"

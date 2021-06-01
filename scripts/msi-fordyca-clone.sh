@@ -86,10 +86,10 @@ mkdir -p build
 
 cd ..
 
-# Clone FORDYCA SIERRA plugin
-if [ -d sierra-plugin-fordyca ]; then rm -rf sierra-plugin-fordyca; fi
-git clone https://github.com/swarm-robotics/sierra-plugin-fordyca.git
-cd sierra-plugin-fordyca
+# Clone TITAN SIERRA plugin
+if [ -d sierra-titan ]; then rm -rf sierra-titan; fi
+git clone https://github.com/swarm-robotics/sierra-titan.git
+cd sierra-titan
 git checkout $BASE_BRANCH
 git submodule update --init --recursive --remote
 
@@ -101,7 +101,7 @@ git clone https://github.com/swarm-robotics/sierra.git
 cd sierra
 git checkout $BASE_BRANCH
 git submodule update --init --recursive --remote
-ln -s ../../sierra-plugin-fordyca projects/fordyca
+ln -s ../sierra-titan/projects .
 
 cd ..
 

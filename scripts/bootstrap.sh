@@ -103,7 +103,7 @@ cd argos3
 mkdir -p build && cd build
 
 git checkout devel
-cmake -DCMAKE_BUILD_TYPE=Release \
+cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
       -DCMAKE_C_COMPILER=gcc-9\
       -DCMAKE_CXX_COMPILER=g++-9\
       -DARGOS_BUILD_FOR=simulator\
@@ -198,7 +198,7 @@ cmake \
     -DCMAKE_C_COMPILER=gcc-9\
     -DCMAKE_CXX_COMPILER=g++-9\
     -DCMAKE_BUILD_TYPE=OPT\
-    -DCOSM_PROJECT_DEPS_PREFIX=/usr/local\
+    -DCOSM_DEPS_PREFIX=$prefix\
     -DLIBRA_ER=NONE\
     ..
 make -j $n_cores
@@ -214,16 +214,17 @@ git checkout devel
 pip3 install --user -r requirements/common.txt
 cd ..
 
-if [ -d sierra-plugin-fordyca ]; then rm -rf sierra-plugin-fordyca; fi
-git clone https://github.com/swarm-robotics/sierra-plugin-fordyca.git
-cd sierra-plugin-fordyca
-git checkout devel
+# Bootstrap TITERRA
+if [ -d sierra-titan ]; then rm -rf sierra-titan; fi
+git clone https://github.com/swarm-robotics/sierra-titan.git
+cd sierra-titan
+git checkout $BASE_BRANCH
+git submodule update --init --recursive --remote
+pip3 install --user -r requirements/common.txt
 cd ..
 
-ln -s $repo_root/sierra-plugin-fordyca sierra/projects/fordyca
-
-# If installed ARGoS as root, all project repos are also owned by root, so we
-# need to fix that.
+# If we installed ARGoS as root, all project repos are also owned by
+# root, so we need to fix that.
 if [ "$YES" = "$argos_sys_install" ]; then
     sudo chown $SUDO_USER:$SUDO_USER -R $repo_root
 fi;
