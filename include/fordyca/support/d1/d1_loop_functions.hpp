@@ -45,7 +45,7 @@ NS_START(fordyca);
 namespace config { namespace caches { struct caches_config; }}
 
 NS_START(support, d1);
-class d1_metrics_aggregator;
+class d1_metrics_manager;
 class static_cache_manager;
 
 template<typename TController, typename TArenaMap>
@@ -119,7 +119,7 @@ class d1_loop_functions : public d0::d0_loop_functions,
   using metric_extractor_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::d1::typelist,
                               ccops::metrics_extract,
-                              d1_metrics_aggregator>::type>;
+                              d1_metrics_manager>::type>;
 
   /**
    * \brief These are friend classes because they are basically just pieces of
@@ -208,7 +208,7 @@ class d1_loop_functions : public d0::d0_loop_functions,
   std::unique_ptr<task_extractor_map_type>            m_task_extractor_map;
   std::unique_ptr<detail::d1_subtask_status_map_type> m_subtask_status_map;
 
-  std::unique_ptr<d1_metrics_aggregator>              m_metrics_agg;
+  std::unique_ptr<d1_metrics_manager>              m_metrics_manager;
   std::unique_ptr<static_cache_manager>               m_cache_manager;
   cache_counts                                        m_cache_counts{};
   /* clang-format on */

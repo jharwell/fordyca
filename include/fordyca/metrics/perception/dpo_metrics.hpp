@@ -1,5 +1,5 @@
 /**
- * \file dpo_perception_metrics.hpp
+ * \file dpo_metrics.hpp
  *
  * \copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_PERCEPTION_DPO_PERCEPTION_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_PERCEPTION_DPO_PERCEPTION_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_PERCEPTION_DPO_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_PERCEPTION_DPO_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -38,7 +38,7 @@ NS_START(fordyca, metrics, perception);
  ******************************************************************************/
 
 /**
- * \class dpo_perception_metrics
+ * \class dpo_metrics
  * \ingroup metrics perception
  *
  * \brief Defines the metrics to be collected from robots about their DPO world
@@ -46,9 +46,9 @@ NS_START(fordyca, metrics, perception);
  *
  * Metrics are collected every timestep.
  */
-class dpo_perception_metrics : public virtual rmetrics::base_metrics {
+class dpo_metrics : public virtual rmetrics::base_metrics {
  public:
-  dpo_perception_metrics(void) = default;
+  dpo_metrics(void) = default;
 
   /**
    * \brief Return the # of blocks that a robot currently knows about.
@@ -75,4 +75,4 @@ class dpo_perception_metrics : public virtual rmetrics::base_metrics {
 
 NS_END(perception, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_PERCEPTION_DPO_PERCEPTION_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_PERCEPTION_DPO_METRICS_HPP_ */

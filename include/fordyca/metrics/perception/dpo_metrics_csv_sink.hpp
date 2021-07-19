@@ -1,5 +1,5 @@
 /**
- * \file manipulation_metrics_collector.hpp
+ * \file dpo_metrics_csv_sink.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,53 +18,56 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_PERCEPTION_DPO_METRICS_CSV_SINK_HPP_
+#define INCLUDE_FORDYCA_METRICS_PERCEPTION_DPO_METRICS_CSV_SINK_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/metrics/base_metrics_collector.hpp"
+#include <string>
+#include <list>
 
-#include "fordyca/metrics/blocks/manipulation_metrics_data.hpp"
+#include "rcppsw/metrics/csv_sink.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, blocks);
+NS_START(fordyca, metrics, perception);
+class dpo_metrics_collector;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class manipulation_metrics_collector
+ * \class dpo_metrics_csv_sink
  * \ingroup metrics blocks
  *
- * \brief Collector for \ref manipulation_metrics.
+ * \brief Sink for \ref dpo_metrics.
  *
  * Metrics CAN be collected in parallel from robots; concurrent updates to the
- * gathered stats are supported. Metrics are written out at the specified
- * collection interval.
+ * gathered stats are supported.
  */
-class manipulation_metrics_collector final : public rmetrics::base_metrics_collector {
+class dpo_metrics_csv_sink final : public rmetrics::csv_sink {
  public:
+  using collector_type = dpo_metrics_collector;
+
   /**
-   * \param sink The metrics sink to use.
+   * \brief \see rmetrics::csv_sink.
    */
-  explicit manipulation_metrics_collector(
-      std::unique_ptr<rmetrics::base_metrics_sink> sink);
+  dpo_metrics_csv_sink(fs::path fpath_no_ext,
+                       const rmetrics::output_mode& mode,
+                       const rtypes::timestep& interval);
 
-  /* base_metrics_collector overrides */
-  void collect(const rmetrics::base_metrics& metrics) override;
-  void reset_after_interval(void) override;
-  const rmetrics::base_metrics_data* data(void) const override { return &m_data; }
+  /* csv_sink overrides */
+  std::list<std::string> csv_header_cols(
+      const rmetrics::base_metrics_data* data) const override;
 
- private:
-  /* clang-format off */
-  manipulation_metrics_data m_data{};
-  /* clang-format on */
+  boost::optional<std::string> csv_line_build(
+      const rmetrics::base_metrics_data* data,
+      const rtypes::timestep& t) override;
 };
 
-NS_END(blocks, metrics, fordyca);
+NS_END(perception, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_PERCEPTION_DPO_METRICS_CSV_SINK_HPP_ */

@@ -1,5 +1,5 @@
 /**
- * \file d1_metrics_aggregator.hpp
+ * \file d1_metrics_manager.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_D1_D1_METRICS_AGGREGATOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_D1_D1_METRICS_AGGREGATOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_D1_D1_METRICS_MANAGER_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_D1_D1_METRICS_MANAGER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -33,9 +33,9 @@
 #include "cosm/ta/metrics/bi_tdgraph_metrics.hpp"
 #include "cosm/ta/polled_task.hpp"
 
-#include "fordyca/support/d0/d0_metrics_aggregator.hpp"
-#include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
-#include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
+#include "fordyca/support/d0/d0_metrics_manager.hpp"
+#include "fordyca/metrics/perception/dpo_metrics.hpp"
+#include "fordyca/metrics/perception/mdpo_metrics.hpp"
 #include "fordyca//controller/foraging_controller.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/controller/cognitive/foraging_perception_subsystem.hpp"
@@ -60,11 +60,11 @@ NS_START(support, d1);
  * Class Definitions
  ******************************************************************************/
 /**
- * \class d1_metrics_aggregator
+ * \class d1_metrics_manager
  * \ingroup support d1
  *
  * \brief Aggregates and metrics collection for d1 foraging. That
- * includes everything from \ref d0_metrics_aggregator, and also:
+ * includes everything from \ref d0_metrics_manager, and also:
  *
  * - FSM cache acquisition metrics
  * - Cache utilization metrics
@@ -73,13 +73,13 @@ NS_START(support, d1);
  * - Task execution metrics (per task)
  * - TAB metrics (rooted at generalist)
  */
-class d1_metrics_aggregator : public d0::d0_metrics_aggregator,
-                                  public rer::client<d1_metrics_aggregator> {
+class d1_metrics_manager : public d0::d0_metrics_manager,
+                           public rer::client<d1_metrics_manager> {
  public:
-  d1_metrics_aggregator(const cmconfig::metrics_config* mconfig,
-                            const cdconfig::grid2D_config* gconfig,
-                            const std::string& output_root,
-                            size_t n_block_clusters);
+  d1_metrics_manager(const rmconfig::metrics_config* mconfig,
+                     const cdconfig::grid2D_config* gconfig,
+                     const fs::path& output_root,
+                     size_t n_block_clusters);
 
   /**
    * \brief Collect metrics from a finished or aborted task.
@@ -103,12 +103,12 @@ class d1_metrics_aggregator : public d0::d0_metrics_aggregator,
    */
     template<class Controller>
     void collect_from_controller(const Controller* const controller) {
-      base_metrics_aggregator::collect_from_controller(controller);
+      fordyca_metrics_manager::collect_from_controller(controller);
       collect_controller_common(controller);
       /*
        * Only controllers with MDPO perception provide these.
        */
-      const auto *mdpo = dynamic_cast<const metrics::perception::mdpo_perception_metrics*>(
+      const auto *mdpo = dynamic_cast<const metrics::perception::mdpo_metrics*>(
           controller->perception());
       if (nullptr != mdpo) {
         collect("perception::mdpo", *mdpo);
@@ -116,7 +116,7 @@ class d1_metrics_aggregator : public d0::d0_metrics_aggregator,
       /*
        * Only controllers with DPO perception provide these.
        */
-      const auto *dpo = dynamic_cast<const metrics::perception::dpo_perception_metrics*>(
+      const auto *dpo = dynamic_cast<const metrics::perception::dpo_metrics*>(
           controller->perception());
       if (nullptr != dpo) {
         collect("perception::dpo", *dpo);
@@ -143,7 +143,7 @@ class d1_metrics_aggregator : public d0::d0_metrics_aggregator,
    * from deeper decomposition graphs can overwrite the original version, and
    * thereby reduce code duplication.
    */
-  void register_with_decomp_depth(const cmconfig::metrics_config* mconfig,
+  void register_with_decomp_depth(const rmconfig::metrics_config* mconfig,
                                   size_t depth);
  private:
   template<typename Controller>
@@ -247,12 +247,12 @@ class d1_metrics_aggregator : public d0::d0_metrics_aggregator,
     collect("tasks::distribution", *controller);
   } /* collect_controller_common() */
 
-  void register_standard(const cmconfig::metrics_config* mconfig);
+  void register_standard(const rmconfig::metrics_config* mconfig);
 
-  void register_with_arena_dims2D(const cmconfig::metrics_config* mconfig,
+  void register_with_arena_dims2D(const rmconfig::metrics_config* mconfig,
                                   const rmath::vector2z& dims);
 };
 
 NS_END(d1, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_D1_D1_METRICS_AGGREGATOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_D1_D1_METRICS_MANAGER_HPP_ */

@@ -55,7 +55,7 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
                                                                                TArenaMap>> {
  public:
   robot_arena_interactor(TArenaMap* const map,
-                         d0_metrics_aggregator *const metrics_agg,
+                         d0_metrics_manager *const metrics_agg,
                          argos::CFloorEntity* const floor,
                          tv::env_dynamics* const envd)
       : ER_CLIENT_INIT("fordyca.support.d0.robot_arena_interactor"),

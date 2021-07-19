@@ -35,7 +35,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, d2);
-class d2_metrics_aggregator;
+class d2_metrics_manager;
 class dynamic_cache_manager;
 template<typename TController, typename TArenaMap>
 class robot_arena_interactor;
@@ -94,7 +94,7 @@ class d2_loop_functions final : public d1::d1_loop_functions,
   using metric_extractor_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::d2::typelist,
                               ccops::metrics_extract,
-                              d2_metrics_aggregator>::type>;
+                              d2_metrics_manager>::type>;
 
   /**
    * \brief These are friend classes because they are basically just pieces of
@@ -153,7 +153,7 @@ class d2_loop_functions final : public d1::d1_loop_functions,
   std::mutex                                 m_dynamic_cache_mtx{};
   bool                                       m_dynamic_cache_create{false};
 
-  std::unique_ptr<d2_metrics_aggregator>     m_metrics_agg;
+  std::unique_ptr<d2_metrics_manager>     m_metrics_manager;
   std::unique_ptr<dynamic_cache_manager>     m_cache_manager;
   std::unique_ptr<interactor_map_type>       m_interactor_map;
   std::unique_ptr<metric_extractor_map_type> m_metric_extractor_map;

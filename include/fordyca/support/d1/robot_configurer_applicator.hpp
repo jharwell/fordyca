@@ -33,13 +33,13 @@
 NS_START(fordyca, support, d1);
 template<class Controller, class Aggregator>
 class robot_configurer;
-class d1_metrics_aggregator;
+class d1_metrics_manager;
 
 NS_START(detail);
 using configurer_map_type = rds::type_map<
    rmpl::typelist_wrap_apply<controller::cognitive::d1::typelist,
                              robot_configurer,
-                             d1_metrics_aggregator>::type>;
+                             d1_metrics_manager>::type>;
 
 /*******************************************************************************
  * Class Definitions

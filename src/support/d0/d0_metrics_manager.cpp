@@ -1,5 +1,5 @@
 /**
- * \file d0_metrics_aggregator.cpp
+ * \file d0_metrics_manager.cpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,14 +21,14 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/d0/d0_metrics_aggregator.hpp"
+#include "fordyca/support/d0/d0_metrics_manager.hpp"
 
 #include <boost/mpl/for_each.hpp>
 
 #include "rcppsw/mpl/typelist.hpp"
 #include "rcppsw/utils/maskable_enum.hpp"
 
-#include "cosm/metrics/collector_registerer.hpp"
+#include "rcppsw/metrics/collector_registerer.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 #include "cosm/spatial/metrics/movement_metrics.hpp"
@@ -42,55 +42,61 @@
 #include "fordyca/controller/reactive/d0/crw_controller.hpp"
 #include "fordyca/fsm/d0/crw_fsm.hpp"
 #include "fordyca/fsm/d0/dpo_fsm.hpp"
-#include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
-#include "fordyca/metrics/perception/dpo_perception_metrics_collector.hpp"
-#include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
-#include "fordyca/metrics/perception/mdpo_perception_metrics_collector.hpp"
+#include "fordyca/metrics/perception/dpo_metrics.hpp"
+#include "fordyca/metrics/perception/dpo_metrics_collector.hpp"
+#include "fordyca/metrics/perception/dpo_metrics_csv_sink.hpp"
+#include "fordyca/metrics/perception/mdpo_metrics.hpp"
+#include "fordyca/metrics/perception/mdpo_metrics_collector.hpp"
+#include "fordyca/metrics/perception/mdpo_metrics_csv_sink.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, d0, detail);
 
-using collector_typelist = rmpl::typelist<
-    rmpl::identity<metrics::perception::mdpo_perception_metrics_collector>,
-    rmpl::identity<metrics::perception::dpo_perception_metrics_collector> >;
+using sink_list = rmpl::typelist<
+    rmpl::identity<metrics::perception::mdpo_metrics_csv_sink>,
+    rmpl::identity<metrics::perception::dpo_metrics_csv_sink> >;
 
 NS_END(detail);
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-d0_metrics_aggregator::d0_metrics_aggregator(
-    const cmconfig::metrics_config* const mconfig,
+d0_metrics_manager::d0_metrics_manager(
+    const rmconfig::metrics_config* const mconfig,
     const cdconfig::grid2D_config* const gconfig,
-    const std::string& output_root,
+    const fs::path& output_root,
     size_t n_block_clusters)
-    : fordyca_metrics_aggregator(mconfig, gconfig, output_root, n_block_clusters),
-      ER_CLIENT_INIT("fordyca.support.d0.d0_aggregator") {
-  cmetrics::collector_registerer<>::creatable_set creatable_set = {
-    { typeid(metrics::perception::mdpo_perception_metrics_collector),
+    : fordyca_metrics_manager(mconfig, gconfig, output_root, n_block_clusters),
+      ER_CLIENT_INIT("fordyca.support.d0.d0_manager") {
+  rmetrics::creatable_collector_set creatable_set = {
+    { typeid(metrics::perception::mdpo_metrics_collector),
       "perception_mdpo",
       "perception::mdpo",
       rmetrics::output_mode::ekAPPEND },
-    { typeid(metrics::perception::dpo_perception_metrics_collector),
+    { typeid(metrics::perception::dpo_metrics_collector),
       "perception_dpo",
       "perception::dpo",
       rmetrics::output_mode::ekAPPEND }
   };
 
-  cmetrics::collector_registerer<> registerer(mconfig, creatable_set, this);
-  boost::mpl::for_each<detail::collector_typelist>(registerer);
+  rmetrics::register_with_csv_sink csv(&mconfig->csv,
+                                       creatable_set,
+                                       this);
+  rmetrics::collector_registerer<decltype(csv)> registerer(std::move(csv));
+  boost::mpl::for_each<detail::sink_list>(registerer);
 
-  reset_all();
+  /* setup metric collection for all collector groups in all sink groups */
+  initialize();
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 template <class T>
-void d0_metrics_aggregator::collect_from_controller(const T* const controller) {
-  base_metrics_aggregator::collect_from_controller(controller);
+void d0_metrics_manager::collect_from_controller(const T* const controller) {
+  fordyca_metrics_manager::collect_from_controller(controller);
 
   /*
    * All d0 controllers provide these.
@@ -139,7 +145,7 @@ void d0_metrics_aggregator::collect_from_controller(const T* const controller) {
    * Only controllers with MDPO perception provide these.
    */
   const auto* mdpo =
-      dynamic_cast<const metrics::perception::mdpo_perception_metrics*>(
+      dynamic_cast<const metrics::perception::mdpo_metrics*>(
           controller->perception());
   if (nullptr != mdpo) {
     collect("perception::mdpo", *mdpo);
@@ -148,7 +154,7 @@ void d0_metrics_aggregator::collect_from_controller(const T* const controller) {
    * Only controllers with DPO perception provide these.
    */
   const auto* dpo =
-      dynamic_cast<const metrics::perception::dpo_perception_metrics*>(
+      dynamic_cast<const metrics::perception::dpo_metrics*>(
           controller->perception());
   if (nullptr != dpo) {
     collect("perception::dpo", *dpo);
@@ -158,15 +164,15 @@ void d0_metrics_aggregator::collect_from_controller(const T* const controller) {
 /*******************************************************************************
  * Template Instantiations
  ******************************************************************************/
-template void d0_metrics_aggregator::collect_from_controller(
+template void d0_metrics_manager::collect_from_controller(
     const controller::reactive::d0::crw_controller* const c);
-template void d0_metrics_aggregator::collect_from_controller(
+template void d0_metrics_manager::collect_from_controller(
     const controller::cognitive::d0::dpo_controller* const c);
-template void d0_metrics_aggregator::collect_from_controller(
+template void d0_metrics_manager::collect_from_controller(
     const controller::cognitive::d0::mdpo_controller* const c);
-template void d0_metrics_aggregator::collect_from_controller(
+template void d0_metrics_manager::collect_from_controller(
     const controller::cognitive::d0::odpo_controller* const c);
-template void d0_metrics_aggregator::collect_from_controller(
+template void d0_metrics_manager::collect_from_controller(
     const controller::cognitive::d0::omdpo_controller* const c);
 
 NS_END(d0, support, fordyca);

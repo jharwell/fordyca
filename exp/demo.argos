@@ -36,8 +36,8 @@
       </sensors>
       <params>
         <output
-          output_root="output"
-          output_dir="__current_date__"
+          output_parent="output"
+          output_leaf="__current_date__"
           />
         <perception
             los_dim="0.4">
@@ -100,26 +100,30 @@
   <!-- ****************** -->
   <loop_functions library="libfordyca"
                   label="d0_loop_functions">
-    <output output_root="output"
-            output_dir="__current_date__">
+    <output output_parent="output"
+            output_leaf="__current_date__">
       <metrics
-          output_dir="metrics">
-          <append
-              output_interval="1000"
-              block_transporter="block-transporter.csv"
-              block_transportee="block-transportee.csv"
-              fsm_collision_counts="fsm-collision-counts.csv"
-              fsm_movement="fsm-movement.csv"
-              block_acq_counts="block-acq-counts.csv"
-              block_manipulation="block-manipulation.csv"
-              />
-          <create
-              output_interval="10"
-              fsm_collision_locs2D="fsm-collision-locs.csv"
-              block_acq_locs2D="block-acq-locs.csv"
-              block_acq_explore_locs2D="block-acq-explore-locs.csv"
-              block_acq_vector_locs2D="block-acq-vector-locs.csv"
-              swarm_dist_pos2D="swarm-dist-pos2D.csv"/>
+          metrics_path="metrics">
+        <sinks>
+          <csv>
+            <append
+                output_interval="1000"
+                block_transporter="block-transporter.csv"
+                block_transportee="block-transportee.csv"
+                fsm_collision_counts="fsm-collision-counts.csv"
+                fsm_movement="fsm-movement.csv"
+                block_acq_counts="block-acq-counts.csv"
+                block_manipulation="block-manipulation.csv"
+                />
+            <create
+                output_interval="10"
+                fsm_collision_locs2D="fsm-collision-locs.csv"
+                block_acq_locs2D="block-acq-locs.csv"
+                block_acq_explore_locs2D="block-acq-explore-locs.csv"
+                block_acq_vector_locs2D="block-acq-vector-locs.csv"
+                swarm_dist_pos2D="swarm-dist-pos2D.csv"/>
+          </csv>
+        </sinks>
       </metrics>
     </output>
 

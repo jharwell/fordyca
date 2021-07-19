@@ -1,5 +1,5 @@
 /**
- * \file fordyca_metrics_aggregator.cpp
+ * \file fordyca_metrics_manager.cpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,21 +21,23 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/fordyca_metrics_aggregator.hpp"
+#include "fordyca/metrics/fordyca_metrics_manager.hpp"
 
 #include <boost/mpl/for_each.hpp>
 
 #include "rcppsw/mpl/typelist.hpp"
 #include "rcppsw/utils/maskable_enum.hpp"
+#include "rcppsw/metrics/collector_registerer.hpp"
 
 #include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/foraging/block_dist/base_distributor.hpp"
-#include "cosm/metrics/collector_registerer.hpp"
 #include "cosm/pal/argos_convergence_calculator.hpp"
 
-#include "fordyca//controller/foraging_controller.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
+#include "fordyca/metrics/blocks/manipulation_metrics_csv_sink.hpp"
 #include "fordyca/metrics/tv/env_dynamics_metrics_collector.hpp"
+#include "fordyca/metrics/tv/env_dynamics_metrics_csv_sink.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 
@@ -44,29 +46,29 @@
  ******************************************************************************/
 NS_START(fordyca, metrics, detail);
 
-using collector_typelist =
-    rmpl::typelist<rmpl::identity<blocks::manipulation_metrics_collector>,
-                   rmpl::identity<tv::env_dynamics_metrics_collector>>;
+using sink_list =
+    rmpl::typelist<rmpl::identity<blocks::manipulation_metrics_csv_sink>,
+                   rmpl::identity<tv::env_dynamics_metrics_csv_sink>>;
 
 NS_END(detail);
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-fordyca_metrics_aggregator::fordyca_metrics_aggregator(
-    const cmconfig::metrics_config* const mconfig,
+fordyca_metrics_manager::fordyca_metrics_manager(
+    const rmconfig::metrics_config* const mconfig,
     const cdconfig::grid2D_config* const gconfig,
-    const std::string& output_root,
+    const fs::path& output_root,
     size_t n_block_clusters)
-    : ER_CLIENT_INIT("fordyca.metrics.aggregator"),
-      base_metrics_aggregator(mconfig, output_root) {
+    : ER_CLIENT_INIT("fordyca.metrics.manager"),
+      cosm_metrics_manager(mconfig, output_root) {
   /* register collectors from base class */
   auto dims2D = rmath::dvec2zvec(gconfig->dims, gconfig->resolution.v());
   register_with_arena_dims2D(mconfig, dims2D);
   register_with_n_block_clusters(mconfig, n_block_clusters);
 
   /* register collectors common to all of FORDYCA */
-  cmetrics::collector_registerer<>::creatable_set creatable_set = {
+  rmetrics::creatable_collector_set creatable_set = {
     { typeid(blocks::manipulation_metrics_collector),
       "block_manipulation",
       "blocks::manipulation",
@@ -77,15 +79,20 @@ fordyca_metrics_aggregator::fordyca_metrics_aggregator(
       rmetrics::output_mode::ekAPPEND },
   };
 
-  cmetrics::collector_registerer<> registerer(mconfig, creatable_set, this);
-  boost::mpl::for_each<detail::collector_typelist>(registerer);
-  reset_all();
+  rmetrics::register_with_csv_sink csv(&mconfig->csv,
+                                       creatable_set,
+                                       this);
+  rmetrics::collector_registerer<decltype(csv)> registerer(std::move(csv));
+  boost::mpl::for_each<detail::sink_list>(registerer);
+
+  /* setup metric collection for all collector groups in all sink groups */
+  initialize();
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void fordyca_metrics_aggregator::collect_from_loop(
+void fordyca_metrics_manager::collect_from_loop(
     const support::base_loop_functions* const loop) {
   if (nullptr != loop->conv_calculator()) {
     collect("swarm::convergence", loop->conv_calculator()->decoratee());

@@ -1,5 +1,5 @@
 /**
- * \file d2_metrics_aggregator.hpp
+ * \file d2_metrics_manager.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,14 +18,14 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_D2_D2_METRICS_AGGREGATOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_D2_D2_METRICS_AGGREGATOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_D2_D2_METRICS_MANAGER_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_D2_D2_METRICS_MANAGER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include "fordyca/support/d1/d1_metrics_aggregator.hpp"
+#include "fordyca/support/d1/d1_metrics_manager.hpp"
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/tasks/d2/foraging_task.hpp"
 
@@ -38,23 +38,23 @@ NS_START(fordyca, support, d2);
  * Class Definitions
  ******************************************************************************/
 /**
- * \class d2_metrics_aggregator
+ * \class d2_metrics_manager
  * \ingroup support d2
  *
  * \brief Aggregates and metrics collection for d2 foraging. That
- * includes everything from \ref d1_metrics_aggregator, and also:
+ * includes everything from \ref d1_metrics_manager, and also:
  *
  * - TAB metrics (rooted at Harvester)
  * - TAB metrics (rooted at Collector)
  * - Cache site selection
  */
-class d2_metrics_aggregator final : public d1::d1_metrics_aggregator,
-                                  public rer::client<d2_metrics_aggregator> {
+class d2_metrics_manager final : public d1::d1_metrics_manager,
+                                  public rer::client<d2_metrics_manager> {
  public:
-  d2_metrics_aggregator(const cmconfig::metrics_config* mconfig,
-                            const cdconfig::grid2D_config* gconfig,
-                            const std::string& output_root,
-                            size_t n_block_clusters);
+  d2_metrics_manager(const rmconfig::metrics_config* mconfig,
+                     const cdconfig::grid2D_config* gconfig,
+                     const fs::path& output_root,
+                     size_t n_block_clusters);
 
   void task_start_cb(const cta::polled_task* task,
                      const cta::ds::bi_tab* tab);
@@ -65,7 +65,7 @@ class d2_metrics_aggregator final : public d1::d1_metrics_aggregator,
    */
   template<class Controller>
   void collect_from_controller(const Controller* c) {
-    d1::d1_metrics_aggregator::collect_from_controller(c);
+    d1::d1_metrics_manager::collect_from_controller(c);
 
     const auto *task = dynamic_cast<const cta::polled_task*>(c->current_task());
 
@@ -76,9 +76,9 @@ class d2_metrics_aggregator final : public d1::d1_metrics_aggregator,
     }
   }
  private:
-  void register_standard(const cmconfig::metrics_config* mconfig);
+  void register_standard(const rmconfig::metrics_config* mconfig);
 };
 
 NS_END(d2, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_D2_D2_METRICS_AGGREGATOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_D2_D2_METRICS_MANAGER_HPP_ */

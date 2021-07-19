@@ -33,7 +33,7 @@
 #include "cosm/controller/manip_event_recorder.hpp"
 #include "cosm/fsm/block_transporter.hpp"
 #include "cosm/fsm/metrics/block_transporter_metrics.hpp"
-#include "cosm/metrics/config/output_config.hpp"
+#include "cosm/pal/config/output_config.hpp"
 #include "cosm/pal/argos_controller2D_adaptor.hpp"
 #include "cosm/subsystem/subsystem_fwd.hpp"
 
@@ -151,7 +151,7 @@ class foraging_controller
   void
   saa_init(const csubsystem::config::actuation_subsystem2D_config* actuation_p,
            const csubsystem::config::sensing_subsystemQ3D_config* sensing_p);
-  void output_init(const cmconfig::output_config* outputp);
+  fs::path output_init(const cpconfig::output_config* outputp) override;
 
   /* clang-format off */
   block_manip_recorder_type m_block_manip{};

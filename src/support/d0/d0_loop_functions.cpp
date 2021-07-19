@@ -42,7 +42,7 @@
 #include "fordyca/controller/cognitive/foraging_perception_subsystem.hpp"
 #include "fordyca/controller/reactive/d0/crw_controller.hpp"
 #include "fordyca/repr/forager_los.hpp"
-#include "fordyca/support/d0/d0_metrics_aggregator.hpp"
+#include "fordyca/support/d0/d0_metrics_manager.hpp"
 #include "fordyca/support/d0/robot_arena_interactor.hpp"
 #include "fordyca/support/d0/robot_configurer.hpp"
 #include "fordyca/support/d0/robot_configurer_applicator.hpp"
@@ -78,12 +78,12 @@ struct functor_maps_initializer {
         typeid(controller),
         robot_arena_interactor<T, carena::caching_arena_map>(
             lf->arena_map(),
-            lf->m_metrics_agg.get(),
+            lf->m_metrics_manager.get(),
             lf->floor(),
             lf->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>()));
     lf->m_metrics_map->emplace(typeid(controller),
-                               ccops::metrics_extract<T, d0_metrics_aggregator>(
-                                   lf->m_metrics_agg.get()));
+                               ccops::metrics_extract<T, d0_metrics_manager>(
+                                   lf->m_metrics_manager.get()));
     config_map->emplace(
         typeid(controller),
         robot_configurer<T>(
@@ -110,7 +110,7 @@ NS_END(detail);
  ******************************************************************************/
 d0_loop_functions::d0_loop_functions(void)
     : ER_CLIENT_INIT("fordyca.loop.d0"),
-      m_metrics_agg(nullptr),
+      m_metrics_manager(nullptr),
       m_interactor_map(nullptr),
       m_metrics_map(nullptr),
       m_los_update_map(nullptr) {}
@@ -137,16 +137,16 @@ void d0_loop_functions::shared_init(ticpp::Element& node) {
 
 void d0_loop_functions::private_init(void) {
   /* initialize output and metrics collection */
-  const auto* output = config()->config_get<cmconfig::output_config>();
+  const auto* output = config()->config_get<cpconfig::output_config>();
   const auto* arena = config()->config_get<caconfig::arena_map_config>();
-  m_metrics_agg = std::make_unique<d0_metrics_aggregator>(
+  m_metrics_manager = std::make_unique<d0_metrics_manager>(
       &output->metrics,
       &arena->grid,
       output_root(),
       arena_map()->block_distributor()->block_clustersro().size());
 
   /* this starts at 0, and ARGoS starts at 1, so sync up */
-  m_metrics_agg->timestep_inc_all();
+  m_metrics_manager->timestep_inc();
 
   m_interactor_map = std::make_unique<interactor_map_type>();
   m_los_update_map = std::make_unique<los_updater_map_type>();
@@ -215,7 +215,7 @@ void d0_loop_functions::post_step(void) {
   ndc_push();
 
   const auto* collector =
-      m_metrics_agg->get<cfmetrics::block_transportee_metrics_collector>("blocks:"
+      m_metrics_manager->get<cfmetrics::block_transportee_metrics_collector>("blocks:"
                                                                          ":"
                                                                          "transpo"
                                                                          "r"
@@ -228,34 +228,34 @@ void d0_loop_functions::post_step(void) {
       nullptr != conv_calculator() ? conv_calculator()->converged() : false);
 
   /* Collect metrics from loop functions */
-  m_metrics_agg->collect_from_loop(this);
+  m_metrics_manager->collect_from_loop(this);
 
-  m_metrics_agg->metrics_write(rmetrics::output_mode::ekTRUNCATE);
-  m_metrics_agg->metrics_write(rmetrics::output_mode::ekCREATE);
+  m_metrics_manager->flush(rmetrics::output_mode::ekTRUNCATE);
+  m_metrics_manager->flush(rmetrics::output_mode::ekCREATE);
 
   /* Not a clean way to do this in the metrics collectors... */
-  if (m_metrics_agg->metrics_write(rmetrics::output_mode::ekAPPEND)) {
+  if (m_metrics_manager->flush(rmetrics::output_mode::ekAPPEND)) {
     if (nullptr != conv_calculator()) {
       conv_calculator()->reset_metrics();
     }
     tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>()->reset_metrics();
   }
-  m_metrics_agg->interval_reset_all();
-  m_metrics_agg->timestep_inc_all();
+  m_metrics_manager->interval_reset();
+  m_metrics_manager->timestep_inc();
 
   ndc_pop();
 } /* post_step() */
 
 void d0_loop_functions::destroy(void) {
-  if (nullptr != m_metrics_agg) {
-    m_metrics_agg->finalize_all();
+  if (nullptr != m_metrics_manager) {
+    m_metrics_manager->finalize();
   }
 } /* destroy() */
 
 void d0_loop_functions::reset(void) {
   ndc_push();
   base_loop_functions::reset();
-  m_metrics_agg->reset_all();
+  m_metrics_manager->initialize();
   ndc_pop();
 } /* reset() */
 
@@ -327,7 +327,7 @@ void d0_loop_functions::robot_post_step(chal::robot& robot) {
    */
   auto mapplicator = ccops::applicator<controller::foraging_controller,
                                        ccops::metrics_extract,
-                                       d0_metrics_aggregator>(controller);
+                                       d0_metrics_manager>(controller);
   boost::apply_visitor(mapplicator, m_metrics_map->at(controller->type_index()));
 
   controller->block_manip_recorder()->reset();

@@ -32,7 +32,6 @@
 
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/hal/subsystem/config/saa_xml_names.hpp"
-#include "cosm/metrics/config/output_config.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/steer2D/config/force_calculator_config.hpp"
 #include "cosm/subsystem/config/actuation_subsystem2D_config.hpp"
@@ -86,8 +85,7 @@ void foraging_controller::init(ticpp::Element& node) {
                               cpal::kARGoSRobotType);
 
   /* initialize output */
-  const auto* outputp = repo.config_get<cmconfig::output_config>();
-  base_controller2D::output_init(outputp->output_root, outputp->output_dir);
+  base_controller2D::output_init(repo.config_get<cpconfig::output_config>());
 
   /* initialize sensing and actuation (SAA) subsystem */
   saa_init(repo.config_get<csubsystem::config::actuation_subsystem2D_config>(),
@@ -100,9 +98,8 @@ void foraging_controller::init(ticpp::Element& node) {
 
 void foraging_controller::reset(void) { block_carrying_controller::reset(); }
 
-void foraging_controller::output_init(const cmconfig::output_config* outputp) {
-  std::string dir =
-      base_controller2D::output_init(outputp->output_root, outputp->output_dir);
+fs::path foraging_controller::output_init(const cpconfig::output_config* outputp) {
+  auto path =  base_controller2D::output_init(outputp);
 
 #if (LIBRA_ER == LIBRA_ER_ALL)
   /*
@@ -111,18 +108,20 @@ void foraging_controller::output_init(const cmconfig::output_config* outputp) {
    * lines within it are not always ordered, which is not overly helpful for
    * debugging.
    */
-  ER_LOGFILE_SET(log4cxx::Logger::getLogger("cosm.ta"), dir + "/ta.log");
+  ER_LOGFILE_SET(log4cxx::Logger::getLogger("cosm.ta"), path / "ta.log");
 
   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.controller"),
-                 dir + "/controller.log");
-  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.ds"), dir + "/ds.log");
-  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.fsm"), dir + "/fsm.log");
+                 path / "controller.log");
+  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.ds"), path / "ds.log");
+  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.fsm"), path / "fsm.log");
   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.controller.saa"),
-                 dir + "/saa.log");
+                 path / "saa.log");
   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.controller.explore_"
                                             "behavior"),
-                 dir + "/saa.log");
+                 path / "saa.log");
 #endif
+
+  return path;
 } /* output_init() */
 
 void foraging_controller::saa_init(

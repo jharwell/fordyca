@@ -58,7 +58,7 @@ template <class TController>
 class argos_convergence_calculator;
 } /* namespace cosm::pal */
 
-namespace cosm::metrics::config {
+namespace cosm::pal::config {
 struct output_config;
 } /* namespace cosm::metrics::config */
 
@@ -159,7 +159,7 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
    *
    * \param output Parsed output parameters.
    */
-  void output_init(const cmconfig::output_config* output) RCPPSW_COLD;
+  void output_init(const cpconfig::output_config* output) override RCPPSW_COLD;
 
   /**
    * \brief Initialize oracular information injection.

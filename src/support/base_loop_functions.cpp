@@ -28,7 +28,7 @@
 #include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/arena/config/arena_map_config.hpp"
 #include "cosm/foraging/oracle/foraging_oracle.hpp"
-#include "cosm/metrics/config/output_config.hpp"
+#include "cosm/pal/config/output_config.hpp"
 #include "cosm/oracle/config/aggregate_oracle_config.hpp"
 #include "cosm/oracle/tasking_oracle.hpp"
 #include "cosm/pal/argos_convergence_calculator.hpp"
@@ -37,7 +37,7 @@
 
 #include "fordyca//controller/foraging_controller.hpp"
 #include "fordyca/config/tv/tv_manager_config.hpp"
-#include "fordyca/metrics/fordyca_metrics_aggregator.hpp"
+#include "fordyca/metrics/fordyca_metrics_manager.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/support/tv/fordyca_pd_adaptor.hpp"
 
@@ -68,7 +68,7 @@ void base_loop_functions::init(ticpp::Element& node) {
   rng_init(config()->config_get<rmath::config::rng_config>());
 
   /* initialize output and metrics collection */
-  output_init(m_config.config_get<cmconfig::output_config>());
+  output_init(m_config.config_get<cpconfig::output_config>());
 
   /* initialize arena map and distribute blocks */
   const auto* aconfig = config()->config_get<caconfig::arena_map_config>();
@@ -140,20 +140,20 @@ void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
       this, cb, cpal::kARGoSRobotType);
 } /* tv_init() */
 
-void base_loop_functions::output_init(const cmconfig::output_config* output) {
-  argos_sm_adaptor::output_init(output->output_root, output->output_dir);
+void base_loop_functions::output_init(const cpconfig::output_config* output) {
+  argos_sm_adaptor::output_init(output);
 
 #if (LIBRA_ER == LIBRA_ER_ALL)
   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.events"),
-                 output_root() + "/events.log");
+                 output_root() / "events.log");
   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.support"),
-                 output_root() + "/support.log");
+                 output_root() = "support.log");
   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.loop"),
-                 output_root() + "/sim.log");
+                 output_root() / "sim.log");
   ER_LOGFILE_SET(log4cxx::Logger::getLogger("cosm.foraging.ds.arena_map"),
-                 output_root() + "/sim.log");
+                 output_root() / "sim.log");
   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.metrics"),
-                 output_root() + "/metrics.log");
+                 output_root() / "metrics.log");
 #endif
 } /* output_init() */
 

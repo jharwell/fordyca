@@ -1,5 +1,5 @@
 /**
- * \file fordyca_metrics_aggregator.hpp
+ * \file site_selection_metrics_csv_sink.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,56 +18,54 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_FORDYCA_METRICS_AGGREGATOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_FORDYCA_METRICS_AGGREGATOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_CACHES_SITE_SELECTION_METRICS_CSV_SINK_HPP_
+#define INCLUDE_FORDYCA_METRICS_CACHES_SITE_SELECTION_METRICS_CSV_SINK_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <list>
 #include <string>
 
-#include "cosm/ds/config/grid2D_config.hpp"
-#include "cosm/metrics/base_metrics_aggregator.hpp"
-#include "cosm/metrics/config/metrics_config.hpp"
-
+#include "rcppsw/metrics/csv_sink.hpp"
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace support {
-class base_loop_functions;
-}
-namespace controller {
-class foraging_controller;
-} /* namespace controller */
-
-NS_START(metrics);
+NS_START(fordyca, metrics, caches);
+class site_selection_metrics_collector;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class fordyca_metrics_aggregator
- * \ingroup metrics
+ * \class site_selection_metrics_csv_sink
+ * \ingroup metrics caches
  *
- * \brief Extends the \ref cmetrics::base_metrics_aggregator for the FORDYCA
- * project.
+ * \brief Sink for \ref site_selection_metrics and \ref
+ * site_selection_metrics_collector to output metrics to .csv.
  */
-class fordyca_metrics_aggregator : public rer::client<fordyca_metrics_aggregator>,
-                                   public cmetrics::base_metrics_aggregator {
+class site_selection_metrics_csv_sink final : public rmetrics::csv_sink {
  public:
-  fordyca_metrics_aggregator(const cmconfig::metrics_config* mconfig,
-                             const cdconfig::grid2D_config* gconfig,
-                             const std::string& output_root,
-                             size_t n_block_clusters);
-  ~fordyca_metrics_aggregator(void) override = default;
+  using collector_type = site_selection_metrics_collector;
 
-  void collect_from_loop(const support::base_loop_functions* loop);
+  /**
+   * \brief \see rmetrics::csv_sink.
+   */
+  site_selection_metrics_csv_sink(fs::path fpath_no_ext,
+                             const rmetrics::output_mode& mode,
+                             const rtypes::timestep& interval);
+
+  /* csv_sink overrides */
+  std::list<std::string> csv_header_cols(
+      const rmetrics::base_metrics_data* data) const override;
+
+  boost::optional<std::string> csv_line_build(
+      const rmetrics::base_metrics_data* data,
+      const rtypes::timestep& t) override;
 };
 
-NS_END(metrics, fordyca);
+NS_END(caches, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_FORDYCA_METRICS_AGGREGATOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_CACHES_SITE_SELECTION_METRICS_CSV_SINK_HPP_ */

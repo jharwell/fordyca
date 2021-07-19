@@ -1,5 +1,5 @@
 /**
- * \file manipulation_metrics_collector.cpp
+ * \file env_dynamics_metrics_csv_sink.cpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,45 +21,57 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
+#include "fordyca/metrics/tv/env_dynamics_metrics_csv_sink.hpp"
 
-#include "cosm/controller/metrics/manipulation_metrics.hpp"
-
-#include "fordyca/metrics/blocks/block_manip_events.hpp"
+#include "fordyca/metrics/tv/env_dynamics_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, blocks);
+NS_START(fordyca, metrics, tv);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-manipulation_metrics_collector::manipulation_metrics_collector(
-    std::unique_ptr<rmetrics::base_metrics_sink> sink)
-    : base_metrics_collector(std::move(sink)) {}
+env_dynamics_metrics_csv_sink::env_dynamics_metrics_csv_sink(
+    fs::path fpath_no_ext,
+    const rmetrics::output_mode& mode,
+    const rtypes::timestep& interval)
+    : csv_sink(fpath_no_ext, mode, interval) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void manipulation_metrics_collector::collect(
-    const rmetrics::base_metrics& metrics) {
-  const auto& m = dynamic_cast<const ccmetrics::manipulation_metrics&>(metrics);
+std::list<std::string>
+env_dynamics_metrics_csv_sink::csv_header_cols(
+    const rmetrics::base_metrics_data*) const {
+  auto merged = dflt_csv_header_cols();
+  auto cols = std::list<std::string>{
+    /* clang-format off */
+      "swarm_motion_throttle",
+      "block_manip_penalty",
+      "cache_usage_penalty"
+    /* clang-format on */
+  };
+  merged.splice(merged.end(), cols);
+  return merged;
+} /* csv_header_cols() */
 
-  for (uint i = 0; i < block_manip_events::ekMAX_EVENTS; ++i) {
-    m_data.interval[i].events += m.status(i);
-    m_data.interval[i].penalties += m.penalty(i).v();
+boost::optional<std::string>
+env_dynamics_metrics_csv_sink::csv_line_build(
+    const rmetrics::base_metrics_data* data,
+    const rtypes::timestep& t) {
+  if (!ready_to_flush(t)) {
+    return boost::none;
+  }
+  std::string line;
 
-    m_data.cum[i].events += m.status(i);
-    m_data.cum[i].penalties += m.penalty(i).v();
-  } /* for(i..) */
-} /* collect() */
+  auto* d = dynamic_cast<const env_dynamics_metrics_data*>(data);
 
-void manipulation_metrics_collector::reset_after_interval(void) {
-  for (auto& e : m_data.interval) {
-    std::atomic_init(&e.events, 0UL);
-    std::atomic_init(&e.penalties, 0UL);
-  } /* for(e..) */
-} /* reset_after_interval() */
+  line += rcppsw::to_string(d->interval.avg_motion_throttle) + separator();
+  line += rcppsw::to_string(d->interval.block_manip_penalty) + separator();
+  line += rcppsw::to_string(d->interval.cache_usage_penalty);
+  return boost::make_optional(line);
+} /* csv_line_build() */
 
-NS_END(blocks, metrics, fordyca);
+NS_END(tv, metrics, fordyca);

@@ -33,7 +33,7 @@
 
 #include "fordyca/controller/cognitive/foraging_perception_subsystem.hpp"
 #include "fordyca/fordyca.hpp"
-#include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
+#include "fordyca/metrics/perception/dpo_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -57,7 +57,7 @@ NS_START(fordyca, controller, cognitive);
 class dpo_perception_subsystem final
     : public rer::client<dpo_perception_subsystem>,
       public foraging_perception_subsystem,
-      public metrics::perception::dpo_perception_metrics {
+      public metrics::perception::dpo_metrics {
  public:
   explicit dpo_perception_subsystem(const cspconfig::perception_config* config);
   ~dpo_perception_subsystem(void) override;

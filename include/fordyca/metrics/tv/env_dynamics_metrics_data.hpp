@@ -1,7 +1,7 @@
 /**
- * \file d0_metrics_aggregator.hpp
+ * \file env_dynamics_metrics_data.hpp
  *
- * \copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2021 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,46 +18,42 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_D0_D0_METRICS_AGGREGATOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_D0_D0_METRICS_AGGREGATOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_TV_ENV_DYNAMICS_METRICS_DATA_HPP_
+#define INCLUDE_FORDYCA_METRICS_TV_ENV_DYNAMICS_METRICS_DATA_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-
-#include "fordyca/metrics/fordyca_metrics_aggregator.hpp"
+#include "rcppsw/metrics/base_metrics_data.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, support, d0);
+NS_START(fordyca, metrics, tv, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class d0_metrics_aggregator
- * \ingroup support d0
+ * \struct env_dynamics_metrics_data
+ * \ingroup metrics tv detail
  *
- * \brief Aggregates and metrics metric collection for d0 foraging. That
- * includes:
- *
- * - FSM distance/block acquisition metrics
+ * \brief Container for holding collected statistics of \ref
+ * env_dynamics_metrics.
  */
-
-class d0_metrics_aggregator : public metrics::fordyca_metrics_aggregator,
-                                  public rer::client<d0_metrics_aggregator> {
- public:
-  d0_metrics_aggregator(const cmconfig::metrics_config* mconfig,
-                            const cdconfig::grid2D_config* gconfig,
-                            const std::string& output_root,
-                            size_t n_block_clusters);
-
-  template<class T>
-  void collect_from_controller(const T* controller);
+struct env_dynamics_metrics_data {
+  double           avg_motion_throttle{0.0};
+  rtypes::timestep block_manip_penalty{0};
+  rtypes::timestep cache_usage_penalty{0};
 };
 
-NS_END(d0, support, fordyca);
+NS_END(detail);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_D0_D0_METRICS_AGGREGATOR_HPP_ */
+struct env_dynamics_metrics_data : public rmetrics::base_metrics_data {
+  detail::env_dynamics_metrics_data interval{};
+};
+
+NS_END(tv, metrics, fordyca);
+
+#endif /* INCLUDE_FORDYCA_METRICS_TV_ENV_DYNAMICS_METRICS_DATA_HPP_ */

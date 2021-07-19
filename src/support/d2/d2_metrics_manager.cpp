@@ -1,5 +1,5 @@
 /**
- * \file d2_metrics_aggregator.cpp
+ * \file d2_metrics_manager.cpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,23 +21,27 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/d2/d2_metrics_aggregator.hpp"
+#include "fordyca/support/d2/d2_metrics_manager.hpp"
 
 #include <boost/mpl/for_each.hpp>
 
 #include "rcppsw/utils/maskable_enum.hpp"
 
-#include "cosm/metrics/collector_registerer.hpp"
+#include "rcppsw/metrics/collector_registerer.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tab.hpp"
 #include "cosm/ta/metrics/bi_tab_metrics.hpp"
 #include "cosm/ta/metrics/bi_tab_metrics_collector.hpp"
+#include "cosm/ta/metrics/bi_tab_metrics_csv_sink.hpp"
 #include "cosm/ta/metrics/bi_tdgraph_metrics_collector.hpp"
+#include "cosm/ta/metrics/bi_tdgraph_metrics_csv_sink.hpp"
 #include "cosm/ta/metrics/execution_metrics.hpp"
 #include "cosm/ta/metrics/execution_metrics_collector.hpp"
+#include "cosm/ta/metrics/execution_metrics_csv_sink.hpp"
 
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
 #include "fordyca/metrics/caches/site_selection_metrics_collector.hpp"
+#include "fordyca/metrics/caches/site_selection_metrics_csv_sink.hpp"
 #include "fordyca/tasks/d0/foraging_task.hpp"
 #include "fordyca/tasks/d1/foraging_task.hpp"
 #include "fordyca/tasks/d2/foraging_task.hpp"
@@ -54,26 +58,27 @@ using task2 = tasks::d2::foraging_task;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-d2_metrics_aggregator::d2_metrics_aggregator(
-    const cmconfig::metrics_config* const mconfig,
+d2_metrics_manager::d2_metrics_manager(
+    const rmconfig::metrics_config* const mconfig,
     const cdconfig::grid2D_config* const gconfig,
-    const std::string& output_root,
+    const fs::path& output_root,
     size_t n_block_clusters)
-    : d1_metrics_aggregator(mconfig, gconfig, output_root, n_block_clusters),
-      ER_CLIENT_INIT("fordyca.support.d2.metrics_aggregator") {
+    : d1_metrics_manager(mconfig, gconfig, output_root, n_block_clusters),
+      ER_CLIENT_INIT("fordyca.support.d2.metrics_manager") {
   register_standard(mconfig);
 
   /* Overwrite d1; we have a deeper decomposition now */
   collector_unregister("tasks::distribution");
   register_with_decomp_depth(mconfig, 2);
 
-  reset_all();
+  /* setup metric collection for all collector groups in all sink groups */
+  initialize();
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void d2_metrics_aggregator::task_start_cb(
+void d2_metrics_manager::task_start_cb(
     RCPPSW_UNUSED const cta::polled_task* const task,
     const cta::ds::bi_tab* const tab) {
   /* Not using stochastic nbhd policy */
@@ -91,19 +96,20 @@ void d2_metrics_aggregator::task_start_cb(
   }
 } /* task_start_cb() */
 
-void d2_metrics_aggregator::task_finish_or_abort_cb(
+void d2_metrics_manager::task_finish_or_abort_cb(
     const cta::polled_task* const task) {
   collect("tasks::execution::" + task->name(),
           dynamic_cast<const ctametrics::execution_metrics&>(*task));
 } /* task_finish_or_abort_cb() */
 
-void d2_metrics_aggregator::register_standard(
-    const cmconfig::metrics_config* const mconfig) {
-  using collector_typelist = rmpl::typelist<
-      rmpl::identity<ctametrics::bi_tab_metrics_collector>,
-      rmpl::identity<ctametrics::execution_metrics_collector>,
-      rmpl::identity<metrics::caches::site_selection_metrics_collector> >;
-  cmetrics::collector_registerer<>::creatable_set creatable_set = {
+void d2_metrics_manager::register_standard(
+    const rmconfig::metrics_config* const mconfig) {
+  using sink_list = rmpl::typelist<
+      rmpl::identity<ctametrics::bi_tab_metrics_csv_sink>,
+      rmpl::identity<ctametrics::execution_metrics_csv_sink>,
+      rmpl::identity<metrics::caches::site_selection_metrics_csv_sink>
+    >;
+  rmetrics::creatable_collector_set creatable_set = {
     { typeid(ctametrics::bi_tab_metrics_collector),
       "task_tab_harvester",
       "tasks::tab::harvester",
@@ -133,9 +139,11 @@ void d2_metrics_aggregator::register_standard(
       "caches::site_selection",
       rmetrics::output_mode::ekAPPEND }
   };
-
-  cmetrics::collector_registerer<> registerer(mconfig, creatable_set, this);
-  boost::mpl::for_each<collector_typelist>(registerer);
+  rmetrics::register_with_csv_sink csv(&mconfig->csv,
+                                       creatable_set,
+                                       this);
+  rmetrics::collector_registerer<decltype(csv)> registerer(std::move(csv));
+  boost::mpl::for_each<sink_list>(registerer);
 } /* register_standard() */
 
 NS_END(d2, support, fordyca);

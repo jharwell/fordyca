@@ -34,7 +34,7 @@
 
 #include "fordyca/controller/cognitive/foraging_perception_subsystem.hpp"
 #include "fordyca/fordyca.hpp"
-#include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
+#include "fordyca/metrics/perception/mdpo_metrics.hpp"
 #include "fordyca/repr/forager_los.hpp"
 
 /*******************************************************************************
@@ -62,7 +62,7 @@ NS_START(controller, cognitive);
 class mdpo_perception_subsystem final
     : public rer::client<mdpo_perception_subsystem>,
       public foraging_perception_subsystem,
-      public metrics::perception::mdpo_perception_metrics {
+      public metrics::perception::mdpo_metrics {
  public:
   mdpo_perception_subsystem(
       const cspconfig::perception_config* config,

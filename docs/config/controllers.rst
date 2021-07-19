@@ -1,3 +1,4 @@
+============================
 Controller XML Configuration
 ============================
 
@@ -102,10 +103,7 @@ The following controllers are available:
 
 
 
-The following root XML tags are defined under ``<params>`` Parameters for robot exploration, collision avoidance,
-                                                           Parameters for robot
-                                                           exploration,
-                                                           collision avoidance,
+The following root XML tags are defined under ``<params>``.
 
 .. list-table::
    :widths: 25,50,50
@@ -169,7 +167,7 @@ The following root XML tags are defined under ``<params>`` Parameters for robot 
 
 
 ``block_sel_matrix``
---------------------
+====================
 
 - Required child attributes if present: ``nest``.
 - Required child tags if present: none.
@@ -193,7 +191,7 @@ XML configuration:
 ``nest`` - The location of the nest.
 
 ``block_sel_matrix/block_priorities``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------
 
 - Required by: None. If omitted, the default priority values shown below are
   used.
@@ -222,7 +220,7 @@ XML configuration:
   ramp blocks during block selection. Default if omitted: 1.0
 
 ``block_sel_matrix/pickup_policy``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------------
 
 - Required by: None.
 - Required child attributes if present: ``policy``.
@@ -260,7 +258,7 @@ XML configuration:
   ``cluster_proximity`` pickup policy.
 
 ``cache_sel_matrix``
---------------------
+====================
 
 - Required by: [d1, d2] controllers.
 - Required child attributes if present: all.
@@ -306,7 +304,7 @@ XML configuration:
   locations by arena boundaries).
 
 ``cache_sel_matrix/pickup_policy``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------------
 
 - Required by: [d1, d2] controllers.
 - Required child attributes if present: ``policy``.
@@ -346,7 +344,7 @@ XML configuration:
     ``pickup_policy`` tag is present.
 
 ``strategy``
--------------
+============
 
 - Required by: All controllers.
 - Required child attributes if present: None.
@@ -368,7 +366,7 @@ XML configuration:
    </strategy>
 
 ``strategy/explore``
-^^^^^^^^^^^^^^^^^^^^
+--------------------
 
 - Required by: All but CRW.
 - Required child attributes if present: ``block_strategy``.
@@ -389,7 +387,7 @@ XML configuration:
    </strategy>
 
 ``strategy/nest_acq``
-^^^^^^^^^^^^^^^^^^^^^
+---------------------
 
 - Required by: All controllers.
 - Required child attributes if present: ``strategy``.

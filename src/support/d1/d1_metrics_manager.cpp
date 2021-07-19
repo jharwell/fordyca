@@ -1,5 +1,5 @@
 /**
- * \file d1_metrics_aggregator.cpp
+ * \file d1_metrics_manager.cpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,35 +21,45 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/d1/d1_metrics_aggregator.hpp"
+#include "fordyca/support/d1/d1_metrics_manager.hpp"
 
 #include <boost/mpl/for_each.hpp>
 #include <vector>
 
 #include "rcppsw/mpl/typelist.hpp"
 #include "rcppsw/utils/maskable_enum.hpp"
+#include "rcppsw/metrics/collector_registerer.hpp"
 
 #include "cosm/arena/metrics/caches/location_metrics.hpp"
 #include "cosm/arena/metrics/caches/location_metrics_collector.hpp"
+#include "cosm/arena/metrics/caches/location_metrics_csv_sink.hpp"
 #include "cosm/arena/metrics/caches/utilization_metrics.hpp"
 #include "cosm/arena/metrics/caches/utilization_metrics_collector.hpp"
+#include "cosm/arena/metrics/caches/utilization_metrics_csv_sink.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
-#include "cosm/metrics/collector_registerer.hpp"
 #include "cosm/spatial/metrics/explore_locs2D_metrics_collector.hpp"
+#include "cosm/spatial/metrics/explore_locs2D_metrics_csv_sink.hpp"
 #include "cosm/spatial/metrics/goal_acq_locs2D_metrics_collector.hpp"
+#include "cosm/spatial/metrics/goal_acq_locs2D_metrics_csv_sink.hpp"
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 #include "cosm/spatial/metrics/goal_acq_metrics_collector.hpp"
+#include "cosm/spatial/metrics/goal_acq_metrics_csv_sink.hpp"
 #include "cosm/spatial/metrics/vector_locs2D_metrics_collector.hpp"
+#include "cosm/spatial/metrics/vector_locs2D_metrics_csv_sink.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tab.hpp"
 #include "cosm/ta/metrics/bi_tab_metrics.hpp"
 #include "cosm/ta/metrics/bi_tab_metrics_collector.hpp"
+#include "cosm/ta/metrics/bi_tab_metrics_csv_sink.hpp"
 #include "cosm/ta/metrics/bi_tdgraph_metrics_collector.hpp"
+#include "cosm/ta/metrics/bi_tdgraph_metrics_csv_sink.hpp"
 #include "cosm/ta/metrics/execution_metrics.hpp"
 #include "cosm/ta/metrics/execution_metrics_collector.hpp"
+#include "cosm/ta/metrics/execution_metrics_csv_sink.hpp"
 
 #include "fordyca/controller/cognitive/d1/bitd_mdpo_controller.hpp"
 #include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
+#include "fordyca/metrics/caches/lifecycle_metrics_csv_sink.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/tasks/d0/foraging_task.hpp"
 #include "fordyca/tasks/d1/foraging_task.hpp"
@@ -65,26 +75,27 @@ using task1 = tasks::d1::foraging_task;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-d1_metrics_aggregator::d1_metrics_aggregator(
-    const cmconfig::metrics_config* const mconfig,
+d1_metrics_manager::d1_metrics_manager(
+    const rmconfig::metrics_config* const mconfig,
     const cdconfig::grid2D_config* const gconfig,
-    const std::string& output_root,
+    const fs::path& output_root,
     size_t n_block_clusters)
-    : d0_metrics_aggregator(mconfig, gconfig, output_root, n_block_clusters),
-      ER_CLIENT_INIT("fordyca.support.d1.metrics_aggregator") {
+    : d0_metrics_manager(mconfig, gconfig, output_root, n_block_clusters),
+      ER_CLIENT_INIT("fordyca.support.d1.metrics_manager") {
   auto dims2D = rmath::dvec2zvec(gconfig->dims, gconfig->resolution.v());
 
   register_standard(mconfig);
   register_with_decomp_depth(mconfig, 1);
   register_with_arena_dims2D(mconfig, dims2D);
 
-  reset_all();
+  /* setup metric collection for all collector groups in all sink groups */
+  initialize();
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void d1_metrics_aggregator::collect_from_cache(
+void d1_metrics_manager::collect_from_cache(
     const carepr::arena_cache* const cache) {
   const auto* util_m =
       dynamic_cast<const cametrics::caches::utilization_metrics*>(cache);
@@ -94,15 +105,15 @@ void d1_metrics_aggregator::collect_from_cache(
   collect("caches::locations", *loc_m);
 } /* collect_from_cache() */
 
-void d1_metrics_aggregator::collect_from_cache_manager(
+void d1_metrics_manager::collect_from_cache_manager(
     const support::base_cache_manager* const manager) {
   collect("caches::lifecycle", *manager);
 } /* collect_from_cache() */
 
-void d1_metrics_aggregator::task_finish_or_abort_cb(
+void d1_metrics_manager::task_finish_or_abort_cb(
     const cta::polled_task* const task) {
   /*
-   * Both d1 and d2 metrics aggregators are registered on the same
+   * Both d1 and d2 metrics managers are registered on the same
    * callback, so this function will be called for the d2 task abort/finish
    * as well, which should be ignored.
    */
@@ -113,14 +124,14 @@ void d1_metrics_aggregator::task_finish_or_abort_cb(
           dynamic_cast<const ctametrics::execution_metrics&>(*task));
 } /* task_finish_or_abort_cb() */
 
-void d1_metrics_aggregator::task_start_cb(const cta::polled_task* const,
+void d1_metrics_manager::task_start_cb(const cta::polled_task* const,
                                           const cta::ds::bi_tab* const tab) {
   /* Not using stochastic nbhd policy */
   if (nullptr == tab) {
     return;
   }
   /*
-   * Depth [0,1,2] metrics aggregators are registered on the same executive,
+   * Depth [0,1,2] metrics managers are registered on the same executive,
    * so this function will be called for the task allocations for any depth,
    * so anything that is not in our TAB should be ignored.
    */
@@ -130,15 +141,15 @@ void d1_metrics_aggregator::task_start_cb(const cta::polled_task* const,
   collect("tasks::tab::generalist", *tab);
 } /* task_start_cb() */
 
-void d1_metrics_aggregator::register_standard(
-    const cmconfig::metrics_config* mconfig) {
-  using collector_typelist = rmpl::typelist<
-      rmpl::identity<csmetrics::goal_acq_metrics_collector>,
-      rmpl::identity<ctametrics::execution_metrics_collector>,
-      rmpl::identity<ctametrics::bi_tab_metrics_collector>,
-      rmpl::identity<cametrics::caches::utilization_metrics_collector>,
-      rmpl::identity<metrics::caches::lifecycle_metrics_collector> >;
-  cmetrics::collector_registerer<>::creatable_set creatable_set = {
+void d1_metrics_manager::register_standard(
+    const rmconfig::metrics_config* mconfig) {
+  using sink_list = rmpl::typelist<
+      rmpl::identity<csmetrics::goal_acq_metrics_csv_sink>,
+      rmpl::identity<ctametrics::execution_metrics_csv_sink>,
+      rmpl::identity<ctametrics::bi_tab_metrics_csv_sink>,
+      rmpl::identity<cametrics::caches::utilization_metrics_csv_sink>,
+      rmpl::identity<metrics::caches::lifecycle_metrics_csv_sink> >;
+  rmetrics::creatable_collector_set creatable_set = {
     { typeid(csmetrics::goal_acq_metrics_collector),
       "cache_acq_counts",
       "caches::acq_counts",
@@ -168,39 +179,44 @@ void d1_metrics_aggregator::register_standard(
       "caches::lifecycle",
       rmetrics::output_mode::ekAPPEND }
   };
-  cmetrics::collector_registerer<> registerer(mconfig, creatable_set, this);
-  boost::mpl::for_each<collector_typelist>(registerer);
+  rmetrics::register_with_csv_sink csv(&mconfig->csv,
+                                       creatable_set,
+                                       this);
+  rmetrics::collector_registerer<decltype(csv)> registerer(std::move(csv));
+  boost::mpl::for_each<sink_list>(registerer);
 } /* register_standard() */
 
-void d1_metrics_aggregator::register_with_decomp_depth(
-    const cmconfig::metrics_config* const mconfig,
+void d1_metrics_manager::register_with_decomp_depth(
+    const rmconfig::metrics_config* const mconfig,
     size_t depth) {
-  using collector_typelist =
-      rmpl::typelist<rmpl::identity<ctametrics::bi_tdgraph_metrics_collector> >;
-  using extra_args_type = std::tuple<size_t>;
-  cmetrics::collector_registerer<extra_args_type>::creatable_set creatable_set = {
+  using sink_list =
+      rmpl::typelist<rmpl::identity<ctametrics::bi_tdgraph_metrics_csv_sink> >;
+  rmetrics::creatable_collector_set creatable_set = {
     { typeid(ctametrics::bi_tdgraph_metrics_collector),
       "task_distribution",
       "tasks::distribution",
       rmetrics::output_mode::ekAPPEND }
   };
+  auto extra_args = std::make_tuple(depth);
 
-  cmetrics::collector_registerer<extra_args_type> registerer(
-      mconfig, creatable_set, this, std::make_tuple(depth));
-  boost::mpl::for_each<collector_typelist>(registerer);
+  rmetrics::register_with_csv_sink<decltype(extra_args)> csv(&mconfig->csv,
+                                                             creatable_set,
+                                                             this,
+                                                             extra_args);
+  rmetrics::collector_registerer<decltype(csv)> registerer(std::move(csv));
+  boost::mpl::for_each<sink_list>(registerer);
 } /* register_with_decomp_depth() */
 
-void d1_metrics_aggregator::register_with_arena_dims2D(
-    const cmconfig::metrics_config* const mconfig,
+void d1_metrics_manager::register_with_arena_dims2D(
+    const rmconfig::metrics_config* const mconfig,
     const rmath::vector2z& dims) {
-  using collector_typelist = rmpl::typelist<
-      rmpl::identity<csmetrics::goal_acq_locs2D_metrics_collector>,
-      rmpl::identity<csmetrics::explore_locs2D_metrics_collector>,
-      rmpl::identity<csmetrics::vector_locs2D_metrics_collector>,
-      rmpl::identity<cametrics::caches::location_metrics_collector> >;
+  using sink_list = rmpl::typelist<
+      rmpl::identity<csmetrics::goal_acq_locs2D_metrics_csv_sink>,
+      rmpl::identity<csmetrics::explore_locs2D_metrics_csv_sink>,
+      rmpl::identity<csmetrics::vector_locs2D_metrics_csv_sink>,
+      rmpl::identity<cametrics::caches::location_metrics_csv_sink> >;
 
-  using extra_args_type = std::tuple<rmath::vector2z>;
-  cmetrics::collector_registerer<extra_args_type>::creatable_set creatable_set = {
+  rmetrics::creatable_collector_set creatable_set = {
     { typeid(csmetrics::goal_acq_locs2D_metrics_collector),
       "cache_acq_locs2D",
       "caches::acq_locs2D",
@@ -218,9 +234,15 @@ void d1_metrics_aggregator::register_with_arena_dims2D(
       "caches::locations",
       rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE }
   };
-  cmetrics::collector_registerer<extra_args_type> registerer(
-      mconfig, creatable_set, this, std::make_tuple(dims));
-  boost::mpl::for_each<collector_typelist>(registerer);
+
+  auto extra_args = std::make_tuple(dims);
+
+  rmetrics::register_with_csv_sink<decltype(extra_args)> csv(&mconfig->csv,
+                                                             creatable_set,
+                                                             this,
+                                                             extra_args);
+  rmetrics::collector_registerer<decltype(csv)> registerer(std::move(csv));
+  boost::mpl::for_each<sink_list>(registerer);
 } /* register_with_arena_dims2D() */
 
 NS_END(d1, support, fordyca);

@@ -40,8 +40,8 @@
       <params>
         <rng seed="123"/>
         <output
-            output_root="output"
-            output_dir="__current_date__"
+            output_parent="output"
+            output_leaf="__current_date__"
             />
         <perception
             los_dim="0.4">
@@ -204,52 +204,56 @@
   <loop_functions library="libfordyca"
                   label="d0_loop_functions">
     <output
-        output_root="output"
-        output_dir="__current_date__">
+        output_parent="output"
+        output_leaf="__current_date__">
       <metrics
-          output_dir="metrics">
-        <append
-            output_interval="1000"
-            block_acq_counts="block-acq-counts"
-            block_transporter="block-transporter"
-            block_transportee="block-transportee"
-            block_manipulation="block-manipulation"
-            cache_acq_counts="cache-acq-counts"
-            cache_utilization="cache-utilization"
-            cache_lifecycle="cache-lifecycle"
-            fsm_interference_counts="fsm-interference-counts"
-            cache_site_selection="cache-site-selection"
-            task_execution_generalist="task-execution-generalist"
-            task_execution_collector="task-execution-collector"
-            task_execution_harvester="task-execution-harvester"
-            task_execution_cache_starter="task-execution-cache_starter"
-            task_execution_cache_finisher="task-execution-cache_finisher"
-            task_execution_cache_transferer="task-execution-cache_transferer"
-            task_execution_cache_collector="task-execution-cache_collector"
-            task_tab_generalist="task-tab-generalist"
-            task_tab_collector="task-tab-collector"
-            task_tab_harvester="task-tab-harvester"
-            task_distribution="task-distribution"
-            spatial_movement='spatial-movement'
-            perception_crw="perception-crw"
-            perception_mcrw="perception-mcrw"
-            swarm_convergence="swarm-convergence"
-            tv_population="tv-population"
-            block_distributor="block-distributor"
-            block_motion="block-motion"
-            nest_acq_strategy="nest-acq-strategy"
-            block_clusters="block-clusters"
-            tv_environment="tv-environment"/>
+          metrics_path="metrics">
+        <sinks>
+          <csv>
+            <append
+                output_interval="1000"
+                block_acq_counts="block-acq-counts"
+                block_transporter="block-transporter"
+                block_transportee="block-transportee"
+                block_manipulation="block-manipulation"
+                cache_acq_counts="cache-acq-counts"
+                cache_utilization="cache-utilization"
+                cache_lifecycle="cache-lifecycle"
+                fsm_interference_counts="fsm-interference-counts"
+                cache_site_selection="cache-site-selection"
+                task_execution_generalist="task-execution-generalist"
+                task_execution_collector="task-execution-collector"
+                task_execution_harvester="task-execution-harvester"
+                task_execution_cache_starter="task-execution-cache_starter"
+                task_execution_cache_finisher="task-execution-cache_finisher"
+                task_execution_cache_transferer="task-execution-cache_transferer"
+                task_execution_cache_collector="task-execution-cache_collector"
+                task_tab_generalist="task-tab-generalist"
+                task_tab_collector="task-tab-collector"
+                task_tab_harvester="task-tab-harvester"
+                task_distribution="task-distribution"
+                spatial_movement='spatial-movement'
+                perception_crw="perception-crw"
+                perception_mcrw="perception-mcrw"
+                swarm_convergence="swarm-convergence"
+                tv_population="tv-population"
+                block_distributor="block-distributor"
+                block_motion="block-motion"
+                nest_acq_strategy="nest-acq-strategy"
+                block_clusters="block-clusters"
+                tv_environment="tv-environment"/>
 
-        <truncate output_interval="10"
-                block_acq_locs2D="block-acq-locs"
-                block_acq_explore_locs2D="block-acq-explore-locs"
-                block_acq_vector_locs2D="block-acq-vector-locs"
-                cache_acq_locs2D="cache-acq-locs"
-                cache_acq_explore_locs2D="cache-acq-explore-locs"
-                cache_acq_vector_locs2D="cache-acq-vector-locs"
-                cache_locations="cache-locations"
-                swarm_dist2D_pos="swarm-dist-pos2D"/>
+            <truncate output_interval="10"
+                      block_acq_locs2D="block-acq-locs"
+                      block_acq_explore_locs2D="block-acq-explore-locs"
+                      block_acq_vector_locs2D="block-acq-vector-locs"
+                      cache_acq_locs2D="cache-acq-locs"
+                      cache_acq_explore_locs2D="cache-acq-explore-locs"
+                      cache_acq_vector_locs2D="cache-acq-vector-locs"
+                      cache_locations="cache-locations"
+                      swarm_dist2D_pos="swarm-dist-pos2D"/>
+          </csv>
+        </sinks>
       </metrics>
     </output>
     <!-- <convergence -->
@@ -318,7 +322,7 @@
           birth_mu="0.0"
           death_lambda="0.0"
           malfunction_lambda="0.000"
-          max_size="00"
+          max_size="0"
           repair_mu="0.000"/>
     </temporal_variance>
 
@@ -399,6 +403,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,10,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
+      
       <entity quantity="16" max_trials="1000">
         <foot-bot id="fb" omnidirectional_camera_aperture="89">
           <controller config="fbc" />

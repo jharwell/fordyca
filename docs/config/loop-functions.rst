@@ -252,7 +252,7 @@ the ``enable`` attribute is required; all other attributes are parsed iff
   probability of static cache respawn will grow once the conditions for
   respawning are met.
 
-``arena_map/caches/dynamib``
+``arena_map/caches/dynamic``
 """"""""""""""""""""""""""""
 
 - Required by: [depth2 controllers].
@@ -283,7 +283,6 @@ XML configuration:
 - ``min_blocks`` - The minimum # of blocks that need to within ``min_dist`` from
   each other to trigger dynamic cache creation.
 
-- ``robot_drop_only`` - If `true`, then caches will only be created by intential
-  robot block drops rather than drops due to abort/block distribution after
-  collection. Default if omitted: `false`.
-
+- ``robot_drop_only`` - If `true`, then caches will only be created by
+  intentional robot block drops rather than drops due to abort/block
+  distribution after collection. Default if omitted: `false`.

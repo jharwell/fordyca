@@ -24,8 +24,8 @@
 #include "fordyca/config/foraging_controller_repository.hpp"
 
 #include "rcppsw/math/config/xml/rng_parser.hpp"
+#include "cosm/pal/config/xml/output_parser.hpp"
 
-#include "cosm/metrics/config/xml/output_parser.hpp"
 #include "cosm/repr/config/xml/nest_parser.hpp"
 #include "cosm/subsystem/config/xml/actuation_subsystem2D_parser.hpp"
 #include "cosm/subsystem/config/xml/sensing_subsystemQ3D_parser.hpp"
@@ -43,8 +43,8 @@ namespace cscxml = csconfig::xml;
  * Constructors/Destructor
  ******************************************************************************/
 foraging_controller_repository::foraging_controller_repository(void) {
-  parser_register<cmconfig::xml::output_parser, cmconfig::output_config>(
-      cmconfig::xml::output_parser::kXMLRoot);
+  parser_register<cpcxml::output_parser, cpconfig::output_config>(
+      cpcxml::output_parser::kXMLRoot);
   parser_register<cscxml::actuation_subsystem2D_parser,
                   csconfig::actuation_subsystem2D_config>(
       cscxml::actuation_subsystem2D_parser::kXMLRoot);

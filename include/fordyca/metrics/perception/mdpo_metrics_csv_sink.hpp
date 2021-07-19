@@ -1,5 +1,5 @@
 /**
- * \file mdpo_perception_metrics_collector.hpp
+ * \file mdpo_metrics_csv_sink.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,68 +18,56 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_PERCEPTION_MDPO_PERCEPTION_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_PERCEPTION_MDPO_PERCEPTION_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_PERCEPTION_MDPO_METRICS_CSV_SINK_HPP_
+#define INCLUDE_FORDYCA_METRICS_PERCEPTION_MDPO_METRICS_CSV_SINK_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
 #include <list>
-#include <atomic>
 
-#include "rcppsw/metrics/base_metrics_collector.hpp"
+#include "rcppsw/metrics/csv_sink.hpp"
 #include "fordyca/fordyca.hpp"
-#include "cosm/fsm/cell2D_state.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics, perception);
+class mdpo_metrics_collector;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class mdpo_perception_metrics_collector
+ * \class mdpo_metrics_csv_sink
  * \ingroup metrics blocks
  *
- * \brief Collector for \ref mdpo_perception_metrics.
+ * \brief Sink for \ref mdpo_metrics.
  *
  * Metrics CAN be collected in parallel from robots; concurrent updates to the
- * gathered stats are supported. Metrics are written out at the specified
- * collection interval.
+ * gathered stats are supported.
  */
-class mdpo_perception_metrics_collector final : public rmetrics::base_metrics_collector {
+class mdpo_metrics_csv_sink final : public rmetrics::csv_sink {
  public:
+  using collector_type = mdpo_metrics_collector;
+
   /**
-   * \param ofname_stem The output file name stem.
-   * \param interval Collection interval.
+   * \brief \see rmetrics::csv_sink.
    */
-  mdpo_perception_metrics_collector(const std::string& ofname_stem,
-                                    const rtypes::timestep& interval);
+  mdpo_metrics_csv_sink(fs::path fpath_no_ext,
+                       const rmetrics::output_mode& mode,
+                       const rtypes::timestep& interval);
 
-  void reset(void) override;
-  void collect(const rmetrics::base_metrics& metrics) override;
-  void reset_after_interval(void) override;
+  /* csv_sink overrides */
+  std::list<std::string> csv_header_cols(
+      const rmetrics::base_metrics_data* data) const override;
 
- private:
-  std::list<std::string> csv_header_cols(void) const override;
-  boost::optional<std::string> csv_line_build(void) override;
-
-  struct stats {
-    std::array<std::atomic_uint, cfsm::cell2D_state::ekST_MAX_STATES> states;
-    std::atomic<double> known_percent{0.0};
-    std::atomic<double> unknown_percent{0.0};
-    std::atomic_uint    robots{0};
-  };
-
-  /* clang-format off */
-  struct stats m_interval{};
-  struct stats m_cum{};
-  /* clang-format on */
+  boost::optional<std::string> csv_line_build(
+      const rmetrics::base_metrics_data* data,
+      const rtypes::timestep& t) override;
 };
 
 NS_END(perception, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_PERCEPTION_MDPO_PERCEPTION_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_PERCEPTION_MDPO_METRICS_CSV_SINK_HPP_ */

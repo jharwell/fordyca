@@ -36,91 +36,33 @@ NS_START(fordyca, metrics, caches);
  * Constructors/Destructor
  ******************************************************************************/
 lifecycle_metrics_collector::lifecycle_metrics_collector(
-    const std::string& ofname_stem,
-    const rtypes::timestep& interval)
-    : base_metrics_collector(ofname_stem,
-                             interval,
-                             rmetrics::output_mode::ekAPPEND) {}
+    std::unique_ptr<rmetrics::base_metrics_sink> sink)
+    : base_metrics_collector(std::move(sink)) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<std::string> lifecycle_metrics_collector::csv_header_cols(void) const {
-  auto merged = dflt_csv_header_cols();
-  auto cols = std::list<std::string>{
-    /* clang-format off */
-    "int_created",
-    "int_depleted",
-    "int_discarded",
-
-    "int_avg_created",
-    "int_avg_depleted",
-    "int_avg_discarded",
-    "int_avg_depletion_age",
-
-    "cum_avg_created",
-    "cum_avg_depleted",
-    "cum_avg_discarded",
-    "cum_avg_depletion_age"
-    /* clang-format on */
-  };
-  merged.splice(merged.end(), cols);
-  return merged;
-} /* csv_header_cols() */
-
-void lifecycle_metrics_collector::reset(void) {
-  base_metrics_collector::reset();
-  reset_after_interval();
-} /* reset() */
-
-boost::optional<std::string> lifecycle_metrics_collector::csv_line_build(void) {
-  if (!(timestep() % interval() == 0UL)) {
-    return boost::none;
-  }
-  std::string line;
-
-  /* raw metrics */
-  line += rcppsw::to_string(m_stats.int_created) + separator();
-  line += rcppsw::to_string(m_stats.int_depleted) + separator();
-  line += rcppsw::to_string(m_stats.int_discarded) + separator();
-
-  /* interval averages */
-  line += csv_entry_intavg(m_stats.int_created);
-  line += csv_entry_intavg(m_stats.int_depleted);
-  line += csv_entry_intavg(m_stats.int_discarded);
-  line += csv_entry_domavg(m_stats.int_depletion_sum.v(), m_stats.int_depleted);
-
-  /* cumulative averages */
-  line += csv_entry_tsavg(m_stats.cum_created);
-  line += csv_entry_tsavg(m_stats.cum_depleted);
-  line += csv_entry_tsavg(m_stats.cum_discarded);
-
-  line +=
-      csv_entry_domavg(m_stats.cum_depletion_sum.v(), m_stats.cum_depleted, true);
-  return boost::make_optional(line);
-} /* csv_line_build() */
-
 void lifecycle_metrics_collector::collect(const rmetrics::base_metrics& metrics) {
   const auto& m = static_cast<const lifecycle_metrics&>(metrics);
   auto ages = m.cache_depletion_ages();
   auto sum = std::accumulate(ages.begin(), ages.end(), rtypes::timestep(0));
 
-  m_stats.int_created += m.caches_created();
-  m_stats.int_depleted += m.caches_depleted();
-  m_stats.int_discarded += m.caches_discarded();
-  m_stats.int_depletion_sum += sum;
+  m_data.interval.created += m.caches_created();
+  m_data.interval.depleted += m.caches_depleted();
+  m_data.interval.discarded += m.caches_discarded();
+  m_data.interval.depletion_sum += sum;
 
-  m_stats.cum_created += m.caches_created();
-  m_stats.cum_depleted += m.caches_depleted();
-  m_stats.cum_discarded += m.caches_discarded();
-  m_stats.cum_depletion_sum += sum;
+  m_data.cum.created += m.caches_created();
+  m_data.cum.depleted += m.caches_depleted();
+  m_data.cum.discarded += m.caches_discarded();
+  m_data.cum.depletion_sum += sum;
 } /* collect() */
 
 void lifecycle_metrics_collector::reset_after_interval(void) {
-  m_stats.int_created = 0;
-  m_stats.int_depleted = 0;
-  m_stats.int_discarded = 0;
-  m_stats.int_depletion_sum = rtypes::timestep(0);
+  m_data.interval.created = 0;
+  m_data.interval.depleted = 0;
+  m_data.interval.discarded = 0;
+  m_data.interval.depletion_sum = rtypes::timestep(0);
 } /* reset_after_interval() */
 
 NS_END(caches, metrics, fordyca);

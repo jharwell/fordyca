@@ -1,5 +1,5 @@
 /**
- * \file lifecycle_metrics_collector.hpp
+ * \file fordyca_metrics_manager.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,56 +18,55 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_CACHES_LIFECYCLE_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_CACHES_LIFECYCLE_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FORDYCA_METRICS_MANAGER_HPP_
+#define INCLUDE_FORDYCA_METRICS_FORDYCA_METRICS_MANAGER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include <list>
 
-#include "rcppsw/metrics/base_metrics_collector.hpp"
+#include "cosm/ds/config/grid2D_config.hpp"
+#include "cosm/metrics/cosm_metrics_manager.hpp"
+
 #include "fordyca/fordyca.hpp"
-#include "fordyca/metrics/caches/lifecycle_metrics_data.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, caches);
+NS_START(fordyca);
+
+namespace support {
+class base_loop_functions;
+}
+namespace controller {
+class foraging_controller;
+} /* namespace controller */
+
+NS_START(metrics);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class lifecycle_metrics_collector
- * \ingroup metrics caches
+ * \class fordyca_metrics_manager
+ * \ingroup metrics
  *
- * \brief Collector for \ref lifecycle_metrics.
- *
- * Metrics CANNOT be collected in parallel; concurrent updates to the gathered
- * stats are not supported.
+ * \brief Extends the \ref cmetrics::cosm_metrics_manager for the FORDYCA
+ * project.
  */
-class lifecycle_metrics_collector final : public rmetrics::base_metrics_collector {
-   public:
-  /**
-   * \param sink The metrics sink to use.
-   */
-  explicit lifecycle_metrics_collector(
-      std::unique_ptr<rmetrics::base_metrics_sink> sink);
+class fordyca_metrics_manager : public rer::client<fordyca_metrics_manager>,
+                                public cmetrics::cosm_metrics_manager {
+ public:
+  fordyca_metrics_manager(const rmconfig::metrics_config* mconfig,
+                          const cdconfig::grid2D_config* gconfig,
+                          const fs::path& output_root,
+                          size_t n_block_clusters);
+  ~fordyca_metrics_manager(void) override = default;
 
-  /* base_metrics_collector overrides */
-  void collect(const rmetrics::base_metrics& metrics) override;
-  void reset_after_interval(void) override;
-  const rmetrics::base_metrics_data* data(void) const override { return &m_data; }
-
-
- private:
-  /* clang-format off */
-  lifecycle_metrics_data m_data{};
-  /* clang-format on */
+  void collect_from_loop(const support::base_loop_functions* loop);
 };
 
-NS_END(caches, metrics, fordyca);
+NS_END(metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_CACHES_LIFECYCLE_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FORDYCA_METRICS_MANAGER_HPP_ */

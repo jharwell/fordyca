@@ -24,12 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <list>
-#include <string>
+#include <memory>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 
-#include "fordyca/fordyca.hpp"
+#include "fordyca/metrics/tv/env_dynamics_metrics_data.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,26 +45,26 @@ NS_START(fordyca, metrics, tv);
  * \brief Collector for \ref env_dynamics_metrics.
  *
  * Metrics CANNOT be collected in parallel; concurrent updates to the gathered
- * stats are not supported. Metrics are written out every timestep.
+ * stats are not supported.
  */
 class env_dynamics_metrics_collector final
     : public rmetrics::base_metrics_collector {
  public:
   /**
-   * \param ofname_stem The output file name stem.
+   * \param sink The metrics sink to use.
    */
-  explicit env_dynamics_metrics_collector(const std::string& ofname_stem);
+  explicit env_dynamics_metrics_collector(
+      std::unique_ptr<rmetrics::base_metrics_sink> sink);
 
+  /* base_metrics_collector overrides */
   void collect(const rmetrics::base_metrics& metrics) override;
+  void reset_after_interval(void) override;
+  const rmetrics::base_metrics_data* data(void) const override { return &m_data; }
+
 
  private:
-  std::list<std::string> csv_header_cols(void) const override;
-  boost::optional<std::string> csv_line_build(void) override;
-
   /* clang-format off */
-  double           m_avg_motion_throttle{0.0};
-  rtypes::timestep m_block_manip_penalty{0};
-  rtypes::timestep m_cache_usage_penalty{0};
+  env_dynamics_metrics_data m_data{};
   /* clang-format on */
 };
 

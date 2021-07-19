@@ -34,7 +34,7 @@
 #include "fordyca/support/tv/block_op_penalty_handler.hpp"
 #include "fordyca/support/interactor_status.hpp"
 #include "fordyca/events/robot_nest_block_drop.hpp"
-#include "fordyca/support/d0/d0_metrics_aggregator.hpp"
+#include "fordyca/support/d0/d0_metrics_manager.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -48,7 +48,7 @@ struct nest_drop_spec_value {
   using arena_map_type = carena::caching_arena_map;
   using penalty_handler_type = tv::block_op_penalty_handler;
   using interactor_status_type = interactor_status;
-  using metrics_agg_type = d0::d0_metrics_aggregator;
+  using metrics_manager_type = d0::d0_metrics_manager;
   using robot_nest_block_process_visitor_type = events::robot_nest_block_drop_visitor;
 };
 

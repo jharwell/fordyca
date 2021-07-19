@@ -61,15 +61,15 @@ class nest_block_drop_interactor final
       TController,
       TControllerSpecMap>::penalty_handler_type;
   using typename cinteractors::
-      base_nest_block_process<TController, TControllerSpecMap>::metrics_agg_type;
+      base_nest_block_process<TController, TControllerSpecMap>::metrics_manager_type;
 
   nest_block_drop_interactor(arena_map_type* const map,
-                             metrics_agg_type* const metrics_agg,
+                             metrics_manager_type* const metrics_manager,
                              argos::CFloorEntity* const floor,
                              tv::env_dynamics* const envd)
       : cinteractors::base_nest_block_process<TController, TControllerSpecMap>(
             map,
-            metrics_agg,
+            metrics_manager,
             floor,
             envd->penalty_handler(tv::block_op_src::ekNEST_DROP)) {}
 

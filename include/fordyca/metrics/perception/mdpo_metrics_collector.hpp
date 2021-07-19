@@ -1,5 +1,5 @@
 /**
- * \file manipulation_metrics_collector.hpp
+ * \file mdpo_metrics_collector.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,40 +18,40 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_PERCEPTION_MDPO_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_PERCEPTION_MDPO_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/metrics/base_metrics_collector.hpp"
+#include <memory>
 
-#include "fordyca/metrics/blocks/manipulation_metrics_data.hpp"
+#include "rcppsw/metrics/base_metrics_collector.hpp"
+#include "fordyca/metrics/perception/mdpo_metrics_data.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, blocks);
+NS_START(fordyca, metrics, perception);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class manipulation_metrics_collector
+ * \class mdpo_metrics_collector
  * \ingroup metrics blocks
  *
- * \brief Collector for \ref manipulation_metrics.
+ * \brief Collector for \ref mdpo_metrics.
  *
  * Metrics CAN be collected in parallel from robots; concurrent updates to the
- * gathered stats are supported. Metrics are written out at the specified
- * collection interval.
+ * gathered stats are supported.
  */
-class manipulation_metrics_collector final : public rmetrics::base_metrics_collector {
- public:
+class mdpo_metrics_collector final : public rmetrics::base_metrics_collector {
+   public:
   /**
    * \param sink The metrics sink to use.
    */
-  explicit manipulation_metrics_collector(
+  explicit mdpo_metrics_collector(
       std::unique_ptr<rmetrics::base_metrics_sink> sink);
 
   /* base_metrics_collector overrides */
@@ -61,10 +61,10 @@ class manipulation_metrics_collector final : public rmetrics::base_metrics_colle
 
  private:
   /* clang-format off */
-  manipulation_metrics_data m_data{};
+  mdpo_metrics_data m_data{};
   /* clang-format on */
 };
 
-NS_END(blocks, metrics, fordyca);
+NS_END(perception, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_PERCEPTION_MDPO_METRICS_COLLECTOR_HPP_ */

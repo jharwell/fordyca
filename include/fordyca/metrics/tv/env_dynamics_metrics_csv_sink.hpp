@@ -1,5 +1,5 @@
 /**
- * \file lifecycle_metrics_collector.hpp
+ * \file env_dynamics_metrics_csv_sink.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,56 +18,58 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_CACHES_LIFECYCLE_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_CACHES_LIFECYCLE_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_TV_ENV_DYNAMICS_METRICS_CSV_SINK_HPP_
+#define INCLUDE_FORDYCA_METRICS_TV_ENV_DYNAMICS_METRICS_CSV_SINK_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
 #include <list>
+#include <string>
 
-#include "rcppsw/metrics/base_metrics_collector.hpp"
-#include "fordyca/fordyca.hpp"
-#include "fordyca/metrics/caches/lifecycle_metrics_data.hpp"
+#include "rcppsw/metrics/csv_sink.hpp"
+
+#include "fordyca/metrics/tv/env_dynamics_metrics_data.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, caches);
+NS_START(fordyca, metrics, tv);
+class env_dynamics_metrics_collector;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class lifecycle_metrics_collector
- * \ingroup metrics caches
+ * \class env_dynamics_metrics_csv_sink
+ * \ingroup metrics tv
  *
- * \brief Collector for \ref lifecycle_metrics.
+ * \brief Sink for \ref env_dynamics_pmetrics.
  *
  * Metrics CANNOT be collected in parallel; concurrent updates to the gathered
  * stats are not supported.
  */
-class lifecycle_metrics_collector final : public rmetrics::base_metrics_collector {
-   public:
+class env_dynamics_metrics_csv_sink final
+    : public rmetrics::csv_sink {
+ public:
+  using collector_type = env_dynamics_metrics_collector;
+
   /**
-   * \param sink The metrics sink to use.
+   * \brief \see rmetrics::csv_sink.
    */
-  explicit lifecycle_metrics_collector(
-      std::unique_ptr<rmetrics::base_metrics_sink> sink);
+  env_dynamics_metrics_csv_sink(fs::path fpath_no_ext,
+                                const rmetrics::output_mode& mode,
+                                const rtypes::timestep& interval);
 
-  /* base_metrics_collector overrides */
-  void collect(const rmetrics::base_metrics& metrics) override;
-  void reset_after_interval(void) override;
-  const rmetrics::base_metrics_data* data(void) const override { return &m_data; }
+  /* csv_sink overrides */
+  std::list<std::string> csv_header_cols(
+      const rmetrics::base_metrics_data* data) const override;
 
-
- private:
-  /* clang-format off */
-  lifecycle_metrics_data m_data{};
-  /* clang-format on */
+  boost::optional<std::string> csv_line_build(
+      const rmetrics::base_metrics_data* data,
+      const rtypes::timestep& t) override;
 };
 
-NS_END(caches, metrics, fordyca);
+NS_END(tv, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_CACHES_LIFECYCLE_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_TV_ENV_DYNAMICS_METRICS_CSV_SINK_HPP_ */

@@ -31,7 +31,7 @@
 #include "cosm/vis/config/visualization_config.hpp"
 #include "cosm/foraging/oracle/foraging_oracle.hpp"
 
-#include "fordyca/support/d1/d1_metrics_aggregator.hpp"
+#include "fordyca/support/d1/d1_metrics_manager.hpp"
 #include "fordyca/controller/cognitive/oracular_info_receptor.hpp"
 
 /*******************************************************************************
@@ -52,17 +52,17 @@ NS_START(fordyca, support, d1);
  * - Enabled oracles (if applicable)
  * - Enabling tasking metric aggregation via task executive hooks
  */
-template <class TController, class TAggregator>
+template <class TController, class TMetricsManager>
 class robot_configurer {
  public:
   using controller_type = TController;
 
   robot_configurer(const cvconfig::visualization_config* const config,
                    cforacle::foraging_oracle* const oracle,
-                   TAggregator* const agg)
+                   TMetricsManager* const metrics_manager)
       : mc_config(config),
         m_oracle(oracle),
-        m_agg(agg) {}
+        m_metrics_manager(metrics_manager) {}
 
   template<typename U = TController,
            RCPPSW_SFINAE_TYPELIST_REJECT(controller::d1::oracular_typelist,
@@ -84,16 +84,16 @@ class robot_configurer {
  protected:
   void metric_callbacks_bind(controller_type* const c) const {
     c->executive()->task_finish_notify(
-        std::bind(&TAggregator::task_finish_or_abort_cb,
-                  m_agg,
+        std::bind(&TMetricsManager::task_finish_or_abort_cb,
+                  m_metrics_manager,
                   std::placeholders::_1));
     c->executive()->task_abort_notify(
-        std::bind(&TAggregator::task_finish_or_abort_cb,
-                  m_agg,
+        std::bind(&TMetricsManager::task_finish_or_abort_cb,
+                  m_metrics_manager,
                   std::placeholders::_1));
     c->executive()->task_start_notify(
-        std::bind(&TAggregator::task_start_cb,
-                  m_agg,
+        std::bind(&TMetricsManager::task_start_cb,
+                  m_metrics_manager,
                   std::placeholders::_1,
                   std::placeholders::_2));
   } /* metric_callbacks_bind() */
@@ -124,7 +124,7 @@ class robot_configurer {
   const cvconfig::visualization_config* const mc_config;
   cforacle::foraging_oracle* const            m_oracle;
 
-  TAggregator* const                          m_agg;
+  TMetricsManager* const                          m_metrics_manager;
   /* clang-format on */
 };
 

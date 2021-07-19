@@ -1,5 +1,5 @@
 /**
- * \file manipulation_metrics_collector.cpp
+ * \file dpo_metrics_collector.cpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,45 +21,60 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
+#include "fordyca/metrics/perception/dpo_metrics_collector.hpp"
 
-#include "cosm/controller/metrics/manipulation_metrics.hpp"
+#include <numeric>
 
-#include "fordyca/metrics/blocks/block_manip_events.hpp"
+#include "fordyca/metrics/perception/dpo_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, blocks);
+NS_START(fordyca, metrics, perception);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-manipulation_metrics_collector::manipulation_metrics_collector(
+dpo_metrics_collector::dpo_metrics_collector(
     std::unique_ptr<rmetrics::base_metrics_sink> sink)
     : base_metrics_collector(std::move(sink)) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void manipulation_metrics_collector::collect(
+void dpo_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
-  const auto& m = dynamic_cast<const ccmetrics::manipulation_metrics&>(metrics);
+  const auto& m = dynamic_cast<const dpo_metrics&>(metrics);
+  ++m_data.interval.robot_count;
+  ++m_data.cum.robot_count;
 
-  for (uint i = 0; i < block_manip_events::ekMAX_EVENTS; ++i) {
-    m_data.interval[i].events += m.status(i);
-    m_data.interval[i].penalties += m.penalty(i).v();
+  m_data.interval.known_blocks += m.n_known_blocks();
+  m_data.interval.known_caches += m.n_known_caches();
 
-    m_data.cum[i].events += m.status(i);
-    m_data.cum[i].penalties += m.penalty(i).v();
-  } /* for(i..) */
+  m_data.cum.known_blocks += m.n_known_blocks();
+  m_data.cum.known_caches += m.n_known_caches();
+
+  auto int_bsum = m_data.interval.block_density_sum.load();
+  auto int_csum = m_data.interval.cache_density_sum.load();
+  m_data.interval.block_density_sum.compare_exchange_strong(
+      int_bsum, int_bsum + m.avg_block_density().v());
+  m_data.interval.cache_density_sum.compare_exchange_strong(
+      int_csum, int_csum + m.avg_cache_density().v());
+
+  auto cum_bsum = m_data.cum.block_density_sum.load();
+  auto cum_csum = m_data.cum.cache_density_sum.load();
+  m_data.cum.block_density_sum.compare_exchange_strong(
+      cum_bsum, cum_bsum + m.avg_block_density().v());
+  m_data.cum.cache_density_sum.compare_exchange_strong(
+      cum_csum, cum_csum + m.avg_cache_density().v());
 } /* collect() */
 
-void manipulation_metrics_collector::reset_after_interval(void) {
-  for (auto& e : m_data.interval) {
-    std::atomic_init(&e.events, 0UL);
-    std::atomic_init(&e.penalties, 0UL);
-  } /* for(e..) */
+void dpo_metrics_collector::reset_after_interval(void) {
+  m_data.interval.robot_count = 0;
+  m_data.interval.known_blocks = 0;
+  m_data.interval.known_caches = 0;
+  m_data.interval.block_density_sum = 0.0;
+  m_data.interval.cache_density_sum = 0.0;
 } /* reset_after_interval() */
 
-NS_END(blocks, metrics, fordyca);
+NS_END(perception, metrics, fordyca);
