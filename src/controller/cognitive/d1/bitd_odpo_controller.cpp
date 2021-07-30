@@ -29,8 +29,8 @@
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 
-#include "fordyca/controller/cognitive/dpo_perception_subsystem.hpp"
-#include "fordyca/controller/cognitive/oracular_info_receptor.hpp"
+#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/oracular_info_receptor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,7 +55,7 @@ void bitd_odpo_controller::control_step(void) {
             block()->id().v(),
             block()->md()->robot_id().v());
 
-  dpo_perception()->update(m_receptor.get());
+  perception()->update(m_receptor.get());
 
   /*
    * Execute the current task/allocate a new task/abort a task/etc and apply
@@ -68,7 +68,7 @@ void bitd_odpo_controller::control_step(void) {
 } /* control_step() */
 
 void bitd_odpo_controller::oracle_init(
-    std::unique_ptr<oracular_info_receptor> receptor) {
+    std::unique_ptr<fsperception::oracular_info_receptor> receptor) {
   m_receptor = std::move(receptor);
   if (m_receptor->tasking_enabled()) {
     m_receptor->tasking_hooks_register(executive());

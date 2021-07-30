@@ -38,7 +38,8 @@
 #include "fordyca/controller/cognitive/d0/mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d0/odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d0/omdpo_controller.hpp"
-#include "fordyca/controller/cognitive/foraging_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/reactive/d0/crw_controller.hpp"
 #include "fordyca/fsm/d0/crw_fsm.hpp"
 #include "fordyca/fsm/d0/dpo_fsm.hpp"
@@ -94,8 +95,8 @@ d0_metrics_manager::d0_metrics_manager(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-template <class T>
-void d0_metrics_manager::collect_from_controller(const T* const controller) {
+template <class TController>
+void d0_metrics_manager::collect_from_controller(const TController* const controller) {
   fordyca_metrics_manager::collect_from_controller(controller);
 
   /*
@@ -120,7 +121,7 @@ void d0_metrics_manager::collect_from_controller(const T* const controller) {
                const auto& m =
                    dynamic_cast<const csmetrics::goal_acq_metrics&>(metrics);
                return fsm::foraging_acq_goal::ekBLOCK == m.acquisition_goal() &&
-                      m.goal_acquired();
+                   m.goal_acquired();
              });
 
   /*
@@ -141,25 +142,17 @@ void d0_metrics_manager::collect_from_controller(const T* const controller) {
                    dynamic_cast<const csmetrics::goal_acq_metrics&>(metrics);
                return m.is_vectoring_to_goal();
              });
-  /*
-   * Only controllers with MDPO perception provide these.
-   */
-  const auto* mdpo =
-      dynamic_cast<const metrics::perception::mdpo_metrics*>(
-          controller->perception());
-  if (nullptr != mdpo) {
-    collect("perception::mdpo", *mdpo);
-  }
-  /*
-   * Only controllers with DPO perception provide these.
-   */
-  const auto* dpo =
-      dynamic_cast<const metrics::perception::dpo_metrics*>(
-          controller->perception());
-  if (nullptr != dpo) {
-    collect("perception::dpo", *dpo);
-  }
+  collect_from_cognitive_controller(controller);
 } /* collect_from_controller() */
+
+template<class TController,
+         typename U,
+         RCPPSW_SFINAE_DEF(std::is_base_of<fccognitive::cognitive_controller,
+                           U>::value)>
+void d0_metrics_manager::collect_from_cognitive_controller(const TController* controller)  {
+  collect("perception::dpo", *controller->perception());
+  collect("perception::mdpo", *controller->perception());
+} /* collect_from_cognitive_controller() */
 
 /*******************************************************************************
  * Template Instantiations

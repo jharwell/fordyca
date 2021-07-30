@@ -36,8 +36,8 @@
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
-#include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
-#include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
 #include "fordyca/tasks/d1/foraging_task.hpp"
@@ -48,7 +48,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events, detail);
-using ds::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -103,8 +102,8 @@ bool robot_cache_block_drop::dispatch_d2_cache_interactor(
 /*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
-void robot_cache_block_drop::visit(ds::dpo_semantic_map& map) {
-  visit(map.access<occupancy_grid::kCell>(x(), y()));
+void robot_cache_block_drop::visit(fspds::dpo_semantic_map& map) {
+  visit(map.access<fspds::occupancy_grid::kCell>(x(), y()));
 } /* visit() */
 
 void robot_cache_block_drop::visit(cds::cell2D& cell) {
@@ -142,7 +141,7 @@ void robot_cache_block_drop::visit(
     controller::cognitive::d1::bitd_mdpo_controller& controller) {
   controller.ndc_pusht();
 
-  visit(*controller.mdpo_perception()->map());
+  visit(*controller.perception()->model<fspds::dpo_semantic_map>());
   dispatch_d1_cache_interactor(controller.current_task());
 
   ER_INFO(
@@ -173,7 +172,7 @@ void robot_cache_block_drop::visit(
     controller::cognitive::d1::bitd_omdpo_controller& controller) {
   controller.ndc_pusht();
 
-  visit(*controller.mdpo_perception()->map());
+  visit(*controller.perception()->model<fspds::dpo_semantic_map>());
   dispatch_d1_cache_interactor(controller.current_task());
 
   ER_INFO(
@@ -222,7 +221,7 @@ void robot_cache_block_drop::visit(
                                    controller.cache_sel_matrix())) {
     controller.csel_exception_added(true);
   }
-  visit(*controller.mdpo_perception()->map());
+  visit(*controller.perception()->model<fspds::dpo_semantic_map>());
   ER_INFO(
       "Dropped block%d in cache%d,task='%s'",
       m_block->id().v(),
@@ -257,7 +256,7 @@ void robot_cache_block_drop::visit(
                                    controller.cache_sel_matrix())) {
     controller.csel_exception_added(true);
   }
-  visit(*controller.mdpo_perception()->map());
+  visit(*controller.perception()->model<fspds::dpo_semantic_map>());
   ER_INFO(
       "Dropped block%d in cache%d,task='%s'",
       m_block->id().v(),

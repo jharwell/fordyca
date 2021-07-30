@@ -24,12 +24,14 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <nlopt.hpp>
+
 #include "cosm/spatial/fsm/acquire_goal_fsm.hpp"
-#include "fordyca/fordyca.hpp"
 #include "cosm/subsystem/subsystem_fwd.hpp"
+
 #include "fordyca/fsm/fsm_ro_params.hpp"
 #include "fordyca/metrics/caches/site_selection_metrics.hpp"
-#include <nlopt.hpp>
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,7 +39,6 @@
 NS_START(fordyca);
 
 namespace controller::cognitive { class cache_sel_matrix; }
-namespace ds { class dpo_store; }
 
 NS_START(fsm, d2);
 
@@ -87,11 +88,12 @@ class acquire_cache_site_fsm : public rer::client<acquire_cache_site_fsm>,
   bool site_acquired_cb(bool explore_result) const RCPPSW_CONST;
 
   /* clang-format off */
-  bool                                                 m_sel_success{false};
-  bool                                                 m_sel_exec{false};
-  nlopt::result                                        m_nlopt_res{};
-  const controller::cognitive::cache_sel_matrix* const mc_matrix;
-  const ds::dpo_store*      const                      mc_store;
+  const controller::cognitive::cache_sel_matrix* mc_matrix;
+  const fsperception::known_objects_accessor*    mc_accessor;
+
+  bool                                           m_sel_success{false};
+  bool                                           m_sel_exec{false};
+  nlopt::result                                  m_nlopt_res{};
   /* clang-format on */
 };
 

@@ -32,6 +32,27 @@
 NS_START(fordyca, strategy, explore);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+ledtaxis_cache_search::ledtaxis_cache_search(
+    const foraging_strategy::params* const c_params,
+    rmath::rng* rng)
+    : ledtaxis_cache_search(c_params->saa,
+                            c_params->accessor,
+                            c_params->ledtaxis_target,
+                            rng) {}
+ledtaxis_cache_search::ledtaxis_cache_search(
+    csubsystem::saa_subsystemQ3D* saa,
+    const fsperception::known_objects_accessor* accessor,
+    const rutils::color& ledtaxis_target,
+    rmath::rng* rng)
+    : foraging_strategy(saa, accessor, rng),
+      ER_CLIENT_INIT("fordyca.fsm.strategy.ledtaxis_cache_search"),
+      m_crw(saa, accessor, rng),
+      m_taxis(saa, accessor, ledtaxis_target, rng) {}
+
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void ledtaxis_cache_search::task_execute(void) {

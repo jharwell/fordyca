@@ -64,8 +64,13 @@ void crw_controller::init(ticpp::Element& node) {
     std::exit(EXIT_FAILURE);
   }
 
-  fstrategy::foraging_strategy::params p(
-      saa(), nullptr, nullptr, nullptr, rutils::color());
+  fstrategy::foraging_strategy::params p{
+    saa(),
+        nullptr,
+        nullptr,
+        nullptr,
+        rutils::color()
+        };
   const auto* nest = repo.config_get<crepr::config::nest_config>();
   const auto* strat_config = repo.config_get<fcstrategy::strategy_config>();
 

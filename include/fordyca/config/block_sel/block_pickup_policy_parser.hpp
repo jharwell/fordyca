@@ -53,7 +53,7 @@ class block_pickup_policy_parser : public rconfig::xml::xml_config_parser {
    * \brief The root tag that all block sel matrix parameters should lie
    * under in the XML tree.
    */
-  inline static const std::string kXMLRoot = "block_pickup_policy";
+  static inline const std::string kXMLRoot = "block_pickup_policy";
 
   void parse(const ticpp::Element& node) override;
 

@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_DPO_PERCEPTION_SUBSYSTEM_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_DPO_PERCEPTION_SUBSYSTEM_HPP_
+#ifndef INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DPO_PERCEPTION_SUBSYSTEM_HPP_
+#define INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DPO_PERCEPTION_SUBSYSTEM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -31,25 +31,22 @@
 
 #include "cosm/ds/entity_vector.hpp"
 
-#include "fordyca/controller/cognitive/foraging_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/foraging_perception_subsystem.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/metrics/perception/dpo_metrics.hpp"
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace fordyca::ds {
-class dpo_store;
-}
-
-NS_START(fordyca, controller, cognitive);
+NS_START(fordyca, subsystem, perception);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * \class dpo_perception_subsystem
- * \ingroup controller cognitive
+ * \ingroup subsystem perception
  *
  * \brief Translates the sensor readings of the robot (i.e. \ref forager_los),
  * into a useful internal repr: a \ref dpo_store.
@@ -63,24 +60,19 @@ class dpo_perception_subsystem final
   ~dpo_perception_subsystem(void) override;
 
   /* DPO perception metrics */
-  uint n_known_blocks(void) const override RCPPSW_PURE;
-  uint n_known_caches(void) const override RCPPSW_PURE;
+  size_t n_known_blocks(void) const override RCPPSW_PURE;
+  size_t n_known_caches(void) const override RCPPSW_PURE;
   crepr::pheromone_density avg_block_density(void) const override;
   crepr::pheromone_density avg_cache_density(void) const override;
 
-  /**
-   * \brief Update the robot's perception of the environment, passing it its
-   * current line of sight.
-   */
+  /* foraging_perception_subsystem overrides */
+  const known_objects_accessor* known_objects(void) const override;
   void update(oracular_info_receptor* receptor) override;
 
   /**
    * \brief Reset the robot's perception of the environment to an initial state
    */
   void reset(void) override;
-
-  const ds::dpo_store* dpo_store(void) const override { return m_store.get(); }
-  ds::dpo_store* dpo_store(void) override { return m_store.get(); }
 
  private:
   /*
@@ -101,11 +93,10 @@ class dpo_perception_subsystem final
   void los_tracking_sync(const repr::forager_los* c_los,
                          const cds::block3D_vectorno& los_blocks);
 
-  /* clang-format off */
-  std::unique_ptr<ds::dpo_store> m_store;
-  /* clang-format on */
+  const ds::dpo_store* store(void) const;
+  ds::dpo_store* store(void);
 };
 
 NS_END(cognitive, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_DPO_PERCEPTION_SUBSYSTEM_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DPO_PERCEPTION_SUBSYSTEM_HPP_ */

@@ -44,19 +44,32 @@ mdpo_metrics_collector::mdpo_metrics_collector(
  ******************************************************************************/
 void mdpo_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
-  const auto& m = dynamic_cast<const mdpo_metrics&>(metrics);
+
+  const auto* m = dynamic_cast<const mdpo_metrics*>(&metrics);
+
+  /*
+   * This can happen because we are trying to collect different types of
+   * metrics from the perception subsystem, which can be of a number of
+   * types. Only one of those types implements these metrics, so we have to
+   * test here. This isn't any less efficient, because we had to cast to
+   * convert anyway.
+   */
+  if (nullptr == m) {
+    return;
+  }
+
   m_data.interval.states[cfsm::cell2D_state::ekST_EMPTY] +=
-      m.cell_state_inaccuracies(cfsm::cell2D_state::ekST_EMPTY);
+      m->cell_state_inaccuracies(cfsm::cell2D_state::ekST_EMPTY);
   m_data.interval.states[cfsm::cell2D_state::ekST_HAS_BLOCK] +=
-      m.cell_state_inaccuracies(cfsm::cell2D_state::ekST_HAS_BLOCK);
+      m->cell_state_inaccuracies(cfsm::cell2D_state::ekST_HAS_BLOCK);
   m_data.interval.states[cfsm::cell2D_state::ekST_HAS_CACHE] +=
-      m.cell_state_inaccuracies(cfsm::cell2D_state::ekST_HAS_CACHE);
+      m->cell_state_inaccuracies(cfsm::cell2D_state::ekST_HAS_CACHE);
   m_data.cum.states[cfsm::cell2D_state::ekST_EMPTY] +=
-      m.cell_state_inaccuracies(cfsm::cell2D_state::ekST_EMPTY);
+      m->cell_state_inaccuracies(cfsm::cell2D_state::ekST_EMPTY);
   m_data.cum.states[cfsm::cell2D_state::ekST_HAS_BLOCK] +=
-      m.cell_state_inaccuracies(cfsm::cell2D_state::ekST_HAS_BLOCK);
+      m->cell_state_inaccuracies(cfsm::cell2D_state::ekST_HAS_BLOCK);
   m_data.cum.states[cfsm::cell2D_state::ekST_HAS_CACHE] +=
-      m.cell_state_inaccuracies(cfsm::cell2D_state::ekST_HAS_CACHE);
+      m->cell_state_inaccuracies(cfsm::cell2D_state::ekST_HAS_CACHE);
 
   auto int_known_percent = m_data.interval.known_percent.load();
   auto int_unknown_percent = m_data.interval.unknown_percent.load();
@@ -64,13 +77,13 @@ void mdpo_metrics_collector::collect(
   auto cum_unknown_percent = m_data.cum.unknown_percent.load();
 
   m_data.interval.known_percent.compare_exchange_strong(
-      int_known_percent, int_known_percent + m.known_percentage());
+      int_known_percent, int_known_percent + m->known_percentage());
   m_data.interval.unknown_percent.compare_exchange_strong(
-      int_unknown_percent, int_unknown_percent + m.unknown_percentage());
+      int_unknown_percent, int_unknown_percent + m->unknown_percentage());
   m_data.cum.known_percent.compare_exchange_strong(
-      cum_known_percent, cum_known_percent + m.known_percentage());
+      cum_known_percent, cum_known_percent + m->known_percentage());
   m_data.cum.unknown_percent.compare_exchange_strong(
-      cum_unknown_percent, cum_unknown_percent + m.unknown_percentage());
+      cum_unknown_percent, cum_unknown_percent + m->unknown_percentage());
   ++m_data.interval.robots;
   ++m_data.cum.robots;
 } /* collect() */

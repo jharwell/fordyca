@@ -28,7 +28,8 @@
 
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/controller/cognitive/d2/new_cache_selector.hpp"
-#include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 
@@ -85,7 +86,7 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
  * General Member Functions
  ******************************************************************************/
 bool acquire_new_cache_fsm::candidates_exist(void) const {
-  return !mc_store->blocks().empty();
+  return !mc_store->known_blocks().empty();
 } /* candidates_exsti() */
 
 boost::optional<csfsm::acquire_goal_fsm::candidate_type>
@@ -94,7 +95,9 @@ acquire_new_cache_fsm::cache_select(void) {
 
   /* A "new" cache is the same as a single block  */
   if (const auto* best =
-          selector(mc_store->blocks(), mc_store->caches(), sensing()->rpos2D())) {
+          selector(mc_store->tracked_blocks(),
+                   mc_store->tracked_caches(),
+                   sensing()->rpos2D())) {
     ER_INFO("Select new cache%d@%s/%s for acquisition",
             best->id().v(),
             rcppsw::to_string(best->ranchor2D()).c_str(),
@@ -116,8 +119,8 @@ acquire_new_cache_fsm::cache_select(void) {
 bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
   ER_ASSERT(!explore_result, "New cache acquisition via exploration?");
   rmath::vector2d position = saa()->sensing()->rpos2D();
-  for (const auto& b : mc_store->blocks().const_values_range()) {
-    if ((b.ent()->rcenter2D() - position).length() <= kNEW_CACHE_ARRIVAL_TOL) {
+  for (const auto& b : mc_store->known_blocks()) {
+    if ((b->rcenter2D() - position).length() <= kNEW_CACHE_ARRIVAL_TOL) {
       return true;
     }
   } /* for(&b..) */

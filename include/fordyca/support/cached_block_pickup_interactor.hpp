@@ -33,7 +33,7 @@
 #include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/ta/polled_task.hpp"
 
-#include "fordyca/ds/dpo_store.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/events/robot_cached_block_pickup.hpp"
@@ -158,7 +158,7 @@ class cached_block_pickup_interactor
       events::cache_vanished_visitor vanished_op(p.id());
       vanished_op.visit(controller);
     } else {
-      fsm::cache_acq_validator v(&controller.perception()->dpo_store()->caches(),
+      fsm::cache_acq_validator v(controller.perception()->known_objects()->known_caches(),
                                  controller.cache_sel_matrix(),
                                  true);
       /*

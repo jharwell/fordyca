@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_DS_OCCUPANCY_GRID_HPP_
-#define INCLUDE_FORDYCA_DS_OCCUPANCY_GRID_HPP_
+#ifndef INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DS_OCCUPANCY_GRID_HPP_
+#define INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DS_OCCUPANCY_GRID_HPP_
 
 /*******************************************************************************
  * Includes
@@ -32,12 +32,12 @@
 
 #include "cosm/ds/cell2D.hpp"
 #include "cosm/repr/pheromone_density.hpp"
-#include "cosm/subsystem/perception/config/perception_config.hpp"
+#include "cosm/subsystem/perception/config/mdpo_config.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, ds);
+NS_START(fordyca, subsystem, perception, ds);
 
 /**
  * \brief The types of layers used by \ref occupancy_grid (i.e. a heterogeneous
@@ -50,7 +50,7 @@ using robot_layer_stack = std::tuple<crepr::pheromone_density, cds::cell2D>;
  ******************************************************************************/
 /**
  * \class occupancy_grid
- * \ingroup ds
+ * \ingroup subsystem perception ds
  *
  * \brief Multilayered grid of cells and associated information
  * density/relevance on the state of those cells. Used by robots in making
@@ -62,15 +62,14 @@ class occupancy_grid : public rer::client<occupancy_grid>,
   /**
    * \brief The index of the \ref crepr::pheromone_density layer.
    */
-  static constexpr uint kPheromone = 0;
+  static constexpr size_t kPheromone = 0;
 
   /**
    * \brief The index of the \ref cell2D layer.
    */
-  static constexpr uint kCell = 1;
+  static constexpr size_t kCell = 1;
 
-  occupancy_grid(const cspconfig::perception_config* c_config,
-                 const std::string& robot_id);
+  explicit occupancy_grid(const cspconfig::mdpo_config* c_config);
 
   /**
    * \brief Update the density of all cells in the grid.
@@ -84,7 +83,7 @@ class occupancy_grid : public rer::client<occupancy_grid>,
 
   bool pheromone_repeat_deposit(void) const { return m_pheromone_repeat_deposit; }
 
-  uint known_cell_count(void) const { return m_known_cell_count; }
+  size_t known_cell_count(void) const { return m_known_cell_count; }
   void known_cells_inc(void) { ++m_known_cell_count; }
   void known_cells_dec(void) { --m_known_cell_count; }
 
@@ -94,7 +93,7 @@ class occupancy_grid : public rer::client<occupancy_grid>,
    * pheromone density, and possibly reseting the cell to be empty if its
    * density gets very close to 0.
    */
-  void cell_state_update(uint i, uint j);
+  void cell_state_update(size_t i, size_t j);
 
   /**
    * \brief Initialize a cell in the occupancy grid, which sets the rate of
@@ -103,7 +102,7 @@ class occupancy_grid : public rer::client<occupancy_grid>,
    * support non zero parameter constructors, and we do *NOT* want to use
    * pointers to cells, because that kills our memory performance.
    */
-  void cell_init(uint i, uint j, double pheromone_rho);
+  void cell_init(size_t i, size_t j, double pheromone_rho);
 
   /* clang-format off */
   /**
@@ -114,12 +113,11 @@ class occupancy_grid : public rer::client<occupancy_grid>,
 
   static constexpr double             kEPSILON{0.0001};
 
-  uint                                m_known_cell_count{0};
+  size_t                              m_known_cell_count{0};
   bool                                m_pheromone_repeat_deposit;
-  std::string                         m_robot_id;
   /* clang-format on */
 };
 
-NS_END(ds, fordyca);
+NS_END(ds, perception, subsystem, fordyca);
 
-#endif /* INCLUDE_FORDYCA_DS_OCCUPANCY_GRID_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DS~_OCCUPANCY_GRID_HPP_ */

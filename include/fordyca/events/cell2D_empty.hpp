@@ -30,14 +30,13 @@
 #include "cosm/ds/operations/cell2D_empty.hpp"
 
 #include "fordyca/fordyca.hpp"
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 namespace fordyca::ds {
 class arena_map;
-class occupancy_grid;
-class dpo_semantic_map;
 } /* namespace fordyca::ds */
 
 NS_START(fordyca, events, detail);
@@ -62,7 +61,9 @@ class cell2D_empty : public cdops::cell2D_empty,
   struct visit_typelist_impl {
     using inherited = cell2D_empty::visit_typelist;
     using others =
-        rmpl::typelist<ds::arena_map, ds::occupancy_grid, ds::dpo_semantic_map>;
+        rmpl::typelist<ds::arena_map,
+                       fspds::occupancy_grid,
+                       fspds::dpo_semantic_map>;
     using value = boost::mpl::joint_view<inherited::type, others::type>;
   };
 
@@ -77,8 +78,8 @@ class cell2D_empty : public cdops::cell2D_empty,
       : cdops::cell2D_empty(coord),
         ER_CLIENT_INIT("fordyca.events.cell2D_empty") {}
 
-  void visit(ds::occupancy_grid& grid);
-  void visit(ds::dpo_semantic_map& map);
+  void visit(fspds::occupancy_grid& grid);
+  void visit(fspds::dpo_semantic_map& map);
 };
 
 NS_END(detail);

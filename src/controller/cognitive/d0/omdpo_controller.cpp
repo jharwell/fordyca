@@ -27,8 +27,8 @@
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
-#include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
-#include "fordyca/controller/cognitive/oracular_info_receptor.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/oracular_info_receptor.hpp"
 #include "fordyca/fsm/d0/dpo_fsm.hpp"
 
 /*******************************************************************************
@@ -54,14 +54,14 @@ void omdpo_controller::control_step(void) {
             block()->id().v(),
             block()->md()->robot_id().v());
 
-  mdpo_perception()->update(m_receptor.get());
+  perception()->update(m_receptor.get());
   fsm()->run();
   saa()->steer_force2D_apply();
   ndc_pop();
 } /* control_step() */
 
 void omdpo_controller::oracle_init(
-    std::unique_ptr<oracular_info_receptor> receptor) {
+    std::unique_ptr<fsperception::oracular_info_receptor> receptor) {
   m_receptor = std::move(receptor);
 } /* oracle_init() */
 

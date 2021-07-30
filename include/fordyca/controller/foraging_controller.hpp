@@ -44,10 +44,6 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace fordyca::controller::cognitive {
-class foraging_perception_subsystem;
-} // namespace fordyca::controller::cognitive
-
 namespace cosm::subsystem::config {
 struct actuation_subsystem2D_config;
 struct sensing_subsystemQ3D_config;
@@ -119,22 +115,6 @@ class foraging_controller
   ts_distance(const csmetrics::movement_category& category) const override;
   rmath::vector3d
   ts_velocity(const csmetrics::movement_category& category) const override;
-
-  /**
-   * \brief By default controllers have no perception subsystem, and are
-   * basically blind centipedes.
-   */
-  virtual const cognitive::foraging_perception_subsystem* perception(void) const {
-    return nullptr;
-  }
-
-  /**
-   * \brief By default controllers have no perception subsystem, and are
-   * basically blind centipedes.
-   */
-  virtual cognitive::foraging_perception_subsystem* perception(void) {
-    return nullptr;
-  }
 
   /**
    * \brief If \c TRUE, the robot is currently at least most of the way in the

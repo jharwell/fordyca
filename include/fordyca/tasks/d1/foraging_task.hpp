@@ -54,8 +54,8 @@ NS_START(fordyca, tasks, d1);
 class foraging_task : public base_foraging_task,
                       public cta::polled_task {
  public:
-  inline static const std::string kCollectorName = "Collector";
-  inline static const std::string kHarvesterName = "Harvester";
+  static inline const std::string kCollectorName = "Collector";
+  static inline const std::string kHarvesterName = "Harvester";
 
   foraging_task(const std::string& name,
                 const struct cta::config::task_alloc_config *config,

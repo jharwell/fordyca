@@ -39,7 +39,7 @@
 #include "fordyca/controller/cognitive/d0/mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d0/odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d0/omdpo_controller.hpp"
-#include "fordyca/controller/cognitive/foraging_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/foraging_perception_subsystem.hpp"
 #include "fordyca/controller/reactive/d0/crw_controller.hpp"
 #include "fordyca/repr/forager_los.hpp"
 #include "fordyca/support/d0/d0_metrics_manager.hpp"

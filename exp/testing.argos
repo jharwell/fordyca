@@ -17,7 +17,7 @@
   <!-- *************** -->
   <controllers>
 
-    <crw_controller id="fbc"
+    <dpo_controller id="fbc"
                           library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -44,11 +44,14 @@
             output_leaf="__current_date__"
             />
         <perception
+            model="dpo"
             los_dim="0.4">
-          <grid2D resolution="0.2"
-                dims="12, 6, 2"/>
-          <pheromone rho="0.00001"
-                     repeat_deposit="false"/>
+          <dpo>
+            <grid2D resolution="0.2"
+                    dims="12, 6, 2"/>
+            <pheromone rho="0.00001"
+                       repeat_deposit="false"/>
+          </dpo>
         </perception>
         <task_executive
             update_exec_ests="true"
@@ -194,7 +197,7 @@
                       max_speed="10.0" />
         </actuation_subsystem2D>
       </params>
-    </crw_controller>
+    </dpo_controller>
 
   </controllers>
 
@@ -219,6 +222,7 @@
                 cache_acq_counts="cache-acq-counts"
                 cache_utilization="cache-utilization"
                 cache_lifecycle="cache-lifecycle"
+                perception_dpo="perception-dpo"
                 fsm_interference_counts="fsm-interference-counts"
                 cache_site_selection="cache-site-selection"
                 task_execution_generalist="task-execution-generalist"
@@ -404,7 +408,7 @@
       <position method="uniform" min="1,1,0" max="10,10,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
       
-      <entity quantity="16" max_trials="1000">
+      <entity quantity="1" max_trials="1000">
         <foot-bot id="fb" omnidirectional_camera_aperture="89">
           <controller config="fbc" />
           <!-- <battery model= "time_motion"/> -->

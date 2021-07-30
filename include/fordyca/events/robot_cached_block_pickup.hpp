@@ -37,6 +37,7 @@
 #include "fordyca/events/block_pickup_base_visit_set.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -100,8 +101,8 @@ class robot_cached_block_pickup : public rer::client<robot_cached_block_pickup>,
 
   void visit(cds::cell2D& cell);
   void visit(cfsm::cell2D_fsm& fsm);
-  void visit(ds::dpo_semantic_map& map);
-  void visit(ds::dpo_store& store);
+  void visit(fspds::dpo_semantic_map& map);
+  void visit(fspds::dpo_store& store);
   void visit(crepr::base_block3D& block);
   void visit(tasks::d1::collector& task);
   void visit(fsm::block_to_goal_fsm& fsm);

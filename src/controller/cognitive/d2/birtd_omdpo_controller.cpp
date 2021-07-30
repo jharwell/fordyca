@@ -29,8 +29,8 @@
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 
-#include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
-#include "fordyca/controller/cognitive/oracular_info_receptor.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/oracular_info_receptor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -54,7 +54,7 @@ void birtd_omdpo_controller::control_step(void) {
             "Carried block%d has robot id=%d",
             block()->id().v(),
             block()->md()->robot_id().v());
-  mdpo_perception()->update(m_receptor.get());
+  perception()->update(m_receptor.get());
 
   /*
    * Execute the current task/allocate a new task/abort a task/etc and apply
@@ -67,7 +67,7 @@ void birtd_omdpo_controller::control_step(void) {
 } /* control_step() */
 
 void birtd_omdpo_controller::oracle_init(
-    std::unique_ptr<oracular_info_receptor> receptor) {
+    std::unique_ptr<fsperception::oracular_info_receptor> receptor) {
   m_receptor = std::move(receptor);
 } /* oracle_init() */
 

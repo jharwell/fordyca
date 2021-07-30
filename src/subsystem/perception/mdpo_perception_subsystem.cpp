@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 
 #include <algorithm>
 
@@ -30,9 +30,9 @@
 #include "cosm/fsm/cell2D_state.hpp"
 #include "cosm/repr/base_block3D.hpp"
 
-#include "fordyca/controller/cognitive/los_proc_verify.hpp"
-#include "fordyca/controller/cognitive/oracular_info_receptor.hpp"
-#include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/los_proc_verify.hpp"
+#include "fordyca/subsystem/perception/oracular_info_receptor.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/cell2D_empty.hpp"
@@ -40,20 +40,21 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller, cognitive);
+NS_START(fordyca, subsystem, perception);
 using ds::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 mdpo_perception_subsystem::mdpo_perception_subsystem(
-    const cspconfig::perception_config* const config,
-    const std::string& id)
-    : ER_CLIENT_INIT("fordyca.controller.mdpo_perception"),
-      foraging_perception_subsystem(config),
+    const cspconfig::perception_config* const config)
+    : ER_CLIENT_INIT("fordyca.subsystem.perception.mdpo"),
+      foraging_perception_subsystem(config,
+                                    std::make_unique<ds::dpo_semantic_map>(&config->mdpo)),
       m_cell_stats(cfsm::cell2D_state::ekST_MAX_STATES),
-      m_los(),
-      m_map(std::make_unique<ds::dpo_semantic_map>(config, id)) {}
+      m_los() {}
+
+mdpo_perception_subsystem::~mdpo_perception_subsystem(void) = default;
 
 /*******************************************************************************
  * Member Functions
@@ -62,10 +63,10 @@ void mdpo_perception_subsystem::update(oracular_info_receptor* const receptor) {
   update_cell_stats(los());
   process_los(los(), receptor);
   ER_ASSERT(los_proc_verify(los())(map()), "LOS verification failed");
-  m_map->decay_all();
+  map()->decay_all();
 } /* update() */
 
-void mdpo_perception_subsystem::reset(void) { m_map->reset(); }
+void mdpo_perception_subsystem::reset(void) { map()->reset(); }
 
 void mdpo_perception_subsystem::process_los(
     const repr::forager_los* const c_los,
@@ -78,7 +79,7 @@ void mdpo_perception_subsystem::process_los(
 
   /* If we are in an oracular controller, process the updates from the oracle */
   if (nullptr != receptor) {
-    receptor->dpo_store_update(dpo_store());
+    receptor->dpo_store_update(map()->store());
   }
 
   /*
@@ -114,7 +115,7 @@ void mdpo_perception_subsystem::process_los_blocks(
 
     ER_DEBUG("Blocks in LOS: [%s]", accum.c_str());
     ER_DEBUG("Blocks in DPO store: [%s]",
-             rcppsw::to_string(m_map->store()->blocks()).c_str());
+             rcppsw::to_string(map()->store()->known_blocks()).c_str());
   }
 
   /*
@@ -128,23 +129,23 @@ void mdpo_perception_subsystem::process_los_blocks(
     for (uint j = 0; j < c_los->ysize(); ++j) {
       rmath::vector2z d = c_los->access(i, j).loc();
       if (!c_los->access(i, j).state_has_block() &&
-          m_map->access<occupancy_grid::kCell>(d).state_has_block()) {
+          map()->access<occupancy_grid::kCell>(d).state_has_block()) {
         auto* los_entity = c_los->access(i, j).entity();
         ER_ASSERT(crepr::entity_dimensionality::ek3D ==
                       los_entity->dimensionality(),
                   "LOS block%d is not 3D!",
                   los_entity->id().v());
-        auto* map_block = m_map->access<occupancy_grid::kCell>(d).block3D();
+        auto* map_block = map()->access<occupancy_grid::kCell>(d).block3D();
         ER_DEBUG("Correct block%d %s/%s discrepency",
                  map_block->id().v(),
                  map_block->ranchor2D().to_str().c_str(),
                  map_block->danchor2D().to_str().c_str());
-        m_map->block_remove(map_block);
+        map()->block_remove(map_block);
       } else if (c_los->access(i, j).state_is_known() &&
-                 !m_map->access<occupancy_grid::kCell>(d).state_is_known()) {
+                 !map()->access<occupancy_grid::kCell>(d).state_is_known()) {
         ER_TRACE("Cell@%s now known to be empty", d.to_str().c_str());
         events::cell2D_empty_visitor e(d);
-        e.visit(*m_map);
+        e.visit(*map());
       }
     } /* for(j..) */
   } /* for(i..) */
@@ -153,7 +154,7 @@ void mdpo_perception_subsystem::process_los_blocks(
     ER_ASSERT(!block->is_out_of_sight(),
               "Block%d out of sight in LOS?",
               block->id().v());
-    auto& cell = m_map->access<occupancy_grid::kCell>(block->danchor2D());
+    auto& cell = map()->access<occupancy_grid::kCell>(block->danchor2D());
     if (!cell.state_has_block()) {
       ER_INFO("Discovered block%d@%s/%s",
               block->id().v(),
@@ -164,14 +165,14 @@ void mdpo_perception_subsystem::process_los_blocks(
                block->id().v(),
                block->ranchor2D().to_str().c_str(),
                block->danchor2D().to_str().c_str());
-      auto range = m_map->blocks().const_values_range();
+      auto range = map()->known_blocks();
       auto it = std::find_if(range.begin(), range.end(), [&](const auto& b1) {
-        return b1.ent()->id() == cell.block3D()->id();
+        return b1->id() == cell.block3D()->id();
       });
       ER_ASSERT(it != range.end(), "Known block%d not in PAM", block->id().v());
     }
     events::block_found_visitor op(block);
-    op.visit(*m_map);
+    op.visit(*map());
   } /* for(block..) */
 } /* process_los_blocks() */
 
@@ -186,7 +187,7 @@ void mdpo_perception_subsystem::process_los_caches(
   if (!los_caches.empty()) {
     ER_DEBUG("Caches in LOS: [%s]", rcppsw::to_string(los_caches).c_str());
     ER_DEBUG("Caches in DPO store: [%s]",
-             rcppsw::to_string(m_map->store()->caches()).c_str());
+             rcppsw::to_string(map()->store()->known_caches()).c_str());
   }
 
   /*
@@ -239,7 +240,7 @@ void mdpo_perception_subsystem::process_los_caches(
               cell.cache()->n_blocks());
     }
     events::cache_found_visitor op(cache);
-    op.visit(*m_map);
+    op.visit(*map());
   } /* for(cache..) */
 } /* process_los_caches() */
 
@@ -249,36 +250,40 @@ void mdpo_perception_subsystem::update_cell_stats(
     for (uint j = 0; j < c_los->ysize(); ++j) {
       rmath::vector2z d = c_los->access(i, j).loc();
       if (c_los->access(i, j).state_is_empty() &&
-          m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
-          !m_map->access<occupancy_grid::kCell>(d).state_is_empty()) {
+          map()->access<occupancy_grid::kCell>(d).state_is_known() &&
+          !map()->access<occupancy_grid::kCell>(d).state_is_empty()) {
         m_cell_stats[cfsm::cell2D_state::ekST_EMPTY]++;
       } else if (c_los->access(i, j).state_has_block() &&
-                 m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
-                 !m_map->access<occupancy_grid::kCell>(d).state_has_block()) {
+                 map()->access<occupancy_grid::kCell>(d).state_is_known() &&
+                 !map()->access<occupancy_grid::kCell>(d).state_has_block()) {
         m_cell_stats[cfsm::cell2D_state::ekST_HAS_BLOCK]++;
       } else if (c_los->access(i, j).state_has_cache() &&
-                 m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
-                 !m_map->access<occupancy_grid::kCell>(d).state_has_cache()) {
+                 map()->access<occupancy_grid::kCell>(d).state_is_known() &&
+                 !map()->access<occupancy_grid::kCell>(d).state_has_cache()) {
         m_cell_stats[cfsm::cell2D_state::ekST_HAS_CACHE]++;
       }
     } /* for(j..) */
   } /* for(i..) */
 } /* update_cell_stats() */
 
-ds::dpo_store* mdpo_perception_subsystem::dpo_store(void) {
-  return m_map->store();
-} /* dpo_store() */
+const known_objects_accessor* mdpo_perception_subsystem::known_objects(void) const {
+  return map()->store()->known_objects();
+}
 
-const ds::dpo_store* mdpo_perception_subsystem::dpo_store(void) const {
-  return m_map->store();
-} /* dpo_store() */
+const ds::dpo_semantic_map* mdpo_perception_subsystem::map(void) const  {
+  return model<const ds::dpo_semantic_map>();
+}
+
+ds::dpo_semantic_map* mdpo_perception_subsystem::map(void)  {
+  return model<ds::dpo_semantic_map>();
+}
 
 /*******************************************************************************
  * MDPO Perception Metrics
  ******************************************************************************/
 double mdpo_perception_subsystem::known_percentage(void) const {
-  return m_map->known_cell_count() /
-         static_cast<double>(m_map->xdsize() * m_map->ydsize());
+  return map()->known_cell_count() /
+         static_cast<double>(map()->xdsize() * map()->ydsize());
 } /* known_percentage() */
 
 double mdpo_perception_subsystem::unknown_percentage(void) const {
@@ -289,4 +294,4 @@ void mdpo_perception_subsystem::reset_metrics(void) {
   m_cell_stats.assign(m_cell_stats.size(), 0);
 } /* reset_metrics() */
 
-NS_END(cognitive, controller, fordyca);
+NS_END(perception, subsystem, fordyca);

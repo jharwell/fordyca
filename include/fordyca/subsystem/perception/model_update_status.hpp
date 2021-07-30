@@ -1,7 +1,7 @@
 /**
- * \file dp_block_map.hpp
+ * \file model_update_status.hpp
  *
- * \copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2021 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,50 +18,63 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_DS_DP_BLOCK_MAP_HPP_
-#define INCLUDE_FORDYCA_DS_DP_BLOCK_MAP_HPP_
+#ifndef INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_MODEL_UPDATE_STATUS_HPP_
+#define INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_MODEL_UPDATE_STATUS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-
-#include "rcppsw/types/type_uuid.hpp"
-
-#include "cosm/repr/base_block3D.hpp"
-
-#include "fordyca/ds/dpo_map.hpp"
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, ds);
+NS_START(fordyca, subsystem, perception);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class dp_block_map
- * \ingroup ds
+ * \enum model_update_status
+ * \ingroup subsystem perception
  *
- * \brief The block map is a repr of the robot's perception of blocks
- * in the arena. It uses integers as keys, because blocks are mobile (i.e. can
- * move between instants of time where the robot sees them), and
- * inserting/removing blocks from the map using location comparison will not
- * give correct results.
+ * \brief Communicates the nature of an update made to a \ref
+ * foraging_perception_model derived class as a result of processing a seen
+ * block/cache.
  */
-class dp_block_map : public dpo_map<rtypes::type_uuid, crepr::base_block3D> {
- public:
-  using dpo_map<rtypes::type_uuid, crepr::base_block3D>::dpo_map;
+enum class model_update_status {
+  /**
+   * \brief No changes were made to the model.
+   */
+  ekNO_CHANGE,
 
   /**
-   * \brief Build a string from the list of DP blocks that a robot is tracking
-   * for logging.
+   * \brief Nothing about the block has changed but its density.
    */
-  std::string to_str(void) const;
+  ekBLOCK_DENSITY_UPDATE,
+
+  /**
+   * \brief A new block was added to the model.
+   */
+  ekNEW_BLOCK_ADDED,
+
+  /**
+   * \brief An already tracked block was updated with a new location.
+   */
+  ekBLOCK_MOVED,
+
+  /**
+   * \brief A new cache was added to the model.
+   */
+  ekNEW_CACHE_ADDED,
+
+  /**
+   * \brief An already tracked block was updated (e.g., the # of blocks in it
+   * changed).
+   */
+  ekCACHE_UPDATED
 };
 
-NS_END(ds, fordyca);
+NS_END(perception, subsystem, fordyca);
 
-#endif /* INCLUDE_FORDYCA_DS_DP_BLOCK_MAP_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_MODEL_UPDATE_STATUS_HPP_ */

@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_DS_DPO_SEMANTIC_MAP_HPP_
-#define INCLUDE_FORDYCA_DS_DPO_SEMANTIC_MAP_HPP_
+#ifndef INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DS_DPO_SEMANTIC_MAP_HPP_
+#define INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DS_DPO_SEMANTIC_MAP_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,24 +29,25 @@
 
 #include "rcppsw/patterns/decorator/decorator.hpp"
 
-#include "cosm/subsystem/perception/config/perception_config.hpp"
+#include "cosm/subsystem/perception/config/mdpo_config.hpp"
 
-#include "fordyca/ds/dp_block_map.hpp"
-#include "fordyca/ds/dp_cache_map.hpp"
-#include "fordyca/ds/dpo_store.hpp"
-#include "fordyca/ds/occupancy_grid.hpp"
+#include "fordyca/subsystem/perception/ds/dp_block_map.hpp"
+#include "fordyca/subsystem/perception/ds/dp_cache_map.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
+#include "fordyca/subsystem/perception/ds/occupancy_grid.hpp"
+#include "fordyca/subsystem/perception/foraging_perception_model.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, ds);
+NS_START(fordyca, subsystem, perception, ds);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * \class dpo_semantic_map
- * \ingroup ds
+ * \ingroup subsystem perception ds
  *
  * \brief Stores a semantic map of the state of the arena, from the perspective
  * of the robot (i.e. th physical extent of the arena + semantic information
@@ -62,12 +63,24 @@ NS_START(fordyca, ds);
  * what the robots need (as of 9/14/18 anyway).
  */
 class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
-                               public rpdecorator::decorator<occupancy_grid> {
+                               public rpdecorator::decorator<occupancy_grid>,
+                               public foraging_perception_model<ds::dp_block_map,
+                                                                ds::dp_cache_map> {
  public:
-  dpo_semantic_map(const cspconfig::perception_config* c_config,
-                   const std::string& robot_id);
+  explicit dpo_semantic_map(const cspconfig::mdpo_config* c_config);
 
-  RCPPSW_DECORATE_DECLDEF(pheromone_repeat_deposit, const);
+  const dpo_store* store(void) const { return &m_store; }
+  dpo_store* store(void) { return &m_store; }
+
+  /* access_known_blocks overrides */
+  RCPPSW_WRAP_DECLDEF_OVERRIDE(known_blocks, (*store()), const);
+  RCPPSW_WRAP_DECLDEF_OVERRIDE(known_caches, (*store()), const)
+
+  /* foraging_perception_model overrides */
+  bool cache_remove(carepr::base_cache* victim) override;
+  bool block_remove(crepr::base_block3D* victim) override;
+  model_update_result block_update(tracked_block_type&& block) override;
+  model_update_result cache_update(tracked_cache_type&& cache) override;
 
   /**
    * \brief Access a particular element in the discretized grid representing the
@@ -121,25 +134,14 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
   RCPPSW_DECORATE_DECLDEF(known_cell_count, const)
   RCPPSW_DECORATE_DECLDEF(resolution, const)
 
-  bool cache_remove(carepr::base_cache* victim);
-  bool block_remove(crepr::base_block3D* victim);
-
-  const dpo_store* store(void) const { return &m_store; }
-  dpo_store* store(void) { return &m_store; }
+  RCPPSW_DECORATE_DECLDEF(pheromone_repeat_deposit, const);
 
  private:
   /* clang-format off */
   dpo_store m_store;
   /* clang-format on */
-
- public:
-  /* wrapping DPO store--must be after declaration -_- */
-  RCPPSW_WRAP_DECLDEF(blocks, (*store()))
-  RCPPSW_WRAP_DECLDEF(caches, (*store()))
-  RCPPSW_WRAP_DECLDEF(blocks, (*store()), const)
-  RCPPSW_WRAP_DECLDEF(caches, (*store()), const)
 };
 
-NS_END(ds, fordyca);
+NS_END(ds, perception, subsystem, fordyca);
 
-#endif /* INCLUDE_FORDYCA_DS_DPO_SEMANTIC_MAP_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DS_DPO_SEMANTIC_MAP_HPP_ */

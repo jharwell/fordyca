@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_ORACULAR_INFO_RECEPTOR_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_ORACULAR_INFO_RECEPTOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_ORACULAR_INFO_RECEPTOR_HPP_
+#define INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_ORACULAR_INFO_RECEPTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -41,18 +41,19 @@ namespace cosm::foraging::oracle {
 class foraging_oracle;
 } // namespace cosm::foraging::oracle
 
-namespace fordyca::ds {
-class dpo_store;
-} /* namespace fordyca::ds */
 
-NS_START(fordyca, controller, cognitive);
+NS_START(fordyca, subsystem, perception);
+
+namespace ds {
+class dpo_store;
+} /* namespace ds */
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * \class oracular_info_receptor
- * \ingroup controller cognitive
+ * \ingroup subsystem perception
  *
  * \brief Plugin/hook for controllers to receive information from the loop
  * functions about the following:
@@ -64,7 +65,7 @@ NS_START(fordyca, controller, cognitive);
 class oracular_info_receptor final : public rer::client<oracular_info_receptor> {
  public:
   explicit oracular_info_receptor(const cforacle::foraging_oracle* oracle)
-      : ER_CLIENT_INIT("fordyca.controller.oracular_info_receptor"),
+      : ER_CLIENT_INIT("fordyca.subsystem.perception.oracular_info_receptor"),
         mc_oracle(oracle) {}
 
   oracular_info_receptor(const oracular_info_receptor&) = delete;
@@ -107,6 +108,6 @@ class oracular_info_receptor final : public rer::client<oracular_info_receptor> 
   /* clang-format on */
 };
 
-NS_END(cognitive, controller, fordyca);
+NS_END(perception, subsystem,fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_ORACULAR_INFO_RECEPTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_ORACULAR_INFO_RECEPTOR_HPP_ */

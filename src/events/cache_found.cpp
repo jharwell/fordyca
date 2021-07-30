@@ -29,9 +29,9 @@
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
-#include "fordyca/controller/cognitive/dpo_perception_subsystem.hpp"
-#include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
-#include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cell2D_empty.hpp"
 
 /*******************************************************************************
@@ -39,7 +39,6 @@
  ******************************************************************************/
 NS_START(fordyca, events, detail);
 using carepr::base_cache;
-using ds::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -52,7 +51,7 @@ cache_found::cache_found(carepr::base_cache* cache)
 /*******************************************************************************
  * DPO Foraging
  ******************************************************************************/
-void cache_found::visit(ds::dpo_store& store) {
+void cache_found::visit(fspds::dpo_store& store) {
   /**
    * Remove any and all blocks from the known blocks set that exist in
    * the same space that a cache occupies (including the host cell).
@@ -63,10 +62,11 @@ void cache_found::visit(ds::dpo_store& store) {
    * a new cache there, we are tracking blocks that no longer exist in the
    * arena.
    */
-  auto it = store.blocks().values_range().begin();
-  while (it != store.blocks().values_range().end()) {
-    if (m_cache->contains_point2D(it->ent()->rcenter2D())) {
-      crepr::base_block3D* tmp = (*it).ent();
+  auto blocks = store.known_blocks();
+  auto it = blocks.begin();
+  while (it != blocks.end()) {
+    if (m_cache->contains_point2D((*it)->rcenter2D())) {
+      crepr::base_block3D* tmp = (*it);
       ++it;
       ER_TRACE("Remove block%d hidden behind cache%d",
                tmp->id().v(),
@@ -89,13 +89,13 @@ void cache_found::visit(ds::dpo_store& store) {
     if (store.repeat_deposit()) {
       density.pheromone_add(crepr::pheromone_density::kUNIT_QUANTITY);
     } else {
-      density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
+      density.pheromone_set(fspds::dpo_store::kNRD_MAX_PHEROMONE);
     }
   } else {
-    density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
+    density.pheromone_set(fspds::dpo_store::kNRD_MAX_PHEROMONE);
   }
 
-  auto ent = ds::dp_cache_map::value_type(m_cache->clone(), density);
+  auto ent = fspds::dp_cache_map::value_type(m_cache->clone(), density);
   store.cache_update(std::move(ent));
 } /* visit() */
 
@@ -141,14 +141,14 @@ void cache_found::visit(cfsm::cell2D_fsm& fsm) {
   } /* for(i..) */
 } /* visit() */
 
-void cache_found::visit(ds::dpo_semantic_map& map) {
-  cds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
+void cache_found::visit(fspds::dpo_semantic_map& map) {
+  cds::cell2D& cell = map.access<fspds::occupancy_grid::kCell>(x(), y());
   crepr::pheromone_density& density =
-      map.access<occupancy_grid::kPheromone>(x(), y());
+      map.access<fspds::occupancy_grid::kPheromone>(x(), y());
   if (!cell.state_is_known()) {
     map.known_cells_inc();
     ER_ASSERT(map.known_cell_count() <= map.xdsize() * map.ydsize(),
-              "Known cell count (%u) >= arena dimensions (%zux%zu)",
+              "Known cell count (%zu) >= arena dimensions (%zux%zu)",
               map.known_cell_count(),
               map.xdsize(),
               map.ydsize());
@@ -164,19 +164,20 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
    * created. When we return to the arena and find a new cache there, we are
    * tracking blocks that no longer exist in our perception.
    */
-  std::list<crepr::base_block3D*> rms;
-  for (auto&& b : map.blocks().values_range()) {
-    if (m_cache->contains_point2D(b.ent()->rcenter2D())) {
+  std::vector<crepr::base_block3D*> rms;
+  auto blocks = map.known_blocks();
+  for (auto&& b : blocks) {
+    if (m_cache->contains_point2D(b->rcenter2D())) {
       ER_TRACE("Remove block%d hidden behind cache%d",
-               b.ent()->id().v(),
+               b->id().v(),
                m_cache->id().v());
-      rms.push_back(b.ent());
+      rms.push_back(b);
     }
   } /* for(&&b..) */
 
   for (auto&& b : rms) {
     cdops::cell2D_empty_visitor op(b->danchor2D());
-    op.visit(map.access<occupancy_grid::kCell>(b->danchor2D()));
+    op.visit(map.access<fspds::occupancy_grid::kCell>(b->danchor2D()));
     map.block_remove(b);
   } /* for(&&b..) */
 
@@ -193,28 +194,6 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
   }
 
   /*
-   * If the ID of the cache we currently think resides in the cell and the ID of
-   * the one we just found that actually resides there are not the same, we need
-   * to reset the density for the cell, and start a new decay count.
-   */
-  if (cell.state_has_cache() && cell.cache()->id() != m_cache->id()) {
-    density.reset();
-  }
-
-  if (map.pheromone_repeat_deposit()) {
-    density.pheromone_add(crepr::pheromone_density::kUNIT_QUANTITY);
-  } else {
-    /*
-     * Seeing a new cache on empty square or one that used to contain a block.
-     */
-    if (!cell.state_has_cache()) {
-      density.reset();
-      density.pheromone_add(crepr::pheromone_density::kUNIT_QUANTITY);
-    } else { /* Seeing a known cache again--set its relevance to the max */
-      density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
-    }
-  }
-  /*
    * The cache we get a handle to is owned by the simulation, and we don't
    * want to just pass that into the robot's arena_map, as keeping them in
    * sync is not possible in all situations.
@@ -226,9 +205,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
    *
    * Cloning is definitely necessary here.
    */
-  auto ent = ds::dp_cache_map::value_type(m_cache->clone(), density);
-  map.store()->cache_update(std::move(ent));
-  visit(cell);
+  map.cache_update({m_cache->clone(), density});
 } /* visit() */
 
 /*******************************************************************************
@@ -237,7 +214,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
 void cache_found::visit(controller::cognitive::d2::birtd_mdpo_controller& c) {
   c.ndc_pusht();
 
-  visit(*c.mdpo_perception()->map());
+  visit(*c.perception()->model<fspds::dpo_semantic_map>());
 
   c.ndc_pop();
 } /* visit() */
@@ -245,7 +222,7 @@ void cache_found::visit(controller::cognitive::d2::birtd_mdpo_controller& c) {
 void cache_found::visit(controller::cognitive::d2::birtd_dpo_controller& c) {
   c.ndc_pusht();
 
-  visit(*c.dpo_perception()->dpo_store());
+  visit(*c.perception()->model<fspds::dpo_store>());
 
   c.ndc_pop();
 } /* visit() */
@@ -253,7 +230,7 @@ void cache_found::visit(controller::cognitive::d2::birtd_dpo_controller& c) {
 void cache_found::visit(controller::cognitive::d2::birtd_omdpo_controller& c) {
   c.ndc_pusht();
 
-  visit(*c.mdpo_perception()->map());
+  visit(*c.perception()->model<fspds::dpo_semantic_map>());
 
   c.ndc_pop();
 } /* visit() */
@@ -261,7 +238,7 @@ void cache_found::visit(controller::cognitive::d2::birtd_omdpo_controller& c) {
 void cache_found::visit(controller::cognitive::d2::birtd_odpo_controller& c) {
   c.ndc_pusht();
 
-  visit(*c.dpo_perception()->dpo_store());
+  visit(*c.perception()->model<fspds::dpo_store>());
 
   c.ndc_pop();
 } /* visit() */

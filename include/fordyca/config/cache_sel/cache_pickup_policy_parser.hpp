@@ -53,7 +53,7 @@ class cache_pickup_policy_parser : public rconfig::xml::xml_config_parser {
    * \brief The root tag that all cache sel matrix parameters should lie
    * under in the XML tree.
    */
-  inline static const std::string kXMLRoot = "pickup_policy";
+  static inline const std::string kXMLRoot = "pickup_policy";
 
   void parse(const ticpp::Element& node) override;
 

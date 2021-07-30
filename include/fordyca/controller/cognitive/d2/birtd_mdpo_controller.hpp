@@ -29,9 +29,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller, cognitive);
-class mdpo_perception_subsystem;
-NS_START(d2);
+NS_START(fordyca, controller, cognitive, d2);
 
 /*******************************************************************************
  * Class Definitions
@@ -60,9 +58,6 @@ class birtd_mdpo_controller : public d2::birtd_dpo_controller,
   std::type_index type_index(void) const override { return typeid(*this); }
 
   void shared_init(const config::d2::controller_repository& config_repo) RCPPSW_COLD;
-
-  mdpo_perception_subsystem* mdpo_perception(void) RCPPSW_PURE;
-  const mdpo_perception_subsystem* mdpo_perception(void) const RCPPSW_PURE;
 };
 
 NS_END(cognitive, d2, controller, fordyca);

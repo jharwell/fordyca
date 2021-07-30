@@ -181,10 +181,25 @@ namespace cognitive {}
 namespace reactive {}
 }
 
+namespace ds {}
+
+namespace subsystem {
+namespace perception {
+namespace ds {}
+} /* namespace perception */
+
+} /* namespace subsystem */
+
 } /* namespace fordyca */
 
 namespace fconfig = fordyca::config;
 namespace fcstrategy = fconfig::strategy;
+
+namespace fds = fordyca::ds;
+
+namespace fsubsystem = fordyca::subsystem;
+namespace fsperception = fsubsystem::perception;
+namespace fspds = fsperception::ds;
 
 namespace fstrategy = fordyca::strategy;
 namespace fsexplore = fstrategy::explore;

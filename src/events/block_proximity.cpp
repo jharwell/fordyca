@@ -29,9 +29,9 @@
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
-#include "fordyca/controller/cognitive/dpo_perception_subsystem.hpp"
-#include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
-#include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
@@ -68,7 +68,7 @@ void block_proximity::visit(controller::cognitive::d2::birtd_dpo_controller& c) 
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
   events::block_found_visitor found_op(m_block);
-  found_op.visit(*c.dpo_perception()->dpo_store());
+  found_op.visit(*c.perception()->model<fspds::dpo_store>());
   dispatch_cache_starter(c.current_task());
 
   c.ndc_pop();
@@ -79,7 +79,7 @@ void block_proximity::visit(controller::cognitive::d2::birtd_mdpo_controller& c)
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
   events::block_found_visitor found_op(m_block);
-  found_op.visit(*c.mdpo_perception()->map());
+  found_op.visit(*c.perception()->model<fspds::dpo_semantic_map>());
   dispatch_cache_starter(c.current_task());
 
   c.ndc_pop();
@@ -90,7 +90,7 @@ void block_proximity::visit(controller::cognitive::d2::birtd_odpo_controller& c)
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
   events::block_found_visitor found_op(m_block);
-  found_op.visit(*c.dpo_perception()->dpo_store());
+  found_op.visit(*c.perception()->model<fspds::dpo_store>());
   dispatch_cache_starter(c.current_task());
 
   c.ndc_pop();
@@ -101,7 +101,7 @@ void block_proximity::visit(controller::cognitive::d2::birtd_omdpo_controller& c
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
   events::block_found_visitor found_op(m_block);
-  found_op.visit(*c.mdpo_perception()->map());
+  found_op.visit(*c.perception()->model<fspds::dpo_semantic_map>());
   dispatch_cache_starter(c.current_task());
 
   c.ndc_pop();

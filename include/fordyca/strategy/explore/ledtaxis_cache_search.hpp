@@ -48,18 +48,12 @@ NS_START(fordyca, strategy, explore);
 class ledtaxis_cache_search : public foraging_strategy,
                               public rer::client<ledtaxis_cache_search> {
  public:
-  explicit ledtaxis_cache_search(const foraging_strategy::params* const c_params,
-                                 rmath::rng* rng)
-      : ledtaxis_cache_search(c_params->saa,
-                              c_params->ledtaxis_target,
-                              rng) {}
+  ledtaxis_cache_search(const foraging_strategy::params* const c_params,
+                       rmath::rng* rng);
   ledtaxis_cache_search(csubsystem::saa_subsystemQ3D* saa,
+                        const fsperception::known_objects_accessor* accessor,
                         const rutils::color& ledtaxis_target,
-                        rmath::rng* rng)
-      : foraging_strategy(saa, rng),
-        ER_CLIENT_INIT("fordyca.fsm.strategy.ledtaxis_cache_search"),
-        m_crw(saa, rng),
-        m_taxis(saa, ledtaxis_target, rng) {}
+                        rmath::rng* rng);
 
   ~ledtaxis_cache_search(void) override = default;
   ledtaxis_cache_search(const ledtaxis_cache_search&) = delete;
@@ -101,6 +95,7 @@ class ledtaxis_cache_search : public foraging_strategy,
   /* prototype overrides */
   std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
     return std::make_unique<ledtaxis_cache_search>(saa(),
+                                                   accessor(),
                                                    m_taxis.target(),
                                                    rng());
   }

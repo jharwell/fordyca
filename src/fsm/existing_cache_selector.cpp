@@ -28,6 +28,7 @@
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/fsm/cache_acq_validator.hpp"
 #include "fordyca/math/existing_cache_utility.hpp"
+#include "fordyca/subsystem/perception/ds/dp_cache_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,7 +42,7 @@ using cselm = controller::cognitive::cache_sel_matrix;
 existing_cache_selector::existing_cache_selector(
     bool is_pickup,
     const controller::cognitive::cache_sel_matrix* const matrix,
-    const ds::dp_cache_map* cache_map)
+    const fspds::dp_cache_map* cache_map)
     : ER_CLIENT_INIT("fordyca.fsm.existing_cache_selector"),
       mc_is_pickup(is_pickup),
       mc_matrix(matrix),
@@ -51,14 +52,14 @@ existing_cache_selector::existing_cache_selector(
  * Member Functions
  ******************************************************************************/
 const carepr::base_cache*
-existing_cache_selector::operator()(const ds::dp_cache_map& existing_caches,
+existing_cache_selector::operator()(const fspds::dp_cache_map& existing_caches,
                                     const rmath::vector2d& position,
                                     const rtypes::timestep& t) {
   const carepr::base_cache* best = nullptr;
   ER_ASSERT(!existing_caches.empty(), "No known existing caches");
 
   double max_utility = 0.0;
-  for (const auto& c : existing_caches.const_values_range()) {
+  for (const auto& c : existing_caches.values_range()) {
     fsm::cache_acq_validator validator(mc_cache_map, mc_matrix, mc_is_pickup);
 
     if (!validator(c.ent()->rcenter2D(), c.ent()->id(), t) ||

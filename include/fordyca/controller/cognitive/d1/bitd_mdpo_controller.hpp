@@ -29,9 +29,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller, cognitive);
-class mdpo_perception_subsystem;
-NS_START(d1);
+NS_START(fordyca, controller, cognitive, d1);
 
 /*******************************************************************************
  * Class Definitions
@@ -63,9 +61,6 @@ class bitd_mdpo_controller : public d1::bitd_dpo_controller,
   void init(ticpp::Element& node) override RCPPSW_COLD;
   void control_step(void) override;
   std::type_index type_index(void) const override { return typeid(*this); }
-
-  mdpo_perception_subsystem* mdpo_perception(void) RCPPSW_PURE;
-  const mdpo_perception_subsystem* mdpo_perception(void) const RCPPSW_PURE;
 
  protected:
   /**

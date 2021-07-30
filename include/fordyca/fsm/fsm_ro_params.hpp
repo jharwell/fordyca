@@ -30,7 +30,8 @@
 #include "rcppsw/math/vector2.hpp"
 
 #include "fordyca/config/strategy/strategy_config.hpp"
-#include "fordyca/fordyca.hpp"
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
+#include "fordyca/subsystem/perception/known_objects_accessor.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -41,10 +42,6 @@ namespace controller::cognitive {
 class block_sel_matrix;
 class cache_sel_matrix;
 } // namespace controller::cognitive
-
-namespace ds {
-class dpo_store;
-} /* namespace ds */
 
 NS_START(fsm);
 
@@ -59,10 +56,13 @@ NS_START(fsm);
  * by the FSM at run-time; not all FSMs need all members.
  */
 struct fsm_ro_params {
-  const fccognitive::block_sel_matrix* bsel_matrix;
-  const fccognitive::cache_sel_matrix* csel_matrix;
-  const ds::dpo_store* store;
-  const fcstrategy::strategy_config strategy_config;
+  /* clang-format off */
+  const fccognitive::block_sel_matrix*        bsel_matrix;
+  const fccognitive::cache_sel_matrix*        csel_matrix;
+  const fspds::dpo_store*                     store;
+  const fsperception::known_objects_accessor* accessor;
+  const fcstrategy::strategy_config           strategy_config{};
+  /* clang-format on */
 };
 
 NS_END(fsm, fordyca);

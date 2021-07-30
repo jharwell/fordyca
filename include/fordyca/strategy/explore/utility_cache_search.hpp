@@ -31,12 +31,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace ds {
-class dpo_store;
-} /* namespace ds */
-
-NS_START(strategy, explore);
+NS_START(fordyca, strategy, explore);
 
 /*******************************************************************************
  * Class Definitions
@@ -53,18 +48,12 @@ NS_START(strategy, explore);
 class utility_cache_search : public localized_search {
  public:
   utility_cache_search(const foraging_strategy::params* const c_params,
-                       rmath::rng* rng)
-      : utility_cache_search(c_params->csel_matrix,
-                             c_params->dpo_store,
-                             c_params->saa,
-                             rng) {}
+                       rmath::rng* rng);
+
   utility_cache_search(const controller::cognitive::cache_sel_matrix* csel_matrix,
-                       const ds::dpo_store* store,
+                       const fsperception::known_objects_accessor* accessor,
                        csubsystem::saa_subsystemQ3D* saa,
-                       rmath::rng* rng)
-      : localized_search(saa, rng),
-        mc_matrix(csel_matrix),
-        mc_store(store) {}
+                       rmath::rng* rng);
 
   ~utility_cache_search(void) override = default;
   utility_cache_search(const utility_cache_search&) = delete;
@@ -76,7 +65,7 @@ class utility_cache_search : public localized_search {
   /* prototype overrides */
   std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
     return std::make_unique<utility_cache_search>(mc_matrix,
-                                                  mc_store,
+                                                  accessor(),
                                                   saa(),
                                                   rng());
   }
@@ -84,7 +73,6 @@ class utility_cache_search : public localized_search {
  private:
   /* clang-format off */
   const controller::cognitive::cache_sel_matrix* mc_matrix;
-  const ds::dpo_store*                           mc_store;
   /* clang-format on */
 };
 

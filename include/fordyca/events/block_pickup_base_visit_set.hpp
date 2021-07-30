@@ -29,6 +29,7 @@
 #include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/fordyca.hpp"
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,14 +38,7 @@ namespace cosm::foraging::ds {
 class arena_map;
 } /* namespace cosm::foraging::ds */
 
-NS_START(fordyca);
-
-namespace ds {
-class dpo_semantic_map;
-class dpo_store;
-} // namespace ds
-
-NS_START(events, detail);
+NS_START(fordyca, events, detail);
 
 /*******************************************************************************
  * Class Definitions
@@ -56,8 +50,8 @@ NS_START(events, detail);
  * dropping a block will need to visit (think data structures).
  */
 using block_pickup_base_visit_typelist = rmpl::typelist<cfds::arena_map,
-                                                        ds::dpo_semantic_map,
-                                                        ds::dpo_store,
+                                                        fspds::dpo_semantic_map,
+                                                        fspds::dpo_store,
                                                         crepr::base_block3D>;
 NS_END(detail, events, fordyca);
 

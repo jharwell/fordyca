@@ -37,9 +37,9 @@
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
-#include "fordyca/controller/cognitive/dpo_perception_subsystem.hpp"
-#include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
-#include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/d1/cached_block_to_nest_fsm.hpp"
@@ -55,7 +55,6 @@
  ******************************************************************************/
 NS_START(fordyca, events, detail);
 using carepr::base_cache;
-using ds::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -129,7 +128,7 @@ void robot_cached_block_pickup::visit(cds::cell2D& cell) {
   visit(cell.fsm());
 } /* visit() */
 
-void robot_cached_block_pickup::visit(ds::dpo_store& store) {
+void robot_cached_block_pickup::visit(fspds::dpo_store& store) {
   ER_ASSERT(store.contains(mc_cache),
             "Cache%d@%s/%s not in DPO store",
             mc_cache->id().v(),
@@ -178,8 +177,8 @@ void robot_cached_block_pickup::visit(ds::dpo_store& store) {
   }
 } /* visit() */
 
-void robot_cached_block_pickup::visit(ds::dpo_semantic_map& map) {
-  cds::cell2D& cell = map.access<occupancy_grid::kCell>(cell2D_op::coord());
+void robot_cached_block_pickup::visit(fspds::dpo_semantic_map& map) {
+  auto& cell = map.access<fspds::occupancy_grid::kCell>(coord());
   ER_ASSERT(cell.state_has_cache(), "Cell does not contain cache");
   ER_ASSERT(cell.cache()->n_blocks() == cell.block_count(),
             "Perceived cache/cell disagree on # of blocks: "
@@ -226,7 +225,7 @@ void robot_cached_block_pickup::visit(
     controller::cognitive::d1::bitd_dpo_controller& controller) {
   controller.ndc_pusht();
 
-  visit(*controller.dpo_perception()->dpo_store());
+  visit(*controller.perception()->model<fspds::dpo_store>());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   dispatch_d1_cache_interactor(controller.current_task());
 
@@ -237,7 +236,7 @@ void robot_cached_block_pickup::visit(
     controller::cognitive::d1::bitd_mdpo_controller& controller) {
   controller.ndc_pusht();
 
-  visit(*controller.dpo_perception()->dpo_store());
+  visit(*controller.perception()->model<fspds::dpo_store>());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   dispatch_d1_cache_interactor(controller.current_task());
 
@@ -248,7 +247,7 @@ void robot_cached_block_pickup::visit(
     controller::cognitive::d1::bitd_odpo_controller& controller) {
   controller.ndc_pusht();
 
-  visit(*controller.dpo_perception()->dpo_store());
+  visit(*controller.perception()->model<fspds::dpo_store>());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   dispatch_d1_cache_interactor(controller.current_task());
 
@@ -259,7 +258,7 @@ void robot_cached_block_pickup::visit(
     controller::cognitive::d1::bitd_omdpo_controller& controller) {
   controller.ndc_pusht();
 
-  visit(*controller.dpo_perception()->dpo_store());
+  visit(*controller.perception()->model<fspds::dpo_store>());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   dispatch_d1_cache_interactor(controller.current_task());
 
@@ -287,7 +286,7 @@ void robot_cached_block_pickup::visit(
     controller::cognitive::d2::birtd_dpo_controller& controller) {
   controller.ndc_pusht();
 
-  visit(*controller.dpo_perception()->dpo_store());
+  visit(*controller.perception()->model<fspds::dpo_semantic_map>());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
 
   if (dispatch_d2_cache_interactor(controller.current_task(),
@@ -302,7 +301,7 @@ void robot_cached_block_pickup::visit(
     controller::cognitive::d2::birtd_mdpo_controller& controller) {
   controller.ndc_pusht();
 
-  visit(*controller.dpo_perception()->dpo_store());
+  visit(*controller.perception()->model<fspds::dpo_semantic_map>());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
 
   if (dispatch_d2_cache_interactor(controller.current_task(),
@@ -316,7 +315,7 @@ void robot_cached_block_pickup::visit(
     controller::cognitive::d2::birtd_odpo_controller& controller) {
   controller.ndc_pusht();
 
-  visit(*controller.dpo_perception()->dpo_store());
+  visit(*controller.perception()->model<fspds::dpo_store>());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
 
   if (dispatch_d2_cache_interactor(controller.current_task(),
@@ -331,7 +330,7 @@ void robot_cached_block_pickup::visit(
     controller::cognitive::d2::birtd_omdpo_controller& controller) {
   controller.ndc_pusht();
 
-  visit(*controller.dpo_perception()->dpo_store());
+  visit(*controller.perception()->model<fspds::dpo_semantic_map>());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
 
   if (dispatch_d2_cache_interactor(controller.current_task(),

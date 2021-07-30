@@ -28,10 +28,13 @@
 #include <string>
 #include <memory>
 
-#include "fordyca/fordyca.hpp"
 #include "rcppsw/er/client.hpp"
-#include "cosm/subsystem/subsystem_fwd.hpp"
 #include "rcppsw/math/rng.hpp"
+
+#include "cosm/subsystem/subsystem_fwd.hpp"
+
+#include "fordyca/fordyca.hpp"
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,15 +52,11 @@ struct oracle_config;
 namespace d1 { class controller_repository; }
 }
 
-namespace ds {
-class dpo_store;
-}
-
 NS_START(controller, cognitive);
 class cache_sel_matrix;
 class block_sel_matrix;
 class saa_subsystem;
-class foraging_perception_subsystem;
+
 NS_START(d1);
 
 /*******************************************************************************
@@ -73,9 +72,9 @@ NS_START(d1);
 class task_executive_builder : public rer::client<task_executive_builder> {
  public:
   task_executive_builder(const controller::cognitive::block_sel_matrix* bsel_matrix,
-                      const controller::cognitive::cache_sel_matrix* csel_matrix,
-                      csubsystem::saa_subsystemQ3D* saa,
-                      foraging_perception_subsystem* perception) RCPPSW_COLD;
+                         const controller::cognitive::cache_sel_matrix* csel_matrix,
+                         csubsystem::saa_subsystemQ3D* saa,
+                         fsperception::foraging_perception_subsystem* perception) RCPPSW_COLD;
 
   ~task_executive_builder(void) override RCPPSW_COLD;
   task_executive_builder& operator=(const task_executive_builder&) = delete;
@@ -88,8 +87,12 @@ class task_executive_builder : public rer::client<task_executive_builder> {
  protected:
   using tasking_map = std::map<std::string, cta::polled_task*>;
 
-  RCPPSW_COLD const foraging_perception_subsystem* perception(void) const { return m_perception; }
-  RCPPSW_COLD foraging_perception_subsystem* perception(void) { return m_perception; }
+  RCPPSW_COLD const fsperception::foraging_perception_subsystem* perception(void) const {
+    return m_perception;
+  }
+  RCPPSW_COLD fsperception::foraging_perception_subsystem* perception(void) {
+    return m_perception;
+  }
 
   RCPPSW_COLD csubsystem::saa_subsystemQ3D* saa(void) const {
     return m_saa;
@@ -124,8 +127,8 @@ class task_executive_builder : public rer::client<task_executive_builder> {
   const controller::cognitive::cache_sel_matrix* const mc_csel_matrix;
   const controller::cognitive::block_sel_matrix* const mc_bsel_matrix;
 
-  csubsystem::saa_subsystemQ3D* const              m_saa;
-  foraging_perception_subsystem* const                 m_perception;
+  csubsystem::saa_subsystemQ3D* const                  m_saa;
+  fsperception::foraging_perception_subsystem* const   m_perception;
 
   /* clang-format on */
 };

@@ -36,6 +36,7 @@
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,9 +48,6 @@ class cache_sel_matrix;
 }
 namespace repr {
 class cache;
-}
-namespace ds {
-class dpo_store;
 }
 
 NS_START(fsm);
@@ -111,9 +109,10 @@ class acquire_existing_cache_fsm : public rer::client<acquire_existing_cache_fsm
    */
   static constexpr double kFOOTBOT_CACHE_ACQ_FACTOR = 0.2;
 
-  const bool                                           mc_for_pickup;
-  const controller::cognitive::cache_sel_matrix* const mc_matrix;
-  const ds::dpo_store*                           const mc_store;
+  const bool                                              mc_for_pickup;
+  const controller::cognitive::cache_sel_matrix* const    mc_matrix;
+  const fspds::dpo_store*                           const mc_store;
+
   /* clang-format on */
 };
 

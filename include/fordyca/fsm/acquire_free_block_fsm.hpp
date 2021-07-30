@@ -38,13 +38,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace ds {
-class dpo_store;
-}
-
-NS_START(fsm);
+NS_START(fordyca, fsm);
 
 /*******************************************************************************
  * Class Definitions
@@ -88,7 +82,7 @@ class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
 
   /* clang-format off */
   const controller::cognitive::block_sel_matrix* const mc_matrix;
-  const ds::dpo_store*      const                      mc_store;
+  const fspds::dpo_store*      const                   mc_store;
   /* clang-format on */
 };
 

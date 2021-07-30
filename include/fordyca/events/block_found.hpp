@@ -32,18 +32,13 @@
 #include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
+#include "fordyca/subsystem/perception/model_update_result.hpp"
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace ds {
-class dpo_semantic_map;
-class dpo_store;
-} // namespace ds
-
-NS_START(events, detail);
+NS_START(fordyca, events, detail);
 
 /*******************************************************************************
  * Class Definitions
@@ -61,7 +56,7 @@ class block_found : public rer::client<block_found>, public cdops::cell2D_op {
   struct visit_typelist_impl {
     using inherited = cell2D_op::visit_typelist;
     using controllers = controller::d2::typelist;
-    using others = rmpl::typelist<ds::dpo_store, ds::dpo_semantic_map>;
+    using others = rmpl::typelist<fspds::dpo_store, fspds::dpo_semantic_map>;
 
     using value = boost::mpl::joint_view<
         boost::mpl::joint_view<inherited::type, controllers::type>::type,
@@ -78,12 +73,12 @@ class block_found : public rer::client<block_found>, public cdops::cell2D_op {
   block_found& operator=(const block_found&) = delete;
 
   /* DPO foraging */
-  void visit(ds::dpo_store& store);
+  fsperception::model_update_result visit(fspds::dpo_store& store);
 
   /* MDPO foraging */
   void visit(cds::cell2D& cell);
   void visit(cfsm::cell2D_fsm& fsm);
-  void visit(ds::dpo_semantic_map& map);
+  void visit(fspds::dpo_semantic_map& map);
 
   /* d2 foraging */
   void visit(controller::cognitive::d2::birtd_dpo_controller& c);
@@ -92,8 +87,6 @@ class block_found : public rer::client<block_found>, public cdops::cell2D_op {
   void visit(controller::cognitive::d2::birtd_omdpo_controller& c);
 
  private:
-  void pheromone_update(ds::dpo_semantic_map& map);
-
   /* clang-format off */
   crepr::base_block3D* m_block;
   /* clang-format on */

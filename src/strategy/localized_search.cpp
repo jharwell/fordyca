@@ -33,12 +33,18 @@ NS_START(fordyca, strategy, explore);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
+localized_search::localized_search(
+    const foraging_strategy::params* const c_params,
+    rmath::rng* rng)
+: localized_search(c_params->saa, c_params->accessor, rng) {}
+
 localized_search::localized_search(csubsystem::saa_subsystemQ3D* saa,
+                                   const fsperception::known_objects_accessor* accessor,
                                    rmath::rng* rng)
-    : foraging_strategy(saa, rng),
+    : foraging_strategy(saa, accessor, rng),
       ER_CLIENT_INIT("fordyca.fsm.strategy.localized_search"),
       m_vfsm(saa, rng),
-      m_crw(saa, rng) {}
+      m_crw(saa, accessor, rng) {}
 
 /*******************************************************************************
  * Member Functions

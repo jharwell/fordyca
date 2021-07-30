@@ -29,13 +29,11 @@
 
 #include "cosm/ds/operations/cell2D_unknown.hpp"
 
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
+
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace fordyca::ds {
-class occupancy_grid;
-} // namespace fordyca::ds
-
 NS_START(fordyca, events, detail);
 
 /*******************************************************************************
@@ -58,7 +56,7 @@ class cell2D_unknown : public cdops::cell2D_unknown,
  private:
   struct visit_typelist_impl {
     using inherited = cdops::cell2D_unknown::visit_typelist;
-    using others = rmpl::typelist<ds::occupancy_grid>;
+    using others = rmpl::typelist<fspds::occupancy_grid>;
     using value = boost::mpl::joint_view<inherited::type, others::type>;
   };
 
@@ -72,7 +70,7 @@ class cell2D_unknown : public cdops::cell2D_unknown,
       : cdops::cell2D_unknown(coord),
         ER_CLIENT_INIT("fordyca.events.cell2D_unknown") {}
 
-  void visit(ds::occupancy_grid& grid);
+  void visit(fspds::occupancy_grid& grid);
 };
 
 NS_END(detail);

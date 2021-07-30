@@ -27,7 +27,7 @@
 #include <boost/variant/static_visitor.hpp>
 #include "cosm/vis/config/visualization_config.hpp"
 #include "fordyca/controller/controller_fwd.hpp"
-#include "fordyca/controller/cognitive/oracular_info_receptor.hpp"
+#include "fordyca/subsystem/perception/oracular_info_receptor.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -70,7 +70,7 @@ class robot_configurer : public boost::static_visitor<void> {
       c->display_id(mc_config->robot_id);
     }
     if (nullptr != mc_oracle) {
-      auto receptor = std::make_unique<controller::cognitive::oracular_info_receptor>(mc_oracle);
+      auto receptor = std::make_unique<fsperception::oracular_info_receptor>(mc_oracle);
       c->oracle_init(std::move(receptor));
     }
   }

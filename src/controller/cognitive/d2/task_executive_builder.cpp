@@ -36,7 +36,7 @@
 
 #include "fordyca/config/d2/controller_repository.hpp"
 #include "fordyca/config/strategy/strategy_config.hpp"
-#include "fordyca/controller/cognitive/foraging_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/foraging_perception_subsystem.hpp"
 #include "fordyca/fsm/d1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/d2/block_to_cache_site_fsm.hpp"
 #include "fordyca/fsm/d2/block_to_new_cache_fsm.hpp"
@@ -48,6 +48,7 @@
 #include "fordyca/tasks/d2/cache_finisher.hpp"
 #include "fordyca/tasks/d2/cache_starter.hpp"
 #include "fordyca/tasks/d2/cache_transferer.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -61,7 +62,7 @@ task_executive_builder::task_executive_builder(
     const controller::cognitive::block_sel_matrix* bsel_matrix,
     const controller::cognitive::cache_sel_matrix* csel_matrix,
     csubsystem::saa_subsystemQ3D* const saa,
-    foraging_perception_subsystem* const perception)
+    fsperception::foraging_perception_subsystem* const perception)
     : d1::task_executive_builder(bsel_matrix, csel_matrix, saa, perception),
       ER_CLIENT_INIT("fordyca.controller.d2.task_executive_builder") {}
 
@@ -84,18 +85,29 @@ task_executive_builder::tasking_map task_executive_builder::d2_tasks_create(
   fsexplore::cache_factory cache_factory;
   csstrategy::nest_acq::factory nest_acq_factory;
 
-  fstrategy::foraging_strategy::params strategy_cachep(
-      saa(), nullptr, cache_sel_matrix(), perception()->dpo_store(), cache_color);
-  fstrategy::foraging_strategy::params strategy_blockp(saa(),
-                                                       nullptr,
-                                                       cache_sel_matrix(),
-                                                       perception()->dpo_store(),
-                                                       rutils::color());
+  fstrategy::foraging_strategy::params strategy_cachep{
+    saa(),
+    nullptr,
+    cache_sel_matrix(),
+    perception()->known_objects(),
+    cache_color
+  };
+  fstrategy::foraging_strategy::params strategy_blockp{
+    saa(),
+    nullptr,
+    cache_sel_matrix(),
+    perception()->known_objects(),
+    rutils::color()
+  };
 
-  fsm::fsm_ro_params params = { .bsel_matrix = block_sel_matrix(),
-                                .csel_matrix = cache_sel_matrix(),
-                                .store = perception()->dpo_store(),
-                                .strategy_config = *strat_config };
+  fsm::fsm_ro_params params = {
+    .bsel_matrix = block_sel_matrix(),
+    .csel_matrix = cache_sel_matrix(),
+    .store = perception()->model<fspds::dpo_store>(),
+    .accessor = perception()->known_objects(),
+    .strategy_config = *strat_config
+  };
+
   auto cache_starter_fsm = std::make_unique<fsm::d2::block_to_cache_site_fsm>(
       &params,
       saa(),

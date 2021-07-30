@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_LOS_PROC_VERIFY_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_LOS_PROC_VERIFY_HPP_
+#ifndef INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_LOS_PROC_VERIFY_HPP_
+#define INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_LOS_PROC_VERIFY_HPP_
 
 /*******************************************************************************
  * Includes
@@ -27,6 +27,7 @@
 #include "rcppsw/er/client.hpp"
 
 #include "fordyca/fordyca.hpp"
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -35,19 +36,14 @@ namespace fordyca::repr {
 class forager_los;
 } // namespace fordyca::repr
 
-NS_START(fordyca);
-namespace ds {
-class dpo_store;
-class dpo_semantic_map;
-} // namespace ds
-NS_START(controller, cognitive);
+NS_START(fordyca, subsystem, perception);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * \class los_proc_verify
- * \ingroup controller cognitive
+ * \ingroup subsystem perception
  *
  * \brief Verifies that a LOS has been processed properly and that the contents
  * of the LOS is now accurately reflected in a robots perception.
@@ -55,7 +51,8 @@ NS_START(controller, cognitive);
 class los_proc_verify : public rer::client<los_proc_verify> {
  public:
   explicit los_proc_verify(const repr::forager_los* const c_los)
-      : ER_CLIENT_INIT("fordyca.controller.los_proc_verify"), mc_los(c_los) {}
+      : ER_CLIENT_INIT("fordyca.subsystem.perception.los_proc_verify"),
+        mc_los(c_los) {}
 
   los_proc_verify(const los_proc_verify& v) = delete;
   los_proc_verify& operator=(const los_proc_verify& v) = delete;
@@ -69,6 +66,6 @@ class los_proc_verify : public rer::client<los_proc_verify> {
   /* clang-format on */
 };
 
-NS_END(cognitive, controller, fordyca);
+NS_END(perception, subsystem, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_LOS_PROC_VERIFY_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_LOS_PROC_VERIFY_HPP_ */

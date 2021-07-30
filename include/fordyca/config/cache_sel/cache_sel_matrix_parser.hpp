@@ -54,7 +54,7 @@ class cache_sel_matrix_parser final : public rconfig::xml::xml_config_parser {
    * \brief The root tag that all cache sel matrix parameters should lie
    * under in the XML tree.
    */
-  inline static const std::string kXMLRoot = "cache_sel_matrix";
+  static inline const std::string kXMLRoot = "cache_sel_matrix";
 
   void parse(const ticpp::Element& node) override RCPPSW_COLD;
 

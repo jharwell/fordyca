@@ -29,7 +29,7 @@
 #include "cosm/spatial/fsm/point_argument.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
-#include "fordyca/ds/dpo_store.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/d2/cache_site_selector.hpp"
 
@@ -39,24 +39,43 @@
 NS_START(fordyca, strategy, explore);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+utility_cache_search::utility_cache_search(
+    const foraging_strategy::params* const c_params,
+    rmath::rng* rng)
+    : utility_cache_search(c_params->csel_matrix,
+                           c_params->accessor,
+                           c_params->saa,
+                           rng) {}
+
+utility_cache_search::utility_cache_search(
+    const controller::cognitive::cache_sel_matrix* csel_matrix,
+    const fsperception::known_objects_accessor* accessor,
+    csubsystem::saa_subsystemQ3D* saa,
+    rmath::rng* rng)
+    : localized_search(saa, accessor, rng),
+      mc_matrix(csel_matrix) {}
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void utility_cache_search::task_start(cta::taskable_argument*) {
-  auto range = mc_store->blocks().const_values_range();
+  auto range = accessor()->known_blocks();
   rmath::vector2d position;
   if (!range.empty()) {
     position = std::accumulate(range.begin(),
                                range.end(),
                                rmath::vector2d(),
                                [&](rmath::vector2d& sum, const auto& bent) {
-                                 return sum + bent.ent()->rcenter2D();
+                                 return sum + bent->rcenter2D();
                                }) /
                boost::size(range);
   } else {
     position = saa()->sensing()->rpos2D();
   }
   fsm::d2::cache_site_selector sel(mc_matrix);
-  if (auto site = sel(mc_store->caches(), position, rng())) {
+  if (auto site = sel(accessor()->known_caches(), position, rng())) {
     csfsm::point_argument v(fsm::kCACHE_ARRIVAL_TOL, *site);
     localized_search::task_start(&v);
   } else {

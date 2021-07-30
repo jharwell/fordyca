@@ -25,7 +25,7 @@
 
 #include "cosm/spatial/fsm/point_argument.hpp"
 
-#include "fordyca/ds/dpo_store.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 
 /*******************************************************************************
@@ -34,10 +34,26 @@
 NS_START(fordyca, strategy, explore);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+likelihood_block_search::likelihood_block_search(
+    const foraging_strategy::params* const c_params,
+    rmath::rng* rng)
+    : likelihood_block_search(c_params->saa,
+                              c_params->accessor,
+                              rng) {}
+
+likelihood_block_search::likelihood_block_search(
+    csubsystem::saa_subsystemQ3D* saa,
+    const fsperception::known_objects_accessor* accessor,
+    rmath::rng* rng)
+    : localized_search(saa, accessor, rng) {}
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void likelihood_block_search::task_start(cta::taskable_argument*) {
-  if (auto loc = mc_store->last_block_loc()) {
+  if (auto loc = accessor()->last_block_loc()) {
     csfsm::point_argument v(fsm::kBLOCK_ARRIVAL_TOL, *loc);
     localized_search::task_start(&v);
   } else {

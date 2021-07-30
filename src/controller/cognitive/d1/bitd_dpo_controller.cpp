@@ -40,8 +40,7 @@
 #include "fordyca/config/d1/controller_repository.hpp"
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/controller/cognitive/d1/task_executive_builder.hpp"
-#include "fordyca/controller/cognitive/dpo_perception_subsystem.hpp"
-#include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
 
@@ -70,7 +69,8 @@ void bitd_dpo_controller::control_step(void) {
             block()->id().v(),
             block()->md()->robot_id().v());
 
-  dpo_perception()->update(nullptr);
+  /* non-oracular controller */
+  perception()->update(nullptr);
 
   /*
    * Execute the current task/allocate a new task/abort a task/etc and apply

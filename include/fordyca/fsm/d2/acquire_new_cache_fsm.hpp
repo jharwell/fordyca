@@ -27,9 +27,10 @@
 #include <memory>
 
 #include "cosm/spatial/fsm/acquire_goal_fsm.hpp"
-#include "fordyca/fordyca.hpp"
 #include "cosm/subsystem/subsystem_fwd.hpp"
+
 #include "fordyca/fsm/fsm_ro_params.hpp"
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,7 +38,6 @@
 NS_START(fordyca);
 
 namespace controller::cognitive { class cache_sel_matrix; }
-namespace ds { class dpo_store; }
 
 NS_START(fsm, d2);
 
@@ -77,7 +77,7 @@ class acquire_new_cache_fsm final : public rer::client<acquire_new_cache_fsm>,
 
   /* clang-format off */
   const controller::cognitive::cache_sel_matrix* const mc_matrix;
-  const ds::dpo_store*      const                      mc_store;
+  const fspds::dpo_store*      const                   mc_store;
   /* clang-format on */
 };
 

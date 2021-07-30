@@ -44,29 +44,41 @@ dpo_metrics_collector::dpo_metrics_collector(
  ******************************************************************************/
 void dpo_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
-  const auto& m = dynamic_cast<const dpo_metrics&>(metrics);
+  const auto* m = dynamic_cast<const dpo_metrics*>(&metrics);
+
+  /*
+   * This can happen because we are trying to collect different types of
+   * metrics from the perception subsystem, which can be of a number of
+   * types. Only one of those types implements these metrics, so we have to
+   * test here. This isn't any less efficient, because we had to cast to
+   * convert anyway.
+   */
+  if (nullptr == m) {
+    return;
+  }
+
   ++m_data.interval.robot_count;
   ++m_data.cum.robot_count;
 
-  m_data.interval.known_blocks += m.n_known_blocks();
-  m_data.interval.known_caches += m.n_known_caches();
+  m_data.interval.known_blocks += m->n_known_blocks();
+  m_data.interval.known_caches += m->n_known_caches();
 
-  m_data.cum.known_blocks += m.n_known_blocks();
-  m_data.cum.known_caches += m.n_known_caches();
+  m_data.cum.known_blocks += m->n_known_blocks();
+  m_data.cum.known_caches += m->n_known_caches();
 
   auto int_bsum = m_data.interval.block_density_sum.load();
   auto int_csum = m_data.interval.cache_density_sum.load();
   m_data.interval.block_density_sum.compare_exchange_strong(
-      int_bsum, int_bsum + m.avg_block_density().v());
+      int_bsum, int_bsum + m->avg_block_density().v());
   m_data.interval.cache_density_sum.compare_exchange_strong(
-      int_csum, int_csum + m.avg_cache_density().v());
+      int_csum, int_csum + m->avg_cache_density().v());
 
   auto cum_bsum = m_data.cum.block_density_sum.load();
   auto cum_csum = m_data.cum.cache_density_sum.load();
   m_data.cum.block_density_sum.compare_exchange_strong(
-      cum_bsum, cum_bsum + m.avg_block_density().v());
+      cum_bsum, cum_bsum + m->avg_block_density().v());
   m_data.cum.cache_density_sum.compare_exchange_strong(
-      cum_csum, cum_csum + m.avg_cache_density().v());
+      cum_csum, cum_csum + m->avg_cache_density().v());
 } /* collect() */
 
 void dpo_metrics_collector::reset_after_interval(void) {

@@ -29,7 +29,7 @@
 #include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 
 #include "fordyca/controller/cognitive/block_selector.hpp"
-#include "fordyca/ds/dpo_store.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/block_acq_validator.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
@@ -107,7 +107,7 @@ acquire_free_block_fsm::block_select(void) const {
   controller::cognitive::block_selector selector(mc_matrix);
 
   if (const auto* best =
-          selector(mc_store->blocks(), saa()->sensing()->rpos2D())) {
+          selector(mc_store->tracked_blocks(), saa()->sensing()->rpos2D())) {
     return boost::make_optional(acquire_goal_fsm::candidate_type(
         best->rcenter2D(), kBLOCK_ARRIVAL_TOL, best->id()));
   } else {
@@ -116,12 +116,12 @@ acquire_free_block_fsm::block_select(void) const {
 } /* block_select() */
 
 bool acquire_free_block_fsm::candidates_exist(void) const {
-  return !mc_store->blocks().empty();
+  return !mc_store->known_blocks().empty();
 } /* candidates_exist() */
 
 bool acquire_free_block_fsm::block_acq_valid(const rmath::vector2d& loc,
                                              const rtypes::type_uuid& id) const {
-  return block_acq_validator(&mc_store->blocks(), mc_matrix)(loc, id);
+  return block_acq_validator(&mc_store->tracked_blocks(), mc_matrix)(loc, id);
 } /* block_acq_valid() */
 
 /*******************************************************************************

@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_DS_DP_CACHE_MAP_HPP_
-#define INCLUDE_FORDYCA_DS_DP_CACHE_MAP_HPP_
+#ifndef INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DS_DP_CACHE_MAP_HPP_
+#define INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DS_DP_CACHE_MAP_HPP_
 
 /*******************************************************************************
  * Includes
@@ -28,7 +28,7 @@
 
 #include "rcppsw/math/vector2.hpp"
 
-#include "fordyca/ds/dpo_map.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_map.hpp"
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
@@ -38,14 +38,14 @@ namespace cosm::arena::repr {
 class base_cache;
 }
 
-NS_START(fordyca, ds);
+NS_START(fordyca, subsystem, perception, ds);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * \class dp_cache_map
- * \ingroup ds
+ * \ingroup subsystem perception ds
  *
  * \brief The cache map is a repr of the robot's perception of caches
  * in the arena. It uses the locations of caches as keys, as caches are
@@ -55,9 +55,11 @@ NS_START(fordyca, ds);
  * during LOS process (it would be inserted into the map, but the old version
  * would not be removed, as they would be considered different objects).
  */
-class dp_cache_map : public dpo_map<rmath::vector2z, carepr::base_cache> {
+class dp_cache_map : public dpo_map<rmath::vector2z,
+                                    carepr::base_cache> {
  public:
-  using dpo_map<rmath::vector2z, carepr::base_cache>::dpo_map;
+  using dpo_map<rmath::vector2z,
+                carepr::base_cache>::dpo_map;
 
   /**
    * \brief Build a string from the list of DP caches that a robot is tracking
@@ -66,6 +68,6 @@ class dp_cache_map : public dpo_map<rmath::vector2z, carepr::base_cache> {
   std::string to_str(void) const;
 };
 
-NS_END(ds, fordyca);
+NS_END(ds, perception, subsystem, fordyca);
 
-#endif /* INCLUDE_FORDYCA_DS_DP_CACHE_MAP_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DS_DP_CACHE_MAP_HPP_ */

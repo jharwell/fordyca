@@ -35,7 +35,6 @@
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
-#include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
 #include "fordyca/tasks/d1/foraging_task.hpp"
@@ -47,7 +46,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events, detail);
-using ds::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor

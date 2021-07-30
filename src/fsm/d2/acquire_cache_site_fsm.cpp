@@ -27,7 +27,7 @@
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
-#include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/d2/cache_site_selector.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
@@ -77,7 +77,7 @@ acquire_cache_site_fsm::acquire_cache_site_fsm(const fsm_ro_params* c_params,
                     return true;
                   }) }),
       mc_matrix(c_params->csel_matrix),
-      mc_store(c_params->store) {}
+      mc_accessor(c_params->accessor) {}
 
 /*******************************************************************************
  * Member Functions
@@ -96,7 +96,7 @@ boost::optional<csfsm::acquire_goal_fsm::candidate_type>
 acquire_cache_site_fsm::site_select(void) {
   auto selector = cache_site_selector(mc_matrix);
   if (auto best =
-          selector(mc_store->caches(), saa()->sensing()->rpos2D(), rng())) {
+          selector(mc_accessor->known_caches(), saa()->sensing()->rpos2D(), rng())) {
     ER_INFO("Select cache site@%s for acquisition", best->to_str().c_str());
     m_sel_success = true;
     m_sel_exec = true;

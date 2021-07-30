@@ -52,10 +52,11 @@ class localized_search : public foraging_strategy,
                          public rer::client<localized_search> {
  public:
   localized_search(const foraging_strategy::params* const c_params,
-                   rmath::rng* rng)
-      : localized_search(c_params->saa, rng) {}
+                   rmath::rng* rng);
 
-  localized_search(csubsystem::saa_subsystemQ3D* saa, rmath::rng* rng);
+  localized_search(csubsystem::saa_subsystemQ3D* saa,
+                   const fsperception::known_objects_accessor* accessor,
+                   rmath::rng* rng);
 
   ~localized_search(void) override = default;
   localized_search(const localized_search&) = delete;
@@ -101,7 +102,7 @@ class localized_search : public foraging_strategy,
 
   /* prototype overrides */
   std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
-    return std::make_unique<localized_search>(saa(), rng());
+    return std::make_unique<localized_search>(saa(), accessor(), rng());
   }
 
  private:

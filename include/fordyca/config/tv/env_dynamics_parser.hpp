@@ -58,7 +58,7 @@ class env_dynamics_parser final : public rconfig::xml::xml_config_parser {
    * \brief The root tag that all temporal variance parameters should lie under
    * in the XML tree.
    */
-  inline static const std::string kXMLRoot = "env_dynamics";
+  static inline const std::string kXMLRoot = "env_dynamics";
 
   void parse(const ticpp::Element& node) override;
   bool validate(void) const override RCPPSW_ATTR(const, cold);

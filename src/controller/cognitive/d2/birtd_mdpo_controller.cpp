@@ -29,8 +29,9 @@
 #include "cosm/subsystem/perception/config/perception_config.hpp"
 
 #include "fordyca/config/d2/controller_repository.hpp"
-#include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
-#include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/perception_subsystem_factory.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -73,23 +74,13 @@ void birtd_mdpo_controller::shared_init(
 
   /* MDPO perception subsystem */
   auto p = *config_repo.config_get<cspconfig::perception_config>();
-  rmath::vector2d padding(p.occupancy_grid.resolution.v() * 5,
-                          p.occupancy_grid.resolution.v() * 5);
-  p.occupancy_grid.dims += padding;
+  rmath::vector2d padding(p.mdpo.grid.resolution.v() * 5,
+                          p.mdpo.grid.resolution.v() * 5);
+  p.mdpo.grid.dims += padding;
 
-  bitd_dpo_controller::perception(
-      std::make_unique<mdpo_perception_subsystem>(&p, GetId()));
+  auto factory = fsperception::perception_subsystem_factory();
+  perception(factory.create(p.model, &p));
 } /* shared_init() */
-
-mdpo_perception_subsystem* birtd_mdpo_controller::mdpo_perception(void) {
-  return static_cast<mdpo_perception_subsystem*>(dpo_controller::perception());
-} /* mdpo_perception() */
-
-const mdpo_perception_subsystem*
-birtd_mdpo_controller::mdpo_perception(void) const {
-  return static_cast<const mdpo_perception_subsystem*>(
-      dpo_controller::perception());
-} /* mdpo_perception() */
 
 using namespace argos; // NOLINT
 

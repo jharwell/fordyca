@@ -35,11 +35,19 @@ NS_START(fordyca, strategy, explore);
  * Constructors/Destructor
  ******************************************************************************/
 ledtaxis::ledtaxis(csubsystem::saa_subsystemQ3D* saa,
+                   const fsperception::known_objects_accessor* accessor,
                    const rutils::color& target,
                    rmath::rng* rng)
-    : foraging_strategy(saa, rng),
+    : foraging_strategy(saa, accessor, rng),
       ER_CLIENT_INIT("fordyca.fsm.strategy.ledtaxis"),
       m_target(target) {}
+
+ledtaxis::ledtaxis(const foraging_strategy::params* const c_params,
+                   rmath::rng* rng)
+    : ledtaxis(c_params->saa,
+               c_params->accessor,
+               c_params->ledtaxis_target,
+               rng) {}
 
 /*******************************************************************************
  * General Member Functions

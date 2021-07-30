@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_MDPO_PERCEPTION_SUBSYSTEM_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_MDPO_PERCEPTION_SUBSYSTEM_HPP_
+#ifndef INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_MDPO_PERCEPTION_SUBSYSTEM_HPP_
+#define INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_MDPO_PERCEPTION_SUBSYSTEM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -32,29 +32,23 @@
 
 #include "cosm/subsystem/perception/config/perception_config.hpp"
 
-#include "fordyca/controller/cognitive/foraging_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/foraging_perception_subsystem.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/metrics/perception/mdpo_metrics.hpp"
 #include "fordyca/repr/forager_los.hpp"
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace ds {
-class dpo_semantic_map;
-class dpo_store;
-} // namespace ds
-
-NS_START(controller, cognitive);
+NS_START(fordyca, subsystem, perception);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * \class mdpo_perception_subsystem
- * \ingroup controller cognitive
+ * \ingroup subsystem perception
  *
  * \brief Translates the sensor readings of the robot (i.e. \ref forager_los),
  * into a useful internal repr: a \ref dpo_semantic_map.
@@ -64,10 +58,8 @@ class mdpo_perception_subsystem final
       public foraging_perception_subsystem,
       public metrics::perception::mdpo_metrics {
  public:
-  mdpo_perception_subsystem(
-      const cspconfig::perception_config* config,
-      const std::string& id);
-  ~mdpo_perception_subsystem(void) override = default;
+  explicit mdpo_perception_subsystem(const cspconfig::perception_config* config);
+  ~mdpo_perception_subsystem(void) override;
 
   /* world model metrics */
   uint cell_state_inaccuracies(uint state) const override {
@@ -77,21 +69,14 @@ class mdpo_perception_subsystem final
   double known_percentage(void) const override RCPPSW_PURE;
   double unknown_percentage(void) const override RCPPSW_PURE;
 
-  /**
-   * \brief Update the robot's perception of the environment, passing it its
-   * current line of sight.
-   */
+  /* foraging_perception_subsystem overrides */
+  const known_objects_accessor* known_objects(void) const override;
   void update(oracular_info_receptor* receptor) override;
 
   /**
    * \brief Reset the robot's perception of the environment to an initial state
    */
   void reset(void) override;
-
-  const ds::dpo_semantic_map* map(void) const { return m_map.get(); }
-  ds::dpo_semantic_map* map(void) { return m_map.get(); }
-  const ds::dpo_store* dpo_store(void) const override RCPPSW_PURE;
-  ds::dpo_store* dpo_store(void) override RCPPSW_PURE;
 
  private:
   /*
@@ -114,13 +99,15 @@ class mdpo_perception_subsystem final
    */
   void update_cell_stats(const repr::forager_los* c_los);
 
+  const ds::dpo_semantic_map* map(void) const;
+  ds::dpo_semantic_map* map(void);
+
   /* clang-format off */
-  std::vector<uint>                     m_cell_stats;
-  std::unique_ptr<repr::forager_los>   m_los;
-  std::unique_ptr<ds::dpo_semantic_map> m_map;
+  std::vector<size_t>                   m_cell_stats;
+  std::unique_ptr<repr::forager_los>    m_los;
   /* clang-format on */
 };
 
-NS_END(cognitive, controller, fordyca);
+NS_END(perception, subsystem, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_MDPO_PERCEPTION_SUBSYSTEM_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_MDPO_PERCEPTION_SUBSYSTEM_HPP_ */

@@ -37,6 +37,7 @@
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,10 +45,6 @@
 namespace cosm::arena::repr {
 class arena_cache;
 } // namespace cosm::arena::repr
-
-namespace fordyca::ds {
-class dpo_semantic_map;
-} // namespace fordyca::ds
 
 namespace fordyca::controller::cognitive {
 class cache_sel_matrix;
@@ -76,7 +73,7 @@ class robot_cache_block_drop : public rer::client<robot_cache_block_drop>,
     using others = rmpl::typelist<
         /* d1 */
         fsm::block_to_goal_fsm,
-        ds::dpo_semantic_map,
+        fspds::dpo_semantic_map,
         carepr::arena_cache,
         tasks::d1::harvester,
         /* d2 */
@@ -99,7 +96,7 @@ class robot_cache_block_drop : public rer::client<robot_cache_block_drop>,
   void visit(class cds::cell2D& cell);
   void visit(cfsm::cell2D_fsm& fsm);
 
-  void visit(ds::dpo_semantic_map& map);
+  void visit(fspds::dpo_semantic_map& map);
   void visit(fsm::block_to_goal_fsm& fsm);
   void visit(tasks::d1::harvester& task);
   void visit(controller::cognitive::d1::bitd_dpo_controller& controller);

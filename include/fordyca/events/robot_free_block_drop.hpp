@@ -44,10 +44,6 @@ namespace fordyca::controller::cognitive {
 class block_sel_matrix;
 } // namespace fordyca::controller::cognitive
 
-namespace fordyca::ds {
-class dpo_semantic_map;
-} /* namespace fordyca::ds */
-
 NS_START(fordyca, events, detail);
 
 /*******************************************************************************

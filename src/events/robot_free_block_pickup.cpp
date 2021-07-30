@@ -37,10 +37,10 @@
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
-#include "fordyca/controller/cognitive/dpo_perception_subsystem.hpp"
-#include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/reactive/d0/crw_controller.hpp"
-#include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cell2D_empty.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/d0/crw_fsm.hpp"
@@ -56,8 +56,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events, detail);
-
-using ds::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -85,7 +83,7 @@ template <typename TController>
 void robot_free_block_pickup::d1d2_dpo_controller_visit(TController& controller) {
   controller.ndc_pusht();
 
-  visit(*controller.dpo_perception()->dpo_store());
+  visit(*controller.perception()->template model<fspds::dpo_store>());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   dispatch_robot_free_block_interactor(controller.current_task());
 
@@ -96,7 +94,7 @@ template <typename TController>
 void robot_free_block_pickup::d1d2_mdpo_controller_visit(TController& controller) {
   controller.ndc_pusht();
 
-  visit(*controller.mdpo_perception()->dpo_store());
+  visit(*controller.perception()->template model<fspds::dpo_semantic_map>());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   dispatch_robot_free_block_interactor(controller.current_task());
 
@@ -107,7 +105,7 @@ template <typename TController>
 void robot_free_block_pickup::d0_dpo_controller_visit(TController& controller) {
   controller.ndc_pusht();
 
-  visit(*controller.dpo_perception()->dpo_store());
+  visit(*controller.perception()->template model<fspds::dpo_store>());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   visit(*controller.fsm());
 
@@ -118,7 +116,7 @@ template <typename TController>
 void robot_free_block_pickup::d0_mdpo_controller_visit(TController& controller) {
   controller.ndc_pusht();
 
-  visit(*controller.mdpo_perception()->map());
+  visit(*controller.perception()->template model<fspds::dpo_semantic_map>());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   visit(*controller.fsm());
 
@@ -146,7 +144,7 @@ void robot_free_block_pickup::visit(fsm::d0::crw_fsm& fsm) {
 /*******************************************************************************
  * DPO/MDPO Depth0 Foraging
  ******************************************************************************/
-void robot_free_block_pickup::visit(ds::dpo_store& store) {
+void robot_free_block_pickup::visit(fspds::dpo_store& store) {
   ER_ASSERT(
       store.contains(block()), "Block%d not in DPO store", block()->id().v());
   store.block_remove(block());
@@ -155,9 +153,8 @@ void robot_free_block_pickup::visit(ds::dpo_store& store) {
             block()->id().v());
 } /* visit() */
 
-void robot_free_block_pickup::visit(ds::dpo_semantic_map& map) {
-  cds::cell2D& cell =
-      map.access<occupancy_grid::kCell>(cell2D_op::x(), cell2D_op::y());
+void robot_free_block_pickup::visit(fspds::dpo_semantic_map& map) {
+  auto& cell = map.access<fspds::occupancy_grid::kCell>(coord());
 
   ER_ASSERT(block()->danchor2D() == cell.loc(),
             "Coordinates for block%d@%s/cell@%s do not agree",

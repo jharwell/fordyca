@@ -33,14 +33,11 @@
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace fordyca::ds {
-class dpo_store;
-class dpo_semantic_map;
-} /* namespace fordyca::ds */
 
 NS_START(fordyca, events, detail);
 
@@ -86,8 +83,8 @@ class robot_free_block_pickup : public rer::client<robot_free_block_pickup>,
   void visit(fsm::d0::crw_fsm& fsm);
 
   /* Depth0 DPO/MDPO foraging */
-  void visit(ds::dpo_store& store);
-  void visit(ds::dpo_semantic_map& map);
+  void visit(fspds::dpo_store& store);
+  void visit(fspds::dpo_semantic_map& map);
   void visit(fsm::d0::dpo_fsm& fsm);
   void visit(controller::cognitive::d0::dpo_controller& controller);
   void visit(controller::cognitive::d0::mdpo_controller& controller);

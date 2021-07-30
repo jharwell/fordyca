@@ -30,11 +30,15 @@
 #include "rcppsw/math/vector2.hpp"
 
 #include "fordyca/controller/cognitive/block_sel_matrix.hpp"
-#include "fordyca/ds/dp_block_map.hpp"
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::repr {
+class base_block3D;
+} /* namespace cosm::repr */
+
 NS_START(fordyca, controller, cognitive);
 
 /*******************************************************************************
@@ -63,7 +67,7 @@ class block_selector : public rer::client<block_selector> {
    * \return A pointer to the "best" block, along with its utility value, if a
    * best block is found, and NULL.
    */
-  const crepr::base_block3D* operator()(const ds::dp_block_map& blocks,
+  const crepr::base_block3D* operator()(const fspds::dp_block_map& blocks,
                                         const rmath::vector2d& position);
 
  private:

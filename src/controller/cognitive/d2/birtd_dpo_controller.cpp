@@ -35,7 +35,7 @@
 #include "fordyca/controller/cognitive/block_sel_matrix.hpp"
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/controller/cognitive/d2/task_executive_builder.hpp"
-#include "fordyca/controller/cognitive/dpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
 #include "fordyca/tasks/d2/foraging_task.hpp"
 
 /*******************************************************************************
@@ -58,7 +58,9 @@ void birtd_dpo_controller::control_step(void) {
             "Carried block%d has robot id=%d",
             block()->id().v(),
             block()->md()->robot_id().v());
-  dpo_perception()->update(nullptr);
+
+  /* non-oracular controller */
+  perception()->update(nullptr);
 
   /*
    * Execute the current task/allocate a new task/abort a task/etc and apply

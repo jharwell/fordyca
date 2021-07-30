@@ -31,6 +31,7 @@
 #include "cosm/ds/operations/cell2D_op.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,11 +39,6 @@
 namespace cosm::arena::repr {
 class base_cache;
 }
-
-namespace fordyca::ds {
-class dpo_store;
-class dpo_semantic_map;
-} // namespace fordyca::ds
 
 NS_START(fordyca, events, detail);
 
@@ -61,7 +57,7 @@ class cache_found : public cdops::cell2D_op, public rer::client<cache_found> {
  private:
   struct visit_typelist_impl {
     using inherited = cell2D_op::visit_typelist;
-    using others = rmpl::typelist<ds::dpo_store, ds::dpo_semantic_map>;
+    using others = rmpl::typelist<fspds::dpo_store, fspds::dpo_semantic_map>;
     using controllers = controller::d2::typelist;
     using value = boost::mpl::joint_view<
         boost::mpl::joint_view<controllers::type, others::type>,
@@ -78,11 +74,11 @@ class cache_found : public cdops::cell2D_op, public rer::client<cache_found> {
   cache_found& operator=(const cache_found& op) = delete;
 
   /* DPO foraging */
-  void visit(ds::dpo_store& store);
+  void visit(fspds::dpo_store& store);
 
   /* MDPO foraging */
   void visit(cds::cell2D& cell);
-  void visit(ds::dpo_semantic_map& map);
+  void visit(fspds::dpo_semantic_map& map);
   void visit(cfsm::cell2D_fsm& fsm);
 
   /* d2 foraging */

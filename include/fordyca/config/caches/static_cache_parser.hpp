@@ -53,7 +53,7 @@ class static_cache_parser final: public rconfig::xml::xml_config_parser {
    * \brief The root tag that all static cache parameters should lie under in
    * the XML tree.
    */
-  inline static const std::string kXMLRoot = "static";
+  static inline const std::string kXMLRoot = "static";
 
   void parse(const ticpp::Element& node) override RCPPSW_COLD;
   bool validate(void) const override RCPPSW_ATTR(const, cold);

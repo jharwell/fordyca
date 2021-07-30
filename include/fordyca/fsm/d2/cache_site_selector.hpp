@@ -30,18 +30,24 @@
 #include <vector>
 #include <string>
 #include <nlopt.hpp>
+#include <boost/optional.hpp>
+
+#include "cosm/arena/ds/cache_vector.hpp"
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/types/spatial_dist.hpp"
 #include "rcppsw/math/rng.hpp"
 
-#include "fordyca/ds/dp_block_map.hpp"
-#include "fordyca/ds/dp_cache_map.hpp"
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::arena::repr {
+class base_cache;
+} /* namespace cosm::arena::repr */
+
 NS_START(fordyca);
 
 namespace controller::cognitive {
@@ -65,8 +71,8 @@ class cache_site_selector: public rer::client<cache_site_selector> {
  public:
   struct cache_constraint_data {
     const carepr::base_cache* mc_cache{nullptr};
-    cache_site_selector*    selector{nullptr};
-    rtypes::spatial_dist     cache_prox{0.0};
+    cache_site_selector*      selector{nullptr};
+    rtypes::spatial_dist      cache_prox{0.0};
   };
   struct nest_constraint_data {
     rmath::vector2d      nest_loc{};
@@ -96,7 +102,7 @@ class cache_site_selector: public rer::client<cache_site_selector> {
    * site could be found (can happen if NLopt mysteriously fails).
    */
   boost::optional<rmath::vector2d> operator()(
-      const ds::dp_cache_map& known_caches,
+      const cads::bcache_vectorno& known_caches,
       rmath::vector2d position,
       rmath::rng* rng);
 
@@ -136,7 +142,7 @@ class cache_site_selector: public rer::client<cache_site_selector> {
   static constexpr uint kMAX_ITERATIONS = 5000;
 
   struct opt_init_conditions {
-    const ds::dp_cache_map& known_caches;
+    const cads::bcache_vectorno& known_caches;
     rmath::vector2d position;
   };
 
@@ -147,7 +153,7 @@ class cache_site_selector: public rer::client<cache_site_selector> {
    * \brief Create constraints for known caches, known blocks, and relating to
    * the nest.
    */
-  void constraints_create(const ds::dp_cache_map& known_caches,
+  void constraints_create(const cads::bcache_vectorno& known_caches,
                           const rmath::vector2d& nest_loc);
 
 
@@ -157,7 +163,7 @@ class cache_site_selector: public rer::client<cache_site_selector> {
                       rmath::rng* rng);
 
   bool verify_site(const rmath::vector2d& site,
-                   const ds::dp_cache_map& known_caches) const RCPPSW_CONST;
+                   const cads::bcache_vectorno& known_caches) const RCPPSW_CONST;
 
   std::string nlopt_ret_str(nlopt::result res) const;
 

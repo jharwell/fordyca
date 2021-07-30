@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/cognitive/oracular_info_receptor.hpp"
+#include "fordyca/subsystem/perception/oracular_info_receptor.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/foraging/oracle/foraging_oracle.hpp"
@@ -32,14 +32,14 @@
 #include "cosm/ta/polled_task.hpp"
 #include "cosm/ta/time_estimate.hpp"
 
-#include "fordyca/ds/dpo_store.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_found.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, controller, cognitive);
+NS_START(fordyca, subsystem, perception);
 
 /*******************************************************************************
  * Member Functions
@@ -53,7 +53,7 @@ void oracular_info_receptor::dpo_store_update(ds::dpo_store* const store) {
                    "b", blocks)
                    .c_str());
       ER_DEBUG("Blocks in DPO store: [%s]",
-               rcppsw::to_string(store->blocks()).c_str());
+               rcppsw::to_string(store->known_blocks()).c_str());
     }
     for (auto* b : blocks) {
       events::block_found_visitor visitor(b);
@@ -68,7 +68,7 @@ void oracular_info_receptor::dpo_store_update(ds::dpo_store* const store) {
                    "c", caches)
                    .c_str());
       ER_DEBUG("Caches in DPO store: [%s]",
-               rcppsw::to_string(store->caches()).c_str());
+               rcppsw::to_string(store->known_caches()).c_str());
     }
     for (auto* c : caches) {
       events::cache_found_visitor visitor(c);
@@ -149,4 +149,4 @@ bool oracular_info_receptor::tasking_enabled(void) const {
   return nullptr != mc_oracle->tasking();
 } /* tasking_enabled() */
 
-NS_END(cognitive, controller, fordyca);
+NS_END(subsystem, perception, fordyca);

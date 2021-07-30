@@ -32,7 +32,7 @@
 #include "cosm/foraging/oracle/foraging_oracle.hpp"
 
 #include "fordyca/support/d1/d1_metrics_manager.hpp"
-#include "fordyca/controller/cognitive/oracular_info_receptor.hpp"
+#include "fordyca/subsystem/perception/oracular_info_receptor.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -114,7 +114,7 @@ class robot_configurer {
       m_oracle->tasking()->listener_add(c->executive());
     }
     if (nullptr != m_oracle) {
-      auto receptor = std::make_unique<controller::cognitive::oracular_info_receptor>(m_oracle);
+      auto receptor = std::make_unique<fsperception::oracular_info_receptor>(m_oracle);
       c->oracle_init(std::move(receptor));
     }
   } /* controller_config_oracle() */
@@ -124,7 +124,7 @@ class robot_configurer {
   const cvconfig::visualization_config* const mc_config;
   cforacle::foraging_oracle* const            m_oracle;
 
-  TMetricsManager* const                          m_metrics_manager;
+  TMetricsManager* const                      m_metrics_manager;
   /* clang-format on */
 };
 

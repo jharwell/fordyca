@@ -29,9 +29,9 @@
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
-#include "fordyca/controller/cognitive/dpo_perception_subsystem.hpp"
-#include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
-#include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
@@ -72,7 +72,7 @@ void cache_proximity::visit(controller::cognitive::d2::birtd_dpo_controller& c) 
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
 
   events::cache_found_visitor found(m_cache);
-  found.visit(*c.dpo_perception()->dpo_store());
+  found.visit(*c.perception()->model<fspds::dpo_store>());
 
   dispatch_cache_interactor(c.current_task());
 
@@ -85,7 +85,7 @@ void cache_proximity::visit(controller::cognitive::d2::birtd_mdpo_controller& c)
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
 
   events::cache_found_visitor found(m_cache);
-  found.visit(*c.mdpo_perception()->map());
+  found.visit(*c.perception()->model<fspds::dpo_semantic_map>());
 
   dispatch_cache_interactor(c.current_task());
 
@@ -98,7 +98,7 @@ void cache_proximity::visit(controller::cognitive::d2::birtd_odpo_controller& c)
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
 
   events::cache_found_visitor found(m_cache);
-  found.visit(*c.dpo_perception()->dpo_store());
+  found.visit(*c.perception()->model<fspds::dpo_store>());
 
   dispatch_cache_interactor(c.current_task());
 
@@ -111,7 +111,7 @@ void cache_proximity::visit(controller::cognitive::d2::birtd_omdpo_controller& c
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
 
   events::cache_found_visitor found(m_cache);
-  found.visit(*c.mdpo_perception()->map());
+  found.visit(*c.perception()->model<fspds::dpo_semantic_map>());
 
   dispatch_cache_interactor(c.current_task());
 

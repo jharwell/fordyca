@@ -26,6 +26,7 @@
 #include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/math/block_utility.hpp"
+#include "fordyca/subsystem/perception/ds/dp_block_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,13 +45,13 @@ block_selector::block_selector(const block_sel_matrix* const sel_matrix)
  * Member Functions
  ******************************************************************************/
 const crepr::base_block3D*
-block_selector::operator()(const ds::dp_block_map& blocks,
+block_selector::operator()(const fspds::dp_block_map& blocks,
                            const rmath::vector2d& position) {
   double max_utility = 0.0;
   const crepr::base_block3D* best = nullptr;
 
   ER_ASSERT(!blocks.empty(), "No known perceived blocks");
-  for (const auto& b : blocks.const_values_range()) {
+  for (const auto& b : blocks.values_range()) {
     if (block_is_excluded(position, b.ent())) {
       continue;
     }

@@ -28,11 +28,15 @@
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/types/timestep.hpp"
 
-#include "fordyca/ds/dp_cache_map.hpp"
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::arena::repr {
+class base_cache;
+} /* namespace cosm::arena::repr */
+
 NS_START(fordyca);
 
 namespace controller::cognitive {
@@ -56,7 +60,7 @@ class existing_cache_selector : public rer::client<existing_cache_selector> {
  public:
   existing_cache_selector(bool is_pickup,
                           const controller::cognitive::cache_sel_matrix* matrix,
-                          const ds::dp_cache_map* cache_map);
+                          const fspds::dp_cache_map* cache_map);
 
   ~existing_cache_selector(void) override = default;
   existing_cache_selector&
@@ -70,7 +74,7 @@ class existing_cache_selector : public rer::client<existing_cache_selector> {
    *
    * \return The "best" existing cache.
    */
-  const carepr::base_cache* operator()(const ds::dp_cache_map& existing_caches,
+  const carepr::base_cache* operator()(const fspds::dp_cache_map& existing_caches,
                                        const rmath::vector2d& position,
                                        const rtypes::timestep& t);
 
@@ -90,7 +94,7 @@ class existing_cache_selector : public rer::client<existing_cache_selector> {
   /* clang-format off */
   const bool                                           mc_is_pickup;
   const controller::cognitive::cache_sel_matrix* const mc_matrix;
-  const ds::dp_cache_map* const                        mc_cache_map;
+  const fspds::dp_cache_map* const                     mc_cache_map;
   /* clang-format on */
 };
 

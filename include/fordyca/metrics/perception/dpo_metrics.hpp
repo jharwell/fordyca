@@ -53,12 +53,12 @@ class dpo_metrics : public virtual rmetrics::base_metrics {
   /**
    * \brief Return the # of blocks that a robot currently knows about.
    */
-  virtual uint n_known_blocks(void) const = 0;
+  virtual size_t n_known_blocks(void) const = 0;
 
   /**
    * \brief Return The # of caches that a robot currently knows about.
    */
-  virtual uint n_known_caches(void) const = 0;
+  virtual size_t n_known_caches(void) const = 0;
 
   /**
    * \brief Return the average block pheromone density for the blocks the robot

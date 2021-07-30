@@ -32,10 +32,11 @@
 
 #include "fordyca/config/d0/mdpo_controller_repository.hpp"
 #include "fordyca/config/strategy/strategy_config.hpp"
-#include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
-#include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/fsm/d0/dpo_fsm.hpp"
 #include "fordyca/strategy/explore/block_factory.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/perception_subsystem_factory.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -98,12 +99,11 @@ void mdpo_controller::shared_init(
 
   /* MDPO perception subsystem */
   auto p = *config_repo.config_get<cspconfig::perception_config>();
-  rmath::vector2d padding(p.occupancy_grid.resolution.v() * 5,
-                          p.occupancy_grid.resolution.v() * 5);
-  p.occupancy_grid.dims += padding;
-
-  dpo_controller::perception(
-      std::make_unique<mdpo_perception_subsystem>(&p, GetId()));
+  rmath::vector2d padding(p.mdpo.grid.resolution.v() * 5,
+                          p.mdpo.grid.resolution.v() * 5);
+  p.mdpo.grid.dims += padding;
+  auto factory = fsperception::perception_subsystem_factory();
+  perception(factory.create(p.model, &p));
 } /* shared_init() */
 
 void mdpo_controller::private_init(
@@ -111,12 +111,19 @@ void mdpo_controller::private_init(
   const auto* strat_config =
       config_repo.config_get<fcstrategy::strategy_config>();
 
-  fstrategy::foraging_strategy::params strategy_params(
-      saa(), nullptr, nullptr, perception()->dpo_store(), rutils::color());
-  fsm::fsm_ro_params fsm_ro_params = { .bsel_matrix = block_sel_matrix(),
-                                       .csel_matrix = nullptr,
-                                       .store = perception()->dpo_store(),
-                                       .strategy_config = *strat_config };
+  fstrategy::foraging_strategy::params strategy_params{
+    saa(),
+    nullptr,
+    nullptr,
+    perception()->known_objects(),
+    rutils::color()
+  };
+  fsm::fsm_ro_params fsm_ro_params = {
+    .bsel_matrix = block_sel_matrix(),
+    .csel_matrix = nullptr,
+    .store = perception()->model<fspds::dpo_semantic_map>()->store(),
+    .accessor = perception()->known_objects(),
+    .strategy_config = *strat_config };
   dpo_controller::fsm(std::make_unique<fsm::d0::dpo_fsm>(
       &fsm_ro_params,
       saa(),
@@ -129,15 +136,6 @@ void mdpo_controller::private_init(
   /* Set MDPO FSM supervision */
   supervisor()->supervisee_update(fsm());
 } /* private_init() */
-
-mdpo_perception_subsystem* mdpo_controller::mdpo_perception(void) {
-  return static_cast<mdpo_perception_subsystem*>(dpo_controller::perception());
-} /* perception() */
-
-const mdpo_perception_subsystem* mdpo_controller::mdpo_perception(void) const {
-  return static_cast<const mdpo_perception_subsystem*>(
-      dpo_controller::perception());
-} /* perception() */
 
 using namespace argos; // NOLINT
 

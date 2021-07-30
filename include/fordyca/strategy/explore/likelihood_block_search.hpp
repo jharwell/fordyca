@@ -27,16 +27,12 @@
 #include <memory>
 
 #include "fordyca/strategy/explore/localized_search.hpp"
+#include "fordyca/subsystem/perception/foraging_perception_model.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace ds {
-class dpo_store;
-} /* namespace ds */
-
-NS_START(strategy, explore);
+NS_START(fordyca, strategy, explore);
 
 /*******************************************************************************
  * Class Definitions
@@ -52,16 +48,11 @@ NS_START(strategy, explore);
 class likelihood_block_search : public localized_search {
  public:
   likelihood_block_search(const foraging_strategy::params* const c_params,
-                          rmath::rng* rng)
-      : likelihood_block_search(c_params->saa,
-                                c_params->dpo_store,
-                                rng) {}
+                          rmath::rng* rng);
 
   likelihood_block_search(csubsystem::saa_subsystemQ3D* saa,
-                          const ds::dpo_store* store,
-                          rmath::rng* rng)
-      : localized_search(saa, rng),
-        mc_store(store) {}
+                          const fsperception::known_objects_accessor* accessor,
+                          rmath::rng* rng);
 
   ~likelihood_block_search(void) override = default;
   likelihood_block_search(const likelihood_block_search&) = delete;
@@ -73,14 +64,9 @@ class likelihood_block_search : public localized_search {
   /* prototype overrides */
   std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
     return std::make_unique<likelihood_block_search>(saa(),
-                                                     mc_store,
+                                                     accessor(),
                                                      rng());
   }
-
- private:
-  /* clang-format off */
-  const ds::dpo_store* mc_store;
-  /* clang-format on */
 };
 
 NS_END(explore, strategy, fordyca);
