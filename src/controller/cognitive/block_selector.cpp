@@ -50,7 +50,7 @@ block_selector::operator()(const ds::dp_block_map& blocks,
   const crepr::base_block3D* best = nullptr;
 
   ER_ASSERT(!blocks.empty(), "No known perceived blocks");
-  for (const auto& b : blocks.const_values_range()) {
+  for (const auto& b : blocks.values_range()) {
     if (block_is_excluded(position, b.ent())) {
       continue;
     }

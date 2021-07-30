@@ -84,10 +84,20 @@ task_executive_builder::tasking_map task_executive_builder::d1_tasks_create(
   const auto* strat_config =
       config_repo.config_get<fcstrategy::strategy_config>();
   auto cache_color = carepr::light_type_index()[carepr::light_type_index::kCache];
-  fstrategy::foraging_strategy::params strategy_cachep(
-      saa(), nullptr, mc_csel_matrix, m_perception->dpo_store(), cache_color);
-  fstrategy::foraging_strategy::params strategy_blockp(
-      saa(), nullptr, mc_csel_matrix, m_perception->dpo_store(), rutils::color());
+  fstrategy::foraging_strategy::params strategy_cachep{
+      saa(),
+      nullptr,
+      mc_csel_matrix,
+       m_perception->model<ds::dpo_store>(),
+      cache_color
+      };
+  fstrategy::foraging_strategy::params strategy_blockp{
+      saa(),
+      nullptr,
+      mc_csel_matrix,
+      m_perception->model<ds::dpo_store>(),
+      rutils::color()
+      };
 
   ER_ASSERT(nullptr != mc_bsel_matrix, "NULL block selection matrix");
   ER_ASSERT(nullptr != mc_csel_matrix, "NULL cache selection matrix");
@@ -98,7 +108,7 @@ task_executive_builder::tasking_map task_executive_builder::d1_tasks_create(
 
   fsm::fsm_ro_params params = { .bsel_matrix = block_sel_matrix(),
                                 .csel_matrix = mc_csel_matrix,
-                                .store = m_perception->dpo_store(),
+                                .store = m_perception->model<ds::dpo_store>(),
                                 .strategy_config = *strat_config };
 
   auto generalist_fsm = std::make_unique<fsm::d0::free_block_to_nest_fsm>(

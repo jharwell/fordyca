@@ -48,9 +48,9 @@ bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
    * here. The fix is to only assert() if there is not a cache that contains the
    * block's location, and it is therefore not occluded.
    */
-  for (const auto& cache : c_dpo->caches().const_values_range()) {
+  for (const auto& cache : c_dpo->known_caches()) {
     for (auto* block : mc_los->blocks()) {
-      if (!cache.ent()->contains_point2D(block->ranchor2D())) {
+      if (!cache->contains_point2D(block->ranchor2D())) {
         ER_ASSERT(c_dpo->contains(block),
                   "Store does not contain block%d@%s",
                   block->id().v(),

@@ -28,17 +28,13 @@
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/repr/forager_los.hpp"
+#include "fordyca/ds/access_known_objects.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, controller, cognitive);
 
-namespace ds {
-class dpo_store;
-}
-
-NS_START(controller, cognitive);
 class oracular_info_receptor;
 
 /*******************************************************************************
@@ -63,11 +59,28 @@ class foraging_perception_subsystem
   /**
    * \brief Update the internal data structure/repr of the
    * environment/arena, after the LOS has been updated.
+   *
+   * \param receptor Handle to \ref oracular_info_receptor containing perfect
+   * information about the environment. If non-NULL, bypasses LOS updating (why
+   * use LOS when you have perception information?).
    */
   virtual void update(oracular_info_receptor* receptor) = 0;
 
-  virtual const ds::dpo_store* dpo_store(void) const = 0;
-  virtual ds::dpo_store* dpo_store(void) = 0;
+  /**
+   * \brief Get access to all objects known to the robot, independent of
+   * perception model.
+   */
+  virtual const ds::access_known_objects* known_objects(void) const = 0;
+  virtual ds::access_known_objects* known_objects(void) = 0;
+
+  template<typename TModelType>
+  const TModelType* model(void) const {
+    return static_cast<const TModelType*>(base_perception_subsystem::model());
+  }
+  template<typename TModelType>
+  TModelType* model(void) {
+    return static_cast<TModelType*>(base_perception_subsystem::model());
+  }
 };
 
 NS_END(cognitive, controller, fordyca);

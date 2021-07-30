@@ -78,7 +78,7 @@ void mdpo_perception_subsystem::process_los(
 
   /* If we are in an oracular controller, process the updates from the oracle */
   if (nullptr != receptor) {
-    receptor->dpo_store_update(dpo_store());
+    receptor->dpo_store_update(model<ds::dpo_semantic_map>()->store());
   }
 
   /*
@@ -114,7 +114,7 @@ void mdpo_perception_subsystem::process_los_blocks(
 
     ER_DEBUG("Blocks in LOS: [%s]", accum.c_str());
     ER_DEBUG("Blocks in DPO store: [%s]",
-             rcppsw::to_string(m_map->store()->blocks()).c_str());
+             rcppsw::to_string(m_map->store()->known_blocks()).c_str());
   }
 
   /*
@@ -164,9 +164,9 @@ void mdpo_perception_subsystem::process_los_blocks(
                block->id().v(),
                block->ranchor2D().to_str().c_str(),
                block->danchor2D().to_str().c_str());
-      auto range = m_map->blocks().const_values_range();
+      auto range = m_map->known_blocks();
       auto it = std::find_if(range.begin(), range.end(), [&](const auto& b1) {
-        return b1.ent()->id() == cell.block3D()->id();
+        return b1->id() == cell.block3D()->id();
       });
       ER_ASSERT(it != range.end(), "Known block%d not in PAM", block->id().v());
     }
@@ -186,7 +186,7 @@ void mdpo_perception_subsystem::process_los_caches(
   if (!los_caches.empty()) {
     ER_DEBUG("Caches in LOS: [%s]", rcppsw::to_string(los_caches).c_str());
     ER_DEBUG("Caches in DPO store: [%s]",
-             rcppsw::to_string(m_map->store()->caches()).c_str());
+             rcppsw::to_string(m_map->store()->known_caches()).c_str());
   }
 
   /*
@@ -265,13 +265,12 @@ void mdpo_perception_subsystem::update_cell_stats(
   } /* for(i..) */
 } /* update_cell_stats() */
 
-ds::dpo_store* mdpo_perception_subsystem::dpo_store(void) {
-  return m_map->store();
-} /* dpo_store() */
-
-const ds::dpo_store* mdpo_perception_subsystem::dpo_store(void) const {
-  return m_map->store();
-} /* dpo_store() */
+const ds::access_known_objects* mdpo_perception_subsystem::known_objects(void) const {
+  return m_map->store()->known_objects();
+}
+ds::access_known_objects* mdpo_perception_subsystem::known_objects(void) {
+  return m_map->store()->known_objects();
+}
 
 /*******************************************************************************
  * MDPO Perception Metrics

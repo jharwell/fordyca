@@ -63,10 +63,11 @@ void cache_found::visit(ds::dpo_store& store) {
    * a new cache there, we are tracking blocks that no longer exist in the
    * arena.
    */
-  auto it = store.blocks().values_range().begin();
-  while (it != store.blocks().values_range().end()) {
-    if (m_cache->contains_point2D(it->ent()->rcenter2D())) {
-      crepr::base_block3D* tmp = (*it).ent();
+  auto blocks = store.known_blocks();
+  auto it = blocks.begin();
+  while (it != blocks.end()) {
+    if (m_cache->contains_point2D((*it)->rcenter2D())) {
+      crepr::base_block3D* tmp = (*it);
       ++it;
       ER_TRACE("Remove block%d hidden behind cache%d",
                tmp->id().v(),
@@ -164,13 +165,14 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
    * created. When we return to the arena and find a new cache there, we are
    * tracking blocks that no longer exist in our perception.
    */
-  std::list<crepr::base_block3D*> rms;
-  for (auto&& b : map.blocks().values_range()) {
-    if (m_cache->contains_point2D(b.ent()->rcenter2D())) {
+  std::vector<crepr::base_block3D*> rms;
+  auto blocks = map.known_blocks();
+  for (auto&& b : blocks) {
+    if (m_cache->contains_point2D(b->rcenter2D())) {
       ER_TRACE("Remove block%d hidden behind cache%d",
-               b.ent()->id().v(),
+               b->id().v(),
                m_cache->id().v());
-      rms.push_back(b.ent());
+      rms.push_back(b);
     }
   } /* for(&&b..) */
 
@@ -193,28 +195,6 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
   }
 
   /*
-   * If the ID of the cache we currently think resides in the cell and the ID of
-   * the one we just found that actually resides there are not the same, we need
-   * to reset the density for the cell, and start a new decay count.
-   */
-  if (cell.state_has_cache() && cell.cache()->id() != m_cache->id()) {
-    density.reset();
-  }
-
-  if (map.pheromone_repeat_deposit()) {
-    density.pheromone_add(crepr::pheromone_density::kUNIT_QUANTITY);
-  } else {
-    /*
-     * Seeing a new cache on empty square or one that used to contain a block.
-     */
-    if (!cell.state_has_cache()) {
-      density.reset();
-      density.pheromone_add(crepr::pheromone_density::kUNIT_QUANTITY);
-    } else { /* Seeing a known cache again--set its relevance to the max */
-      density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
-    }
-  }
-  /*
    * The cache we get a handle to is owned by the simulation, and we don't
    * want to just pass that into the robot's arena_map, as keeping them in
    * sync is not possible in all situations.
@@ -226,9 +206,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
    *
    * Cloning is definitely necessary here.
    */
-  auto ent = ds::dp_cache_map::value_type(m_cache->clone(), density);
-  map.store()->cache_update(std::move(ent));
-  visit(cell);
+  map.cache_update({m_cache->clone(), density});
 } /* visit() */
 
 /*******************************************************************************
@@ -237,7 +215,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
 void cache_found::visit(controller::cognitive::d2::birtd_mdpo_controller& c) {
   c.ndc_pusht();
 
-  visit(*c.mdpo_perception()->map());
+  visit(*c.perception()->model<ds::dpo_semantic_map>());
 
   c.ndc_pop();
 } /* visit() */
@@ -245,7 +223,7 @@ void cache_found::visit(controller::cognitive::d2::birtd_mdpo_controller& c) {
 void cache_found::visit(controller::cognitive::d2::birtd_dpo_controller& c) {
   c.ndc_pusht();
 
-  visit(*c.dpo_perception()->dpo_store());
+  visit(*c.perception()->model<ds::dpo_store>());
 
   c.ndc_pop();
 } /* visit() */
@@ -253,7 +231,7 @@ void cache_found::visit(controller::cognitive::d2::birtd_dpo_controller& c) {
 void cache_found::visit(controller::cognitive::d2::birtd_omdpo_controller& c) {
   c.ndc_pusht();
 
-  visit(*c.mdpo_perception()->map());
+  visit(*c.perception()->model<ds::dpo_semantic_map>());
 
   c.ndc_pop();
 } /* visit() */
@@ -261,7 +239,7 @@ void cache_found::visit(controller::cognitive::d2::birtd_omdpo_controller& c) {
 void cache_found::visit(controller::cognitive::d2::birtd_odpo_controller& c) {
   c.ndc_pusht();
 
-  visit(*c.dpo_perception()->dpo_store());
+  visit(*c.perception()->model<ds::dpo_store>());
 
   c.ndc_pop();
 } /* visit() */

@@ -1,5 +1,5 @@
 /**
- * \file dp_block_map.hpp
+ * \file access_tracked_objects.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,23 +18,19 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_DS_DP_BLOCK_MAP_HPP_
-#define INCLUDE_FORDYCA_DS_DP_BLOCK_MAP_HPP_
+#ifndef INCLUDE_FORDYCA_DS_ACCESS_TRACKED_OBJECTS_HPP_
+#define INCLUDE_FORDYCA_DS_ACCESS_TRACKED_OBJECTS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-
-#include "rcppsw/types/type_uuid.hpp"
-
 #include "cosm/repr/base_block3D.hpp"
+#include "cosm/arena/repr/base_cache.hpp"
 
-#include "fordyca/ds/dpo_map.hpp"
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, ds);
 
@@ -42,28 +38,37 @@ NS_START(fordyca, ds);
  * Class Definitions
  ******************************************************************************/
 /**
- * \class dp_block_map
+ * \class access_tracked_objects
  * \ingroup ds
  *
- * \brief The block map is a repr of the robot's perception of blocks
- * in the arena. It uses integers as keys, because blocks are mobile (i.e. can
- * move between instants of time where the robot sees them), and
- * inserting/removing blocks from the map using location comparison will not
- * give correct results.
+ * \brief Defines the interface for extracting information about currently
+ * access_tracked objects, including tracking information about each object.
  */
-class dp_block_map : public dpo_map<rtypes::type_uuid,
-                                    crepr::base_block3D> {
+template <typename TBlockContainer, typename TCacheContainer>
+class access_tracked_objects {
  public:
-  using dpo_map<rtypes::type_uuid,
-                crepr::base_block3D>::dpo_map;
+  using cache_container_type = TCacheContainer;
+  using block_container_type = TBlockContainer;
+
+  using tracked_cache_type = typename cache_container_type::value_type;
+  using tracked_block_type = typename block_container_type::value_type;
+
+  access_tracked_objects(void) = default;
+  virtual ~access_tracked_objects(void) = default;
 
   /**
-   * \brief Build a string from the list of DP blocks that a robot is tracking
-   * for logging.
+   * \brief Get all tracked blocks the robot is currently aware of.
    */
-  std::string to_str(void) const;
+  virtual const block_container_type& tracked_blocks(void) const = 0;
+  virtual block_container_type& tracked_blocks(void) = 0;
+
+  /**
+   * \brief Get all tracked caches the robot is currently aware of.
+   */
+  virtual const cache_container_type& tracked_caches(void) const = 0;
+  virtual cache_container_type& tracked_caches(void) = 0;
 };
 
 NS_END(ds, fordyca);
 
-#endif /* INCLUDE_FORDYCA_DS_DP_BLOCK_MAP_HPP_ */
+#endif /* INCLUDE_FORDYCA_DS_ACCESS_TRACKED_OBJECTS_HPP_ */

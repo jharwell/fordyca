@@ -48,11 +48,11 @@ block_to_existing_cache_fsm::block_to_existing_cache_fsm(
           fsexplore::cache_factory().create(
               c_params->strategy_config.explore.cache_strategy,
               std::make_unique<fstrategy::foraging_strategy::params>(
-                  saa,
-                  nullptr,
-                  c_params->csel_matrix,
-                  c_params->store,
-                  carepr::light_type_index()[carepr::light_type_index::kCache])
+                saa,
+                    nullptr,
+                    c_params->csel_matrix,
+                    c_params->store,
+                carepr::light_type_index()[carepr::light_type_index::kCache])
                   .get(),
               rng),
           rng,

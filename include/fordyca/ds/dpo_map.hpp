@@ -47,26 +47,43 @@ NS_START(fordyca, ds);
  * reference), which decouples/simplifies a lot of the tricky handshaking logic
  * when robots interact with the arena.
  */
-template <typename key_type, typename obj_type>
+template <typename TKeyType,
+          typename TRawValueType>
 class dpo_map {
  public:
-  using value_type = typename repr::dpo_entity<obj_type>;
+  using raw_value_type = TRawValueType;
+  using value_type = typename repr::dpo_entity<TRawValueType>;
+  using key_type = TKeyType;
   using map_type = std::map<key_type, value_type>;
 
-  template <typename T, typename Adaptor>
-  using iterator_type =
-      decltype(boost::make_iterator_range(std::declval<T>().begin(),
-                                          std::declval<T>().end()) |
-               std::declval<Adaptor>());
+  template<typename TRawVectorType>
+  static TRawVectorType raw_values_extract(const dpo_map& map) {
+    auto range = map.values_range();
+    /*
+     * For some reason the boost adaptor ranges only have overloads for
+     * std::transform for binary operations...
+     */
+    auto value_to_obj =[](value_type& v, raw_value_type*) {
+                         return v.ent();
+                       };
+    TRawVectorType ret;
 
-  dpo_map(void) : mc_obj_ref(m_obj) {}
+    std::transform(std::begin(range),
+                   std::end(range),
+                   std::begin(ret),
+                   std::begin(ret),
+                   value_to_obj);
+    return ret;
+  }
+
+  dpo_map(void)  = default;
 
   /**
    * \brief Update the densities of all objects in the map. Should be called
    * when one unit of time has passed (e.g. every timestep).
    */
   void decay_all(void) {
-    for (std::pair<const key_type, value_type>& o : m_obj) {
+    for (auto& o : m_obj) {
       o.second.density().update();
     } /* for(&o..) */
   }
@@ -106,8 +123,11 @@ class dpo_map {
    * \brief Return an iterator for examining, but not modifying the values of
    * the map.
    */
-  auto const_values_range(void) const
-      -> decltype(std::declval<map_type>() | boost::adaptors::map_values) {
+  auto values_range(void) const {
+    return const_cast<dpo_map*>(this)->values_range();
+  }
+
+  auto values_range(void) {
     return m_obj | boost::adaptors::map_values;
   }
 
@@ -115,10 +135,8 @@ class dpo_map {
    * \brief Return an iterator for examining, but not modifying, the keys of
    * the map.
    */
-  iterator_type<const map_type, decltype(boost::adaptors::map_keys)>
-  keys_range(void) const {
-    return boost::make_iterator_range(m_obj.begin(), m_obj.end()) |
-           boost::adaptors::map_keys;
+  auto keys_range(void) const {
+    return m_obj | boost::adaptors::map_keys;
   }
 
   /**
@@ -130,30 +148,13 @@ class dpo_map {
 
  private:
   /* clang-format off */
-  /**
-   * \brief Needed for compiler to correctly deduce wrapped function return
-   * types for const qualified contexts (must be BEFORE the wrapping macros in
-   * the file).
-   */
-  const map_type& mc_obj_ref;
   map_type        m_obj{};
   /* clang-format on */
 
  public:
-  RCPPSW_WRAP_DECLDEF(size, mc_obj_ref, const)
-  RCPPSW_WRAP_DECLDEF(empty, mc_obj_ref, const)
+  RCPPSW_WRAP_DECLDEF(size, m_obj, const)
+  RCPPSW_WRAP_DECLDEF(empty, m_obj, const)
   RCPPSW_WRAP_DECLDEF(clear, m_obj)
-
-  /**
-   * \brief Iterate over mutable values of the map.
-   *
-   * \todo This has to be AFTER the member variable is declared, because I can't
-   * figure out how to get std:declval<map_type>() to be non-const (I think) and
-   * have the non-const map_values iterator as the chosen function overload.
-   */
-  auto values_range(void) -> decltype(m_obj | boost::adaptors::map_values) {
-    return m_obj | boost::adaptors::map_values;
-  }
 };
 
 NS_END(ds, fordyca);

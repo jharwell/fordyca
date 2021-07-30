@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/config/foraging_controller_repository.hpp"
+#include "fordyca/config/perceptive_controller_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,7 +41,7 @@ NS_START(fordyca, config, d0);
  * \brief Collection of all parameter parsers and parse results needed by
  * \ref dpo_controller.
  */
-class dpo_controller_repository: public foraging_controller_repository {
+class dpo_controller_repository: public perceptive_controller_repository {
  public:
   dpo_controller_repository(void) RCPPSW_COLD;
 };

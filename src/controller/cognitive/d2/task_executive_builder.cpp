@@ -48,6 +48,7 @@
 #include "fordyca/tasks/d2/cache_finisher.hpp"
 #include "fordyca/tasks/d2/cache_starter.hpp"
 #include "fordyca/tasks/d2/cache_transferer.hpp"
+#include "fordyca/ds/dpo_store.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -84,17 +85,24 @@ task_executive_builder::tasking_map task_executive_builder::d2_tasks_create(
   fsexplore::cache_factory cache_factory;
   csstrategy::nest_acq::factory nest_acq_factory;
 
-  fstrategy::foraging_strategy::params strategy_cachep(
-      saa(), nullptr, cache_sel_matrix(), perception()->dpo_store(), cache_color);
-  fstrategy::foraging_strategy::params strategy_blockp(saa(),
-                                                       nullptr,
-                                                       cache_sel_matrix(),
-                                                       perception()->dpo_store(),
-                                                       rutils::color());
+  fstrategy::foraging_strategy::params strategy_cachep{
+    saa(),
+    nullptr,
+    cache_sel_matrix(),
+    perception()->model<ds::dpo_store>(),
+    cache_color
+  };
+  fstrategy::foraging_strategy::params strategy_blockp{
+    saa(),
+    nullptr,
+    cache_sel_matrix(),
+    perception()->model<ds::dpo_store>(),
+    rutils::color()
+  };
 
   fsm::fsm_ro_params params = { .bsel_matrix = block_sel_matrix(),
                                 .csel_matrix = cache_sel_matrix(),
-                                .store = perception()->dpo_store(),
+                                .store = perception()->model<ds::dpo_store>(),
                                 .strategy_config = *strat_config };
   auto cache_starter_fsm = std::make_unique<fsm::d2::block_to_cache_site_fsm>(
       &params,

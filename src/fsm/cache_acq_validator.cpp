@@ -45,7 +45,16 @@ cache_acq_validator::cache_acq_validator(
     : ER_CLIENT_INIT("fordyca.fsm.cache_acq_validator"),
       mc_for_pickup(for_pickup),
       mc_csel_matrix(csel_matrix),
-      mc_dpo_map(dpo_map) {}
+      mc_caches(ds::dp_cache_map::raw_values_extract<cads::bcache_vectorno>(*dpo_map)) {}
+
+cache_acq_validator::cache_acq_validator(
+    const cads::bcache_vectorno& caches,
+    const controller::cognitive::cache_sel_matrix* csel_matrix,
+    bool for_pickup)
+    : ER_CLIENT_INIT("fordyca.fsm.cache_acq_validator"),
+      mc_for_pickup(for_pickup),
+      mc_csel_matrix(csel_matrix),
+      mc_caches(caches) {}
 
 /*******************************************************************************
  * Member Functions
@@ -59,20 +68,19 @@ bool cache_acq_validator::operator()(const rmath::vector2d& loc,
    * the cache's host cell location. Instead we look up the cache by ID, and
    * verify that the cache exists contains the point we are acquiring.
    */
-  auto range = mc_dpo_map->const_values_range();
-  auto it = std::find_if(range.begin(), range.end(), [&](const auto& c) {
-    return c.ent()->id() == id;
+  auto it = std::find_if(mc_caches.begin(), mc_caches.end(), [&](const auto& c) {
+    return c->id() == id;
   });
 
-  if (range.end() == it) {
+  if (mc_caches.end() == it) {
     ER_WARN("Cache%d near %s invalid for acquisition: cache unknown",
             id.v(),
             loc.to_str().c_str());
     return false;
-  } else if (!it->ent()->contains_point2D(loc)) {
+  } else if (!(*it)->contains_point2D(loc)) {
     ER_WARN("Cache%d@%s invalid for acquisition: does not contain %s",
             id.v(),
-            rcppsw::to_string(it->ent()->dcenter2D()).c_str(),
+            rcppsw::to_string((*it)->dcenter2D()).c_str(),
             rcppsw::to_string(loc).c_str());
     return false;
   }
@@ -87,7 +95,7 @@ bool cache_acq_validator::operator()(const rmath::vector2d& loc,
   }
 
   /* verify pickup policy */
-  return pickup_policy_validate(it->ent(), t);
+  return pickup_policy_validate(*it, t);
 } /* operator()() */
 
 bool cache_acq_validator::pickup_policy_validate(const carepr::base_cache* cache,

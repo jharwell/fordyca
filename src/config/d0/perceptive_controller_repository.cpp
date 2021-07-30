@@ -1,7 +1,7 @@
 /**
- * \file dp_cache_map.cpp
+ * \file perceptive_controller_repository.cpp
  *
- * \copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2021 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,31 +21,21 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/ds/dp_cache_map.hpp"
+#include "fordyca/config/perceptive_controller_repository.hpp"
 
-#include <numeric>
-
-#include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/subsystem/perception/config/xml/perception_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, ds);
+NS_START(fordyca, config);
 
 /*******************************************************************************
- * Member Functions
+ * Constructors/Destructor
  ******************************************************************************/
-std::string dp_cache_map::to_str(void) const {
-  auto range = values_range();
-  return std::accumulate(range.begin(),
-                         range.end(),
-                         std::string(),
-                         [&](const std::string& a, const auto& pair) {
-                           return a + "c" + rcppsw::to_string(pair.ent()->id()) +
-                                  "@" +
-                                  rcppsw::to_string(pair.ent()->dcenter2D()) +
-                                  ",";
-                         });
-} /* to_str() */
+perceptive_controller_repository::perceptive_controller_repository(void) {
+  parser_register<cspconfig::xml::perception_parser, cspconfig::perception_config>(
+      cspconfig::xml::perception_parser::kXMLRoot);
+}
 
-NS_END(ds, fordyca);
+NS_END(config, fordyca);

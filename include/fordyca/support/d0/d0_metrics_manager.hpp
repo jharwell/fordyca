@@ -27,6 +27,7 @@
 #include <string>
 
 #include "fordyca/metrics/fordyca_metrics_manager.hpp"
+#include "fordyca/controller/cognitive/cognitive_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,6 +57,29 @@ class d0_metrics_manager : public metrics::fordyca_metrics_manager,
 
   template<class T>
   void collect_from_controller(const T* controller);
+
+
+  template<class TController,
+           typename U = TController,
+           RCPPSW_SFINAE_DECL(std::is_base_of<fccognitive::cognitive_controller,
+                              U>::value)>
+  void collect_from_cognitive_controller(const TController* controller);
+
+  template<class TController,
+           typename U = TController,
+           RCPPSW_SFINAE_DECLDEF(!std::is_base_of<fccognitive::cognitive_controller,
+                                 U>::value)>
+  void collect_from_cognitive_controller(const TController*) {}
+
+ private:
+  /*
+   * Only controllers with DPO or MDPO perception provide these.
+   */
+  template <typename T>
+  using uses_dpo_perception = decltype(std::declval<T>().dpo_perception());
+
+  template <typename T>
+  using uses_mdpo_perception = decltype(std::declval<T>().mdpo_perception());
 };
 
 NS_END(d0, support, fordyca);

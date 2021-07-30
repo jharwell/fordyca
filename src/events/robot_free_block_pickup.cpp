@@ -85,7 +85,7 @@ template <typename TController>
 void robot_free_block_pickup::d1d2_dpo_controller_visit(TController& controller) {
   controller.ndc_pusht();
 
-  visit(*controller.dpo_perception()->dpo_store());
+  visit(*controller.perception()->template model<ds::dpo_store>());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   dispatch_robot_free_block_interactor(controller.current_task());
 
@@ -96,7 +96,7 @@ template <typename TController>
 void robot_free_block_pickup::d1d2_mdpo_controller_visit(TController& controller) {
   controller.ndc_pusht();
 
-  visit(*controller.mdpo_perception()->dpo_store());
+  visit(*controller.mdpo_perception()->template model<ds::dpo_store>());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   dispatch_robot_free_block_interactor(controller.current_task());
 
@@ -107,7 +107,7 @@ template <typename TController>
 void robot_free_block_pickup::d0_dpo_controller_visit(TController& controller) {
   controller.ndc_pusht();
 
-  visit(*controller.dpo_perception()->dpo_store());
+  visit(*controller.perception()->template model<ds::dpo_store>());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   visit(*controller.fsm());
 
@@ -118,7 +118,7 @@ template <typename TController>
 void robot_free_block_pickup::d0_mdpo_controller_visit(TController& controller) {
   controller.ndc_pusht();
 
-  visit(*controller.mdpo_perception()->map());
+  visit(*controller.perception()->template model<ds::dpo_semantic_map>());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   visit(*controller.fsm());
 

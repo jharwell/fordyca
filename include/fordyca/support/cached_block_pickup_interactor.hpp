@@ -158,7 +158,7 @@ class cached_block_pickup_interactor
       events::cache_vanished_visitor vanished_op(p.id());
       vanished_op.visit(controller);
     } else {
-      fsm::cache_acq_validator v(&controller.perception()->dpo_store()->caches(),
+      fsm::cache_acq_validator v(controller.perception()->known_objects()->known_caches(),
                                  controller.cache_sel_matrix(),
                                  true);
       /*

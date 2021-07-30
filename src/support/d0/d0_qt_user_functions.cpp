@@ -69,7 +69,7 @@ void d0_qt_user_functions::Draw(chal::robot& c_entity) {
   }
   if (nullptr != mdpo && mdpo->display_los()) {
     const auto* los = mdpo->perception()->los();
-    auto res = mdpo->mdpo_perception()->map()->resolution();
+    auto res = mdpo->perception()->template model<ds::dpo_semantic_map>()->resolution();
     std::vector<rmath::vector2d> points = {
       rmath::zvec2dvec(los->abs_ll(), res.v()) - mdpo->rpos2D(),
       rmath::zvec2dvec(los->abs_ul(), res.v()) - mdpo->rpos2D(),

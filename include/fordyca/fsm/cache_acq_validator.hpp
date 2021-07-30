@@ -29,6 +29,8 @@
 #include "rcppsw/types/timestep.hpp"
 #include "rcppsw/types/type_uuid.hpp"
 
+#include "cosm/arena/ds/cache_vector.hpp"
+
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
@@ -66,6 +68,10 @@ class cache_acq_validator : public rer::client<cache_acq_validator> {
                       const controller::cognitive::cache_sel_matrix* csel_matrix,
                       bool for_pickup);
 
+  cache_acq_validator(const cads::bcache_vectorno& caches,
+                      const controller::cognitive::cache_sel_matrix* csel_matrix,
+                      bool for_pickup);
+
   cache_acq_validator(const cache_acq_validator& v) = delete;
   cache_acq_validator& operator=(const cache_acq_validator& v) = delete;
 
@@ -84,7 +90,7 @@ class cache_acq_validator : public rer::client<cache_acq_validator> {
   /* clang-format off */
   const bool                                           mc_for_pickup;
   const controller::cognitive::cache_sel_matrix* const mc_csel_matrix;
-  const ds::dp_cache_map*             const            mc_dpo_map;
+  const cads::bcache_vectorno                          mc_caches;
   /* clang-format on */
 };
 

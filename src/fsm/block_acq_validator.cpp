@@ -68,7 +68,7 @@ bool block_acq_validator::operator()(const rmath::vector2d& loc,
    * validation if we make it this far.
    */
   if (bselm::kPickupPolicyClusterProx == config.policy) {
-    auto range = mc_map->const_values_range();
+    auto range = mc_map->values_range();
     if (!range.empty()) {
       auto avg_position =
           std::accumulate(range.begin(),

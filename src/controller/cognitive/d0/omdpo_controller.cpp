@@ -54,7 +54,7 @@ void omdpo_controller::control_step(void) {
             block()->id().v(),
             block()->md()->robot_id().v());
 
-  mdpo_perception()->update(m_receptor.get());
+  perception<mdpo_perception_subsystem>()->update(m_receptor.get());
   fsm()->run();
   saa()->steer_force2D_apply();
   ndc_pop();

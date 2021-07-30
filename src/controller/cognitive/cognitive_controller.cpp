@@ -1,7 +1,7 @@
 /**
- * \file dp_cache_map.cpp
+ * \file cognitive_controller.cpp
  *
- * \copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2021 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,31 +21,41 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/ds/dp_cache_map.hpp"
+#include "fordyca/controller/cognitive/cognitive_controller.hpp"
 
-#include <numeric>
+#include "cosm/subsystem/perception/config/perception_config.hpp"
 
-#include "cosm/arena/repr/base_cache.hpp"
+#include "fordyca/controller/cognitive/foraging_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, ds);
+NS_START(fordyca, controller, cognitive);
+
+/*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+cognitive_controller::cognitive_controller(void)
+    : ER_CLIENT_INIT("fordyca.controller.cognitive"),
+      m_perception() {}
+
+cognitive_controller::~cognitive_controller(void) = default;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string dp_cache_map::to_str(void) const {
-  auto range = values_range();
-  return std::accumulate(range.begin(),
-                         range.end(),
-                         std::string(),
-                         [&](const std::string& a, const auto& pair) {
-                           return a + "c" + rcppsw::to_string(pair.ent()->id()) +
-                                  "@" +
-                                  rcppsw::to_string(pair.ent()->dcenter2D()) +
-                                  ",";
-                         });
-} /* to_str() */
+void cognitive_controller::perception(
+    std::unique_ptr<foraging_perception_subsystem> perception) {
+  m_perception = std::move(perception);
+}
 
-NS_END(ds, fordyca);
+double cognitive_controller::los_dim(void) const {
+  return perception()->los_dim();
+} /* los_dim() */
+
+void cognitive_controller::reset(void) {
+  foraging_controller::reset();
+  m_perception->reset();
+} /* reset() */
+
+NS_END(cognitive, controller, fordyca);

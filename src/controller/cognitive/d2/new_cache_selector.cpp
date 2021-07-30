@@ -53,7 +53,7 @@ new_cache_selector::operator()(const ds::dp_block_map& new_caches,
   ER_ASSERT(!new_caches.empty(), "No known new caches");
 
   double max_utility = 0.0;
-  for (const auto& c : new_caches.const_values_range()) {
+  for (const auto& c : new_caches.values_range()) {
     if (new_cache_is_excluded(existing_caches, new_caches, c.ent())) {
       continue;
     }
@@ -105,7 +105,7 @@ bool new_cache_selector::new_cache_is_excluded(
    * Use the center rather than the anchor to get a distance unaffected by the
    * relative position of an existing cache and new cache.
    */
-  for (const auto& ec : existing_caches.const_values_range()) {
+  for (const auto& ec : existing_caches.values_range()) {
     double dist = (ec.ent()->rcenter2D() - new_cache->rcenter2D()).length();
     if (cache_prox >= dist) {
       ER_DEBUG("Ignoring new cache%d@%s/%s: Too close to cache%d@%s/%s (%f <= "
@@ -132,7 +132,7 @@ bool new_cache_selector::new_cache_is_excluded(
    * So, we approximate a block distribution as a single block, and only choose
    * new caches that are sufficiently far from any potential clusters.
    */
-  for (const auto& b : blocks.const_values_range()) {
+  for (const auto& b : blocks.values_range()) {
     if (b.ent() == new_cache) {
       continue;
     }

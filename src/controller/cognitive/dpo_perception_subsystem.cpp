@@ -53,7 +53,8 @@ dpo_perception_subsystem::~dpo_perception_subsystem(void) = default;
  ******************************************************************************/
 void dpo_perception_subsystem::update(oracular_info_receptor* const receptor) {
   process_los(los(), receptor);
-  ER_ASSERT(los_proc_verify(los())(dpo_store()), "LOS verification failed");
+  ER_ASSERT(los_proc_verify(los())(model<ds::dpo_store>()),
+            "LOS verification failed");
   m_store->decay_all();
 } /* update() */
 
@@ -91,7 +92,7 @@ void dpo_perception_subsystem::process_los_caches(
     const repr::forager_los* const c_los) {
   cads::bcache_vectorno los_caches = c_los->caches();
   ER_DEBUG("Caches in DPO store: [%s]",
-           rcppsw::to_string(m_store->caches()).c_str());
+           rcppsw::to_string(m_store->known_caches()).c_str());
   if (!los_caches.empty()) {
     ER_DEBUG("Caches in LOS: [%s]", rcppsw::to_string(los_caches).c_str());
   }
@@ -126,7 +127,7 @@ void dpo_perception_subsystem::process_los_blocks(
    */
   auto los_blocks = c_los->blocks();
   ER_DEBUG("Blocks in DPO store: [%s]",
-           rcppsw::to_string(m_store->blocks()).c_str());
+           rcppsw::to_string(m_store->known_blocks()).c_str());
   if (!los_blocks.empty()) {
     ER_DEBUG("Blocks in LOS: [%s]", rcppsw::to_string(los_blocks).c_str());
   }
@@ -167,17 +168,17 @@ void dpo_perception_subsystem::los_tracking_sync(
    * the corresponding cache should also be in our LOS. If it is not, then our
    * tracked version is out of date and needs to be removed.
    */
-  auto range = m_store->caches().values_range();
+  auto range = m_store->known_caches();
   auto it = range.begin();
 
   while (it != range.end()) {
     ER_TRACE("Check tracked DPO cache%d@%s/%s xspan=%s,yspan=%s w/LOS "
              "xspan=%s,yspan=%s",
-             it->ent()->id().v(),
-             rcppsw::to_string(it->ent()->rcenter2D()).c_str(),
-             rcppsw::to_string(it->ent()->dcenter2D()).c_str(),
-             rcppsw::to_string(it->ent()->xrspan()).c_str(),
-             rcppsw::to_string(it->ent()->yrspan()).c_str(),
+             (*it)->id().v(),
+             rcppsw::to_string((*it)->rcenter2D()).c_str(),
+             rcppsw::to_string((*it)->dcenter2D()).c_str(),
+             rcppsw::to_string((*it)->xrspan()).c_str(),
+             rcppsw::to_string((*it)->yrspan()).c_str(),
              rcppsw::to_string(c_los->xspan()).c_str(),
              rcppsw::to_string(c_los->yspan()).c_str());
 
@@ -185,23 +186,23 @@ void dpo_perception_subsystem::los_tracking_sync(
      * We can't just check if the cache host cell is in our LOS, because for
      * bigger arenas, it almost never is.
      */
-    bool should_be_in_los = it->ent()->yrspan().overlaps_with(c_los->yspan()) ||
-                            it->ent()->xrspan().overlaps_with(c_los->xspan());
+    bool should_be_in_los = (*it)->yrspan().overlaps_with(c_los->yspan()) ||
+                            (*it)->xrspan().overlaps_with(c_los->xspan());
 
     bool in_los =
         los_caches.end() !=
         std::find_if(los_caches.begin(), los_caches.end(), [&](const auto& c) {
-          return c->dloccmp(*it->ent());
+          return c->dloccmp(**it);
         });
 
     if (should_be_in_los && !in_los) {
       ER_INFO("Remove tracked DPO cache%d@%s/%s xspan=%s,yspan=%s: not in LOS "
               "xspan=%s,yspan=%s",
-              it->ent()->id().v(),
-              rcppsw::to_string(it->ent()->rcenter2D()).c_str(),
-              rcppsw::to_string(it->ent()->dcenter2D()).c_str(),
-              rcppsw::to_string(it->ent()->xrspan()).c_str(),
-              rcppsw::to_string(it->ent()->yrspan()).c_str(),
+              (*it)->id().v(),
+              rcppsw::to_string((*it)->rcenter2D()).c_str(),
+              rcppsw::to_string((*it)->dcenter2D()).c_str(),
+              rcppsw::to_string((*it)->xrspan()).c_str(),
+              rcppsw::to_string((*it)->yrspan()).c_str(),
               rcppsw::to_string(c_los->xspan()).c_str(),
               rcppsw::to_string(c_los->yspan()).c_str());
 
@@ -210,7 +211,7 @@ void dpo_perception_subsystem::los_tracking_sync(
        * avoid iterator invalidation and undefined behavior (I've seen both a
        * segfault and infinite loop). See FORDYCA#589.
        */
-      carepr::base_cache* tmp = (*it).ent();
+      carepr::base_cache* tmp = *it;
       ++it;
       m_store->cache_remove(tmp);
       ER_ASSERT(nullptr == m_store->find(tmp),
@@ -234,16 +235,16 @@ void dpo_perception_subsystem::los_tracking_sync(
    * has moved since we last saw it (since that is limited to at most a single
    * block, it is handled by the \ref block_found event).
    */
-  auto range = m_store->blocks().values_range();
+  auto range = m_store->known_blocks();
   auto it = range.begin();
 
   while (it != range.end()) {
     ER_TRACE("Examining block%d@%s/%s",
-             it->ent()->id().v(),
-             rcppsw::to_string(it->ent()->ranchor2D()).c_str(),
-             rcppsw::to_string(it->ent()->danchor2D()).c_str());
+             (*it)->id().v(),
+             rcppsw::to_string((*it)->ranchor2D()).c_str(),
+             rcppsw::to_string((*it)->danchor2D()).c_str());
 
-    if (!c_los->contains_abs(it->ent()->danchor2D())) {
+    if (!c_los->contains_abs((*it)->danchor2D())) {
       ++it;
       continue;
     }
@@ -254,20 +255,20 @@ void dpo_perception_subsystem::los_tracking_sync(
     auto exists_in_los =
         los_blocks.end() !=
         std::find_if(los_blocks.begin(), los_blocks.end(), [&](const auto& b) {
-          return static_cast<crepr::base_block3D*>(b)->idcmp(*(it->ent()));
+          return static_cast<crepr::base_block3D*>(b)->idcmp(*((*it)));
         });
-    ER_TRACE("Block%d location in LOS", it->ent()->id().v());
+    ER_TRACE("Block%d location in LOS", (*it)->id().v());
     if (!exists_in_los) {
       ER_INFO("Remove tracked block%d@%s/%s: not in LOS blocks",
-              it->ent()->id().v(),
-              rcppsw::to_string(it->ent()->ranchor2D()).c_str(),
-              rcppsw::to_string(it->ent()->danchor2D()).c_str());
+              (*it)->id().v(),
+              rcppsw::to_string((*it)->ranchor2D()).c_str(),
+              rcppsw::to_string((*it)->danchor2D()).c_str());
       /*
        * Copy iterator object + iterator increment MUST be before removal to
        * avoid iterator invalidation and undefined behavior (I've seen both a
        * segfault and infinite loop). See FORDYCA#589.
        */
-      crepr::base_block3D* tmp = (*it).ent();
+      crepr::base_block3D* tmp = *it;
       ++it;
       m_store->block_remove(tmp);
     } else {
@@ -279,40 +280,51 @@ void dpo_perception_subsystem::los_tracking_sync(
 /*******************************************************************************
  * DPO Perception Metrics
  ******************************************************************************/
-uint dpo_perception_subsystem::n_known_blocks(void) const {
-  return m_store->blocks().size();
+size_t dpo_perception_subsystem::n_known_blocks(void) const {
+  return m_store->known_blocks().size();
 } /* n_known_blocks() */
 
-uint dpo_perception_subsystem::n_known_caches(void) const {
-  return m_store->caches().size();
+size_t dpo_perception_subsystem::n_known_caches(void) const {
+  return m_store->known_caches().size();
 } /* n_known_caches() */
 
 crepr::pheromone_density dpo_perception_subsystem::avg_block_density(void) const {
-  auto range = m_store->blocks().const_values_range();
-  if (m_store->blocks().empty()) {
-    return crepr::pheromone_density();
+  auto range = m_store->tracked_blocks().values_range();
+  crepr::pheromone_density ret;
+
+  if (!m_store->tracked_blocks().empty()) {
+    std::accumulate(range.begin(),
+                    range.end(),
+                    crepr::pheromone_density(),
+                    [&](const auto& accum, const auto& block) {
+                      return accum + block.density();
+                    }) /
+        m_store->tracked_blocks().size();
   }
-  return std::accumulate(range.begin(),
-                         range.end(),
-                         crepr::pheromone_density(),
-                         [&](const auto& accum, const auto& block) {
-                           return accum + block.density();
-                         }) /
-         m_store->blocks().size();
+  return ret;
 } /* avg_block_density() */
 
 crepr::pheromone_density dpo_perception_subsystem::avg_cache_density(void) const {
-  auto range = m_store->caches().const_values_range();
-  if (m_store->caches().empty()) {
-    return crepr::pheromone_density();
+  auto range = m_store->tracked_caches().values_range();
+  crepr::pheromone_density ret;
+
+  if (!m_store->tracked_caches().empty()) {
+    std::accumulate(range.begin(),
+                    range.end(),
+                    crepr::pheromone_density(),
+                    [&](const auto& accum, const auto& cache) {
+                      return accum + cache.density();
+                    }) /
+        m_store->tracked_caches().size();
   }
-  return std::accumulate(range.begin(),
-                         range.end(),
-                         crepr::pheromone_density(),
-                         [&](const auto& accum, const auto& cache) {
-                           return accum + cache.density();
-                         }) /
-         m_store->caches().size();
+  return ret;
 } /* avg_cache_density() */
+
+const ds::access_known_objects* dpo_perception_subsystem::known_objects(void) const {
+  return m_store->known_objects();
+}
+ds::access_known_objects* dpo_perception_subsystem::known_objects(void) {
+  return m_store->known_objects();
+}
 
 NS_END(cognitive, controller, fordyca);

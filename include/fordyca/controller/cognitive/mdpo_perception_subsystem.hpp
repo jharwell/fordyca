@@ -77,10 +77,9 @@ class mdpo_perception_subsystem final
   double known_percentage(void) const override RCPPSW_PURE;
   double unknown_percentage(void) const override RCPPSW_PURE;
 
-  /**
-   * \brief Update the robot's perception of the environment, passing it its
-   * current line of sight.
-   */
+  /* foraging_perception_subsystem overrides */
+  const ds::access_known_objects* known_objects(void) const override;
+  ds::access_known_objects* known_objects(void) override;
   void update(oracular_info_receptor* receptor) override;
 
   /**
@@ -90,8 +89,6 @@ class mdpo_perception_subsystem final
 
   const ds::dpo_semantic_map* map(void) const { return m_map.get(); }
   ds::dpo_semantic_map* map(void) { return m_map.get(); }
-  const ds::dpo_store* dpo_store(void) const override RCPPSW_PURE;
-  ds::dpo_store* dpo_store(void) override RCPPSW_PURE;
 
  private:
   /*
@@ -115,8 +112,8 @@ class mdpo_perception_subsystem final
   void update_cell_stats(const repr::forager_los* c_los);
 
   /* clang-format off */
-  std::vector<uint>                     m_cell_stats;
-  std::unique_ptr<repr::forager_los>   m_los;
+  std::vector<size_t>                   m_cell_stats;
+  std::unique_ptr<repr::forager_los>    m_los;
   std::unique_ptr<ds::dpo_semantic_map> m_map;
   /* clang-format on */
 };

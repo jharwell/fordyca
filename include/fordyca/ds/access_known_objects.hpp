@@ -1,5 +1,5 @@
 /**
- * \file dp_cache_map.cpp
+ * \file access_known_objects.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,34 +18,48 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_DS_ACCESS_KNOWN_OBJECTS_HPP_
+#define INCLUDE_FORDYCA_DS_ACCESS_KNOWN_OBJECTS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/ds/dp_cache_map.hpp"
-
-#include <numeric>
-
-#include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/ds/block3D_vector.hpp"
+#include "cosm/arena/ds/cache_vector.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, ds);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-std::string dp_cache_map::to_str(void) const {
-  auto range = values_range();
-  return std::accumulate(range.begin(),
-                         range.end(),
-                         std::string(),
-                         [&](const std::string& a, const auto& pair) {
-                           return a + "c" + rcppsw::to_string(pair.ent()->id()) +
-                                  "@" +
-                                  rcppsw::to_string(pair.ent()->dcenter2D()) +
-                                  ",";
-                         });
-} /* to_str() */
+/**
+ * \class access_known_objects
+ * \ingroup ds
+ *
+ * \brief Defines the interface for extracting information about currently
+ * known objects, without tracking information (i.e., "raw" tracked objects).
+ */
+class access_known_objects {
+ public:
+  access_known_objects(void) = default;
+  virtual ~access_known_objects(void) = default;
+
+  /**
+   * \brief Get all known blocks the robot is currently aware of, sans tracking
+   * information.
+   */
+  virtual cds::block3D_vectorno known_blocks(void) const = 0;
+
+  /**
+   * \brief Get all known caches the robot is currently aware of, sans tracking
+   * information.
+   */
+  virtual cads::bcache_vectorno known_caches(void) const = 0;
+};
 
 NS_END(ds, fordyca);
+
+#endif /* INCLUDE_FORDYCA_DS_ACCESS_KNOWN_OBJECTS_HPP_ */

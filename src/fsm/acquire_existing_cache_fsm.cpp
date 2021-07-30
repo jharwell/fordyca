@@ -106,9 +106,11 @@ acquire_existing_cache_fsm::acq_goal_internal(void) {
  ******************************************************************************/
 boost::optional<acquire_existing_cache_fsm::acq_loc_type>
 acquire_existing_cache_fsm::calc_acq_location(void) {
-  existing_cache_selector selector(mc_for_pickup, mc_matrix, &mc_store->caches());
+  existing_cache_selector selector(mc_for_pickup,
+                                   mc_matrix,
+                                   &mc_store->tracked_caches());
 
-  if (const auto* best = selector(mc_store->caches(),
+  if (const auto* best = selector(mc_store->tracked_caches(),
                                   saa()->sensing()->rpos2D(),
                                   saa()->sensing()->tick())) {
     ER_INFO("Selected existing cache%d@%s/%s for acquisition",
@@ -139,7 +141,7 @@ acquire_existing_cache_fsm::existing_cache_select(void) {
 } /* existing_cache_select() */
 
 bool acquire_existing_cache_fsm::candidates_exist(void) const {
-  return !mc_store->caches().empty();
+  return !mc_store->known_caches().empty();
 } /* candidates() */
 
 bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) const {
@@ -157,7 +159,8 @@ bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) const {
 
 bool acquire_existing_cache_fsm::cache_acq_valid(const rmath::vector2d& loc,
                                                  const rtypes::type_uuid& id) {
-  return cache_acq_validator(&mc_store->caches(), mc_matrix, mc_for_pickup)(
+  auto caches = mc_store->known_caches();
+  return cache_acq_validator(caches, mc_matrix, mc_for_pickup)(
       loc, id, saa()->sensing()->tick());
 } /* cache_acq_valid() */
 

@@ -53,7 +53,7 @@ void oracular_info_receptor::dpo_store_update(ds::dpo_store* const store) {
                    "b", blocks)
                    .c_str());
       ER_DEBUG("Blocks in DPO store: [%s]",
-               rcppsw::to_string(store->blocks()).c_str());
+               rcppsw::to_string(store->known_blocks()).c_str());
     }
     for (auto* b : blocks) {
       events::block_found_visitor visitor(b);
@@ -68,7 +68,7 @@ void oracular_info_receptor::dpo_store_update(ds::dpo_store* const store) {
                    "c", caches)
                    .c_str());
       ER_DEBUG("Caches in DPO store: [%s]",
-               rcppsw::to_string(store->caches()).c_str());
+               rcppsw::to_string(store->known_caches()).c_str());
     }
     for (auto* c : caches) {
       events::cache_found_visitor visitor(c);

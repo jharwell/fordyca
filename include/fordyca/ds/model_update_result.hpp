@@ -1,7 +1,7 @@
 /**
- * \file dp_cache_map.cpp
+ * \file model_update_result.hpp
  *
- * \copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2021 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,34 +18,41 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_DS_MODEL_UPDATE_RESULT_HPP_
+#define INCLUDE_FORDYCA_DS_MODEL_UPDATE_RESULT_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/ds/dp_cache_map.hpp"
+#include "rcppsw/math/vector2.hpp"
 
-#include <numeric>
-
-#include "cosm/arena/repr/base_cache.hpp"
+#include "fordyca/ds/model_update_status.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, ds);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-std::string dp_cache_map::to_str(void) const {
-  auto range = values_range();
-  return std::accumulate(range.begin(),
-                         range.end(),
-                         std::string(),
-                         [&](const std::string& a, const auto& pair) {
-                           return a + "c" + rcppsw::to_string(pair.ent()->id()) +
-                                  "@" +
-                                  rcppsw::to_string(pair.ent()->dcenter2D()) +
-                                  ",";
-                         });
-} /* to_str() */
+/**
+ * \brief The result of a applying an update to a \ref base_perception_model
+ * derived class.
+ */
+struct model_update_result {
+  /**
+   * If the model has changed, what is the reason for the change?
+   */
+  model_update_status reason{ model_update_status::ekNO_CHANGE };
+
+  /**
+   * If the applied update resulted in an object changing position, then this
+   * field is the previous location of the tracked object.
+   */
+  rmath::vector2z old_loc{};
+};
 
 NS_END(ds, fordyca);
+
+#endif /* INCLUDE_FORDYCA_DS_MODEL_UPDATE_RESULT_HPP_ */

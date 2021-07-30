@@ -96,7 +96,7 @@ boost::optional<csfsm::acquire_goal_fsm::candidate_type>
 acquire_cache_site_fsm::site_select(void) {
   auto selector = cache_site_selector(mc_matrix);
   if (auto best =
-          selector(mc_store->caches(), saa()->sensing()->rpos2D(), rng())) {
+          selector(mc_store->tracked_caches(), saa()->sensing()->rpos2D(), rng())) {
     ER_INFO("Select cache site@%s for acquisition", best->to_str().c_str());
     m_sel_success = true;
     m_sel_exec = true;

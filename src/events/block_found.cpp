@@ -57,15 +57,16 @@ block_found::block_found(crepr::base_block3D* block)
 /*******************************************************************************
  * Depth0 Foraging
  ******************************************************************************/
-void block_found::visit(ds::dpo_store& store) {
+ds::model_update_result block_found::visit(ds::dpo_store& store) {
   /*
    * If the cell in the arena that we thought contained a cache now contains a
    * block, remove the out-of-date cache.
    */
-  auto it = store.caches().values_range().begin();
-  while (it != store.caches().values_range().end()) {
-    if (m_block->danchor2D() == it->ent()->dcenter2D()) {
-      carepr::base_cache* tmp = (*it).ent();
+  auto caches = store.known_caches();
+  auto it = caches.begin();
+  while (it != caches.end()) {
+    if (m_block->danchor2D() == (*it)->dcenter2D()) {
+      carepr::base_cache* tmp = (*it);
       ++it;
       store.cache_remove(tmp);
     } else {
@@ -92,7 +93,7 @@ void block_found::visit(ds::dpo_store& store) {
       density = known->density();
 
       /*
-       * If repeat pheromon deposits are enabled, make a deposit. Otherwise,
+       * If repeat pheromone deposits are enabled, make a deposit. Otherwise,
        * just reset the pheromone density to make because we have seen the block
        * again.
        */
@@ -106,7 +107,7 @@ void block_found::visit(ds::dpo_store& store) {
     density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
   }
 
-  store.block_update(
+  return store.block_update(
       repr::dpo_entity<crepr::base_block3D>(m_block->clone(), density));
 } /* visit() */
 
@@ -131,9 +132,9 @@ void block_found::visit(cfsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void block_found::visit(ds::dpo_semantic_map& map) {
-  cds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
-  crepr::pheromone_density& density =
-      map.access<occupancy_grid::kPheromone>(x(), y());
+  visit(*map.store());
+
+  auto& cell = map.access<occupancy_grid::kCell>(coord());
 
   if (!cell.state_is_known()) {
     map.known_cells_inc();
@@ -148,23 +149,14 @@ void block_found::visit(ds::dpo_semantic_map& map) {
    * cell is coming back into our LOS with a block, when it contained a cache
    * the last time it was seen. Remove the cache/synchronize with reality.
    *
-   * The density needs to be reset as well, as we are now tracking a different
-   * kind of cell entity.
+   * The density is reset by cache_remove().
    */
   if (cell.state_has_cache()) {
     map.cache_remove(cell.cache());
   }
 
-  /*
-   * If the ID of the block we currently think resides in the cell and the ID of
-   * the one we just found that actually resides there are not the same, we need
-   * to reset the density for the cell, and start a new decay count.
-   */
-  if (cell.state_has_block() && cell.block3D()->id() != m_block->id()) {
-    density.reset();
-  }
-
-  pheromone_update(map);
+  auto* dpo_ent = map.store()->find(m_block);
+  map.block_update(std::move(*dpo_ent));
 
   ER_ASSERT(cell.state_has_block(),
             "Cell@%s not in HAS_BLOCK",
@@ -176,62 +168,13 @@ void block_found::visit(ds::dpo_semantic_map& map) {
             cell.block3D()->id().v());
 } /* visit() */
 
-void block_found::pheromone_update(ds::dpo_semantic_map& map) {
-  crepr::pheromone_density& density =
-      map.access<occupancy_grid::kPheromone>(x(), y());
-  cds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
-  if (map.pheromone_repeat_deposit()) {
-    density.pheromone_add(crepr::pheromone_density::kUNIT_QUANTITY);
-  } else {
-    /*
-     * Seeing a new block on empty square or one that used to contain a cache.
-     */
-    if (!cell.state_has_block()) {
-      density.reset();
-      density.pheromone_add(crepr::pheromone_density::kUNIT_QUANTITY);
-    } else { /* Seeing a known block again--set its relevance to the max */
-      density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
-    }
-  }
-  /*
-   * ONLY if the underlying DPO store actually changed do we update what block
-   * the cell points to. If we do it unconditionally, we are left
-   * with dangling references as a result of mixing unique_ptr and raw ptr. See
-   * FORDYCA#229.
-   */
-  auto res = map.store()->block_update(
-      repr::dpo_entity<crepr::base_block3D>(m_block->clone(), density));
-  if (res.status) {
-    if (ds::dpo_store::update_status::ekBLOCK_MOVED == res.reason) {
-      ER_DEBUG("Updating cell@%s: Block%d moved %s -> %s",
-               res.old_loc.to_str().c_str(),
-               m_block->id().v(),
-               res.old_loc.to_str().c_str(),
-               m_block->danchor2D().to_str().c_str());
-      cdops::cell2D_empty_visitor op(res.old_loc);
-      op.visit(map.access<occupancy_grid::kCell>(res.old_loc));
-    } else {
-      ER_ASSERT(ds::dpo_store::update_status::ekNEW_BLOCK_ADDED == res.reason,
-                "Bad reason for DPO store update: %d",
-                res.reason);
-    }
-
-    /*
-     * At this point we know that if the block was previously tracked, its old
-     * host cell has been updated and the block updated in the store, so we are
-     * good to update the NEW host cell to point to the block.
-     */
-    visit(cell);
-  }
-} /* pheromone_update() */
-
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
 void block_found::visit(controller::cognitive::d2::birtd_mdpo_controller& c) {
   c.ndc_pusht();
 
-  visit(*c.mdpo_perception()->map());
+  visit(*c.perception()->model<ds::dpo_semantic_map>());
 
   c.ndc_pop();
 } /* visit() */
@@ -239,7 +182,7 @@ void block_found::visit(controller::cognitive::d2::birtd_mdpo_controller& c) {
 void block_found::visit(controller::cognitive::d2::birtd_dpo_controller& c) {
   c.ndc_pusht();
 
-  visit(*c.dpo_perception()->dpo_store());
+  visit(*c.perception()->model<ds::dpo_store>());
 
   c.ndc_pop();
 } /* visit() */
@@ -247,7 +190,7 @@ void block_found::visit(controller::cognitive::d2::birtd_dpo_controller& c) {
 void block_found::visit(controller::cognitive::d2::birtd_omdpo_controller& c) {
   c.ndc_pusht();
 
-  visit(*c.mdpo_perception()->map());
+  visit(*c.perception()->model<ds::dpo_semantic_map>());
 
   c.ndc_pop();
 } /* visit() */
@@ -255,7 +198,7 @@ void block_found::visit(controller::cognitive::d2::birtd_omdpo_controller& c) {
 void block_found::visit(controller::cognitive::d2::birtd_odpo_controller& c) {
   c.ndc_pusht();
 
-  visit(*c.dpo_perception()->dpo_store());
+  visit(*c.perception()->model<ds::dpo_store>());
 
   c.ndc_pop();
 } /* visit() */

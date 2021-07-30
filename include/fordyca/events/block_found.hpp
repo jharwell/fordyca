@@ -32,6 +32,7 @@
 #include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
+#include "fordyca/ds/model_update_result.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -78,7 +79,7 @@ class block_found : public rer::client<block_found>, public cdops::cell2D_op {
   block_found& operator=(const block_found&) = delete;
 
   /* DPO foraging */
-  void visit(ds::dpo_store& store);
+  ds::model_update_result visit(ds::dpo_store& store);
 
   /* MDPO foraging */
   void visit(cds::cell2D& cell);
@@ -92,8 +93,6 @@ class block_found : public rer::client<block_found>, public cdops::cell2D_op {
   void visit(controller::cognitive::d2::birtd_omdpo_controller& c);
 
  private:
-  void pheromone_update(ds::dpo_semantic_map& map);
-
   /* clang-format off */
   crepr::base_block3D* m_block;
   /* clang-format on */

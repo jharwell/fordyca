@@ -121,22 +121,6 @@ class foraging_controller
   ts_velocity(const csmetrics::movement_category& category) const override;
 
   /**
-   * \brief By default controllers have no perception subsystem, and are
-   * basically blind centipedes.
-   */
-  virtual const cognitive::foraging_perception_subsystem* perception(void) const {
-    return nullptr;
-  }
-
-  /**
-   * \brief By default controllers have no perception subsystem, and are
-   * basically blind centipedes.
-   */
-  virtual cognitive::foraging_perception_subsystem* perception(void) {
-    return nullptr;
-  }
-
-  /**
    * \brief If \c TRUE, the robot is currently at least most of the way in the
    * nest, as reported by the sensors.
    */

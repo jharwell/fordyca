@@ -59,28 +59,26 @@ class dpo_perception_subsystem final
       public foraging_perception_subsystem,
       public metrics::perception::dpo_metrics {
  public:
+  using model_type = ds::dpo_store;
+
   explicit dpo_perception_subsystem(const cspconfig::perception_config* config);
   ~dpo_perception_subsystem(void) override;
 
   /* DPO perception metrics */
-  uint n_known_blocks(void) const override RCPPSW_PURE;
-  uint n_known_caches(void) const override RCPPSW_PURE;
+  size_t n_known_blocks(void) const override RCPPSW_PURE;
+  size_t n_known_caches(void) const override RCPPSW_PURE;
   crepr::pheromone_density avg_block_density(void) const override;
   crepr::pheromone_density avg_cache_density(void) const override;
 
-  /**
-   * \brief Update the robot's perception of the environment, passing it its
-   * current line of sight.
-   */
+  /* foraging_perception_subsystem overrides */
+  const ds::access_known_objects* known_objects(void) const override;
+  ds::access_known_objects* known_objects(void) override;
   void update(oracular_info_receptor* receptor) override;
 
   /**
    * \brief Reset the robot's perception of the environment to an initial state
    */
   void reset(void) override;
-
-  const ds::dpo_store* dpo_store(void) const override { return m_store.get(); }
-  ds::dpo_store* dpo_store(void) override { return m_store.get(); }
 
  private:
   /*

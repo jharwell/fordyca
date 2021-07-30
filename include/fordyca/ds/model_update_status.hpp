@@ -1,7 +1,7 @@
 /**
- * \file dp_cache_map.cpp
+ * \file model_update_status.hpp
  *
- * \copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2021 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,34 +18,60 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_DS_MODEL_UPDATE_STATUS_HPP_
+#define INCLUDE_FORDYCA_DS_MODEL_UPDATE_STATUS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/ds/dp_cache_map.hpp"
-
-#include <numeric>
-
-#include "cosm/arena/repr/base_cache.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, ds);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-std::string dp_cache_map::to_str(void) const {
-  auto range = values_range();
-  return std::accumulate(range.begin(),
-                         range.end(),
-                         std::string(),
-                         [&](const std::string& a, const auto& pair) {
-                           return a + "c" + rcppsw::to_string(pair.ent()->id()) +
-                                  "@" +
-                                  rcppsw::to_string(pair.ent()->dcenter2D()) +
-                                  ",";
-                         });
-} /* to_str() */
+/**
+ * \brief Communicates the nature of an update made to a \ref
+ * base_perception_model derived class as a result of processing a seen
+ * block/cache.
+ */
+enum class model_update_status {
+  /**
+   * \brief No changes were made to the model.
+   */
+  ekNO_CHANGE,
+
+  /**
+   * \brief Nothing about the block has changed but its density.
+   */
+  ekBLOCK_DENSITY_UPDATE,
+
+  /**
+   * \brief A new block was added to the model.
+   */
+  ekNEW_BLOCK_ADDED,
+
+  /**
+   * \brief An already tracked block was updated with a new location.
+   */
+  ekBLOCK_MOVED,
+
+  /**
+   * \brief A new cache was added to the model.
+   */
+  ekNEW_CACHE_ADDED,
+
+  /**
+   * \brief An already tracked block was updated (e.g., the # of blocks in it
+   * changed).
+   */
+  ekCACHE_UPDATED
+};
 
 NS_END(ds, fordyca);
+
+#endif /* INCLUDE_FORDYCA_DS_MODEL_UPDATE_STATUS_HPP_ */

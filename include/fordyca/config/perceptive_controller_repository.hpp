@@ -1,7 +1,7 @@
 /**
- * \file dp_cache_map.cpp
+ * \file perceptive_controller_repository.hpp
  *
- * \copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2021 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,34 +18,34 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_CONFIG_PERCEPTIVE_CONTROLLER_REPOSITORY_HPP_
+#define INCLUDE_FORDYCA_CONFIG_PERCEPTIVE_CONTROLLER_REPOSITORY_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/ds/dp_cache_map.hpp"
-
-#include <numeric>
-
-#include "cosm/arena/repr/base_cache.hpp"
+#include "fordyca/config/foraging_controller_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, ds);
+NS_START(fordyca, config);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-std::string dp_cache_map::to_str(void) const {
-  auto range = values_range();
-  return std::accumulate(range.begin(),
-                         range.end(),
-                         std::string(),
-                         [&](const std::string& a, const auto& pair) {
-                           return a + "c" + rcppsw::to_string(pair.ent()->id()) +
-                                  "@" +
-                                  rcppsw::to_string(pair.ent()->dcenter2D()) +
-                                  ",";
-                         });
-} /* to_str() */
+/**
+ * \class perceptive_controller_repository
+ * \ingroup config
+ *
+ * \brief Collection of all parameter parsers and parse results needed by
+ * \ref perceptive_controller.
+ */
+class perceptive_controller_repository: public foraging_controller_repository {
+ public:
+  perceptive_controller_repository(void) RCPPSW_COLD;
+};
 
-NS_END(ds, fordyca);
+NS_END(config, fordyca);
+
+#endif /* INCLUDE_FORDYCA_CONFIG_PERCEPTIVE_CONTROLLER_REPOSITORY_HPP_ */

@@ -29,13 +29,12 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 
-#include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/repr/base_block3D.hpp"
 #include "cosm/subsystem/perception/config/pheromone_config.hpp"
 
 #include "fordyca/ds/dp_block_map.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
 #include "fordyca/ds/dpo_map.hpp"
+#include "fordyca/ds/foraging_perception_model.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -55,33 +54,17 @@ NS_START(fordyca, ds);
  * an entity are encountered (e.g. the real version has vanished and the tracked
  * version is out of date).
  */
-class dpo_store final : public rer::client<dpo_store> {
+class dpo_store final : public foraging_perception_model<ds::dp_block_map,
+                                                         ds::dp_cache_map>,
+                        public rer::client<dpo_store> {
  public:
   template <typename T>
   using dpo_entity = repr::dpo_entity<T>;
 
-  enum update_status {
-    ekNO_CHANGE,
-    ekNEW_BLOCK_ADDED,
-    ekBLOCK_MOVED,
-    ekNEW_CACHE_ADDED,
-    ekCACHE_UPDATED /* # blocks can change */
-  };
-
-  /**
-   * \brief The result of a applying a DPO store update.
-   *
-   * status: Has the store changed as a result of the applied update?
-   * reason: If the store has changed, what is the reason for the change?
-   * old_loc: If the applied update resulted in a block changing position, then
-   *          this field is the previous location of the tracked block.
-   */
-
-  struct update_res_t {
-    bool status{ false };
-    update_status reason{ ekNO_CHANGE };
-    rmath::vector2z old_loc{};
-  };
+  using base_model_type = foraging_perception_model<ds::dp_block_map,
+                                                    ds::dp_cache_map>;
+  using base_model_type::tracked_cache_type;
+  using base_model_type::tracked_block_type;
 
   /**
    * \brief The maximum pheromone level if repeat deposits of pheromone are not
@@ -91,19 +74,29 @@ class dpo_store final : public rer::client<dpo_store> {
 
   explicit dpo_store(const cspconfig::pheromone_config* config);
 
-  /**
-   * \brief Get all blocks the robot is currently aware of, and their
-   * corresponding pheromone levels.
-   */
-  ds::dp_block_map& blocks(void) { return m_blocks; }
-  const ds::dp_block_map& blocks(void) const { return m_blocks; }
+  /* access_known_objects overrides */
+  cds::block3D_vectorno known_blocks(void) const override {
+    return dp_block_map::raw_values_extract<cds::block3D_vectorno>(tracked_blocks());
+  }
+  cads::bcache_vectorno known_caches(void) const override {
+    return dp_cache_map::raw_values_extract<cads::bcache_vectorno>(tracked_caches());
+  }
 
-  /**
-   * \brief Get all caches the robot is currently aware of, and their
-   * corresponding pheromone levels.
+  /* foraging_perception_model overrides */
+  bool cache_remove(carepr::base_cache* victim) override;
+  bool block_remove(crepr::base_block3D* victim) override;
+  model_update_result cache_update(tracked_cache_type&& cache) override;
+
+  /*
+   * \brief Update the known blocks set with the new block.
+   *
+   * If the the new block's location has changed: tracked block is replaced
+   * If the new blocks' location has not changed from the tracked block: don't
+   * replace it, but update its pheromone level to correspond to the new block.
+   *
+   * \return \c TRUE if a block was added, and \c FALSE otherwise.
    */
-  ds::dp_cache_map& caches(void) { return m_caches; }
-  const ds::dp_cache_map& caches(void) const { return m_caches; }
+  model_update_result block_update(tracked_block_type&& block) override;
 
   bool repeat_deposit(void) const { return mc_repeat_deposit; }
 
@@ -113,72 +106,14 @@ class dpo_store final : public rer::client<dpo_store> {
    * timestep).
    */
   void decay_all(void);
-
   void clear_all(void);
-
-  bool contains(const crepr::base_block3D* block) const RCPPSW_PURE;
-  bool contains(const carepr::base_cache* cache) const;
-
-  const dp_cache_map::value_type* find(const carepr::base_cache* cache) const;
-  dp_cache_map::value_type* find(const carepr::base_cache* cache);
-
-  const dp_block_map::value_type*
-  find(const crepr::base_block3D* block) const RCPPSW_PURE;
-  dp_block_map::value_type* find(const crepr::base_block3D* block) RCPPSW_PURE;
-
-  /**
-   * \brief Update the known caches set with the new cache.
-   *
-   * If there is already a known cache at the location of the incoming cache, it
-   * is removed and replaced with a new one.
-   *
-   * \param cache Cache to update.
-   */
-  update_res_t cache_update(dpo_entity<carepr::base_cache> cache);
-
-  /*
-   * \brief Update the known blocks set with the new block.
-   *
-   * If the block is already in our set of known blocks it *MAY* need to be
-   * removed, depending on if its location has changed or not. If its location
-   * has not changed, then its pheromone count is updated to correspond to the
-   * new block, but the block object currently in the set is not replaced.
-   *
-   * \return \c TRUE if a block was added, and \c FALSE otherwise.
-   */
-  update_res_t block_update(dpo_entity<crepr::base_block3D> block_in);
-
-  /**
-   * \brief Remove a cache from the set of of known caches.
-   */
-  bool cache_remove(carepr::base_cache* victim);
-
-  /*
-   * \brief Remove a block from the set of known blocks. If the victim is not
-   * currently in our set of known blocks, no action is performed.
-   *
-   * \return \c TRUE if a block was removed, \c FALSE otherwise.
-   */
-  bool block_remove(crepr::base_block3D* victim);
 
   double pheromone_rho(void) const { return mc_pheromone_rho; }
 
-  boost::optional<rmath::vector2d> last_block_loc(void) const {
-    return m_last_block_loc;
-  }
-  boost::optional<rmath::vector2d> last_cache_loc(void) const {
-    return m_last_cache_loc;
-  }
-
  private:
   /* clang-format off */
-  const bool                       mc_repeat_deposit;
-  const double                     mc_pheromone_rho;
-
-  ds::dp_block_map                 m_blocks{};
-  ds::dp_cache_map                 m_caches{};
-  boost::optional<rmath::vector2d> m_last_block_loc{};
-  boost::optional<rmath::vector2d> m_last_cache_loc{};
+  const bool   mc_repeat_deposit;
+  const double mc_pheromone_rho;
   /* clang-format on */
 };
 

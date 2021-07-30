@@ -68,7 +68,7 @@ void block_proximity::visit(controller::cognitive::d2::birtd_dpo_controller& c) 
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
   events::block_found_visitor found_op(m_block);
-  found_op.visit(*c.dpo_perception()->dpo_store());
+  found_op.visit(*c.perception()->model<ds::dpo_store>());
   dispatch_cache_starter(c.current_task());
 
   c.ndc_pop();
@@ -90,7 +90,7 @@ void block_proximity::visit(controller::cognitive::d2::birtd_odpo_controller& c)
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
   events::block_found_visitor found_op(m_block);
-  found_op.visit(*c.dpo_perception()->dpo_store());
+  found_op.visit(*c.perception()->model<ds::dpo_store>());
   dispatch_cache_starter(c.current_task());
 
   c.ndc_pop();

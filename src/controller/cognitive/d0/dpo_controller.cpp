@@ -40,6 +40,7 @@
 #include "fordyca/controller/cognitive/dpo_perception_subsystem.hpp"
 #include "fordyca/fsm/d0/dpo_fsm.hpp"
 #include "fordyca/strategy/explore/block_factory.hpp"
+#include "fordyca/ds/dpo_store.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,7 +53,6 @@ NS_START(fordyca, controller, cognitive, d0);
 dpo_controller::dpo_controller(void)
     : ER_CLIENT_INIT("fordyca.controller.d0.dpo"),
       m_block_sel_matrix(),
-      m_perception(),
       m_fsm() {}
 
 dpo_controller::~dpo_controller(void) = default;
@@ -64,15 +64,6 @@ void dpo_controller::fsm(std::unique_ptr<fsm::d0::dpo_fsm> fsm) {
   m_fsm = std::move(fsm);
 } /* fsm() */
 
-void dpo_controller::perception(
-    std::unique_ptr<foraging_perception_subsystem> perception) {
-  m_perception = std::move(perception);
-}
-
-double dpo_controller::los_dim(void) const {
-  return perception()->los_dim();
-} /* los_dim() */
-
 void dpo_controller::control_step(void) {
   ndc_pusht();
   ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
@@ -80,7 +71,8 @@ void dpo_controller::control_step(void) {
             block()->id().v(),
             block()->md()->robot_id().v());
 
-  m_perception->update(nullptr);
+  /* Update perception */
+  perception()->update(nullptr);
 
   /*
    * Run the FSM and apply steering forces if normal operation, otherwise handle
@@ -92,11 +84,7 @@ void dpo_controller::control_step(void) {
 } /* control_step() */
 
 void dpo_controller::init(ticpp::Element& node) {
-  /*
-   * Note that we do not call \ref crw_controller::init()--there
-   * is nothing in there that we need.
-   */
-  foraging_controller::init(node);
+  cognitive_controller::init(node);
 
   ndc_push();
   ER_INFO("Initializing...");
@@ -119,13 +107,13 @@ void dpo_controller::init(ticpp::Element& node) {
 
 void dpo_controller::shared_init(
     const config::d0::dpo_controller_repository& config_repo) {
-  const auto* perception = config_repo.config_get<cspconfig::perception_config>();
+  const auto* perception_config = config_repo.config_get<cspconfig::perception_config>();
   const auto* block_matrix =
       config_repo.config_get<config::block_sel::block_sel_matrix_config>();
   const auto* nest = config_repo.config_get<crepr::config::nest_config>();
 
   /* DPO perception subsystem */
-  m_perception = std::make_unique<dpo_perception_subsystem>(perception);
+  perception(std::make_unique<dpo_perception_subsystem>(perception_config));
 
   /* block selection matrix */
   m_block_sel_matrix =
@@ -137,11 +125,16 @@ void dpo_controller::private_init(
   const auto* strat_config =
       config_repo.config_get<fcstrategy::strategy_config>();
 
-  fstrategy::foraging_strategy::params strategy_params(
-      saa(), nullptr, nullptr, nullptr, rutils::color());
+  fstrategy::foraging_strategy::params strategy_params{
+    .saa = saa(),
+    .bsel_matrix = nullptr,
+    .csel_matrix = nullptr,
+    .dpo_store = nullptr,
+    .ledtaxis_target = rutils::color()
+  };
   fsm::fsm_ro_params fsm_ro_params = { .bsel_matrix = block_sel_matrix(),
                                        .csel_matrix = nullptr,
-                                       .store = perception()->dpo_store(),
+                                       .store = perception()->model<const ds::dpo_store>(),
                                        .strategy_config = *strat_config };
   m_fsm = std::make_unique<fsm::d0::dpo_fsm>(
       &fsm_ro_params,
@@ -157,16 +150,15 @@ void dpo_controller::private_init(
 } /* private_init() */
 
 dpo_perception_subsystem* dpo_controller::dpo_perception(void) {
-  return static_cast<dpo_perception_subsystem*>(m_perception.get());
-} /* dpo_perception() */
+  return static_cast<dpo_perception_subsystem*>(perception());
+} /* perception() */
 
 const dpo_perception_subsystem* dpo_controller::dpo_perception(void) const {
-  return static_cast<const dpo_perception_subsystem*>(m_perception.get());
-} /* dpo_perception() */
+  return static_cast<const dpo_perception_subsystem*>(perception());
+} /* perception() */
 
 void dpo_controller::reset(void) {
-  crw_controller::Reset();
-  m_perception->reset();
+  cognitive_controller::reset();
 } /* reset() */
 
 /*******************************************************************************

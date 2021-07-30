@@ -42,21 +42,21 @@ NS_START(fordyca, strategy, explore);
  * Member Functions
  ******************************************************************************/
 void utility_cache_search::task_start(cta::taskable_argument*) {
-  auto range = mc_store->blocks().const_values_range();
+  auto range = mc_store->known_blocks();
   rmath::vector2d position;
   if (!range.empty()) {
     position = std::accumulate(range.begin(),
                                range.end(),
                                rmath::vector2d(),
                                [&](rmath::vector2d& sum, const auto& bent) {
-                                 return sum + bent.ent()->rcenter2D();
+                                 return sum + bent->rcenter2D();
                                }) /
                boost::size(range);
   } else {
     position = saa()->sensing()->rpos2D();
   }
   fsm::d2::cache_site_selector sel(mc_matrix);
-  if (auto site = sel(mc_store->caches(), position, rng())) {
+  if (auto site = sel(mc_store->tracked_caches(), position, rng())) {
     csfsm::point_argument v(fsm::kCACHE_ARRIVAL_TOL, *site);
     localized_search::task_start(&v);
   } else {
