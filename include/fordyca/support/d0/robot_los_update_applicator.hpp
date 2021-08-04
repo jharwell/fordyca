@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include "rcppsw/ds/type_map.hpp"
 
-#include "cosm/controller/operations/robot_los_update.hpp"
+#include "cosm/controller/operations/los_update.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
 
@@ -55,9 +55,9 @@ NS_START(fordyca, support, d0);
 class robot_los_update_applicator {
  public:
   template<typename TController>
-  using los_update_op_type = ccops::robot_los_update<TController,
-                                                     rds::grid2D_overlay<cds::cell2D>,
-                                                     repr::forager_los>;
+  using los_update_op_type = ccops::los_update<TController,
+                                               rds::grid2D_overlay<cds::cell2D>,
+                                               repr::forager_los>;
 
   explicit robot_los_update_applicator(controller::foraging_controller* const c)
       : controller(c) {}
