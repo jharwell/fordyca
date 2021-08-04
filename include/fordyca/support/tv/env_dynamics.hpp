@@ -46,11 +46,11 @@ namespace cosm::pal {
 class argos_controller2D_adaptor;
 } /* namespace cosm::pal */
 
-NS_START(fordyca);
+NS_START(fordyca, support);
 
-namespace config { namespace tv { struct env_dynamics_config; }}
-NS_START(support);
-
+namespace config::tv {
+struct env_dynamics_config;
+}
 class base_loop_functions;
 
 NS_START(tv);

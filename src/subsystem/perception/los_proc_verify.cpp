@@ -50,7 +50,7 @@ bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
    */
   for (const auto& cache : c_dpo->known_caches()) {
     for (auto* block : mc_los->blocks()) {
-      if (!cache->contains_point2D(block->ranchor2D())) {
+      if (!cache->contains_point(block->ranchor2D())) {
         ER_ASSERT(c_dpo->contains(block),
                   "Store does not contain block%d@%s",
                   block->id().v(),
@@ -117,8 +117,8 @@ bool los_proc_verify::operator()(const ds::dpo_semantic_map* const c_map) const 
    * Verify that for each cell in LOS that was empty or contained a block, that
    * it matches the map version.
    */
-  for (uint i = 0; i < mc_los->xsize(); ++i) {
-    for (uint j = 0; j < mc_los->ysize(); ++j) {
+  for (size_t i = 0; i < mc_los->xdsize(); ++i) {
+    for (size_t j = 0; j < mc_los->ydsize(); ++j) {
       rmath::vector2z d = mc_los->access(i, j).loc();
       const auto& cell1 = mc_los->access(i, j);
       const auto& cell2 = c_map->access<ds::occupancy_grid::kCell>(d);

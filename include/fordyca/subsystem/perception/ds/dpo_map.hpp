@@ -66,6 +66,7 @@ class dpo_map {
   }
 
   dpo_map(void)  = default;
+  virtual ~dpo_map(void) = default;
 
   /**
    * \brief Update the densities of all objects in the map. Should be called

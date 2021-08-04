@@ -47,9 +47,9 @@ using ds::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 mdpo_perception_subsystem::mdpo_perception_subsystem(
-    const cspconfig::perception_config* const config)
+    const config::perception_config* const config)
     : ER_CLIENT_INIT("fordyca.subsystem.perception.mdpo"),
-      foraging_perception_subsystem(config,
+      foraging_perception_subsystem(&config->mdpo.rlos,
                                     std::make_unique<ds::dpo_semantic_map>(&config->mdpo)),
       m_cell_stats(cfsm::cell2D_state::ekST_MAX_STATES),
       m_los() {}
@@ -125,8 +125,8 @@ void mdpo_perception_subsystem::process_los_blocks(
    * between then and now, and it needs to update its internal repr
    * accordingly.
    */
-  for (uint i = 0; i < c_los->xsize(); ++i) {
-    for (uint j = 0; j < c_los->ysize(); ++j) {
+  for (size_t i = 0; i < c_los->xdsize(); ++i) {
+    for (size_t j = 0; j < c_los->ydsize(); ++j) {
       rmath::vector2z d = c_los->access(i, j).loc();
       if (!c_los->access(i, j).state_has_block() &&
           map()->access<occupancy_grid::kCell>(d).state_has_block()) {
@@ -196,8 +196,8 @@ void mdpo_perception_subsystem::process_los_caches(
    * the cell does not contain a cache, then the cache was depleted between then
    * and now, and it needs to update its internal repr accordingly.
    */
-  for (uint i = 0; i < c_los->xsize(); ++i) {
-    for (uint j = 0; j < c_los->ysize(); ++j) {
+  for (size_t i = 0; i < c_los->xdsize(); ++i) {
+    for (size_t j = 0; j < c_los->ydsize(); ++j) {
       rmath::vector2z d = c_los->access(i, j).loc();
       if (!c_los->access(i, j).state_has_cache() &&
           map()->access<occupancy_grid::kCell>(d).state_has_cache()) {
@@ -246,8 +246,8 @@ void mdpo_perception_subsystem::process_los_caches(
 
 void mdpo_perception_subsystem::update_cell_stats(
     const repr::forager_los* const c_los) {
-  for (uint i = 0; i < c_los->xsize(); ++i) {
-    for (uint j = 0; j < c_los->ysize(); ++j) {
+  for (size_t i = 0; i < c_los->xdsize(); ++i) {
+    for (size_t j = 0; j < c_los->ydsize(); ++j) {
       rmath::vector2z d = c_los->access(i, j).loc();
       if (c_los->access(i, j).state_is_empty() &&
           map()->access<occupancy_grid::kCell>(d).state_is_known() &&

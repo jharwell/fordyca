@@ -96,7 +96,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    *               way that callers probably do not want.
    * \param t The current timestep.
    */
-  std::unique_ptr<carepr::arena_cache>
+  std::shared_ptr<carepr::arena_cache>
   create_single_cache(const rmath::vector2d& center,
                       cds::block3D_vectorno&& blocks,
                       const rtypes::timestep& t,

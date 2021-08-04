@@ -168,44 +168,49 @@
  */
 
 namespace fordyca {
-namespace config {
-namespace strategy {}
-} /* namespace config */
 
 namespace strategy {
 namespace explore {}
+namespace config {}
 } /* namespace strategy */
 
 namespace controller {
 namespace cognitive {}
 namespace reactive {}
-}
+namespace config {
+namespace strategy {}
+} /* namespace config */
+} /* namespace controller */
 
 namespace ds {}
 
 namespace subsystem {
+
 namespace perception {
 namespace ds {}
+namespace config {}
 } /* namespace perception */
 
 } /* namespace subsystem */
 
 } /* namespace fordyca */
 
-namespace fconfig = fordyca::config;
-namespace fcstrategy = fconfig::strategy;
-
 namespace fds = fordyca::ds;
 
 namespace fsubsystem = fordyca::subsystem;
 namespace fsperception = fsubsystem::perception;
 namespace fspds = fsperception::ds;
+namespace fspconfig = fsperception::config;
 
 namespace fstrategy = fordyca::strategy;
 namespace fsexplore = fstrategy::explore;
+namespace fsconfig = fstrategy::config;
 
 namespace fcontroller = fordyca::controller;
 namespace fccognitive = fcontroller::cognitive;
+namespace fcconfig = fcontroller::config;
+namespace fccstrategy = fcconfig::strategy;
+
 namespace fcreactive = fcontroller::reactive;
 
 #endif /* INCLUDE_FORDYCA_FORDYCA_HPP_ */

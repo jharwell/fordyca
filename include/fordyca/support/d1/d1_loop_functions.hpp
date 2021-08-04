@@ -33,6 +33,7 @@
 #include "cosm/controller/operations/task_id_extract.hpp"
 
 #include "fordyca/support/d0/d0_loop_functions.hpp"
+#include "fordyca/support/config/caches/caches_config.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -31,13 +31,12 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace fsm { namespace d0 { class dpo_fsm; }}
-
-namespace config {
-namespace d0 { class dpo_controller_repository; }
+namespace fordyca::controller::config::d0 {
+ class dpo_controller_repository;
 }
+
+NS_START(fordyca);
+namespace fsm { namespace d0 { class dpo_fsm; }}
 
 NS_START(controller, cognitive);
 class block_sel_matrix;

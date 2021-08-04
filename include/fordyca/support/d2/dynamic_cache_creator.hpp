@@ -102,7 +102,7 @@ class dynamic_cache_creator : public base_cache_creator,
  private:
   struct cache_i_result {
     bool status{false};
-    std::unique_ptr<carepr::arena_cache> cache{nullptr};
+    std::shared_ptr<carepr::arena_cache> cache{nullptr};
     cds::block3D_vectorno used{};
   };
 

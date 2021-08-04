@@ -31,6 +31,7 @@
 
 #include "cosm/ds/entity_vector.hpp"
 
+#include "fordyca/subsystem/perception/config/perception_config.hpp"
 #include "fordyca/subsystem/perception/foraging_perception_subsystem.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/metrics/perception/dpo_metrics.hpp"
@@ -56,7 +57,7 @@ class dpo_perception_subsystem final
       public foraging_perception_subsystem,
       public metrics::perception::dpo_metrics {
  public:
-  explicit dpo_perception_subsystem(const cspconfig::perception_config* config);
+  explicit dpo_perception_subsystem(const config::perception_config* config);
   ~dpo_perception_subsystem(void) override;
 
   /* DPO perception metrics */

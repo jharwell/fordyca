@@ -31,7 +31,7 @@
 #include "cosm/spatial/strategy/nest_acq/factory.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
-#include "fordyca/config/foraging_controller_repository.hpp"
+#include "fordyca/controller/config/foraging_controller_repository.hpp"
 #include "fordyca/fsm/d0/crw_fsm.hpp"
 #include "fordyca/strategy/explore/block_factory.hpp"
 
@@ -72,7 +72,7 @@ void crw_controller::init(ticpp::Element& node) {
         rutils::color()
         };
   const auto* nest = repo.config_get<crepr::config::nest_config>();
-  const auto* strat_config = repo.config_get<fcstrategy::strategy_config>();
+  const auto* strat_config = repo.config_get<fsconfig::strategy_config>();
 
   m_fsm = std::make_unique<fsm::d0::crw_fsm>(
       saa(),

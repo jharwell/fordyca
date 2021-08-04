@@ -48,6 +48,7 @@
 #include "cosm/spatial/metrics/vector_locs2D_metrics_csv_sink.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tab.hpp"
+#include "cosm/ds/cell2D.hpp"
 #include "cosm/ta/metrics/bi_tab_metrics.hpp"
 #include "cosm/ta/metrics/bi_tab_metrics_collector.hpp"
 #include "cosm/ta/metrics/bi_tab_metrics_csv_sink.hpp"

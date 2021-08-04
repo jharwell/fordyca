@@ -37,7 +37,7 @@ NS_START(fordyca, subsystem, perception, ds);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-dpo_semantic_map::dpo_semantic_map(const cspconfig::mdpo_config* c_config)
+dpo_semantic_map::dpo_semantic_map(const config::mdpo_config* c_config)
     : ER_CLIENT_INIT("fordyca.subsystem.perception.ds.dpo_semantic_map"),
       decorator(c_config),
       m_store(&c_config->pheromone) {}

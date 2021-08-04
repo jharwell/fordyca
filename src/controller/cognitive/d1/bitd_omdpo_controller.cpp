@@ -28,6 +28,7 @@
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
+#include "cosm/ds/cell2D.hpp"
 
 #include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/subsystem/perception/oracular_info_receptor.hpp"

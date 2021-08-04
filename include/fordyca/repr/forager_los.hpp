@@ -49,8 +49,9 @@ NS_START(fordyca, repr);
  */
 class forager_los final : public crepr::los2D, public rer::client<forager_los> {
  public:
-  explicit forager_los(const const_grid_view& c_view)
-      : los2D(c_view), ER_CLIENT_INIT("fordyca.repr.forager_los") {}
+  forager_los(const rtypes::type_uuid& c_id,
+              const grid_view_type& c_view,
+              const rtypes::discretize_ratio& c_resolution);
 
   /**
    * \brief Get the list of blocks currently in the LOS.

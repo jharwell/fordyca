@@ -25,6 +25,7 @@
 
 #include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/ds/cell2D.hpp"
 
 #include "fordyca/subsystem/perception/los_proc_verify.hpp"
 #include "fordyca/subsystem/perception/oracular_info_receptor.hpp"
@@ -41,9 +42,9 @@ NS_START(fordyca, subsystem, perception);
  * Constructors/Destructor
  ******************************************************************************/
 dpo_perception_subsystem::dpo_perception_subsystem(
-    const cspconfig::perception_config* const config)
+    const config::perception_config* const config)
     : ER_CLIENT_INIT("fordyca.subsystem.perception.dpo"),
-      foraging_perception_subsystem(config,
+      foraging_perception_subsystem(&config->dpo.rlos,
                                     std::make_unique<ds::dpo_store>(&config->dpo.pheromone)) {}
 
 dpo_perception_subsystem::~dpo_perception_subsystem(void) = default;
@@ -179,15 +180,15 @@ void dpo_perception_subsystem::los_tracking_sync(
              rcppsw::to_string((*it)->dcenter2D()).c_str(),
              rcppsw::to_string((*it)->xrspan()).c_str(),
              rcppsw::to_string((*it)->yrspan()).c_str(),
-             rcppsw::to_string(c_los->xspan()).c_str(),
-             rcppsw::to_string(c_los->yspan()).c_str());
+             rcppsw::to_string(c_los->xdspan()).c_str(),
+             rcppsw::to_string(c_los->ydspan()).c_str());
 
     /*
      * We can't just check if the cache host cell is in our LOS, because for
      * bigger arenas, it almost never is.
      */
-    bool should_be_in_los = (*it)->yrspan().overlaps_with(c_los->yspan()) ||
-                            (*it)->xrspan().overlaps_with(c_los->xspan());
+    bool should_be_in_los = (*it)->yrspan().overlaps_with(c_los->yrspan()) ||
+                            (*it)->xrspan().overlaps_with(c_los->xrspan());
 
     bool in_los =
         los_caches.end() !=
@@ -203,8 +204,8 @@ void dpo_perception_subsystem::los_tracking_sync(
               rcppsw::to_string((*it)->dcenter2D()).c_str(),
               rcppsw::to_string((*it)->xrspan()).c_str(),
               rcppsw::to_string((*it)->yrspan()).c_str(),
-              rcppsw::to_string(c_los->xspan()).c_str(),
-              rcppsw::to_string(c_los->yspan()).c_str());
+              rcppsw::to_string(c_los->xdspan()).c_str(),
+              rcppsw::to_string(c_los->ydspan()).c_str());
 
       /*
        * Copy iterator object + iterator increment MUST be before removal to

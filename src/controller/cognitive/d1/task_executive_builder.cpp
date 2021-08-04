@@ -35,9 +35,10 @@
 #include "cosm/ta/config/task_alloc_config.hpp"
 #include "cosm/ta/config/task_executive_config.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
+#include "cosm/ds/cell2D.hpp"
 
-#include "fordyca/config/d1/controller_repository.hpp"
-#include "fordyca/config/strategy/strategy_config.hpp"
+#include "fordyca/controller/config/d1/controller_repository.hpp"
+#include "fordyca/strategy/config/strategy_config.hpp"
 #include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
 #include "fordyca/subsystem/perception/foraging_perception_subsystem.hpp"
 #include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
@@ -82,7 +83,7 @@ task_executive_builder::tasking_map task_executive_builder::d1_tasks_create(
   const auto* task_config =
       config_repo.config_get<cta::config::task_alloc_config>();
   const auto* strat_config =
-      config_repo.config_get<fcstrategy::strategy_config>();
+      config_repo.config_get<fsconfig::strategy_config>();
   auto cache_color = carepr::light_type_index()[carepr::light_type_index::kCache];
   fstrategy::foraging_strategy::params strategy_cachep{
       saa(),
@@ -183,8 +184,8 @@ void task_executive_builder::d1_exec_est_init(
   rmath::rangeu g_bounds =
       task_config->exec_est.ranges.find("generalist")->second;
 
-  rmath::rangeu h_bounds = task_config->exec_est.ranges.find("harvester")->second;
-  rmath::rangeu c_bounds = task_config->exec_est.ranges.find("collector")->second;
+  auto h_bounds = task_config->exec_est.ranges.find("harvester")->second;
+  auto c_bounds = task_config->exec_est.ranges.find("collector")->second;
   ER_INFO("Seeding exec estimate for tasks: '%s'=%s '%s'=%s '%s'=%s",
           generalist->name().c_str(),
           g_bounds.to_str().c_str(),

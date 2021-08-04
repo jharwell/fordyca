@@ -38,6 +38,7 @@
 #include "cosm/ta/metrics/execution_metrics.hpp"
 #include "cosm/ta/metrics/execution_metrics_collector.hpp"
 #include "cosm/ta/metrics/execution_metrics_csv_sink.hpp"
+#include "cosm/ds/cell2D.hpp"
 
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
 #include "fordyca/metrics/caches/site_selection_metrics_collector.hpp"

@@ -70,7 +70,7 @@ void utility_cache_search::task_start(cta::taskable_argument*) {
                                [&](rmath::vector2d& sum, const auto& bent) {
                                  return sum + bent->rcenter2D();
                                }) /
-               boost::size(range);
+               range.size();
   } else {
     position = saa()->sensing()->rpos2D();
   }

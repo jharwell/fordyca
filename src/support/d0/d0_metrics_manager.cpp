@@ -32,6 +32,7 @@
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 #include "cosm/spatial/metrics/movement_metrics.hpp"
+#include "cosm/ds/cell2D.hpp"
 
 #include "fordyca//controller/foraging_controller.hpp"
 #include "fordyca/controller/cognitive/d0/dpo_controller.hpp"

@@ -26,9 +26,11 @@
  ******************************************************************************/
 #include <memory>
 
-#include "fordyca/strategy/foraging_strategy.hpp"
 #include "rcppsw/math/vector2.hpp"
+
 #include "cosm/spatial/fsm/vector_fsm.hpp"
+
+#include "fordyca/strategy/foraging_strategy.hpp"
 #include "fordyca/strategy/explore/crw_adaptor.hpp"
 
 /*******************************************************************************

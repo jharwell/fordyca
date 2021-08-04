@@ -30,8 +30,7 @@
 
 #include "rcppsw/er/client.hpp"
 
-#include "cosm/subsystem/perception/config/perception_config.hpp"
-
+#include "fordyca/subsystem/perception/config/perception_config.hpp"
 #include "fordyca/subsystem/perception/foraging_perception_subsystem.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/metrics/perception/mdpo_metrics.hpp"
@@ -58,7 +57,7 @@ class mdpo_perception_subsystem final
       public foraging_perception_subsystem,
       public metrics::perception::mdpo_metrics {
  public:
-  explicit mdpo_perception_subsystem(const cspconfig::perception_config* config);
+  explicit mdpo_perception_subsystem(const config::perception_config* config);
   ~mdpo_perception_subsystem(void) override;
 
   /* world model metrics */

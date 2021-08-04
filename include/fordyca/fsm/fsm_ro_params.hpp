@@ -29,7 +29,7 @@
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/math/vector2.hpp"
 
-#include "fordyca/config/strategy/strategy_config.hpp"
+#include "fordyca/strategy/config/strategy_config.hpp"
 #include "fordyca/subsystem/perception/perception_fwd.hpp"
 #include "fordyca/subsystem/perception/known_objects_accessor.hpp"
 
@@ -61,7 +61,7 @@ struct fsm_ro_params {
   const fccognitive::cache_sel_matrix*        csel_matrix;
   const fspds::dpo_store*                     store;
   const fsperception::known_objects_accessor* accessor;
-  const fcstrategy::strategy_config           strategy_config{};
+  const fsconfig::strategy_config             strategy_config{};
   /* clang-format on */
 };
 

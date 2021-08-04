@@ -46,13 +46,9 @@ class bi_tab;
 } /* namespace ds */
 }
 
-NS_START(fordyca);
+namespace fordyca::controller::config::d1 { class controller_repository; }
 
-namespace config {
-namespace d1 { class controller_repository; }
-}
-
-NS_START(controller, cognitive);
+NS_START(fordyca, controller, cognitive);
 class cache_sel_matrix;
 NS_START(d1);
 

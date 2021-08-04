@@ -26,9 +26,9 @@
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
-#include "cosm/subsystem/perception/config/perception_config.hpp"
+#include "cosm/ds/cell2D.hpp"
 
-#include "fordyca/config/d2/controller_repository.hpp"
+#include "fordyca/controller/config/d2/controller_repository.hpp"
 #include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
 #include "fordyca/subsystem/perception/perception_subsystem_factory.hpp"
@@ -73,13 +73,13 @@ void birtd_mdpo_controller::shared_init(
   birtd_dpo_controller::shared_init(config_repo);
 
   /* MDPO perception subsystem */
-  auto p = *config_repo.config_get<cspconfig::perception_config>();
-  rmath::vector2d padding(p.mdpo.grid.resolution.v() * 5,
-                          p.mdpo.grid.resolution.v() * 5);
-  p.mdpo.grid.dims += padding;
+  auto p = *config_repo.config_get<fspconfig::perception_config>();
+  rmath::vector2d padding(p.mdpo.rlos.grid2D.resolution.v() * 5,
+                          p.mdpo.rlos.grid2D.resolution.v() * 5);
+  p.mdpo.rlos.grid2D.dims += padding;
 
   auto factory = fsperception::perception_subsystem_factory();
-  perception(factory.create(p.model, &p));
+  perception(factory.create(p.type, &p));
 } /* shared_init() */
 
 using namespace argos; // NOLINT

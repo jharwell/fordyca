@@ -32,12 +32,9 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace config {
-namespace d2 { class controller_repository; }
-}
+namespace fordyca::controller::config::d2 { class controller_repository; }
 
-NS_START(controller, cognitive, d2);
+NS_START(fordyca, controller, cognitive, d2);
 
 /*******************************************************************************
  * Class Definitions

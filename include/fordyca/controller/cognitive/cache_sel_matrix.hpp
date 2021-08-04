@@ -34,18 +34,14 @@
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/types/spatial_dist.hpp"
 
-#include "fordyca/config/cache_sel/cache_pickup_policy_config.hpp"
+#include "fordyca/controller/config/cache_sel/cache_sel_matrix_config.hpp"
 #include "fordyca/controller/cognitive/cache_sel_exception.hpp"
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace config::cache_sel {
-struct cache_sel_matrix_config;
-} // namespace config::cache_sel
-NS_START(controller, cognitive);
+NS_START(fordyca, controller, cognitive);
 
 /**
  * \brief \ref boost::variant containing all the different object/POD types that

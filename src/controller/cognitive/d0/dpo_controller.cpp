@@ -30,12 +30,12 @@
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/repr/config/nest_config.hpp"
 #include "cosm/spatial/strategy/nest_acq/factory.hpp"
-#include "cosm/subsystem/perception/config/perception_config.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
+#include "cosm/ds/cell2D.hpp"
 
-#include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
-#include "fordyca/config/d0/dpo_controller_repository.hpp"
-#include "fordyca/config/strategy/strategy_config.hpp"
+#include "fordyca/controller/config/block_sel/block_sel_matrix_config.hpp"
+#include "fordyca/controller/config/d0/dpo_controller_repository.hpp"
+#include "fordyca/strategy/config/strategy_config.hpp"
 #include "fordyca/controller/cognitive/block_sel_matrix.hpp"
 #include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
 #include "fordyca/fsm/d0/dpo_fsm.hpp"
@@ -108,14 +108,14 @@ void dpo_controller::init(ticpp::Element& node) {
 
 void dpo_controller::shared_init(
     const config::d0::dpo_controller_repository& config_repo) {
-  const auto* perception_config = config_repo.config_get<cspconfig::perception_config>();
+  const auto* perception_config = config_repo.config_get<fspconfig::perception_config>();
   const auto* block_matrix =
       config_repo.config_get<config::block_sel::block_sel_matrix_config>();
   const auto* nest = config_repo.config_get<crepr::config::nest_config>();
 
   /* DPO perception subsystem */
   auto factory = fsperception::perception_subsystem_factory();
-  perception(factory.create(perception_config->model,
+  perception(factory.create(perception_config->type,
                             perception_config));
 
   /* block selection matrix */
@@ -126,7 +126,7 @@ void dpo_controller::shared_init(
 void dpo_controller::private_init(
     const config::d0::dpo_controller_repository& config_repo) {
   const auto* strat_config =
-      config_repo.config_get<fcstrategy::strategy_config>();
+      config_repo.config_get<fsconfig::strategy_config>();
 
   auto strategy_params = fstrategy::foraging_strategy::params{
     saa(),

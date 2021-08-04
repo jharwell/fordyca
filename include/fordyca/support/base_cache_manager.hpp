@@ -40,7 +40,7 @@
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/metrics/caches/lifecycle_metrics.hpp"
-#include "fordyca/config/caches/caches_config.hpp"
+#include "fordyca/support/config/caches/caches_config.hpp"
 
 /*******************************************************************************
  * Namespaces

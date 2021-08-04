@@ -34,7 +34,7 @@
 #include "cosm/foraging/ds/block_cluster_vector.hpp"
 
 #include "fordyca/support/cache_create_ro_params.hpp"
-#include "fordyca/config/caches/caches_config.hpp"
+#include "fordyca/support/config/caches/caches_config.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 
 /*******************************************************************************

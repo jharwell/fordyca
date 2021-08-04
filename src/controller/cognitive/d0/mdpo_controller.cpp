@@ -27,11 +27,10 @@
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/spatial/strategy/nest_acq/factory.hpp"
-#include "cosm/subsystem/perception/config/perception_config.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
-#include "fordyca/config/d0/mdpo_controller_repository.hpp"
-#include "fordyca/config/strategy/strategy_config.hpp"
+#include "fordyca/controller/config/d0/mdpo_controller_repository.hpp"
+#include "fordyca/strategy/config/strategy_config.hpp"
 #include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/fsm/d0/dpo_fsm.hpp"
 #include "fordyca/strategy/explore/block_factory.hpp"
@@ -98,18 +97,18 @@ void mdpo_controller::shared_init(
   dpo_controller::shared_init(config_repo);
 
   /* MDPO perception subsystem */
-  auto p = *config_repo.config_get<cspconfig::perception_config>();
-  rmath::vector2d padding(p.mdpo.grid.resolution.v() * 5,
-                          p.mdpo.grid.resolution.v() * 5);
-  p.mdpo.grid.dims += padding;
+  auto p = *config_repo.config_get<fspconfig::perception_config>();
+  rmath::vector2d padding(p.mdpo.rlos.grid2D.resolution.v() * 5,
+                          p.mdpo.rlos.grid2D.resolution.v() * 5);
+  p.mdpo.rlos.grid2D.dims += padding;
   auto factory = fsperception::perception_subsystem_factory();
-  perception(factory.create(p.model, &p));
+  perception(factory.create(p.type, &p));
 } /* shared_init() */
 
 void mdpo_controller::private_init(
     const config::d0::mdpo_controller_repository& config_repo) {
   const auto* strat_config =
-      config_repo.config_get<fcstrategy::strategy_config>();
+      config_repo.config_get<fsconfig::strategy_config>();
 
   fstrategy::foraging_strategy::params strategy_params{
     saa(),

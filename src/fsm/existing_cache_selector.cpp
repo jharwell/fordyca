@@ -109,7 +109,7 @@ bool existing_cache_selector::cache_is_excluded(
    * This threshold prevents that behavior, forcing robots to at least LEAVE
    * the cache, even if they will then immediately return to it.
    */
-  if (cache->contains_point2D(position)) {
+  if (cache->contains_point(position)) {
     ER_DEBUG("Ignoring cache%d@%s/%s: robot@%s inside it",
              cache->id().v(),
              rcppsw::to_string(cache->rcenter2D()).c_str(),

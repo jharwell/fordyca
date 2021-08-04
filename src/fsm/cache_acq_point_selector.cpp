@@ -53,7 +53,7 @@ rmath::vector2d cache_acq_point_selector::operator()(
 
   rmath::vector2d loc(rng->uniform(xrange), rng->uniform(yrange));
 
-  ER_ASSERT(cache->contains_point2D(loc),
+  ER_ASSERT(cache->contains_point(loc),
             "Cache%d@%s/%s with xspan=%s,yspan=%s does not contain %s",
             cache->id().v(),
             rcppsw::to_string(cache->rcenter2D()).c_str(),

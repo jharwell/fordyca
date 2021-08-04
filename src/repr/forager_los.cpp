@@ -33,13 +33,23 @@
 NS_START(fordyca, repr);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+forager_los::forager_los(const rtypes::type_uuid& c_id,
+                         const grid_view_type& c_view,
+                         const rtypes::discretize_ratio& c_resolution)
+    : los2D(c_id, c_view, c_resolution),
+      ER_CLIENT_INIT("fordyca.repr.forager_los") {}
+
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 cds::block3D_vectorno forager_los::blocks(void) const {
   cds::block3D_vectorno blocks{};
-  for (size_t i = 0; i < xsize(); ++i) {
-    for (size_t j = 0; j < ysize(); ++j) {
-      const cds::cell2D& cell = access(i, j);
+  for (size_t i = 0; i < xdsize(); ++i) {
+    for (size_t j = 0; j < ydsize(); ++j) {
+      const auto& cell = access(i, j);
       if (cell.state_has_block() || cell.state_in_block_extent()) {
         ER_ASSERT(nullptr != cell.block3D(),
                   "Cell@%s in HAS_BLOCK/BLOCK_EXTENT state, but does not have "
@@ -55,9 +65,9 @@ cds::block3D_vectorno forager_los::blocks(void) const {
 cads::bcache_vectorno forager_los::caches(void) const {
   cads::bcache_vectorno caches;
 
-  for (size_t i = 0; i < xsize(); ++i) {
-    for (size_t j = 0; j < ysize(); ++j) {
-      const cds::cell2D& cell = access(i, j);
+  for (size_t i = 0; i < xdsize(); ++i) {
+    for (size_t j = 0; j < ydsize(); ++j) {
+      const auto& cell = access(i, j);
       if (cell.state_has_cache() || cell.state_in_cache_extent()) {
         auto* cache = cell.cache();
         ER_ASSERT(nullptr != cache,

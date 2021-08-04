@@ -32,7 +32,8 @@
 
 #include "cosm/ds/cell2D.hpp"
 #include "cosm/repr/pheromone_density.hpp"
-#include "cosm/subsystem/perception/config/mdpo_config.hpp"
+
+#include "fordyca/subsystem/perception/config/mdpo_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -69,7 +70,7 @@ class occupancy_grid : public rer::client<occupancy_grid>,
    */
   static constexpr size_t kCell = 1;
 
-  explicit occupancy_grid(const cspconfig::mdpo_config* c_config);
+  explicit occupancy_grid(const config::mdpo_config* c_config);
 
   /**
    * \brief Update the density of all cells in the grid.

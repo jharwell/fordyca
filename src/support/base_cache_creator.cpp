@@ -51,7 +51,7 @@ base_cache_creator::base_cache_creator(carena::caching_arena_map* const map,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::unique_ptr<carepr::arena_cache>
+std::shared_ptr<carepr::arena_cache>
 base_cache_creator::create_single_cache(const rmath::vector2d& center,
                                         cds::block3D_vectorno&& blocks,
                                         const rtypes::timestep& t,
@@ -145,7 +145,7 @@ base_cache_creator::create_single_cache(const rmath::vector2d& center,
 
   /* create the cache! */
   cds::block3D_vectorno for_cache(blocks.begin(), blocks.end());
-  auto ret = std::make_unique<carepr::arena_cache>(
+  auto ret = std::make_shared<carepr::arena_cache>(
       carepr::arena_cache::params{ mc_cache_dim,
             m_map->grid_resolution(),
             center,

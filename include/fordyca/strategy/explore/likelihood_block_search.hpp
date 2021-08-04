@@ -27,7 +27,7 @@
 #include <memory>
 
 #include "fordyca/strategy/explore/localized_search.hpp"
-#include "fordyca/subsystem/perception/foraging_perception_model.hpp"
+#include "fordyca/subsystem/perception/known_objects_accessor.hpp"
 
 /*******************************************************************************
  * Namespaces

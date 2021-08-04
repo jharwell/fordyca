@@ -32,17 +32,13 @@
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/types/type_uuid.hpp"
 
-#include "fordyca/config/block_sel/block_pickup_policy_config.hpp"
+#include "fordyca/controller/config/block_sel/block_sel_matrix_config.hpp"
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace config { namespace block_sel {
-struct block_sel_matrix_config;
-}} // namespace config::block_sel
-NS_START(controller, cognitive);
+NS_START(fordyca, controller, cognitive);
 
 /**
  * \brief \ref boost::variant containing all the different object/POD types that

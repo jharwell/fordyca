@@ -25,7 +25,7 @@
 
 #include "cosm/arena/repr/base_cache.hpp"
 
-#include "fordyca/config/cache_sel/cache_pickup_policy_config.hpp"
+#include "fordyca/controller/config/cache_sel/cache_pickup_policy_config.hpp"
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/subsystem/perception/ds/dp_cache_map.hpp"
 
@@ -77,7 +77,7 @@ bool cache_acq_validator::operator()(const rmath::vector2d& loc,
             id.v(),
             loc.to_str().c_str());
     return false;
-  } else if (!(*it)->contains_point2D(loc)) {
+  } else if (!(*it)->contains_point(loc)) {
     ER_WARN("Cache%d@%s invalid for acquisition: does not contain %s",
             id.v(),
             rcppsw::to_string((*it)->dcenter2D()).c_str(),
@@ -100,7 +100,7 @@ bool cache_acq_validator::operator()(const rmath::vector2d& loc,
 
 bool cache_acq_validator::pickup_policy_validate(const carepr::base_cache* cache,
                                                  const rtypes::timestep& t) const {
-  const auto& config = boost::get<config::cache_sel::cache_pickup_policy_config>(
+  const auto& config = boost::get<fcconfig::cache_sel::cache_pickup_policy_config>(
       mc_csel_matrix->find(cselm::kPickupPolicy)->second);
 
   if (cselm::kPickupPolicyTime == config.policy && t < config.timestep) {

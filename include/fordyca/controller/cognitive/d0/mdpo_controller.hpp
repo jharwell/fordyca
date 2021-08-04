@@ -29,11 +29,9 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+namespace fordyca::controller::config::d0 { class mdpo_controller_repository; }
 
-namespace config { namespace d0 { class mdpo_controller_repository; }}
-
-NS_START(controller, cognitive);
+NS_START(fordyca, controller, cognitive);
 
 class mdpo_perception_subsystem;
 

@@ -29,13 +29,12 @@
 
 #include "rcppsw/patterns/decorator/decorator.hpp"
 
-#include "cosm/subsystem/perception/config/mdpo_config.hpp"
-
+#include "fordyca/subsystem/perception/config/mdpo_config.hpp"
 #include "fordyca/subsystem/perception/ds/dp_block_map.hpp"
 #include "fordyca/subsystem/perception/ds/dp_cache_map.hpp"
 #include "fordyca/subsystem/perception/ds/dpo_store.hpp"
 #include "fordyca/subsystem/perception/ds/occupancy_grid.hpp"
-#include "fordyca/subsystem/perception/foraging_perception_model.hpp"
+#include "fordyca/subsystem/perception/foraging_memory_model.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -64,10 +63,10 @@ NS_START(fordyca, subsystem, perception, ds);
  */
 class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
                                public rpdecorator::decorator<occupancy_grid>,
-                               public foraging_perception_model<ds::dp_block_map,
+                               public foraging_memory_model<ds::dp_block_map,
                                                                 ds::dp_cache_map> {
  public:
-  explicit dpo_semantic_map(const cspconfig::mdpo_config* c_config);
+  explicit dpo_semantic_map(const config::mdpo_config* c_config);
 
   const dpo_store* store(void) const { return &m_store; }
   dpo_store* store(void) { return &m_store; }
@@ -76,7 +75,7 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
   RCPPSW_WRAP_DECLDEF_OVERRIDE(known_blocks, (*store()), const);
   RCPPSW_WRAP_DECLDEF_OVERRIDE(known_caches, (*store()), const)
 
-  /* foraging_perception_model overrides */
+  /* foraging_memory_model overrides */
   bool cache_remove(carepr::base_cache* victim) override;
   bool block_remove(crepr::base_block3D* victim) override;
   model_update_result block_update(tracked_block_type&& block) override;

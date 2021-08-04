@@ -27,6 +27,7 @@
 #include <string>
 
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/er/stringizable.hpp"
 
 #include "fordyca/subsystem/perception/ds/dpo_map.hpp"
 #include "fordyca/fordyca.hpp"
@@ -56,16 +57,13 @@ NS_START(fordyca, subsystem, perception, ds);
  * would not be removed, as they would be considered different objects).
  */
 class dp_cache_map : public dpo_map<rmath::vector2z,
-                                    carepr::base_cache> {
+                                    carepr::base_cache>,
+                     public rer::stringizable {
  public:
   using dpo_map<rmath::vector2z,
                 carepr::base_cache>::dpo_map;
 
-  /**
-   * \brief Build a string from the list of DP caches that a robot is tracking
-   * for logging.
-   */
-  std::string to_str(void) const;
+  std::string to_str(void) const override;
 };
 
 NS_END(ds, perception, subsystem, fordyca);

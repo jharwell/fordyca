@@ -26,11 +26,11 @@
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
-#include "cosm/subsystem/perception/config/perception_config.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
+#include "cosm/ds/cell2D.hpp"
 
-#include "fordyca/config/d1/controller_repository.hpp"
+#include "fordyca/controller/config/d1/controller_repository.hpp"
 #include "fordyca/controller/cognitive/d1/task_executive_builder.hpp"
 #include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/subsystem/perception/perception_subsystem_factory.hpp"
@@ -94,16 +94,13 @@ void bitd_mdpo_controller::shared_init(
   bitd_dpo_controller::shared_init(config_repo);
 
   /* MDPO perception subsystem */
-  auto p = *config_repo.config_get<cspconfig::perception_config>();
-  rmath::vector2d padding(p.mdpo.grid.resolution.v() * 5,
-                          p.mdpo.grid.resolution.v() * 5);
-  p.mdpo.grid.dims += padding;
+  auto p = *config_repo.config_get<fspconfig::perception_config>();
+  rmath::vector2d padding(p.mdpo.rlos.grid2D.resolution.v() * 5,
+                          p.mdpo.rlos.grid2D.resolution.v() * 5);
+  p.mdpo.rlos.grid2D.dims += padding;
 
   auto factory = fsperception::perception_subsystem_factory();
-  perception(factory.create(p.model,&p));
-
-  bitd_dpo_controller::perception(
-      std::make_unique<fsperception::mdpo_perception_subsystem>(&p));
+  perception(factory.create(p.type, &p));
 
   /*
    * Task executive. Even though we use the same executive as the \ref

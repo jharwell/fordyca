@@ -65,7 +65,7 @@ void cache_found::visit(fspds::dpo_store& store) {
   auto blocks = store.known_blocks();
   auto it = blocks.begin();
   while (it != blocks.end()) {
-    if (m_cache->contains_point2D((*it)->rcenter2D())) {
+    if (m_cache->contains_point((*it)->rcenter2D())) {
       crepr::base_block3D* tmp = (*it);
       ++it;
       ER_TRACE("Remove block%d hidden behind cache%d",
@@ -167,7 +167,7 @@ void cache_found::visit(fspds::dpo_semantic_map& map) {
   std::vector<crepr::base_block3D*> rms;
   auto blocks = map.known_blocks();
   for (auto&& b : blocks) {
-    if (m_cache->contains_point2D(b->rcenter2D())) {
+    if (m_cache->contains_point(b->rcenter2D())) {
       ER_TRACE("Remove block%d hidden behind cache%d",
                b->id().v(),
                m_cache->id().v());

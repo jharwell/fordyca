@@ -34,7 +34,7 @@
 #include "fordyca/subsystem/perception/ds/dp_block_map.hpp"
 #include "fordyca/subsystem/perception/ds/dp_cache_map.hpp"
 #include "fordyca/subsystem/perception/ds/dpo_map.hpp"
-#include "fordyca/subsystem/perception/foraging_perception_model.hpp"
+#include "fordyca/subsystem/perception/foraging_memory_model.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -54,14 +54,14 @@ NS_START(fordyca, subsystem, perception, ds);
  * an entity are encountered (e.g. the real version has vanished and the tracked
  * version is out of date).
  */
-class dpo_store final : public foraging_perception_model<ds::dp_block_map,
+class dpo_store final : public foraging_memory_model<ds::dp_block_map,
                                                          ds::dp_cache_map>,
                         public rer::client<dpo_store> {
  public:
   template <typename T>
   using dpo_entity = repr::dpo_entity<T>;
 
-  using base_model_type = foraging_perception_model<ds::dp_block_map,
+  using base_model_type = foraging_memory_model<ds::dp_block_map,
                                                     ds::dp_cache_map>;
   using base_model_type::tracked_cache_type;
   using base_model_type::tracked_block_type;
@@ -82,7 +82,7 @@ class dpo_store final : public foraging_perception_model<ds::dp_block_map,
     return dp_cache_map::raw_values_extract<cads::bcache_vectorno>(tracked_caches());
   }
 
-  /* foraging_perception_model overrides */
+  /* foraging_memory_model overrides */
   bool cache_remove(carepr::base_cache* victim) override;
   bool block_remove(crepr::base_block3D* victim) override;
   model_update_result cache_update(tracked_cache_type&& cache) override;

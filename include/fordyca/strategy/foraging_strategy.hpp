@@ -67,6 +67,9 @@ class foraging_strategy : public csstrategy::base_strategy {
           accessor(accesor_in),
           ledtaxis_target(ledtaxis_target_in) {}
 
+    params(const params&) = delete;
+    params& operator=(const params&) = delete;
+
     csubsystem::saa_subsystemQ3D* saa;
     const controller::cognitive::block_sel_matrix* bsel_matrix;
     const controller::cognitive::cache_sel_matrix* csel_matrix;

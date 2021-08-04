@@ -46,13 +46,11 @@ namespace ds {
 class bi_tdgraph;
 } /* namespace ds */
 }
-NS_START(fordyca);
-namespace config {
-struct oracle_config;
-namespace d1 { class controller_repository; }
-}
+namespace fordyca::controller::config::d1 {
+ class controller_repository;
+} /* namespace fordyca::controller::config::d1 */
 
-NS_START(controller, cognitive);
+NS_START(fordyca, controller, cognitive);
 class cache_sel_matrix;
 class block_sel_matrix;
 class saa_subsystem;

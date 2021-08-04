@@ -28,8 +28,6 @@
 #include <string>
 #include <vector>
 
-#include <argos3/core/simulator/loop_functions.h>
-
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/config/rng_config.hpp"
 #include "rcppsw/math/radians.hpp"
@@ -39,9 +37,9 @@
 
 #include "cosm/pal/argos_sm_adaptor.hpp"
 
-#include "fordyca/config/loop_function_repository.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
+#include "fordyca/support/config/loop_function_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -69,15 +67,13 @@ namespace cosm::foraging::oracle {
 class foraging_oracle;
 }
 
-NS_START(fordyca);
+NS_START(fordyca, support);
 
 namespace config {
-class loop_function_repository;
 namespace tv {
 struct tv_manager_config;
 }
 } // namespace config
-NS_START(support);
 
 /*******************************************************************************
  * Classes

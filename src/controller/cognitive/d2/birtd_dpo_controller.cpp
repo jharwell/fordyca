@@ -30,8 +30,9 @@
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
+#include "cosm/ds/cell2D.hpp"
 
-#include "fordyca/config/d2/controller_repository.hpp"
+#include "fordyca/controller/config/d2/controller_repository.hpp"
 #include "fordyca/controller/cognitive/block_sel_matrix.hpp"
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/controller/cognitive/d2/task_executive_builder.hpp"

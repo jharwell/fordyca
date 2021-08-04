@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/subsystem/perception/perception_subsystem_factory.hpp"
 
+#include "cosm/ds/cell2D.hpp"
+
 #include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
 #include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 

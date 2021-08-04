@@ -105,9 +105,7 @@ dynamic_cache_creator::create_all(const cache_create_ro_params& c_params,
                                   c_params.clusters)) {
         cache_delete(cache_i);
       } else {
-        auto shared =
-            std::shared_ptr<carepr::arena_cache>(std::move(cache_i.cache));
-        res.created.push_back(shared);
+        res.created.push_back(cache_i.cache);
         /*
          * Remove all the blocks successfully used during creation from the set
          * of blocks which can be absorbed as part of subsequent successful

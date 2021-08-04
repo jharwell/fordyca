@@ -23,8 +23,9 @@
  ******************************************************************************/
 #include "fordyca/controller/cognitive/cognitive_controller.hpp"
 
-#include "cosm/subsystem/perception/config/perception_config.hpp"
+#include "cosm/ds/cell2D.hpp"
 
+#include "fordyca/subsystem/perception/config/perception_config.hpp"
 #include "fordyca/subsystem/perception/foraging_perception_subsystem.hpp"
 
 /*******************************************************************************

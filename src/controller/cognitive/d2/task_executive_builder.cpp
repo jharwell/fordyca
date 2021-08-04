@@ -33,9 +33,10 @@
 #include "cosm/ta/config/task_alloc_config.hpp"
 #include "cosm/ta/config/task_executive_config.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
+#include "cosm/ds/cell2D.hpp"
 
-#include "fordyca/config/d2/controller_repository.hpp"
-#include "fordyca/config/strategy/strategy_config.hpp"
+#include "fordyca/controller/config/d2/controller_repository.hpp"
+#include "fordyca/strategy/config/strategy_config.hpp"
 #include "fordyca/subsystem/perception/foraging_perception_subsystem.hpp"
 #include "fordyca/fsm/d1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/d2/block_to_cache_site_fsm.hpp"
@@ -78,7 +79,7 @@ task_executive_builder::tasking_map task_executive_builder::d2_tasks_create(
   const auto* task_config =
       config_repo.config_get<cta::config::task_alloc_config>();
   const auto* strat_config =
-      config_repo.config_get<fcstrategy::strategy_config>();
+      config_repo.config_get<fsconfig::strategy_config>();
   auto cache_color = carepr::light_type_index()[carepr::light_type_index::kCache];
 
   fsexplore::block_factory block_factory;

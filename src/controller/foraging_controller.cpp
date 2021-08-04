@@ -39,7 +39,7 @@
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/tv/robot_dynamics_applicator.hpp"
 
-#include "fordyca/config/foraging_controller_repository.hpp"
+#include "fordyca/controller/config/foraging_controller_repository.hpp"
 
 /*******************************************************************************
  * Namespaces

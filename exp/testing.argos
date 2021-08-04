@@ -44,11 +44,12 @@
             output_leaf="__current_date__"
             />
         <perception
-            model="dpo"
-            los_dim="0.4">
+            type="dpo">
           <dpo>
-            <grid2D resolution="0.2"
-                    dims="12, 6, 2"/>
+            <rlos dim="0.4">
+              <grid2D resolution="0.2"
+                      dims="12, 6, 2"/>
+            </rlos>
             <pheromone rho="0.00001"
                        repeat_deposit="false"/>
           </dpo>
@@ -180,21 +181,21 @@
         <actuation_subsystem2D>
           <force_calculator>
             <avoidance_force lookahead="0.5"
-                             max="8"/>
+                             max="0.08"/>
             <arrival_force slowing_radius="0.2"
                            slowing_speed_min="1.0"
-                           max="8"/>
+                           max="0.08"/>
             <wander_force circle_distance="4.0"
                           circle_radius="100.0"
                           max_angle_delta="5"
-                          max="9.0"
+                          max="0.09"
                           interval="1"
                           normal_dist="false"/>
-            <phototaxis_force max="8"/>
+            <phototaxis_force max="0.08"/>
           </force_calculator>
 
           <diff_drive soft_turn_max="15"
-                      max_speed="10.0" />
+                      max_speed="0.1" />
         </actuation_subsystem2D>
       </params>
     </dpo_controller>

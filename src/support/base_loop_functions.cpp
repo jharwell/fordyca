@@ -35,8 +35,8 @@
 #include "cosm/pal/argos_swarm_iterator.hpp"
 #include "cosm/vis/config/visualization_config.hpp"
 
-#include "fordyca//controller/foraging_controller.hpp"
-#include "fordyca/config/tv/tv_manager_config.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca/support/config/tv/tv_manager_config.hpp"
 #include "fordyca/metrics/fordyca_metrics_manager.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/support/tv/fordyca_pd_adaptor.hpp"

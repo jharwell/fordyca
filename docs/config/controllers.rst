@@ -420,13 +420,121 @@ XML configuration:
 
   - ``wander_random_thresh`` - ``random_thresh`` + ``wander``.
 
-Additional notes to :xref:`COSM` controller docs
-================================================
-
 ``perception``
 --------------
 
-- ``grid`` child tag required by [``MDPO``, ``BITD-MDPO``, ``BIRTD-MDPO`` ]
+- Required child attributes if present: [ ``type`` ].
+- Required child tags if present: none.
+- Optional child tags: [ ``rlos``, ``dpo``, ``mdpo`` ]
+- Optional child attributes: none.
+
+XML configuration:
+
+.. code-block:: XML
+
+   <perception
+     type="STRING">
+     <rlos>
+        ...
+     </rlos>
+     <dpo>
+         ...
+     <dpo/>
+     <mdpo>
+         ...
+     <mdpo/>
+   </perception>
+
+- ``type`` - The perception type to use.
+
+``perception/dpo``
+^^^^^^^^^^^^^^^^^^
+
+Parameters for the Decaying Pheromone Object (DPO) perception type.
+
+- Required child attributes if present: none.
+- Required child tags if present: [ ``rlos``, ``pheromone`` ].
+- Optional child tags: none.
+- Optional child attributes: none.
+
+XML configuration:
+
+.. code-block:: XML
+
+   <perception>
+     ...
+     <dpo>
+       <rlos>
+         ...
+       </rlos>
+       <pheromone>
+         ...
+       </pheromone
+     </dpo>
+     ...
+   </perception>
+
+``perception/dpo/pheromone``
+""""""""""""""""""""""""""""
+
+Parameters controlling the decay of the pheromone-based memory for the Decaying
+Pheromone Object (DPO) perception model.
+
+- Required child attributes if present: ``rho``.
+- Required child tags if present: none.
+- Optional child attributes: ``repeat_deposit``.
+- Optional child tags: none.
+
+XML configuration:
+
+.. code-block:: XML
+
+   <dpo>
+     ...
+     <pheromone rho="FLOAT"
+                repeat_deposit="false"/>
+     ...
+   </dpo>
+
+- ``rho`` How fast the relevance of information about a particular cell within a
+  robot's 2D map of the world loses relevance. Should be < 1.0.
+
+- ``repeat_deposit`` - If *true*, then repeated pheromone deposits for objects a
+  robot already knows about will be enabled. ``rho`` should be updated
+  accordingly, probably to a larger value to enable faster decay. Default if
+  omitted: *false*.
+
+
+``perception/mdpo``
+^^^^^^^^^^^^^^^^^^^
+
+Parameters for the Mapped Decaying Pheromone Object (MDPO) perception model.
+
+- Required child attributes if present: none.
+- Required child tags if present: [ ``rlos``, ``pheromone`` ].
+- Optional child tags: none.
+- Optional child attributes: none.
+
+XML configuration:
+
+.. code-block:: XML
+
+   <perception>
+     ...
+     <mdpo>
+       <rlos>
+         ...
+       </rlos>
+       <pheromone>
+         ...
+       </pheromone
+     </mdpo>
+     ...
+   </perception>
+
+
+Additional notes to :xref:`COSM` controller docs
+================================================
 
 ``task_alloc/stoch_nbhd1``
 ---------------------------------

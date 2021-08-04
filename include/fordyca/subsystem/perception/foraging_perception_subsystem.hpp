@@ -25,10 +25,11 @@
  * Includes
  ******************************************************************************/
 #include <memory>
+#include <utility>
 
 #include "rcppsw/metrics/base_metrics.hpp"
 
-#include "cosm/subsystem/perception/base_perception_subsystem.hpp"
+#include "cosm/subsystem/perception/mlos_perception_subsystem.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/repr/forager_los.hpp"
@@ -52,15 +53,17 @@ class oracular_info_receptor;
  * which is just the \ref dpo_store of objects.
  */
 class foraging_perception_subsystem
-    : public csperception::base_perception_subsystem<repr::forager_los>,
+    : public csperception::mlos_perception_subsystem<repr::forager_los>,
       public virtual rmetrics::base_metrics {
  public:
   explicit foraging_perception_subsystem(
-      const cspconfig::perception_config* const pconfig,
-      std::unique_ptr<csperception::base_perception_model> model)
-      : base_perception_subsystem(pconfig, std::move(model)) {}
+      const cspconfig::rlos_config* const config,
+      std::unique_ptr<csperception::base_memory_model> model)
+      : mlos_perception_subsystem(config, std::move(model)) {}
 
   ~foraging_perception_subsystem(void) override = default;
+
+  using mlos_perception_subsystem<repr::forager_los>::los_dim;
 
   /**
    * \brief Update the internal data structure/repr of the
@@ -84,11 +87,11 @@ class foraging_perception_subsystem
    */
   template<typename TModelType>
   const TModelType* model(void) const {
-    return static_cast<const TModelType*>(base_perception_subsystem::model());
+    return static_cast<const TModelType*>(mlos_perception_subsystem::model());
   }
   template<typename TModelType>
   TModelType* model(void) {
-    return static_cast<TModelType*>(base_perception_subsystem::model());
+    return static_cast<TModelType*>(mlos_perception_subsystem::model());
   }
 };
 
