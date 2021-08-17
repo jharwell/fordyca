@@ -25,6 +25,7 @@
 
 #include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
 #include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/ntimestep_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -37,6 +38,7 @@ NS_START(fordyca, subsystem, perception);
 perception_subsystem_factory::perception_subsystem_factory(void) {
   register_type<dpo_perception_subsystem>(kDPO);
   register_type<mdpo_perception_subsystem>(kMDPO);
+  register_type<ntimestep_perception_subsystem>(kNTIMESTEP)
 }
 
 NS_END(perception, subsystem, fordyca);

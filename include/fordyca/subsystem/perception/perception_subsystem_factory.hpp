@@ -51,6 +51,7 @@ class perception_subsystem_factory :
  public:
   static inline const std::string kDPO = "dpo";
   static inline const std::string kMDPO = "mdpo";
+  static inline const std::string kNTIMESTEP = "ntimestep";
 
   perception_subsystem_factory(void);
 };
