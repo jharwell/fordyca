@@ -69,7 +69,8 @@
         "__tree": "cpp",
         "__hash_table": "cpp",
         "__split_buffer": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "*.ipp": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }

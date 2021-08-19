@@ -59,7 +59,7 @@ class nb_store final : public foraging_perception_model<ds::dp_block_map,
                         public rer::client<nb_store> {
  public:
   template <typename T>
-  using dpo_entity = repr::dpo_entity<T>;
+  using dpo_entity = repr::dpo_entity<T>; // use nb_entity instead 
 
   using base_model_type = foraging_perception_model<ds::dp_block_map,
                                                     ds::dp_cache_map>;
@@ -91,7 +91,6 @@ class nb_store final : public foraging_perception_model<ds::dp_block_map,
    * \return \c TRUE if a block was added, and \c FALSE otherwise.
    */
   model_update_result block_update(tracked_block_type&& block) override; 
-
 
   void clear_all(void);
 

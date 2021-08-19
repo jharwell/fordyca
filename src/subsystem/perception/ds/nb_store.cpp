@@ -154,7 +154,7 @@ nb_store::block_update(tracked_block_type&& block_in) {
     // corroborate tracked blocks with map to make sure that block is known
 
     if (nullptr != known) {
-      mc_block_storage[block_in.ent()->id()] = c_timestep
+      mc_block_storage[block_in.ent()->id()] = c_timestep // need to retrieve from perception subsystem
 
       ER_TRACE("Update density of known block%d@%s to %f",
                block_in.ent()->id().v(),

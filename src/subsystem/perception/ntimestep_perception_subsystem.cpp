@@ -28,7 +28,7 @@
 
 #include "fordyca/subsystem/perception/los_proc_verify.hpp"
 #include "fordyca/subsystem/perception/oracular_info_receptor.hpp"
-#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
+#include "fordyca/subsystem/perception/ds/nb_store.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_found.hpp"
 
@@ -42,8 +42,9 @@ NS_START(fordyca, subsystem, perception);
  ******************************************************************************/
 ntimestep_perception_subsystem::ntimestep_perception_subsystem(
     const cspconfig::perception_config* const config)
-    : ER_CLIENT_INIT("fordyca.controller.perception.ntimestep"), //TODO: replace dpo perception with ntimestep store here
-      foraging_perception_subsystem(config, std::make_unique<ds::dpo_store>(&config->dpo.pheromone)) {}  //TODO: replace unique pointer here to point towards nb_store
+    : ER_CLIENT_INIT("fordyca.subsystem.perception.ntimestep"),
+      foraging_perception_subsystem(config, 
+                                    std::make_unique<ds::nb_store>(&config->ntimestep.N)) {}  //TODO: replace unique pointer here to point towards nb_store
 
 ntimestep_perception_subsystem::~ntimestep_perception_subsystem(void) = default;
 
@@ -51,12 +52,13 @@ ntimestep_perception_subsystem::~ntimestep_perception_subsystem(void) = default;
  * Member Functions
  ******************************************************************************/
 void ntimestep_perception_subsystem::update(oracular_info_receptor* const receptor, uint timestep) {
+  c_timestep = timestep;
   process_los(los(), receptor);
   ER_ASSERT(los_proc_verify(los()), "LOS verification failed");
-  m_store->decay_all(); //TODO: instead of a decay_all call here maybe do timestep update thats passed into the store?? 
+  store()->decay_all(); //TODO: instead of a decay_all call here maybe do timestep update thats passed into the store?? 
 } /* update() */
 
-void ntimestep_perception_subsystem::reset(void) { m_store->clear_all(); }
+void ntimestep_perception_subsystem::reset(void) { store()->clear_all(); }
 
 void ntimestep_perception_subsystem::process_los(
     const repr::forager_los* const c_los,
@@ -69,7 +71,7 @@ void ntimestep_perception_subsystem::process_los(
 
   /* If we are in an oracular controller, process the updates from the oracle */
   if (nullptr != receptor) { //TODO: in oracular controller need to update the seen blocks into our ntimestep ds -- aka our Map
-    receptor->dpo_store_update(m_store.get()); //TODO: replace dpo_store with ntimestep ds
+    receptor->dpo_store_update(store()); //TODO: replace dpo_store with ntimestep ds
   }
 
   /*
@@ -97,20 +99,20 @@ void ntimestep_perception_subsystem::process_los_caches(
   los_tracking_sync(c_los, los_caches);
 
   for (auto& cache : los_caches) {
-    if (!m_store->contains(cache)) {
+    if (!store()->contains(cache)) {
       ER_INFO("Discovered Cache%d@%s/%s",
               cache->id().v(),
               rcppsw::to_string(cache->rcenter2D()).c_str(),
               rcppsw::to_string(cache->dcenter2D()).c_str());
-    } else if (cache->n_blocks() != m_store->find(cache)->ent()->n_blocks()) {
+    } else if (cache->n_blocks() != store()->find(cache)->ent()->n_blocks()) {
       ER_INFO("Update cache%d@%s blocks: %zu -> %zu",
               cache->id().v(),
               rcppsw::to_string(cache->dcenter2D()).c_str(),
-              m_store->find(cache)->ent()->n_blocks(),
+              store->find(cache)->ent()->n_blocks(),
               cache->n_blocks());
     }
     events::cache_found_visitor op(cache);
-    op.visit(*m_store);
+    op.visit(*store());
   } /* for(cache..) */
 } /* process_los_caches() */
 
@@ -123,7 +125,7 @@ void ntimestep_perception_subsystem::process_los_blocks( //TODO: processing bloc
    */
   auto los_blocks = c_los->blocks();
   ER_DEBUG("Blocks in DPO store: [%s]", //TODO: do a debug of the blocks in our Map?
-           rcppsw::to_string(m_store->blocks()).c_str());
+           rcppsw::to_string(store->blocks()).c_str());
   if (!los_blocks.empty()) {
     ER_DEBUG("Blocks in LOS: [%s]", rcppsw::to_string(los_blocks).c_str());
   }
@@ -141,18 +143,18 @@ void ntimestep_perception_subsystem::process_los_blocks( //TODO: processing bloc
               rcppsw::to_string(block->ranchor2D()).c_str(),
               rcppsw::to_string(block->danchor2D()).c_str());
 
-    ER_CHECKI(!m_store->contains(block),
+    ER_CHECKI(!store->contains(block),
               "Discovered block%d@%s/%s",
               block->id().v(),
               rcppsw::to_string(block->ranchor2D()).c_str(),
               rcppsw::to_string(block->danchor2D()).c_str());
-    ER_CHECKD(m_store->contains(block),
+    ER_CHECKD(store->contains(block),
               "Block%d@%s/%s already known",
               block->id().v(),
               rcppsw::to_string(block->ranchor2D()).c_str(),
               rcppsw::to_string(block->danchor2D()).c_str());
     events::block_found_visitor op(block);
-    op.visit(*m_store);
+    op.visit(*store());
   } /* for(block..) */
 } /* process_los() */
 
@@ -164,7 +166,7 @@ void ntimestep_perception_subsystem::los_tracking_sync( //TODO: replace dpo stor
    * the corresponding cache should also be in our LOS. If it is not, then our
    * tracked version is out of date and needs to be removed.
    */
-  auto range = m_store->caches().values_range();
+  auto range = store()->known_caches();
   auto it = range.begin();
 
   while (it != range.end()) {
@@ -209,8 +211,8 @@ void ntimestep_perception_subsystem::los_tracking_sync( //TODO: replace dpo stor
        */
       carepr::base_cache* tmp = (*it).ent();
       ++it;
-      m_store->cache_remove(tmp);
-      ER_ASSERT(nullptr == m_store->find(tmp),
+      store()->cache_remove(tmp);
+      ER_ASSERT(nullptr == store()->find(tmp),
                 "Cache%d still exists in store after removal",
                 tmp->id().v());
     } else {
@@ -231,16 +233,16 @@ void ntimestep_perception_subsystem::los_tracking_sync( //TODO: replace dpo stor
    * has moved since we last saw it (since that is limited to at most a single
    * block, it is handled by the \ref block_found event).
    */
-  auto range = m_store->blocks().values_range();
+  auto range = store()->known_blocks();
   auto it = range.begin();
 
   while (it != range.end()) {
     ER_TRACE("Examining block%d@%s/%s",
-             it->ent()->id().v(),
-             rcppsw::to_string(it->ent()->ranchor2D()).c_str(),
-             rcppsw::to_string(it->ent()->danchor2D()).c_str());
+             (*it)->id().v(),
+             rcppsw::to_string((*it)->ranchor2D()).c_str(),
+             rcppsw::to_string((*it)->danchor2D()).c_str());
 
-    if (!c_los->contains_abs(it->ent()->danchor2D())) {
+    if (!c_los->contains_abs((*it)->danchor2D())) {
       ++it;
       continue;
     }
@@ -264,9 +266,9 @@ void ntimestep_perception_subsystem::los_tracking_sync( //TODO: replace dpo stor
        * avoid iterator invalidation and undefined behavior (I've seen both a
        * segfault and infinite loop). See FORDYCA#589.
        */
-      crepr::base_block3D* tmp = (*it).ent();
+      crepr::base_block3D* tmp = *it;
       ++it;
-      m_store->block_remove(tmp);
+      store()->block_remove(tmp);
     } else {
       ++it;
     }
@@ -277,16 +279,20 @@ void ntimestep_perception_subsystem::los_tracking_sync( //TODO: replace dpo stor
  * DPO Perception Metrics
  ******************************************************************************/
 uint ntimestep_perception_subsystem::n_known_blocks(void) const { //TODO: Perception metrics here to be replaced with ntimestep variant
-  return m_store->blocks().size();
+  return store()->known_blocks().size();
 } /* n_known_blocks() */
 
 uint ntimestep_perception_subsystem::n_known_caches(void) const { //TODO: if we are going to keep the caches stored we need a new store
-  return m_store->caches().size();
+  return store()->known_caches().size();
 } /* n_known_caches() */
 
+uint ntimestep_perception_subsystem::timestep(void) const {
+  return store()->c_timestep;
+}
+
 crepr::pheromone_density dpo_perception_subsystem::avg_block_density(void) const {
-  auto range = m_store->blocks().const_values_range();
-  if (m_store->blocks().empty()) {
+  auto range = store->blocks().const_values_range();
+  if (store->blocks().empty()) {
     return crepr::pheromone_density();
   }
   return std::accumulate(range.begin(),
@@ -295,12 +301,12 @@ crepr::pheromone_density dpo_perception_subsystem::avg_block_density(void) const
                          [&](const auto& accum, const auto& block) {
                            return accum + block.density();
                          }) /
-         m_store->blocks().size();
+         store->blocks().size();
 } /* avg_block_density() */
 
 crepr::pheromone_density dpo_perception_subsystem::avg_cache_density(void) const {
-  auto range = m_store->caches().const_values_range();
-  if (m_store->caches().empty()) {
+  auto range = store->caches().const_values_range();
+  if (store->caches().empty()) {
     return crepr::pheromone_density();
   }
   return std::accumulate(range.begin(),
@@ -309,7 +315,7 @@ crepr::pheromone_density dpo_perception_subsystem::avg_cache_density(void) const
                          [&](const auto& accum, const auto& cache) {
                            return accum + cache.density();
                          }) /
-         m_store->caches().size();
+         store->caches().size();
 } /* avg_cache_density() */
 
 NS_END(cognitive, controller, fordyca);

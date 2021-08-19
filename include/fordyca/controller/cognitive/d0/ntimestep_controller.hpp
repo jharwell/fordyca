@@ -60,6 +60,8 @@ class ntimestep_controller : public cognitive::cognitive_controller,
   ntimestep_controller(void) RCPPSW_COLD;
   ~ntimestep_controller(void) override RCPPSW_COLD;
 
+  uint c_timestep = 0;
+
   /* foraging_controller overrides */
   void init(ticpp::Element& node) override RCPPSW_COLD;
   void control_step(void) override;

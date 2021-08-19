@@ -33,15 +33,14 @@
 #include "cosm/ds/entity_vector.hpp"
 
 #include "fordyca/subsystem/perception/foraging_perception_subsystem.hpp"
-#include "fordyca/subsystem/perception/foraging_perception_model.hpp"
+#include "fordyca/metrics/perception/ntimestep_metrics.hpp"
 #include "fordyca/fordyca.hpp"
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
+
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace fordyca::ds {
-class nb_store;
-}
 
 NS_START(fordyca, subsystem, perception);
 
@@ -57,7 +56,8 @@ NS_START(fordyca, subsystem, perception);
  */
 class ntimestep_perception_subsystem final
     : public rer::client<ntimestep_perception_subsystem>,
-      public foraging_perception_subsystem {
+      public foraging_perception_subsystem,
+      public metrics::perception::ntimestep_metrics {
 
  public:
   explicit ntimestep_perception_subsystem(const cspconfig::perception_config* config, const uint timestep);
@@ -67,23 +67,18 @@ class ntimestep_perception_subsystem final
   uint n_known_blocks(void) const;  // can compare this stat with block objects in our object store??? ;
   uint n_known_caches(void) const;
 
-  uint c_timestep(void) const; // timestep stuff here -- need to get this parameter through to nb_store
+  uint timestep(void) const; // timestep stuff here -- need to get this parameter through to nb_store
 
   /**
    * \brief Update the robot's perception of the environment, passing it its
    * current line of sight.
    */
-  void update(oracular_info_receptor* receptor) override;
+  void update(oracular_info_receptor* receptor, uint timestep) override;
 
   /**
    * \brief Reset the robot's perception of the environment to an initial state
    */
   void reset(void) override;
-
-  /**
-   * const ds::dpo_store* dpo_store(void) const override { return m_store.get(); } //TODO: don't use dpo store
-   * ds::dpo_store* dpo_store(void) override { return m_store.get(); }
-   */ 
 
  private:
   /*
@@ -104,9 +99,9 @@ class ntimestep_perception_subsystem final
   void los_tracking_sync(const repr::forager_los* c_los,
                          const cds::block3D_vectorno& los_blocks);
 
-  /* clang-format off */
-  std::unique_ptr<ds::nb_store> m_store;
-  /* clang-format on */
+  const ds::nb_store* store(void) const;
+  ds::nb_store* store(void);
+
 };
 
 NS_END(cognitive, controller, fordyca);

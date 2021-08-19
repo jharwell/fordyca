@@ -50,9 +50,7 @@ mdpo_perception_subsystem::mdpo_perception_subsystem(
     const cspconfig::perception_config* const config)
     : ER_CLIENT_INIT("fordyca.subsystem.perception.mdpo"),
       foraging_perception_subsystem(config,
-                                    std::make_unique<ds::dpo_semantic_map>(&config->mdpo)),
-      m_cell_stats(cfsm::cell2D_state::ekST_MAX_STATES),
-      m_los() {}
+                                    std::make_unique<ds::dpo_semantic_map>(&config->mdpo)){}
 
 mdpo_perception_subsystem::~mdpo_perception_subsystem(void) = default;
 

@@ -72,6 +72,8 @@ class foraging_perception_subsystem
    */
   virtual void update(oracular_info_receptor* receptor) = 0;
 
+  virtual void update(oracular_info_receptor* receptor, uint timestep) = 0;
+
   /**
    * \brief Get access to all objects known to the robot, independent of
    * perception model.
