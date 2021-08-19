@@ -65,7 +65,11 @@
         "cinttypes": "cpp",
         "typeindex": "cpp",
         "typeinfo": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "__tree": "cpp",
+        "__hash_table": "cpp",
+        "__split_buffer": "cpp",
+        "stack": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }

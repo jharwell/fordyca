@@ -110,7 +110,7 @@ nb_store::block_update(tracked_block_type&& block_in) {
    * list) or not, in order to avoid transient assert() triggering during LOS
    * processing.
    */
-  if (it2 != range.end()) {
+  if (it2 != range.end()) { 
     ER_TRACE("Remove old block%d@%s: new block%d found there",
              it2->ent()->id().v(),
              block_in.ent()->danchor2D().to_str().c_str(),
@@ -142,22 +142,20 @@ nb_store::block_update(tracked_block_type&& block_in) {
                block_in.ent()->id().v(),
                block_in.ent()->danchor2D().to_str().c_str(),
                tracked_blocks().size());
-      tracked_blocks().obj_add({ block_in.ent()->id(), std::move(block_in) });
+      tracked_blocks().obj_add({ block_in.ent()->id(), std::move(block_in) }); //TODO: update tracked_blocks instead with all blocks currently in our map
 
       return { model_update_status::ekBLOCK_MOVED, old_loc };
     }
     /*
      * Even if the block's location has not changed, if we have seen it again we
      * need to update its density.     
-     */  //TODO: instead of updating it's density here, update it's timestamp
+     */ 
     dp_block_map::value_type* known = tracked_blocks().find(block_in.ent()->id());
-
-
     // corroborate tracked blocks with map to make sure that block is known
 
     if (nullptr != known) {
-      known->density(block_in.density());
-      known->timestamp(block_in.timestamp()); // create timestamp update function or something
+      mc_block_storage[block_in.ent()->id()] = c_timestep
+
       ER_TRACE("Update density of known block%d@%s to %f",
                block_in.ent()->id().v(),
                block_in.ent()->danchor2D().to_str().c_str(),
@@ -165,8 +163,8 @@ nb_store::block_update(tracked_block_type&& block_in) {
       return { model_update_status::ekBLOCK_DENSITY_UPDATE, rmath::vector2z() };
     }
   } else { /* block is not known */
+    mc_block_storage.insert(block_in.ent()->id(), c_timestep) //adding unknown block to map
 
-    // block is not known add to map??? 
     ER_TRACE("Unknown incoming block%d", block_in.ent()->id().v());
     ER_TRACE("Add block%d@%s (n_blocks=%zu)",
              block_in.ent()->id().v(),
@@ -183,6 +181,14 @@ bool nb_store::block_remove(crepr::base_block3D* const victim) {
   auto it = std::find_if(range.begin(), range.end(), [&](const auto& b) {
     return b.ent()->idcmp(*victim);
   });
+
+  // here iterate through the map
+  for (auto const& x : mc_block_storage) {
+    if (c_timestep - x.second < N_timesteps) {
+        // remove block from memory model
+    }
+  }
+
   if (it != range.end()) {
     ER_TRACE("Removing block%d@%s",
              victim->id().v(),
@@ -197,7 +203,7 @@ bool nb_store::block_remove(crepr::base_block3D* const victim) {
 } /* block_remove() */
 
 void nb_store::clear_all(void) {
-  tracked_blocks().clear();
+  tracked_blocks().clear();  //TODO: instead of this clear all should tracked_blocks be updated with all the blocks in our current map?
   tracked_caches().clear();
 } /* clear_all() */
 

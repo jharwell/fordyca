@@ -42,18 +42,18 @@ NS_START(fordyca, subsystem, perception);
  ******************************************************************************/
 ntimestep_perception_subsystem::ntimestep_perception_subsystem(
     const cspconfig::perception_config* const config)
-    : ER_CLIENT_INIT("fordyca.controller.perception.ntimestep"), //TODO: replace dpo perception with ntimestep
-      foraging_perception_subsystem(config, std::make_unique<ds::dpo_store>(&config->dpo.pheromone)) {} 
+    : ER_CLIENT_INIT("fordyca.controller.perception.ntimestep"), //TODO: replace dpo perception with ntimestep store here
+      foraging_perception_subsystem(config, std::make_unique<ds::dpo_store>(&config->dpo.pheromone)) {}  //TODO: replace unique pointer here to point towards nb_store
 
 ntimestep_perception_subsystem::~ntimestep_perception_subsystem(void) = default;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void ntimestep_perception_subsystem::update(oracular_info_receptor* const receptor) {
+void ntimestep_perception_subsystem::update(oracular_info_receptor* const receptor, uint timestep) {
   process_los(los(), receptor);
   ER_ASSERT(los_proc_verify(los()), "LOS verification failed");
-  m_store->decay_all();
+  m_store->decay_all(); //TODO: instead of a decay_all call here maybe do timestep update thats passed into the store?? 
 } /* update() */
 
 void ntimestep_perception_subsystem::reset(void) { m_store->clear_all(); }

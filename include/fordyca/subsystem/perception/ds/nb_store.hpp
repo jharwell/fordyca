@@ -84,9 +84,9 @@ class nb_store final : public foraging_perception_model<ds::dp_block_map,
   /*
    * \brief Update the known blocks set with the new block.
    *
-   * If the the new block's location has changed: tracked block is replaced
+   * If the the new block's location has changed: tracked block is replaced 
    * If the new blocks' location has not changed from the tracked block: don't
-   * replace it, but update its pheromone level to correspond to the new block.
+   * replace it, but update its timestep to correspond to the new block.
    *
    * \return \c TRUE if a block was added, and \c FALSE otherwise.
    */
@@ -95,9 +95,9 @@ class nb_store final : public foraging_perception_model<ds::dp_block_map,
 
   void clear_all(void);
 
-  const int N_timesteps (void) { return mc_N_timesteps; }
+  int N_timesteps(void) const { return mc_N_timesteps; }
 
-  const std::map<rtypes::type_uuid&, int> block_storage (void) { return mc_block_storage; } // form <uuid, timestep>
+  std::map<rtypes::type_uuid&, int> block_storage(void) const { return mc_block_storage; } // form <uuid, timestep>
 
  private: 
   /* clang-format off */

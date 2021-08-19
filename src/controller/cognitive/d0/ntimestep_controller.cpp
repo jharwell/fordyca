@@ -73,7 +73,11 @@ void ntimestep_controller::control_step(void) {
             block()->md()->robot_id().v());
 
   /* Update perception */
-  perception()->update(nullptr);
+  
+  // update the timestep here or something
+  c_timestep++; //TODO: increment from perception subsystem metrics ?? where to store timestep
+
+  perception()->update(nullptr, c_timestep); // pass in next timestep 
 
   /*
    * Run the FSM and apply steering forces if normal operation, otherwise handle
@@ -107,13 +111,13 @@ void ntimestep_controller::init(ticpp::Element& node) {
 } /* init() */
 
 void ntimestep_controller::shared_init(
-    const config::perceptive_controller_repository& config_repo) { // create ntimestep_controller_repository
+    const config::perceptive_controller_repository& config_repo) { 
   const auto* perception_config = config_repo.config_get<cspconfig::perception_config>();
   const auto* block_matrix =
       config_repo.config_get<config::block_sel::block_sel_matrix_config>();
   const auto* nest = config_repo.config_get<crepr::config::nest_config>();
 
-  /* DPO perception subsystem */
+  /* ntimestep perception subsystem */
   auto factory = fsperception::perception_subsystem_factory();
   perception(factory.create(perception_config->model,
                             perception_config));

@@ -1,7 +1,7 @@
 /**
- * \file ntimestep_perception_metrics.hpp
+ * \file nb_entity.hpp
  *
- * \copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,49 +18,60 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_PERCEPTION_NTIMESTEP_PERCEPTION_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_PERCEPTION_NTIMESTEP_PERCEPTION_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_REPR_NB_ENTITY_HPP_
+#define INCLUDE_FORDYCA_REPR_NB_ENTITY_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/metrics/base_metrics.hpp"
+#include <memory>
+#include <utility>
+
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, perception);
+NS_START(fordyca, repr);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-
 /**
- * \class ntimestep_perception_metrics
- * \ingroup metrics perception
+ * \class nb_entity
+ * \ingroup repr
  *
- * \brief Defines the metrics to be collected from robots about their DPO world
- * model.
+ * \brief A repr of a Decaying Pheromone (DP) entity in the arena,
+ * which has a pheromone density/relevance associated with it.
  *
- * Metrics are collected every timestep.
+ * When performing equality tests between instances, only the underlying entity
+ * is considered (relevance is ignored).
  */
-class ntimestep_perception_metrics : public virtual rmetrics::base_metrics {
+template <class T>
+class nb_entity {
  public:
-  ntimestep_perception_metrics(void) = default;
+  nb_entity(void) = default;
+  nb_entity(std::unique_ptr<T> ent)
+      : m_ent(std::move(ent)) {}
 
   /**
-   * \brief Return the # of blocks that a robot currently knows about.
+   * \brief Compare two entities for equality. We must explicitly invoke
+   * operator== on the object managed by the unique_ptr, otherwise we get only
+   * pointer comparison, which is NOT what we want.
    */
-  virtual uint n_known_blocks(void) const = 0;
+  bool operator==(const nb_entity<T>& other) const {
+    return m_ent->idcmp(*other.ent());
+  }
 
-  /**
-   * \brief Return The # of caches that a robot currently knows about.
-   */
-  virtual uint n_known_caches(void) const = 0;
+  T* ent(void) { return m_ent.get(); }
+  const T* ent(void) const { return m_ent.get(); }
 
+ private:
+  /* clang-format off */
+  std::unique_ptr<T>       m_ent;
+  /* clang-format on */
 };
 
-NS_END(perception, metrics, fordyca);
+NS_END(repr, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_PERCEPTION_NTIMESTEP_PERCEPTION_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPR_NB_ENTITY_HPP_ */

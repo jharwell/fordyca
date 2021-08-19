@@ -44,6 +44,9 @@ NS_START(fordyca, subsystem, perception);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
+
+//TODO: overload dpo_store_update to update the nb_store instead
+
 void oracular_info_receptor::dpo_store_update(ds::dpo_store* const store) {
   if (entities_blocks_enabled()) {
     auto blocks = mc_oracle->blocks()->ask();

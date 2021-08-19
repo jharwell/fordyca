@@ -40,7 +40,7 @@
  * Namespaces
  ******************************************************************************/
 namespace fordyca::ds {
-class dpo_store;
+class nb_store;
 }
 
 NS_START(fordyca, subsystem, perception);
@@ -60,18 +60,14 @@ class ntimestep_perception_subsystem final
       public foraging_perception_subsystem {
 
  public:
-  explicit ntimestep_perception_subsystem(const cspconfig::perception_config* config);
+  explicit ntimestep_perception_subsystem(const cspconfig::perception_config* config, const uint timestep);
   ~ntimestep_perception_subsystem(void) override;
 
   /* ntimestep perception metrics */
   uint n_known_blocks(void) const;  // can compare this stat with block objects in our object store??? ;
   uint n_known_caches(void) const;
 
-  std::map<std::string, int> n_timesteps_known_blocks /*** something here */ ; 
-  
-  //TODO: replaced pheromone density stuff here with n_timestep stuff
-  //TODO: instead of using pheromone density we need a Map object here
-  
+  uint c_timestep(void) const; // timestep stuff here -- need to get this parameter through to nb_store
 
   /**
    * \brief Update the robot's perception of the environment, passing it its
@@ -109,7 +105,7 @@ class ntimestep_perception_subsystem final
                          const cds::block3D_vectorno& los_blocks);
 
   /* clang-format off */
-  std::unique_ptr<ds::dpo_store> m_store;
+  std::unique_ptr<ds::nb_store> m_store;
   /* clang-format on */
 };
 
