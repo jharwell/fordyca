@@ -40,6 +40,7 @@ NS_START(fordyca, subsystem, perception);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
+
 ntimestep_perception_subsystem::ntimestep_perception_subsystem(
     const cspconfig::perception_config* const config)
     : ER_CLIENT_INIT("fordyca.subsystem.perception.ntimestep"),
@@ -55,7 +56,7 @@ void ntimestep_perception_subsystem::update(oracular_info_receptor* const recept
   c_timestep = timestep;
   process_los(los(), receptor);
   ER_ASSERT(los_proc_verify(los()), "LOS verification failed");
-  store()->decay_all(); //TODO: instead of a decay_all call here maybe do timestep update thats passed into the store?? 
+  store()->update_all(); //TODO: here update all the objects from our memory model into the "tracked_blocks" variable
 } /* update() */
 
 void ntimestep_perception_subsystem::reset(void) { store()->clear_all(); }
@@ -71,7 +72,7 @@ void ntimestep_perception_subsystem::process_los(
 
   /* If we are in an oracular controller, process the updates from the oracle */
   if (nullptr != receptor) { //TODO: in oracular controller need to update the seen blocks into our ntimestep ds -- aka our Map
-    receptor->dpo_store_update(store()); //TODO: replace dpo_store with ntimestep ds
+    receptor->store_update(store(), c_timestep); 
   }
 
   /*
@@ -184,8 +185,8 @@ void ntimestep_perception_subsystem::los_tracking_sync( //TODO: replace dpo stor
      * We can't just check if the cache host cell is in our LOS, because for
      * bigger arenas, it almost never is.
      */
-    bool should_be_in_los = it->ent()->yrspan().overlaps_with(c_los->yspan()) ||
-                            it->ent()->xrspan().overlaps_with(c_los->xspan());
+    bool should_be_in_los = (*it)->yrspan().overlaps_with(c_los->yspan()) ||
+                            (*it)->xrspan().overlaps_with(c_los->xspan());
 
     bool in_los =
         los_caches.end() !=
@@ -209,7 +210,7 @@ void ntimestep_perception_subsystem::los_tracking_sync( //TODO: replace dpo stor
        * avoid iterator invalidation and undefined behavior (I've seen both a
        * segfault and infinite loop). See FORDYCA#589.
        */
-      carepr::base_cache* tmp = (*it).ent();
+      carepr::base_cache* tmp = *it;
       ++it;
       store()->cache_remove(tmp);
       ER_ASSERT(nullptr == store()->find(tmp),
@@ -276,46 +277,14 @@ void ntimestep_perception_subsystem::los_tracking_sync( //TODO: replace dpo stor
 } /* los_tracking_sync() */
 
 /*******************************************************************************
- * DPO Perception Metrics
+ * NTimestep Perception Metrics
  ******************************************************************************/
 uint ntimestep_perception_subsystem::n_known_blocks(void) const { //TODO: Perception metrics here to be replaced with ntimestep variant
   return store()->known_blocks().size();
 } /* n_known_blocks() */
 
-uint ntimestep_perception_subsystem::n_known_caches(void) const { //TODO: if we are going to keep the caches stored we need a new store
+uint ntimestep_perception_subsystem::n_known_caches(void) const { 
   return store()->known_caches().size();
 } /* n_known_caches() */
-
-uint ntimestep_perception_subsystem::timestep(void) const {
-  return store()->c_timestep;
-}
-
-crepr::pheromone_density dpo_perception_subsystem::avg_block_density(void) const {
-  auto range = store->blocks().const_values_range();
-  if (store->blocks().empty()) {
-    return crepr::pheromone_density();
-  }
-  return std::accumulate(range.begin(),
-                         range.end(),
-                         crepr::pheromone_density(),
-                         [&](const auto& accum, const auto& block) {
-                           return accum + block.density();
-                         }) /
-         store->blocks().size();
-} /* avg_block_density() */
-
-crepr::pheromone_density dpo_perception_subsystem::avg_cache_density(void) const {
-  auto range = store->caches().const_values_range();
-  if (store->caches().empty()) {
-    return crepr::pheromone_density();
-  }
-  return std::accumulate(range.begin(),
-                         range.end(),
-                         crepr::pheromone_density(),
-                         [&](const auto& accum, const auto& cache) {
-                           return accum + cache.density();
-                         }) /
-         store->caches().size();
-} /* avg_cache_density() */
 
 NS_END(cognitive, controller, fordyca);

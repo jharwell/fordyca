@@ -33,6 +33,7 @@
 #include "cosm/ta/time_estimate.hpp"
 
 #include "fordyca/subsystem/perception/ds/dpo_store.hpp"
+#include "fordyca/subsystem/perception/ds/nb_store.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_found.hpp"
 
@@ -45,9 +46,42 @@ NS_START(fordyca, subsystem, perception);
  * Member Functions
  ******************************************************************************/
 
-//TODO: overload dpo_store_update to update the nb_store instead
+void oracular_info_receptor::store_update(ds::nb_store* store, uint timestep) {
+  store->ctimestep = timestep;
 
-void oracular_info_receptor::dpo_store_update(ds::dpo_store* const store) {
+  if (entities_blocks_enabled()) {
+    auto blocks = mc_oracle->blocks()->ask();
+    if (!blocks.empty()) {
+      ER_DEBUG("Blocks in receptor: [%s]",
+               cforacle::foraging_oracle::blocks_oracle_type::knowledge_to_string(
+                   "b", blocks)
+                   .c_str());
+      ER_DEBUG("Blocks in DPO store: [%s]",
+               rcppsw::to_string(store->known_blocks()).c_str());
+    }
+    for (auto* b : blocks) {
+      events::block_found_visitor visitor(b);
+      visitor.visit(*store);
+    } /* for(&e..) */
+  }
+  if (entities_caches_enabled()) {
+    auto caches = mc_oracle->caches()->ask();
+    if (!caches.empty()) {
+      ER_DEBUG("Caches in receptor: [%s]",
+               cforacle::foraging_oracle::caches_oracle_type::knowledge_to_string(
+                   "c", caches)
+                   .c_str());
+      ER_DEBUG("Caches in DPO store: [%s]",
+               rcppsw::to_string(store->known_caches()).c_str());
+    }
+    for (auto* c : caches) {
+      events::cache_found_visitor visitor(c);
+      visitor.visit(*store);
+    } /* for(&e..) */
+  }
+} /* nb_store_update() */
+
+void oracular_info_receptor::store_update(ds::dpo_store* const store) {
   if (entities_blocks_enabled()) {
     auto blocks = mc_oracle->blocks()->ask();
     if (!blocks.empty()) {

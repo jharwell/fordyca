@@ -60,6 +60,7 @@ class ntimestep_controller : public cognitive::cognitive_controller,
   ntimestep_controller(void) RCPPSW_COLD;
   ~ntimestep_controller(void) override RCPPSW_COLD;
 
+  /* intial timestep */
   uint c_timestep = 0;
 
   /* foraging_controller overrides */

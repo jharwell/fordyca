@@ -60,14 +60,14 @@ class ntimestep_perception_subsystem final
       public metrics::perception::ntimestep_metrics {
 
  public:
-  explicit ntimestep_perception_subsystem(const cspconfig::perception_config* config, const uint timestep);
+  explicit ntimestep_perception_subsystem(const cspconfig::perception_config* config);
   ~ntimestep_perception_subsystem(void) override;
 
   /* ntimestep perception metrics */
   uint n_known_blocks(void) const;  // can compare this stat with block objects in our object store??? ;
   uint n_known_caches(void) const;
 
-  uint timestep(void) const; // timestep stuff here -- need to get this parameter through to nb_store
+  uint c_timestep(void) const; 
 
   /**
    * \brief Update the robot's perception of the environment, passing it its

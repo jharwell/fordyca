@@ -148,29 +148,30 @@ nb_store::block_update(tracked_block_type&& block_in) {
     }
     /*
      * Even if the block's location has not changed, if we have seen it again we
-     * need to update its density.     
+     * need to update its timestep.     
      */ 
-    dp_block_map::value_type* known = tracked_blocks().find(block_in.ent()->id());
+    dp_block_map::value_type* known = tracked_blocks().find(block_in.ent()->id()); //TODO: how is tracked_blocks currently updated?
+    
     // corroborate tracked blocks with map to make sure that block is known
 
     if (nullptr != known) {
-      mc_block_storage[block_in.ent()->id()] = c_timestep // need to retrieve from perception subsystem
+      block_storage.at(block_in.ent()->id()) = ctimestep; // set the value of our block to its discovery/rediscovery timestep
 
       ER_TRACE("Update density of known block%d@%s to %f",
                block_in.ent()->id().v(),
                block_in.ent()->danchor2D().to_str().c_str(),
                block_in.density().v());
-      return { model_update_status::ekBLOCK_DENSITY_UPDATE, rmath::vector2z() };
+      return { model_update_status::ekBLOCK_DENSITY_UPDATE, rmath::vector2z() };  //TODO: add timestamp update to model update status
     }
   } else { /* block is not known */
-    mc_block_storage.insert(block_in.ent()->id(), c_timestep) //adding unknown block to map
+    block_storage.insert(block_in.ent()->id(), ctimestep); //adding unknown block to map
 
     ER_TRACE("Unknown incoming block%d", block_in.ent()->id().v());
     ER_TRACE("Add block%d@%s (n_blocks=%zu)",
              block_in.ent()->id().v(),
              block_in.ent()->danchor2D().to_str().c_str(),
              tracked_blocks().size());
-    tracked_blocks().obj_add({ block_in.ent()->id(), std::move(block_in) });
+    tracked_blocks().obj_add({ block_in.ent()->id(), std::move(block_in) }); // Don't do these tracked_block updates here, these should all be done in the update_all() method
     return { model_update_status::ekNEW_BLOCK_ADDED, rmath::vector2z() };
   }
   return { model_update_status::ekNO_CHANGE, rmath::vector2z() };
@@ -184,7 +185,7 @@ bool nb_store::block_remove(crepr::base_block3D* const victim) {
 
   // here iterate through the map
   for (auto const& x : mc_block_storage) {
-    if (c_timestep - x.second < N_timesteps) {
+    if (ctimestep - x.second < N_timesteps()) { // expect the front of the map to be removed only
         // remove block from memory model
     }
   }
@@ -206,5 +207,9 @@ void nb_store::clear_all(void) {
   tracked_blocks().clear();  //TODO: instead of this clear all should tracked_blocks be updated with all the blocks in our current map?
   tracked_caches().clear();
 } /* clear_all() */
+
+void nb_store::update_all(void) {
+
+}
 
 NS_END(ds, perception, subsystem, fordyca);

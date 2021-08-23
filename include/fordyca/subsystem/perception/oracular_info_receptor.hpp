@@ -46,6 +46,7 @@ NS_START(fordyca, subsystem, perception);
 
 namespace ds {
 class dpo_store;
+class nb_store;
 } /* namespace ds */
 
 /*******************************************************************************
@@ -79,7 +80,8 @@ class oracular_info_receptor final : public rer::client<oracular_info_receptor> 
    * (per-timestep) update our perception of entities in the environment by
    * calling this function in the controller.
    */
-  void dpo_store_update(ds::dpo_store* store);
+  void store_update(ds::dpo_store* store);
+  void store_update(ds::nb_store* store, uint timestep);
 
   bool entities_blocks_enabled(void) const RCPPSW_PURE;
   bool entities_caches_enabled(void) const RCPPSW_PURE;

@@ -75,7 +75,7 @@ void ntimestep_controller::control_step(void) {
   /* Update perception */
   
   // update the timestep here or something
-  c_timestep++; //TODO: increment from perception subsystem metrics ?? where to store timestep
+  c_timestep++;
 
   perception()->update(nullptr, c_timestep); // pass in next timestep 
 
@@ -190,7 +190,7 @@ RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
 RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
 RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 
-REGISTER_CONTROLLER(int ntimestep_controller, "ntimestep_controller");
+REGISTER_CONTROLLER(ntimestep_controller, "ntimestep_controller");
 
 RCPPSW_WARNING_DISABLE_POP()
 
