@@ -155,16 +155,18 @@ nb_store::block_update(tracked_block_type&& block_in) {
     // corroborate tracked blocks with map to make sure that block is known
 
     if (nullptr != known) {
-      block_storage.at(block_in.ent()->id()) = ctimestep; // set the value of our block to its discovery/rediscovery timestep
+      mc_block_storage.at(block_in.ent()->id()) = ctimestep;
+    //  block_storage.at(block_in.ent()->id()) = ctimestep; // set the value of our block to its discovery/rediscovery timestep
 
       ER_TRACE("Update density of known block%d@%s to %f",
                block_in.ent()->id().v(),
                block_in.ent()->danchor2D().to_str().c_str(),
                block_in.density().v());
-      return { model_update_status::ekBLOCK_DENSITY_UPDATE, rmath::vector2z() };  //TODO: add timestamp update to model update status
+      return { model_update_status::ekBLOCK_TIMESTEP_UPDATE, rmath::vector2z() };  //TODO: add timestamp update to model update status
     }
   } else { /* block is not known */
-    block_storage.insert(block_in.ent()->id(), ctimestep); //adding unknown block to map
+    mc_block_storage.insert(std::pair<rtypes::type_uuid, int>(block_in.ent()->id(), ctimestep))
+  //  block_storage.insert(block_in.ent()->id(), ctimestep); //adding unknown block to map
 
     ER_TRACE("Unknown incoming block%d", block_in.ent()->id().v());
     ER_TRACE("Add block%d@%s (n_blocks=%zu)",
@@ -186,7 +188,7 @@ bool nb_store::block_remove(crepr::base_block3D* const victim) {
   // here iterate through the map
   for (auto const& x : mc_block_storage) {
     if (ctimestep - x.second < N_timesteps()) { // expect the front of the map to be removed only
-        // remove block from memory model
+        mc_block_storage.erase(x.first);  // remove block from memory model
     }
   }
 

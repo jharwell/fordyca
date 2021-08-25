@@ -17,7 +17,7 @@
   <!-- *************** -->
   <controllers>
 
-    <dpo_controller id="fbc"
+    <ntimestep_controller id="fbc"
                           library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -52,6 +52,7 @@
             <pheromone rho="0.00001"
                        repeat_deposit="false"/>
           </dpo>
+          <ntimestep N="15"/>
         </perception>
         <task_executive
             update_exec_ests="true"
@@ -197,7 +198,7 @@
                       max_speed="10.0" />
         </actuation_subsystem2D>
       </params>
-    </dpo_controller>
+    </ntimestep_controller>
 
   </controllers>
 
@@ -408,7 +409,7 @@
       <position method="uniform" min="1,1,0" max="10,10,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
       
-      <entity quantity="1" max_trials="1000">
+      <entity quantity="24" max_trials="1000">
         <foot-bot id="fb" omnidirectional_camera_aperture="89">
           <controller config="fbc" />
           <!-- <battery model= "time_motion"/> -->

@@ -47,7 +47,7 @@ NS_START(fordyca, subsystem, perception);
  ******************************************************************************/
 
 void oracular_info_receptor::store_update(ds::nb_store* store, uint timestep) {
-  store->ctimestep = timestep;
+  store->ctimestep = timestep; // updating timestep from perception subsystem to the store
 
   if (entities_blocks_enabled()) {
     auto blocks = mc_oracle->blocks()->ask();

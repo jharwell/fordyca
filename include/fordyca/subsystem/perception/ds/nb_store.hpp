@@ -92,18 +92,23 @@ class nb_store final : public foraging_perception_model<ds::dp_block_map,
    */
   model_update_result block_update(tracked_block_type&& block) override; 
 
+
+/**
+   * \brief Updates the tracked_blocks with the blocks discovered/rediscovered within 
+   * the last N timesteps.
+   */
   void clear_all(void);
   void update_all(void);
 
   uint ctimestep;
 
   int N_timesteps(void) const { return mc_N_timesteps; }
-  std::map<rtypes::type_uuid&, int> block_storage(void) const { return mc_block_storage; } // form <uuid, timestep>
+  std::map<rtypes::type_uuid, int> block_storage(void) { return mc_block_storage; } // form <uuid, timestep>
 
  private: 
   /* clang-format off */
   const int mc_N_timesteps;
-  const std::map<rtypes::type_uuid&, int> mc_block_storage;
+  std::map<rtypes::type_uuid, int> mc_block_storage;
   /* clang-format on */
 };
 

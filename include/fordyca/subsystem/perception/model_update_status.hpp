@@ -72,7 +72,11 @@ enum class model_update_status {
    * \brief An already tracked block was updated (e.g., the # of blocks in it
    * changed).
    */
-  ekCACHE_UPDATED
+  ekCACHE_UPDATED,
+  /**
+   * \brief Nothing about the block has changed but its most recent timestep at rediscovery.
+   */
+  ekBLOCK_TIMESTEP_UPDATE
 };
 
 NS_END(perception, subsystem, fordyca);

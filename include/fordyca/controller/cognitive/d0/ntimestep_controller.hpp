@@ -144,4 +144,4 @@ class ntimestep_controller : public cognitive::cognitive_controller,
 
 NS_END(cognitive, d0, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D0_DPO_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D0_NTIMESTEP_CONTROLLER_HPP_ */

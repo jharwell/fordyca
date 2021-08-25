@@ -21,6 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+
 #include "fordyca/controller/cognitive/d0/ntimestep_controller.hpp"
 
 #include <fstream>
@@ -41,7 +42,7 @@
 #include "fordyca/fsm/d0/dpo_fsm.hpp"
 #include "fordyca/strategy/explore/block_factory.hpp"
 #include "fordyca/subsystem/perception/perception_subsystem_factory.hpp"
-#include "fordyca/subsystem/perception/ds/dpo_store.hpp" // turn this into nb_store
+#include "fordyca/subsystem/perception/ds/nb_store.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -74,9 +75,8 @@ void ntimestep_controller::control_step(void) {
 
   /* Update perception */
   
-  // update the timestep here or something
+  // Moving the timestep 1 unit and passing it to the perception subsystem
   c_timestep++;
-
   perception()->update(nullptr, c_timestep); // pass in next timestep 
 
   /*
@@ -142,7 +142,7 @@ void ntimestep_controller::private_init(
   fsm::fsm_ro_params fsm_ro_params = {
     .bsel_matrix = block_sel_matrix(),
     .csel_matrix = nullptr,
-    .store = perception()->model<fspds::dpo_store>(),
+    .store = perception()->model<fspds::nb_store>(), // huh why trying to initialize dpo store?
     .accessor = perception()->known_objects(),
     .strategy_config = *strat_config
   };

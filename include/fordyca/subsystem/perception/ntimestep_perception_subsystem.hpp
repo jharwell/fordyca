@@ -67,7 +67,7 @@ class ntimestep_perception_subsystem final
   uint n_known_blocks(void) const;  // can compare this stat with block objects in our object store??? ;
   uint n_known_caches(void) const;
 
-  uint c_timestep(void) const; 
+  uint c_timestep; 
 
   /**
    * \brief Update the robot's perception of the environment, passing it its
