@@ -1,1 +1,0 @@
-./libra/commitlint.config.js
