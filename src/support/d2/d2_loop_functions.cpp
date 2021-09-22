@@ -105,10 +105,10 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
             lf->m_metrics_manager.get()));
     lf->m_los_update_map->emplace(
         typeid(controller),
-        ccops::los_update<T,
+        ccops::grid_los_update<T,
         rds::grid2D_overlay<cds::cell2D>,
         repr::forager_los>(
-            lf->arena_map()->decoratee().template layer<cds::arena_grid::kCell>()));
+            lf->arena_map()->decoratee().template layer<cads::arena_grid::kCell>()));
   }
 
   /* clang-format off */
@@ -386,7 +386,7 @@ void d2_loop_functions::robot_pre_step(chal::robot& robot) {
             controller->type_index().name());
 
   auto applicator = ccops::applicator<controller::foraging_controller,
-                                      ccops::los_update,
+                                      ccops::grid_los_update,
                                       rds::grid2D_overlay<cds::cell2D>,
                                       repr::forager_los>(controller);
   boost::apply_visitor(applicator,

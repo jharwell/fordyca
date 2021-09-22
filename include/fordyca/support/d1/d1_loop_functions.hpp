@@ -29,7 +29,7 @@
 #include <atomic>
 #include <utility>
 
-#include "cosm/controller/operations/los_update.hpp"
+#include "cosm/controller/operations/grid_los_update.hpp"
 #include "cosm/controller/operations/task_id_extract.hpp"
 
 #include "fordyca/support/d0/d0_loop_functions.hpp"
@@ -111,7 +111,7 @@ class d1_loop_functions : public d0::d0_loop_functions,
                              carena::caching_arena_map>::type>;
   using los_updater_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::d1::typelist,
-                              ccops::los_update,
+                              ccops::grid_los_update,
                               rds::grid2D_overlay<cds::cell2D>,
                               repr::forager_los>::type>;
   using task_extractor_map_type = rds::type_map<

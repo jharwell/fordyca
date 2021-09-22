@@ -29,7 +29,7 @@
 #include "rcppsw/ds/type_map.hpp"
 #include "rcppsw/ds/grid2D_overlay.hpp"
 
-#include "cosm/controller/operations/los_update.hpp"
+#include "cosm/controller/operations/grid_los_update.hpp"
 #include "cosm/controller/operations/metrics_extract.hpp"
 #include "cosm/hal/robot.hpp"
 
@@ -94,7 +94,7 @@ private:
     >;
   using los_updater_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::d0::typelist,
-                              ccops::los_update,
+                              ccops::grid_los_update,
                               rds::grid2D_overlay<cds::cell2D>,
                               repr::forager_los>::type>;
 

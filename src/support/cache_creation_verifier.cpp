@@ -34,7 +34,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
-using cds::arena_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -128,7 +127,7 @@ error:
 
 bool cache_creation_verifier::sanity_check_internal_consistency(
     const carepr::arena_cache* cache) const {
-  auto& cell = m_map->access<arena_grid::kCell>(cache->dcenter2D());
+  auto& cell = m_map->access<cads::arena_grid::kCell>(cache->dcenter2D());
   ER_CHECK(cell.fsm().state_has_cache(),
            "Cell@%s not in HAS_CACHE state",
            cell.loc().to_str().c_str());

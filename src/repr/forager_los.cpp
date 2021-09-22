@@ -38,7 +38,7 @@ NS_START(fordyca, repr);
 forager_los::forager_los(const rtypes::type_uuid& c_id,
                          const grid_view_type& c_view,
                          const rtypes::discretize_ratio& c_resolution)
-    : los2D(c_id, c_view, c_resolution),
+    : grid2D_los(c_id, c_view, c_resolution),
       ER_CLIENT_INIT("fordyca.repr.forager_los") {}
 
 

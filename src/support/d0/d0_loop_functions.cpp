@@ -91,10 +91,10 @@ struct functor_maps_initializer {
             lf->oracle()));
     lf->m_los_update_map->emplace(
         typeid(controller),
-        ccops::los_update<T,
+        ccops::grid_los_update<T,
         rds::grid2D_overlay<cds::cell2D>,
         repr::forager_los>(
-            lf->arena_map()->decoratee().template layer<cds::arena_grid::kCell>()));
+            lf->arena_map()->decoratee().template layer<cads::arena_grid::kCell>()));
   }
 
   /* clang-format off */

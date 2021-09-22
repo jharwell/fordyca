@@ -1,0 +1,6 @@
+** TODO Enable Travis again
+** TODO Remove unecessary includes
+** TODO Switch rst tables to the list-table format--much easier to work with.
+** TODO Make all "policy" based XML config disabled by "" OR "Null", to be consistent
+** TODO Make all parsers inherit from rer::client so that they can print if/when they fail validation. Would make...
+

@@ -32,6 +32,8 @@ Usage: $0 --prefix [/usr/local|$HOME/<dir>] [--rroot <dir>] [--cores <n_cores>] 
 EOF
     exit 1
 }
+# For better debugging when the script doesn't work
+# set -x
 
 repo_root=$HOME/research
 install_sys_pkgs="YES"
@@ -57,32 +59,39 @@ while true; do
 done
 
 echo -e "********************************************************************************"
-echo -e "BOOTSTRAP START:\n"
+echo -e "FORDYCA BOOTSTRAP START:\n"
 echo -e "PREFIX=$prefix\nREPO_ROOT=$repo_root\nN_CORES=$n_cores\nSYSPKGS=$install_sys_pkgs\nBUILD_TYPE=$build_type\n"
 echo -e "********************************************************************************"
 
 mkdir -p $repo_root && cd $repo_root
 
+# First, bootstrap RCPPSW
+# wget https://raw.githubusercontent.com/swarm-robotics/rcppsw/devel/scripts/bootstrap.sh -O bootstrap-rcppsw.sh
+cp $rcppsw/scripts/bootstrap.sh  bootstrap-rcppsw.sh
+
+chmod +x bootstrap-rcppsw.sh
+rcppsw_syspkgs=$([ "YES" = "$install_sys_pkgs" ] && echo "" || echo "--nosyspkgs")
+rcppsw_opt=$([ "OPT" = "$build_type" ] && echo "--opt" || echo "")
+./bootstrap-rcppsw.sh \
+    --rroot $repo_root\
+    --cores $n_cores\
+    --nobuild\
+    $rcppsw_syspkgs\
+    $rcppsw_opt
+
 # Install system packages
 if [ "YES" = "$install_sys_pkgs" ]; then
     fordyca_pkgs=(qtbase5-dev libnlopt-dev libnlopt-cxx-dev libfreeimageplus-dev
-                  freeglut3-dev libeigen3-dev libudev-dev liblua5.3-dev pip3 npm)
-    rcppsw_pkgs=(libboost-all-dev liblog4cxx-dev catch ccache python3-pip)
-    libra_pkgs=(make cmake git nodejs npm graphviz doxygen cppcheck cmake make gcc-9 g++-9
-                libclang-9-dev clang-tools-9 clang-format-9 clang-tidy-9)
+                  freeglut3-dev libeigen3-dev libudev-dev
+                  liblua5.3-dev)
     sierra_pkgs=(pip3)
 
     # Install packages (must be loop to ignore ones that don't exist)
-    for pkg in "${libra_pkgs[@]}" "${rcppsw_pkgs[@]}" "${fordyca_pkgs[@]}" "${sierra_pkgs[@]}"
+    for pkg in "${fordyca_pkgs[@]}" "${sierra_pkgs[@]}"
     do
         sudo apt-get -my install $pkg
     done
 fi
-
-# Install python packages for user
-python_pkgs=(cpplint breathe)
-pip3 install --user --upgrade pip
-pip3 install --user  "${python_pkgs[@]}"
 
 # Exit when any command after this fails. Can't be before the package installs,
 # because it is not an error if some of the packages are not found (I just put a
@@ -91,11 +100,7 @@ pip3 install --user  "${python_pkgs[@]}"
 set -e
 
 # Install ARGoS
-if [ "/usr/local" = "$prefix" ]; then
-    argos_sys_install="YES"
-else
-    argos_sys_install="NO"
-fi;
+argos_sys_install=$([ "/usr/local" = "$prefix" ] && echo "YES" || echo "NO")
 
 if [ -d argos3 ]; then rm -rf argos3; fi
 git clone https://github.com/swarm-robotics/argos3.git
@@ -131,7 +136,6 @@ if [ -d argos3-eepuck3D ]; then rm -rf argos3-eepuck3D; fi
 git clone https://github.com/swarm-robotics/argos3-eepuck3D.git
 cd argos3-eepuck3D
 mkdir -p build && cd build
-
 git checkout devel
 
 # This code expects ARGoS to be installed system wide, so we have to
@@ -153,15 +157,6 @@ else
 fi;
 
 cd ../../
-
-# Bootstrap RCPPSW
-if [ -d rcppsw ]; then rm -rf rcppsw; fi
-git clone https://github.com/swarm-robotics/rcppsw.git
-cd rcppsw
-git checkout devel
-git submodule update --init --recursive --remote
-
-cd ..
 
 # Bootstrap COSM
 if [ -d cosm ]; then rm -rf cosm; fi
@@ -186,11 +181,7 @@ rm -rf ext/cosm
 ln -s $repo_root/cosm ext/cosm
 
 # Build FORDYCA and documentation
-if [ "OPT" = "$build_type" ]; then
-    er="NONE"
-else
-    er="ALL"
-fi;
+er=$([ "OPT" = "$build_type" ] && echo "NONE" || echo "ALL")
 
 mkdir -p build && cd build
 
@@ -199,14 +190,14 @@ cmake \
     -DCMAKE_CXX_COMPILER=g++-9\
     -DCMAKE_BUILD_TYPE=OPT\
     -DCOSM_DEPS_PREFIX=$prefix\
-    -DLIBRA_ER=NONE\
+    -DLIBRA_ER=$er\
     ..
 make -j $n_cores
 make documentation
 
 cd ../../
 
-# Bootstrap sierra
+# Bootstrap SIERRA
 if [ -d sierra ]; then rm -rf sierra; fi
 git clone https://github.com/swarm-robotics/sierra.git
 cd sierra
@@ -215,10 +206,10 @@ pip3 install --user -r requirements/common.txt
 cd ..
 
 # Bootstrap TITERRA
-if [ -d sierra-titan ]; then rm -rf sierra-titan; fi
-git clone https://github.com/swarm-robotics/sierra-titan.git
-cd sierra-titan
-git checkout $BASE_BRANCH
+if [ -d titerra ]; then rm -rf titerra; fi
+git clone https://github.com/swarm-robotics/titerra.git
+cd titerra
+git checkout devel
 git submodule update --init --recursive --remote
 pip3 install --user -r requirements/common.txt
 cd ..
@@ -231,5 +222,5 @@ fi;
 
 # Made it!
 echo -e "********************************************************************************"
-echo -e "BOOTSTRAP SUCCESS!"
+echo -e "FORDYCA BOOTSTRAP SUCCESS!"
 echo -e "********************************************************************************"

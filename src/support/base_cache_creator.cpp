@@ -37,7 +37,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
-using cds::arena_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -60,7 +59,7 @@ base_cache_creator::create_single_cache(const rmath::vector2d& center,
             "Center@%s is not positive definite",
             center.to_str().c_str());
   auto dcenter = rmath::dvec2zvec(center, m_map->grid_resolution().v());
-  auto& cell = m_map->access<arena_grid::kCell>(dcenter);
+  auto& cell = m_map->access<cads::arena_grid::kCell>(dcenter);
 
   /*
    * The cell that will be the location of the new cache may already contain a

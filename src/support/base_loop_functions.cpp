@@ -61,6 +61,8 @@ base_loop_functions::~base_loop_functions(void) = default;
  * Initialization Functions
  ******************************************************************************/
 void base_loop_functions::init(ticpp::Element& node) {
+  argos_sm_adaptor::init(node);
+
   /* parse simulation input file */
   config_parse(node);
 
@@ -75,7 +77,7 @@ void base_loop_functions::init(ticpp::Element& node) {
   const auto* vconfig = config()->config_get<cvconfig::visualization_config>();
   arena_map_create<carena::caching_arena_map>(aconfig);
   if (!delay_arena_map_init()) {
-    arena_map_init(vconfig);
+    arena_map_init(vconfig, nullptr);
   }
 
   /* initialize convergence calculations */
@@ -169,7 +171,7 @@ void base_loop_functions::oracle_init(
  * ARGoS Hooks
  ******************************************************************************/
 void base_loop_functions::pre_step(void) {
-  timestep(rtypes::timestep(GetSpace().GetSimulationClock()));
+  argos_sm_adaptor::pre_step();
 
   /* update the arena map, which MIGHT require a redraw of the floor */
   auto status = arena_map()->pre_step_update(timestep());
@@ -191,6 +193,7 @@ void base_loop_functions::pre_step(void) {
 } /* pre_step() */
 
 void base_loop_functions::post_step(void) {
+  argos_sm_adaptor::post_step();
   /*
    * Needs to be after robot controllers are run, because computing convergence
    * before that gives you the convergence status for the LAST timestep.
@@ -201,7 +204,8 @@ void base_loop_functions::post_step(void) {
 } /* post_step() */
 
 void base_loop_functions::reset(void) {
-  arena_map()->initialize(this);
+  argos_sm_adaptor::reset();
+  arena_map()->initialize(this, nullptr);
 } /* reset() */
 
 /*******************************************************************************

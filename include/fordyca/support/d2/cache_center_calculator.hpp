@@ -29,7 +29,7 @@
 #include <vector>
 #include <boost/optional.hpp>
 
-#include "cosm/ds/arena_grid.hpp"
+#include "cosm/arena/ds/arena_grid.hpp"
 #include "cosm/ds/block3D_vector.hpp"
 #include "cosm/arena/ds/cache_vector.hpp"
 #include "cosm/foraging/ds/block_cluster_vector.hpp"
@@ -76,7 +76,7 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    * \param nests The nests in the arena.
    * \param c_clusters Vector of block clusters in the area.
    */
-  cache_center_calculator(cds::arena_grid* grid,
+  cache_center_calculator(cads::arena_grid* grid,
                           const rtypes::spatial_dist& cache_dim,
                           const cads::nest_vectorro& c_nests,
                           const cfds::block3D_cluster_vectorro& c_clusters);
@@ -149,7 +149,7 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
   const cads::nest_vectorro          mc_nests;
   const cfds::block3D_cluster_vectorro mc_clusters;
 
-  cds::arena_grid*                   m_grid;
+  cads::arena_grid*                  m_grid;
   /* clang-format on */
 };
 NS_END(d2, support, fordyca);

@@ -39,7 +39,7 @@ NS_START(fordyca, support, d2);
  * Constructors/Destructor
  ******************************************************************************/
 cache_center_calculator::cache_center_calculator(
-    cds::arena_grid* const grid,
+    cads::arena_grid* const grid,
     const rtypes::spatial_dist& cache_dim,
     const cads::nest_vectorro& c_nests,
     const cfds::block3D_cluster_vectorro& c_clusters)
@@ -228,8 +228,8 @@ cache_center_calculator::deconflict_loc_entity(const crepr::entity2D* ent,
       rmath::dvec2zvec(c_center, m_grid->resolution().v());
   auto exc_xspan = ent->xrspan();
   auto exc_yspan = ent->yrspan();
-  auto newc_xspan = crepr::entity2D::xrspan(c_center, mc_cache_dim);
-  auto newc_yspan = crepr::entity2D::yrspan(c_center, mc_cache_dim);
+  auto newc_xspan = rmath::xspan(c_center, mc_cache_dim.v());
+  auto newc_yspan = rmath::yspan(c_center, mc_cache_dim.v());
 
   ER_TRACE("cache: xspan=%s,center=%s/%s ent%d: xspan=%s",
            rcppsw::to_string(newc_xspan).c_str(),
