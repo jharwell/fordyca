@@ -67,7 +67,7 @@ class dpo_perception_subsystem final
   crepr::pheromone_density avg_cache_density(void) const override;
 
   /* foraging_perception_subsystem overrides */
-  const known_objects_accessor* known_objects(void) const override;
+  const known_objects_accessor* known_objects(void) const override RCPPSW_PURE;
   void update(oracular_info_receptor* receptor) override;
 
   /**
@@ -94,8 +94,8 @@ class dpo_perception_subsystem final
   void los_tracking_sync(const repr::forager_los* c_los,
                          const cds::block3D_vectorno& los_blocks);
 
-  const ds::dpo_store* store(void) const;
-  ds::dpo_store* store(void);
+  const ds::dpo_store* store(void) const RCPPSW_PURE;
+  ds::dpo_store* store(void) RCPPSW_PURE;
 };
 
 NS_END(cognitive, controller, fordyca);

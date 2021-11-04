@@ -99,8 +99,8 @@ class cache_creation_verifier : public rer::client<cache_creation_verifier> {
  private:
   bool sanity_check_internal_consistency(const carepr::arena_cache* cache) const
       RCPPSW_PURE;
-  bool
-  sanity_check_cross_consistency(const cads::acache_vectorro& c_caches) const;
+  bool sanity_check_cross_consistency(
+      const cads::acache_vectorro& c_caches) const RCPPSW_PURE;
   bool sanity_check_cache_overlap(const cads::acache_vectorro& c_caches) const;
   bool
   sanity_check_free_block_overlap(const carepr::arena_cache* cache,

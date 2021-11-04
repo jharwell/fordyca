@@ -53,7 +53,7 @@ ext/cosm
 node_modules
 
 # Runtime
-*.txt
+
 .gdb_history
 *.csv
 output

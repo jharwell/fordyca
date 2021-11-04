@@ -69,7 +69,7 @@ class mdpo_perception_subsystem final
   double unknown_percentage(void) const override RCPPSW_PURE;
 
   /* foraging_perception_subsystem overrides */
-  const known_objects_accessor* known_objects(void) const override;
+  const known_objects_accessor* known_objects(void) const override RCPPSW_PURE;
   void update(oracular_info_receptor* receptor) override;
 
   /**
@@ -98,8 +98,8 @@ class mdpo_perception_subsystem final
    */
   void update_cell_stats(const repr::forager_los* c_los);
 
-  const ds::dpo_semantic_map* map(void) const;
-  ds::dpo_semantic_map* map(void);
+  const ds::dpo_semantic_map* map(void) const RCPPSW_PURE;
+  ds::dpo_semantic_map* map(void) RCPPSW_PURE;
 
   /* clang-format off */
   std::vector<size_t>                   m_cell_stats;

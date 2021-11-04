@@ -80,14 +80,17 @@
                            max="0.08"/>
             <wander_force circle_distance="4.0"
                           circle_radius="100.0"
-                          max_angle_delta="5"
                           max="0.09"
-                          interval="1"
-                          normal_dist="false"/>
+                          interval="1">
+              <!-- 5 degrees max delta. -->
+              <bias_angle src="uniform"
+                          max_delta="0.0872"/>
+            </wander_force>
             <phototaxis_force max="0.08"/>
           </force_calculator>
 
-          <diff_drive soft_turn_max="25"
+          <!-- 25 degrees soft_turn_max. -->
+          <diff_drive soft_turn_max="0.436"
                       max_speed="0.1" />
         </actuation_subsystem2D>
       </params>
