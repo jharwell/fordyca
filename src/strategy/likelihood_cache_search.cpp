@@ -37,17 +37,10 @@ NS_START(fordyca, strategy, explore);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-
 likelihood_cache_search::likelihood_cache_search(
-    const foraging_strategy::params* const c_params,
+    const fstrategy::strategy_params* params,
     rmath::rng* rng)
-    : likelihood_cache_search(c_params->saa, c_params->accessor, rng) {}
-
-likelihood_cache_search::likelihood_cache_search(
-    csubsystem::saa_subsystemQ3D* saa,
-    const fsperception::known_objects_accessor* accessor,
-    rmath::rng* rng)
-    : localized_search(saa, accessor, rng) {}
+    : localized_search(params, rng) {}
 
 /*******************************************************************************
  * Member Functions

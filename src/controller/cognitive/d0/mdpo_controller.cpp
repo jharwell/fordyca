@@ -110,8 +110,13 @@ void mdpo_controller::private_init(
   const auto* strat_config =
       config_repo.config_get<fsconfig::strategy_config>();
 
-  fstrategy::foraging_strategy::params strategy_params{
+  csfsm::fsm_params fsm_params {
     saa(),
+    inta_tracker(),
+    nz_tracker(),
+  };
+  auto strategy_params = fstrategy::strategy_params{
+    &fsm_params,
     nullptr,
     nullptr,
     perception()->known_objects(),
@@ -125,11 +130,13 @@ void mdpo_controller::private_init(
     .strategy_config = *strat_config };
   dpo_controller::fsm(std::make_unique<fsm::d0::dpo_fsm>(
       &fsm_ro_params,
-      saa(),
-      fsexplore::block_factory().create(
-          strat_config->explore.block_strategy, &strategy_params, rng()),
-      csstrategy::nest_acq::factory().create(
-          strat_config->nest_acq.strategy, saa(), rng()),
+      &fsm_params,
+      fsexplore::block_factory().create(strat_config->explore.block_strategy,
+                                        &strategy_params,
+                                        rng()),
+      csstrategy::nest_acq::factory().create(strat_config->nest_acq.strategy,
+                                             &fsm_params,
+                                             rng()),
       rng()));
 
   /* Set MDPO FSM supervision */

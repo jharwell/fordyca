@@ -227,7 +227,7 @@
                 cache_utilization="cache-utilization"
                 cache_lifecycle="cache-lifecycle"
                 perception_dpo="perception-dpo"
-                fsm_interference_counts="fsm-interference-counts"
+                spatial_interference_counts="spatial-interference-counts"
                 cache_site_selection="cache-site-selection"
                 task_execution_generalist="task-execution-generalist"
                 task_execution_collector="task-execution-collector"
@@ -241,6 +241,7 @@
                 task_tab_harvester="task-tab-harvester"
                 task_distribution="task-distribution"
                 spatial_movement='spatial-movement'
+                spatial_nest_zone='spatial-nest-zone'
                 perception_crw="perception-crw"
                 perception_mcrw="perception-mcrw"
                 swarm_convergence="swarm-convergence"
@@ -259,7 +260,7 @@
                       cache_acq_explore_locs2D="cache-acq-explore-locs"
                       cache_acq_vector_locs2D="cache-acq-vector-locs"
                       cache_locations="cache-locations"
-                      swarm_dist2D_pos="swarm-dist-pos2D"/>
+                      spatial_dist_pos2D="spatial-dist-pos2D"/>
           </csv>
         </sinks>
       </metrics>

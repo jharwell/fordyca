@@ -33,14 +33,9 @@ NS_START(fordyca, strategy, explore);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-crw_adaptor::crw_adaptor(const foraging_strategy::params* c_params,
+crw_adaptor::crw_adaptor(const fstrategy::strategy_params* params,
                          rmath::rng* rng)
-    : crw_adaptor(c_params->saa, c_params->accessor, rng) {}
-
-crw_adaptor::crw_adaptor(csubsystem::saa_subsystemQ3D* saa,
-                         const fsperception::known_objects_accessor* accessor,
-                         rmath::rng* rng)
-    : foraging_strategy(saa, accessor, rng),
-      decorator(saa, rng) {}
+    : foraging_strategy(params, rng),
+      decorator(params->fsm, rng) {}
 
 NS_END(explore, strategy, fordyca);

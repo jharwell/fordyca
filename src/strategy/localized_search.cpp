@@ -33,18 +33,12 @@ NS_START(fordyca, strategy, explore);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-localized_search::localized_search(
-    const foraging_strategy::params* const c_params,
-    rmath::rng* rng)
-: localized_search(c_params->saa, c_params->accessor, rng) {}
-
-localized_search::localized_search(csubsystem::saa_subsystemQ3D* saa,
-                                   const fsperception::known_objects_accessor* accessor,
+localized_search::localized_search(const fstrategy::strategy_params* params,
                                    rmath::rng* rng)
-    : foraging_strategy(saa, accessor, rng),
+    : foraging_strategy(params, rng),
       ER_CLIENT_INIT("fordyca.fsm.strategy.localized_search"),
-      m_vfsm(saa, rng),
-      m_crw(saa, accessor, rng) {}
+      m_vfsm(params->fsm, rng),
+      m_crw(params, rng) {}
 
 /*******************************************************************************
  * Member Functions
@@ -59,43 +53,5 @@ void localized_search::task_execute(void) {
     m_crw.task_execute();
   }
 } /* task_execute() */
-
-/*******************************************************************************
- * Interference Metrics
- ******************************************************************************/
-bool localized_search::exp_interference(void) const {
-  return (m_vfsm.task_running() && m_vfsm.exp_interference()) ||
-         (m_crw.task_running() && m_crw.exp_interference());
-} /* exp_interference() */
-
-bool localized_search::entered_interference(void) const {
-  return (m_vfsm.task_running() && m_vfsm.entered_interference()) ||
-         (m_crw.task_running() && m_crw.entered_interference());
-} /* entered_interference() */
-
-bool localized_search::exited_interference(void) const {
-  return (m_vfsm.task_running() && m_vfsm.exited_interference()) ||
-         (m_crw.task_running() && m_crw.exited_interference());
-} /* exited_interference() */
-
-rtypes::timestep localized_search::interference_duration(void) const {
-  if (m_vfsm.task_running()) {
-    return m_vfsm.interference_duration();
-  } else if (m_crw.task_running()) {
-    return m_crw.interference_duration();
-  } else {
-    return rtypes::timestep(0);
-  }
-} /* interference_duration() */
-
-rmath::vector3z localized_search::interference_loc3D(void) const {
-  ER_ASSERT(m_vfsm.task_running() || m_crw.task_running(),
-            "In collision interference without running task?");
-  if (m_vfsm.task_running()) {
-    return m_vfsm.interference_loc3D();
-  } else {
-    return m_crw.interference_loc3D();
-  }
-} /* interference_loc3D() */
 
 NS_END(explore, strategy, fordyca);

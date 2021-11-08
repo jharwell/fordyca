@@ -43,13 +43,13 @@ NS_START(fordyca, fsm);
  * Constructors/Destructors
  ******************************************************************************/
 acquire_free_block_fsm::acquire_free_block_fsm(
-    const fsm_ro_params* c_params,
-    csubsystem::saa_subsystemQ3D* saa,
+    const fsm_ro_params* c_ro,
+    const csfsm::fsm_params* c_no,
     std::unique_ptr<csstrategy::base_strategy> exp_behavior,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_free_block"),
       acquire_goal_fsm(
-          saa,
+        c_no,
           std::move(exp_behavior),
           rng,
           acquire_goal_fsm::hook_list{
@@ -78,8 +78,8 @@ acquire_free_block_fsm::acquire_free_block_fsm(
                             this,
                             std::placeholders::_1,
                             std::placeholders::_2)) }),
-      mc_matrix(c_params->bsel_matrix),
-      mc_store(c_params->store) {}
+      mc_matrix(c_ro->bsel_matrix),
+      mc_store(c_ro->store) {}
 
 /*******************************************************************************
  * Member Functions

@@ -63,11 +63,15 @@ NS_START(fordyca, controller, cognitive, d1);
 task_executive_builder::task_executive_builder(
     const controller::cognitive::block_sel_matrix* bsel_matrix,
     const controller::cognitive::cache_sel_matrix* csel_matrix,
+    cspatial::interference_tracker* inta,
+    cspatial::nest_zone_tracker* nz,
     csubsystem::saa_subsystemQ3D* const saa,
     fsperception::foraging_perception_subsystem* const perception)
     : ER_CLIENT_INIT("fordyca.controller.d1.task_executive_builder"),
       mc_csel_matrix(csel_matrix),
       mc_bsel_matrix(bsel_matrix),
+      m_inta_tracker(inta),
+      m_nz_tracker(nz),
       m_saa(saa),
       m_perception(perception) {}
 
@@ -85,20 +89,25 @@ task_executive_builder::tasking_map task_executive_builder::d1_tasks_create(
   const auto* strat_config =
       config_repo.config_get<fsconfig::strategy_config>();
   auto cache_color = carepr::light_type_index()[carepr::light_type_index::kCache];
-  fstrategy::foraging_strategy::params strategy_cachep{
+csfsm::fsm_params fsm_params {
       saa(),
-      nullptr,
-      mc_csel_matrix,
-      m_perception->known_objects(),
-      cache_color
-      };
-  fstrategy::foraging_strategy::params strategy_blockp{
-      saa(),
-      nullptr,
-      mc_csel_matrix,
-      m_perception->known_objects(),
-      rutils::color()
-      };
+      inta_tracker(),
+      nz_tracker(),
+    };
+  auto strategy_cachep = fstrategy::strategy_params{
+    &fsm_params,
+    nullptr,
+    mc_csel_matrix,
+    m_perception->known_objects(),
+    cache_color
+  };
+  auto strategy_blockp = fstrategy::strategy_params{
+    &fsm_params,
+    nullptr,
+    mc_csel_matrix,
+    m_perception->known_objects(),
+    rutils::color()
+  };
 
   ER_ASSERT(nullptr != mc_bsel_matrix, "NULL block selection matrix");
   ER_ASSERT(nullptr != mc_csel_matrix, "NULL cache selection matrix");
@@ -107,7 +116,7 @@ task_executive_builder::tasking_map task_executive_builder::d1_tasks_create(
   fsexplore::cache_factory cache_factory;
   csstrategy::nest_acq::factory nest_acq_factory;
 
-  fsm::fsm_ro_params params = {
+  fsm::fsm_ro_params ro_params = {
     .bsel_matrix = block_sel_matrix(),
     .csel_matrix = mc_csel_matrix,
     .store = perception()->model<fspds::dpo_store>(),
@@ -116,22 +125,28 @@ task_executive_builder::tasking_map task_executive_builder::d1_tasks_create(
   };
 
   auto generalist_fsm = std::make_unique<fsm::d0::free_block_to_nest_fsm>(
-      &params,
-      saa(),
+      &ro_params,
+      &fsm_params,
       block_factory.create(
           strat_config->explore.block_strategy, &strategy_blockp, rng),
-      nest_acq_factory.create(strat_config->nest_acq.strategy, saa(), rng),
+      nest_acq_factory.create(strat_config->nest_acq.strategy,
+                              &fsm_params,
+                              rng),
       rng);
   auto collector_fsm = std::make_unique<fsm::d1::cached_block_to_nest_fsm>(
-      &params,
-      saa(),
+      &ro_params,
+      &fsm_params,
       cache_factory.create(
           strat_config->explore.cache_strategy, &strategy_cachep, rng),
-      nest_acq_factory.create(strat_config->nest_acq.strategy, saa(), rng),
+      nest_acq_factory.create(strat_config->nest_acq.strategy,
+                              &fsm_params,
+                              rng),
       rng);
 
-  auto harvester_fsm =
-      std::make_unique<fsm::d1::block_to_existing_cache_fsm>(&params, saa(), rng);
+  auto harvester_fsm = std::make_unique<fsm::d1::block_to_existing_cache_fsm>(
+      &ro_params,
+      &fsm_params,
+      rng);
 
   auto collector = std::make_unique<tasks::d1::collector>(
       task_config, std::move(collector_fsm));
@@ -150,8 +165,7 @@ task_executive_builder::tasking_map task_executive_builder::d1_tasks_create(
   graph->install_tab(
       tasks::d0::foraging_task::kGeneralistName, std::move(children), rng);
   return tasking_map{
-    { "generalist",
-      graph->find_vertex(tasks::d0::foraging_task::kGeneralistName) },
+    { "generalist", graph->find_vertex(tasks::d0::foraging_task::kGeneralistName) },
     { "collector", graph->find_vertex(tasks::d1::foraging_task::kCollectorName) },
     { "harvester", graph->find_vertex(tasks::d1::foraging_task::kHarvesterName) }
   };

@@ -53,23 +53,12 @@ NS_START(fordyca, strategy, explore);
 class localized_search : public foraging_strategy,
                          public rer::client<localized_search> {
  public:
-  localized_search(const foraging_strategy::params* const c_params,
-                   rmath::rng* rng);
-
-  localized_search(csubsystem::saa_subsystemQ3D* saa,
-                   const fsperception::known_objects_accessor* accessor,
+  localized_search(const fstrategy::strategy_params* const c_params,
                    rmath::rng* rng);
 
   ~localized_search(void) override = default;
   localized_search(const localized_search&) = delete;
   localized_search& operator=(const localized_search&) = delete;
-
-  /* interference metrics */
-  bool exp_interference(void) const override final RCPPSW_PURE;
-  bool entered_interference(void) const override final RCPPSW_PURE;
-  bool exited_interference(void) const override final RCPPSW_PURE;
-  rtypes::timestep interference_duration(void) const override final;
-  rmath::vector3z interference_loc3D(void) const override final RCPPSW_PURE;
 
   /* taskable overrides */
 
@@ -104,7 +93,19 @@ class localized_search : public foraging_strategy,
 
   /* prototype overrides */
   std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
-    return std::make_unique<localized_search>(saa(), accessor(), rng());
+    csfsm::fsm_params fsm_params {
+      saa(),
+      inta_tracker(),
+      nz_tracker(),
+    };
+    fstrategy::strategy_params params {
+      &fsm_params,
+      nullptr,
+      nullptr,
+      accessor(),
+      {}
+    };
+    return std::make_unique<localized_search>(&params, rng());
   }
 
  private:

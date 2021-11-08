@@ -113,18 +113,19 @@
                 output_interval="1000"
                 block_transporter="block-transporter.csv"
                 block_transportee="block-transportee.csv"
-                fsm_collision_counts="fsm-collision-counts.csv"
-                fsm_movement="fsm-movement.csv"
+                spatial_interference_counts="spatial-interference-counts.csv"
+                spatial_movement="spatial-movement.csv"
+                spatial_nest_zone='spatial-nest-zone'
                 block_acq_counts="block-acq-counts.csv"
                 block_manipulation="block-manipulation.csv"
                 />
             <create
                 output_interval="10"
-                fsm_collision_locs2D="fsm-collision-locs.csv"
+                spatial_interference_locs2D="spatial-interference-locs.csv"
                 block_acq_locs2D="block-acq-locs.csv"
                 block_acq_explore_locs2D="block-acq-explore-locs.csv"
                 block_acq_vector_locs2D="block-acq-vector-locs.csv"
-                swarm_dist_pos2D="swarm-dist-pos2D.csv"/>
+                spatial_dist_pos2D="spatial-dist-pos2D.csv"/>
           </csv>
         </sinks>
       </metrics>
@@ -181,7 +182,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="16" max_trials="1000">
+      <entity quantity="1" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->

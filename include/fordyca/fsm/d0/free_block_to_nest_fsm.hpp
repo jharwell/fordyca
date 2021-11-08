@@ -60,8 +60,8 @@ class free_block_to_nest_fsm final : public cffsm::foraging_util_hfsm,
                                      public cta::taskable {
  public:
   free_block_to_nest_fsm(
-      const fsm_ro_params* c_params,
-      csubsystem::saa_subsystemQ3D* saa,
+      const fsm_ro_params* c_ro,
+      const csfsm::fsm_params* c_no,
       std::unique_ptr<csstrategy::base_strategy> explore,
       std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
       rmath::rng* rng);
@@ -80,13 +80,6 @@ class free_block_to_nest_fsm final : public cffsm::foraging_util_hfsm,
   bool task_running(void) const override {
     return !(ekST_FINISHED == current_state() || ekST_START == current_state());
   }
-
-  /* interference metrics */
-  bool exp_interference(void) const override RCPPSW_PURE;
-  bool entered_interference(void) const override RCPPSW_PURE;
-  bool exited_interference(void) const override RCPPSW_PURE;
-  rtypes::timestep interference_duration(void) const override RCPPSW_PURE;
-  rmath::vector3z interference_loc3D(void) const override RCPPSW_PURE;
 
   /* goal acquisition metrics */
   bool goal_acquired(void) const override RCPPSW_PURE;

@@ -42,20 +42,10 @@ NS_START(fordyca, strategy, explore);
  * Constructors/Destructor
  ******************************************************************************/
 utility_cache_search::utility_cache_search(
-    const foraging_strategy::params* const c_params,
+    const fstrategy::strategy_params* params,
     rmath::rng* rng)
-    : utility_cache_search(c_params->csel_matrix,
-                           c_params->accessor,
-                           c_params->saa,
-                           rng) {}
-
-utility_cache_search::utility_cache_search(
-    const controller::cognitive::cache_sel_matrix* csel_matrix,
-    const fsperception::known_objects_accessor* accessor,
-    csubsystem::saa_subsystemQ3D* saa,
-    rmath::rng* rng)
-    : localized_search(saa, accessor, rng),
-      mc_matrix(csel_matrix) {}
+    : localized_search(params, rng),
+      mc_matrix(params->csel_matrix) {}
 
 /*******************************************************************************
  * Member Functions

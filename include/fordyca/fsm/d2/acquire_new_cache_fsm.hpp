@@ -57,8 +57,8 @@ NS_START(fsm, d2);
 class acquire_new_cache_fsm final : public rer::client<acquire_new_cache_fsm>,
                               public csfsm::acquire_goal_fsm {
  public:
-  acquire_new_cache_fsm(const fsm_ro_params* c_params,
-                        csubsystem::saa_subsystemQ3D* saa,
+  acquire_new_cache_fsm(const fsm_ro_params* c_ro,
+                        const csfsm::fsm_params* c_no,
                         std::unique_ptr<csstrategy::base_strategy> exp_behavior,
                         rmath::rng* rng);
   ~acquire_new_cache_fsm(void) override = default;

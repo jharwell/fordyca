@@ -103,5 +103,8 @@
   <category name="fordyca.ds.perceived_arena_map" >
     <priority value ="info" />
   </category>
+  <category name="rcppsw.metrics" >
+    <priority value ="debug" />
+  </category>
 
  </log4j:configuration>

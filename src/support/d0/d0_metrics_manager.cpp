@@ -103,20 +103,13 @@ void d0_metrics_manager::collect_from_controller(const TController* const contro
   /*
    * All d0 controllers provide these.
    */
-  collect("spatial::movement", *controller);
+  collect("spatial::nest_zone", *controller->nz_tracker());
   collect("strategy::nest_acq", *controller->fsm());
-  collect("fsm::interference_counts", *controller->fsm());
-  collect("blocks::acq_counts", *controller);
+  collect("blocks::acq::counts", *controller);
   collect("blocks::transporter", *controller);
   collect("blocks::manipulation", *controller->block_manip_recorder());
 
-  collect_if("fsm::interference_locs2D",
-             *controller->fsm(),
-             [&](const rmetrics::base_metrics&) {
-               return controller->fsm()->inta_tracker()->exp_interference();
-             });
-
-  collect_if("blocks::acq_locs2D",
+  collect_if("blocks::acq::locs2D",
              *controller,
              [&](const rmetrics::base_metrics& metrics) {
                const auto& m =
@@ -129,14 +122,14 @@ void d0_metrics_manager::collect_from_controller(const TController* const contro
    * We count "false" explorations as part of gathering metrics on where robots
    * explore.
    */
-  collect_if("blocks::acq_explore_locs2D",
+  collect_if("blocks::acq::explore_locs2D",
              *controller,
              [&](const rmetrics::base_metrics& metrics) {
                const auto& m =
                    dynamic_cast<const csmetrics::goal_acq_metrics&>(metrics);
                return m.is_exploring_for_goal().is_exploring;
              });
-  collect_if("blocks::acq_vector_locs2D",
+  collect_if("blocks::acq::vector_locs2D",
              *controller,
              [&](const rmetrics::base_metrics& metrics) {
                const auto& m =

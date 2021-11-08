@@ -50,22 +50,13 @@ NS_START(fordyca, strategy, explore);
 class crw_adaptor final : public foraging_strategy,
                           public rpdecorator::decorator<csstrategy::explore::crw> {
  public:
-  crw_adaptor(const foraging_strategy::params* c_params, rmath::rng* rng);
-  crw_adaptor(csubsystem::saa_subsystemQ3D* saa,
-              const fsperception::known_objects_accessor* accessor,
-              rmath::rng* rng);
+  crw_adaptor(const fstrategy::strategy_params* c_params, rmath::rng* rng);
 
   ~crw_adaptor(void) override = default;
   crw_adaptor(const crw_adaptor&) = delete;
   crw_adaptor& operator=(const crw_adaptor&) = delete;
 
-  /* interference metrics */
-  RCPPSW_WRAP_DECLDEF_OVERRIDE(exp_interference, decoratee(), const);
-  RCPPSW_WRAP_DECLDEF_OVERRIDE(entered_interference, decoratee(), const);
-  RCPPSW_WRAP_DECLDEF_OVERRIDE(exited_interference, decoratee(), const);
-  RCPPSW_WRAP_DECLDEF_OVERRIDE(interference_duration, decoratee(), const);
-  RCPPSW_WRAP_DECLDEF_OVERRIDE(interference_loc3D, decoratee(), const);
-
+  /* taskable overrides */
   RCPPSW_WRAP_DECLDEF_OVERRIDE(task_reset, decoratee());
   RCPPSW_WRAP_DECLDEF_OVERRIDE(task_running, decoratee(), const);
   RCPPSW_WRAP_DECLDEF_OVERRIDE(task_finished, decoratee(), const);

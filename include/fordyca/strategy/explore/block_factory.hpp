@@ -47,7 +47,7 @@ NS_START(fordyca, strategy, explore);
 class block_factory :
     public rpfactory::releasing_factory<csstrategy::base_strategy,
                                         std::string, /* key type */
-                                        const foraging_strategy::params*,
+                                        const fstrategy::strategy_params*,
                                         rmath::rng*> {
  public:
   static inline const std::string kCRW = "CRW";

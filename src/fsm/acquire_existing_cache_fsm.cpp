@@ -43,14 +43,14 @@ NS_START(fordyca, fsm);
  * Constructors/Destructors
  ******************************************************************************/
 acquire_existing_cache_fsm::acquire_existing_cache_fsm(
-    const fsm_ro_params* c_params,
-    csubsystem::saa_subsystemQ3D* saa,
+    const fsm_ro_params* c_ro,
+    const csfsm::fsm_params* c_no,
     std::unique_ptr<csstrategy::base_strategy> exp_behavior,
     rmath::rng* rng,
     bool for_pickup)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_existing_cache"),
       acquire_goal_fsm(
-          saa,
+          c_no,
           std::move(exp_behavior),
           rng,
           acquire_goal_fsm::hook_list{
@@ -90,8 +90,8 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
                             std::placeholders::_1,
                             std::placeholders::_2)) }),
       mc_for_pickup(for_pickup),
-      mc_matrix(c_params->csel_matrix),
-      mc_store(c_params->store) {}
+      mc_matrix(c_ro->csel_matrix),
+      mc_store(c_ro->store) {}
 
 /*******************************************************************************
  * Non-Member Functions

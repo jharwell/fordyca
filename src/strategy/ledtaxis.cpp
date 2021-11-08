@@ -34,20 +34,10 @@ NS_START(fordyca, strategy, explore);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-ledtaxis::ledtaxis(csubsystem::saa_subsystemQ3D* saa,
-                   const fsperception::known_objects_accessor* accessor,
-                   const rutils::color& target,
-                   rmath::rng* rng)
-    : foraging_strategy(saa, accessor, rng),
+ledtaxis::ledtaxis(const fstrategy::strategy_params* params, rmath::rng* rng)
+    : foraging_strategy(params, rng),
       ER_CLIENT_INIT("fordyca.fsm.strategy.ledtaxis"),
-      m_target(target) {}
-
-ledtaxis::ledtaxis(const foraging_strategy::params* const c_params,
-                   rmath::rng* rng)
-    : ledtaxis(c_params->saa,
-               c_params->accessor,
-               c_params->ledtaxis_target,
-               rng) {}
+      m_target(params->ledtaxis_target) {}
 
 /*******************************************************************************
  * General Member Functions
@@ -56,7 +46,7 @@ void ledtaxis::task_execute(void) {
   saa()->steer_force2D().accum(saa()->steer_force2D().wander(rng()));
 
   if (auto obs = saa()->sensing()->proximity()->avg_prox_obj()) {
-    inta_tracker()->inta_enter();
+    inta_tracker()->state_enter();
 
     ER_DEBUG("Found threatening obstacle: %s@%f [%f]",
              obs->to_str().c_str(),
@@ -66,7 +56,7 @@ void ledtaxis::task_execute(void) {
     saa()->steer_force2D().accum(saa()->steer_force2D().avoidance(*obs));
 
   } else {
-    inta_tracker()->inta_exit();
+    inta_tracker()->state_exit();
 
     ER_DEBUG("No threatening obstacle found");
     saa()->actuation()->leds()->set_color(-1, rutils::color::kMAGENTA);

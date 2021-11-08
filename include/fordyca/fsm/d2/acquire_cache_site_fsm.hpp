@@ -60,8 +60,8 @@ class acquire_cache_site_fsm : public rer::client<acquire_cache_site_fsm>,
                                public csfsm::acquire_goal_fsm,
                                public metrics::caches::site_selection_metrics {
  public:
-  acquire_cache_site_fsm(const fsm_ro_params* c_params,
-                         csubsystem::saa_subsystemQ3D* saa,
+  acquire_cache_site_fsm(const fsm_ro_params* c_ro,
+                         const csfsm::fsm_params* c_no,
                          rmath::rng* rng);
   ~acquire_cache_site_fsm(void) override = default;
 

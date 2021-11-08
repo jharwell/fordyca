@@ -47,12 +47,7 @@ NS_START(fordyca, strategy, explore);
  */
 class utility_cache_search : public localized_search {
  public:
-  utility_cache_search(const foraging_strategy::params* const c_params,
-                       rmath::rng* rng);
-
-  utility_cache_search(const controller::cognitive::cache_sel_matrix* csel_matrix,
-                       const fsperception::known_objects_accessor* accessor,
-                       csubsystem::saa_subsystemQ3D* saa,
+  utility_cache_search(const fstrategy::strategy_params* const c_params,
                        rmath::rng* rng);
 
   ~utility_cache_search(void) override = default;
@@ -64,10 +59,20 @@ class utility_cache_search : public localized_search {
 
   /* prototype overrides */
   std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
-    return std::make_unique<utility_cache_search>(mc_matrix,
-                                                  accessor(),
-                                                  saa(),
-                                                  rng());
+    csfsm::fsm_params fsm_params {
+      saa(),
+      inta_tracker(),
+      nz_tracker(),
+    };
+    fstrategy::strategy_params params {
+      &fsm_params,
+      nullptr,
+      mc_matrix,
+      accessor(),
+      {}
+    };
+
+    return std::make_unique<utility_cache_search>(&params, rng());
   }
 
  private:

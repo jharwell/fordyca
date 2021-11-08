@@ -62,9 +62,16 @@ NS_START(fordyca, controller, cognitive, d2);
 task_executive_builder::task_executive_builder(
     const controller::cognitive::block_sel_matrix* bsel_matrix,
     const controller::cognitive::cache_sel_matrix* csel_matrix,
+    cspatial::interference_tracker* inta,
+    cspatial::nest_zone_tracker* nz,
     csubsystem::saa_subsystemQ3D* const saa,
     fsperception::foraging_perception_subsystem* const perception)
-    : d1::task_executive_builder(bsel_matrix, csel_matrix, saa, perception),
+    : d1::task_executive_builder(bsel_matrix,
+                                 csel_matrix,
+                                 inta,
+                                 nz,
+                                 saa,
+                                 perception),
       ER_CLIENT_INIT("fordyca.controller.d2.task_executive_builder") {}
 
 task_executive_builder::~task_executive_builder(void) = default;
@@ -85,16 +92,20 @@ task_executive_builder::tasking_map task_executive_builder::d2_tasks_create(
   fsexplore::block_factory block_factory;
   fsexplore::cache_factory cache_factory;
   csstrategy::nest_acq::factory nest_acq_factory;
-
-  fstrategy::foraging_strategy::params strategy_cachep{
+  csfsm::fsm_params fsm_params {
     saa(),
+    inta_tracker(),
+    nz_tracker(),
+  };
+  auto strategy_cachep = fstrategy::strategy_params{
+    &fsm_params,
     nullptr,
     cache_sel_matrix(),
     perception()->known_objects(),
     cache_color
   };
-  fstrategy::foraging_strategy::params strategy_blockp{
-    saa(),
+  auto strategy_blockp = fstrategy::strategy_params{
+    &fsm_params,
     nullptr,
     cache_sel_matrix(),
     perception()->known_objects(),
@@ -111,31 +122,33 @@ task_executive_builder::tasking_map task_executive_builder::d2_tasks_create(
 
   auto cache_starter_fsm = std::make_unique<fsm::d2::block_to_cache_site_fsm>(
       &params,
-      saa(),
+      &fsm_params,
       block_factory.create(
           strat_config->explore.block_strategy, &strategy_blockp, rng),
       rng);
 
   auto cache_finisher_fsm = std::make_unique<fsm::d2::block_to_new_cache_fsm>(
       &params,
-      saa(),
+      &fsm_params,
       block_factory.create(
           strat_config->explore.block_strategy, &strategy_blockp, rng),
       rng);
 
   auto cache_transferer_fsm = std::make_unique<fsm::d2::cache_transferer_fsm>(
       &params,
-      saa(),
+      &fsm_params,
       cache_factory.create(
           strat_config->explore.cache_strategy, &strategy_cachep, rng),
       rng);
 
   auto cache_collector_fsm = std::make_unique<fsm::d1::cached_block_to_nest_fsm>(
       &params,
-      saa(),
+      &fsm_params,
       cache_factory.create(
           strat_config->explore.cache_strategy, &strategy_cachep, rng),
-      nest_acq_factory.create(strat_config->nest_acq.strategy, saa(), rng),
+      nest_acq_factory.create(strat_config->nest_acq.strategy,
+                              &fsm_params,
+                              rng),
       rng);
 
   auto cache_starter = std::make_unique<tasks::d2::cache_starter>(

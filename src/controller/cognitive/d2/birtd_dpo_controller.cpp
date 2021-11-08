@@ -98,9 +98,12 @@ void birtd_dpo_controller::private_init(
    * Rebind executive to use d2 task decomposition graph instead of d1
    * version.
    */
-  executive(task_executive_builder(
-      block_sel_matrix(), cache_sel_matrix(), saa(), perception())(config_repo,
-                                                                   rng()));
+  executive(task_executive_builder(block_sel_matrix(),
+                                   cache_sel_matrix(),
+                                   inta_tracker(),
+                                   nz_tracker(),
+                                   saa(),
+                                   perception())(config_repo,rng()));
 
   /*
    * Set task alloction callback, rebind task abort callback (original was lost

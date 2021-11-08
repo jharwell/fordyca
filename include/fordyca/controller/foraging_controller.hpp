@@ -36,6 +36,7 @@
 #include "cosm/pal/config/output_config.hpp"
 #include "cosm/pal/argos_controller2D_adaptor.hpp"
 #include "cosm/subsystem/subsystem_fwd.hpp"
+#include "cosm/spatial/metrics/nest_zone_metrics.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/foraging_transport_goal.hpp"
@@ -57,6 +58,10 @@ class robot_dynamics_applicator;
 namespace cosm::repr {
 class unicell_entity2D;
 } // namespace cosm::repr
+
+namespace cosm::spatial {
+class nest_zone_tracker;
+} /* namespace cosm::spatial */
 
 namespace rcppsw::math::config {
 struct rng_config;
@@ -87,7 +92,8 @@ class foraging_controller
       public cfsm::block_transporter<fsm::foraging_transport_goal>,
       public cfsm::metrics::block_transporter_metrics,
       public ccontroller::irv_recipient_controller,
-      public rer::client<foraging_controller> {
+      public rer::client<foraging_controller>,
+      public csmetrics::nest_zone_metrics {
  public:
   using block_manip_recorder_type = ccontroller::manip_event_recorder<
       metrics::blocks::block_manip_events::ekMAX_EVENTS>;
@@ -116,16 +122,23 @@ class foraging_controller
   rmath::vector3d
   ts_velocity(const csmetrics::movement_category& category) const override;
 
-  /**
-   * \brief If \c TRUE, the robot is currently at least most of the way in the
-   * nest, as reported by the sensors.
-   */
-  bool in_nest(void) const;
+  /* nest zone metrics */
+  RCPPSW_WRAP_DECL_OVERRIDE(bool, in_nest, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(bool, entered_nest, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(bool, exited_nest, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(rtypes::timestep, nest_duration, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(rtypes::timestep, nest_entry_time, const);
 
   const block_manip_recorder_type* block_manip_recorder(void) const {
     return &m_block_manip;
   }
   block_manip_recorder_type* block_manip_recorder(void) { return &m_block_manip; }
+  const cspatial::nest_zone_tracker* nz_tracker(void) const {
+    return m_nz_tracker.get();
+  }
+
+ protected:
+  cspatial::nest_zone_tracker* nz_tracker(void) { return m_nz_tracker.get(); }
 
  private:
   void
@@ -134,7 +147,8 @@ class foraging_controller
   fs::path output_init(const cpconfig::output_config* outputp) override;
 
   /* clang-format off */
-  block_manip_recorder_type m_block_manip{};
+  block_manip_recorder_type                    m_block_manip{};
+  std::unique_ptr<cspatial::nest_zone_tracker> m_nz_tracker{nullptr};
   /* clang-format on */
 };
 

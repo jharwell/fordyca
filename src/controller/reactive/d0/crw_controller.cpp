@@ -64,21 +64,30 @@ void crw_controller::init(ticpp::Element& node) {
     std::exit(EXIT_FAILURE);
   }
 
-  fstrategy::foraging_strategy::params p{
+  csfsm::fsm_params fsm_params {
     saa(),
+        inta_tracker(),
+        nz_tracker()
+        };
+  auto strategy_params = fstrategy::strategy_params{
+    &fsm_params,
         nullptr,
         nullptr,
         nullptr,
         rutils::color()
         };
+
   const auto* nest = repo.config_get<crepr::config::nest_config>();
   const auto* strat_config = repo.config_get<fsconfig::strategy_config>();
 
   m_fsm = std::make_unique<fsm::d0::crw_fsm>(
-      saa(),
-      fsexplore::block_factory().create(fsexplore::block_factory::kCRW, &p, rng()),
-      csstrategy::nest_acq::factory().create(
-          strat_config->nest_acq.strategy, saa(), rng()),
+      &fsm_params,
+      fsexplore::block_factory().create(fsexplore::block_factory::kCRW,
+                                        &strategy_params,
+                                        rng()),
+      csstrategy::nest_acq::factory().create(strat_config->nest_acq.strategy,
+                                             &fsm_params,
+                                             rng()),
       nest->center,
       rng());
   /* Set CRW FSM supervision */

@@ -58,8 +58,8 @@ NS_START(fordyca, fsm, d1);
  */
 class block_to_existing_cache_fsm final : public block_to_goal_fsm {
  public:
-   block_to_existing_cache_fsm(const fsm_ro_params* c_params,
-                               csubsystem::saa_subsystemQ3D* saa,
+   block_to_existing_cache_fsm(const fsm_ro_params* c_ro,
+                               const csfsm::fsm_params* c_no,
                                rmath::rng* rng);
 
   ~block_to_existing_cache_fsm(void) override = default;

@@ -48,11 +48,7 @@ NS_START(fordyca, strategy, explore);
 class ledtaxis_cache_search : public foraging_strategy,
                               public rer::client<ledtaxis_cache_search> {
  public:
-  ledtaxis_cache_search(const foraging_strategy::params* const c_params,
-                       rmath::rng* rng);
-  ledtaxis_cache_search(csubsystem::saa_subsystemQ3D* saa,
-                        const fsperception::known_objects_accessor* accessor,
-                        const rutils::color& ledtaxis_target,
+  ledtaxis_cache_search(const fstrategy::strategy_params* params,
                         rmath::rng* rng);
 
   ~ledtaxis_cache_search(void) override = default;
@@ -85,19 +81,21 @@ class ledtaxis_cache_search : public foraging_strategy,
   bool task_finished(void) const override final { return false; }
   void task_execute(void) override final;
 
-  /* interference metrics */
-  bool exp_interference(void) const override final RCPPSW_PURE;
-  bool entered_interference(void) const override final RCPPSW_PURE;
-  bool exited_interference(void) const override final RCPPSW_PURE;
-  rtypes::timestep interference_duration(void) const override final;
-  rmath::vector3z interference_loc3D(void) const override final RCPPSW_PURE;
-
   /* prototype overrides */
   std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
-    return std::make_unique<ledtaxis_cache_search>(saa(),
-                                                   accessor(),
-                                                   m_taxis.target(),
-                                                   rng());
+    csfsm::fsm_params fsm_params {
+      saa(),
+      inta_tracker(),
+      nz_tracker(),
+    };
+    fstrategy::strategy_params params {
+      &fsm_params,
+      nullptr,
+      nullptr,
+      accessor(),
+      m_taxis.target()
+    };
+    return std::make_unique<ledtaxis_cache_search>(&params, rng());
   }
 
  private:

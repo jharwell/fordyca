@@ -107,9 +107,12 @@ void bitd_mdpo_controller::shared_init(
    * bitd_dpo_controller, we have to replace it because we have our own
    * perception subsystem, which is used to create the executive's graph.
    */
-  executive(task_executive_builder(
-      block_sel_matrix(), cache_sel_matrix(), saa(), perception())(config_repo,
-                                                                   rng()));
+  executive(task_executive_builder(block_sel_matrix(),
+                                   cache_sel_matrix(),
+                                   inta_tracker(),
+                                   nz_tracker(),
+                                   saa(),
+                                   perception())(config_repo, rng()));
   executive()->task_abort_notify(std::bind(
       &bitd_mdpo_controller::task_abort_cb, this, std::placeholders::_1));
 } /* shared_init() */

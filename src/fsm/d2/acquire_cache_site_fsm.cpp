@@ -40,12 +40,12 @@ NS_START(fordyca, fsm, d2);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-acquire_cache_site_fsm::acquire_cache_site_fsm(const fsm_ro_params* c_params,
-                                               csubsystem::saa_subsystemQ3D* saa,
+acquire_cache_site_fsm::acquire_cache_site_fsm(const fsm_ro_params* c_ro,
+                                               const csfsm::fsm_params* c_no,
                                                rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.d2.acquire_cache_site"),
       acquire_goal_fsm(
-          saa,
+          c_no,
           nullptr, /* never explore for cache sites */
           rng,
           acquire_goal_fsm::hook_list{
@@ -76,8 +76,8 @@ acquire_cache_site_fsm::acquire_cache_site_fsm(const fsm_ro_params* c_params,
                   [](const rmath::vector2d&, const rtypes::type_uuid&) noexcept {
                     return true;
                   }) }),
-      mc_matrix(c_params->csel_matrix),
-      mc_accessor(c_params->accessor) {}
+      mc_matrix(c_ro->csel_matrix),
+      mc_accessor(c_ro->accessor) {}
 
 /*******************************************************************************
  * Member Functions

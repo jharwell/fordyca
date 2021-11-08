@@ -40,12 +40,12 @@ using bsel_matrix = controller::cognitive::block_sel_matrix;
  * Constructors/Destructors
  ******************************************************************************/
 free_block_to_nest_fsm::free_block_to_nest_fsm(
-    const fsm_ro_params* c_params,
-    csubsystem::saa_subsystemQ3D* saa,
+    const fsm_ro_params* c_ro,
+    const csfsm::fsm_params* c_no,
     std::unique_ptr<csstrategy::base_strategy> explore,
     std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
     rmath::rng* rng)
-    : foraging_util_hfsm(saa, std::move(nest_acq), rng, ekST_MAX_STATES),
+    : foraging_util_hfsm(c_no, std::move(nest_acq), rng, ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.d0.free_block_to_nest"),
       RCPPSW_HFSM_CONSTRUCT_STATE(leaving_nest, &start),
       RCPPSW_HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
@@ -72,8 +72,8 @@ free_block_to_nest_fsm::free_block_to_nest_fsm(
                                              &exit_transport_to_nest),
           RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&finished)),
       mc_nest_loc(boost::get<rmath::vector2d>(
-          c_params->bsel_matrix->find(bsel_matrix::kNestLoc)->second)),
-      m_block_fsm(c_params, saa, std::move(explore), rng) {}
+          c_ro->bsel_matrix->find(bsel_matrix::kNestLoc)->second)),
+      m_block_fsm(c_ro, c_no, std::move(explore), rng) {}
 
 RCPPSW_HFSM_STATE_DEFINE(free_block_to_nest_fsm, start, rpfsm::event_data* data) {
   /* first time running FSM */
@@ -135,40 +135,6 @@ RCPPSW_HFSM_STATE_DEFINE(free_block_to_nest_fsm,
 RCPPSW_CONST RCPPSW_HFSM_STATE_DEFINE_ND(free_block_to_nest_fsm, finished) {
   return fsm::foraging_signal::ekHANDLED;
 }
-
-/*******************************************************************************
- * Collision Metrics
- ******************************************************************************/
-bool free_block_to_nest_fsm::exp_interference(void) const {
-  return (m_block_fsm.task_running() && m_block_fsm.exp_interference()) ||
-         cffsm::foraging_util_hfsm::exp_interference();
-} /* in_interference() */
-
-bool free_block_to_nest_fsm::entered_interference(void) const {
-  return (m_block_fsm.task_running() && m_block_fsm.entered_interference()) ||
-         cffsm::foraging_util_hfsm::entered_interference();
-} /* entered_interference() */
-
-bool free_block_to_nest_fsm::exited_interference(void) const {
-  return (m_block_fsm.task_running() && m_block_fsm.exited_interference()) ||
-         cffsm::foraging_util_hfsm::exited_interference();
-} /* exited_interference() */
-
-rtypes::timestep free_block_to_nest_fsm::interference_duration(void) const {
-  if (m_block_fsm.task_running()) {
-    return m_block_fsm.interference_duration();
-  } else {
-    return cffsm::foraging_util_hfsm::interference_duration();
-  }
-} /* interference_duration() */
-
-rmath::vector3z free_block_to_nest_fsm::interference_loc3D(void) const {
-  if (m_block_fsm.task_running()) {
-    return m_block_fsm.interference_loc3D();
-  } else {
-    return cffsm::foraging_util_hfsm::interference_loc3D();
-  }
-} /* interference_loc3D() */
 
 /*******************************************************************************
  * Goal Acquisition Metrics

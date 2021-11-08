@@ -136,6 +136,8 @@ void bitd_dpo_controller::private_init(
   /* task executive */
   m_executive = task_executive_builder(block_sel_matrix(),
                                        m_cache_sel_matrix.get(),
+                                       inta_tracker(),
+                                       nz_tracker(),
                                        saa(),
                                        perception())(config_repo, rng());
   executive()->task_abort_notify(std::bind(

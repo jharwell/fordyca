@@ -25,23 +25,13 @@
  * Includes
  ******************************************************************************/
 #include "cosm/spatial/strategy/base_strategy.hpp"
-#include "cosm/subsystem/subsystem_fwd.hpp"
 
-#include "fordyca/fordyca.hpp"
-#include "fordyca/subsystem/perception/perception_fwd.hpp"
-#include "fordyca/subsystem/perception/known_objects_accessor.hpp"
+#include "fordyca/strategy/strategy_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace controller::cognitive {
-class cache_sel_matrix;
-class block_sel_matrix;
-} // namespace controller::cognitive
-
-NS_START(strategy);
+NS_START(fordyca, strategy);
 
 /*******************************************************************************
  * Class Definitions
@@ -55,33 +45,9 @@ NS_START(strategy);
  */
 class foraging_strategy : public csstrategy::base_strategy {
  public:
-  struct params {
-    params(csubsystem::saa_subsystemQ3D* const saa_in,
-           const controller::cognitive::block_sel_matrix* const bsel_matrix_in,
-           const controller::cognitive::cache_sel_matrix* const csel_matrix_in,
-           const fsperception::known_objects_accessor* accesor_in,
-           const rutils::color& ledtaxis_target_in)
-        : saa(saa_in),
-          bsel_matrix(bsel_matrix_in),
-          csel_matrix(csel_matrix_in),
-          accessor(accesor_in),
-          ledtaxis_target(ledtaxis_target_in) {}
-
-    params(const params&) = delete;
-    params& operator=(const params&) = delete;
-
-    csubsystem::saa_subsystemQ3D* saa;
-    const controller::cognitive::block_sel_matrix* bsel_matrix;
-    const controller::cognitive::cache_sel_matrix* csel_matrix;
-    const fsperception::known_objects_accessor* accessor;
-    rutils::color ledtaxis_target;
-  };
-
-  foraging_strategy(csubsystem::saa_subsystemQ3D* saa,
-                    const fsperception::known_objects_accessor* accessor,
-                    rmath::rng* rng)
-      : base_strategy(saa, rng),
-        mc_accessor(accessor) {}
+  foraging_strategy(const fstrategy::strategy_params * params, rmath::rng* rng)
+      : base_strategy(params->fsm, rng),
+        mc_accessor(params->accessor) {}
 
   foraging_strategy(const foraging_strategy&) = delete;
   foraging_strategy& operator=(const foraging_strategy&) = delete;

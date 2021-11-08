@@ -43,13 +43,13 @@ using cselm = controller::cognitive::cache_sel_matrix;
  * Constructors/Destructors
  ******************************************************************************/
 acquire_new_cache_fsm::acquire_new_cache_fsm(
-    const fsm_ro_params* c_params,
-    csubsystem::saa_subsystemQ3D* saa,
+    const fsm_ro_params* c_ro,
+    const csfsm::fsm_params* c_no,
     std::unique_ptr<csstrategy::base_strategy> exp_behavior,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.d2.acquire_new_cache"),
       acquire_goal_fsm(
-          saa,
+          c_no,
           std::move(exp_behavior),
           rng,
           acquire_goal_fsm::hook_list{
@@ -79,8 +79,8 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
                                                const rtypes::type_uuid&) {
                                               return true;
                                             }) }),
-      mc_matrix(c_params->csel_matrix),
-      mc_store(c_params->store) {}
+      mc_matrix(c_ro->csel_matrix),
+      mc_store(c_ro->store) {}
 
 /*******************************************************************************
  * General Member Functions

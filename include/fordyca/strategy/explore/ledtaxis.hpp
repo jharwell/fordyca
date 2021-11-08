@@ -47,12 +47,7 @@ NS_START(fordyca, strategy, explore);
 class ledtaxis : public foraging_strategy,
                  public rer::client<ledtaxis> {
  public:
-   ledtaxis(const foraging_strategy::params* const c_params,
-            rmath::rng* rng);
-  ledtaxis(csubsystem::saa_subsystemQ3D* saa,
-           const fsperception::known_objects_accessor* accessor,
-           const rutils::color& target,
-           rmath::rng* rng);
+  ledtaxis(const fstrategy::strategy_params* params, rmath::rng* rng);
 
   ~ledtaxis(void) override = default;
   ledtaxis(const ledtaxis&) = delete;

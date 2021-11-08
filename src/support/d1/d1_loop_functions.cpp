@@ -38,6 +38,7 @@
 #include "cosm/pal/argos_swarm_iterator.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
+#include "cosm/spatial/nest_zone_tracker.hpp"
 
 #include "fordyca/controller/cognitive/d1/bitd_dpo_controller.hpp"
 #include "fordyca/controller/cognitive/d1/bitd_mdpo_controller.hpp"

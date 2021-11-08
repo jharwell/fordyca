@@ -148,23 +148,16 @@ class d1_metrics_manager : public d0::d0_metrics_manager,
  private:
   template<typename Controller>
   void collect_controller_common(const Controller* const controller) {
-    collect("fsm::movement", *controller);
+    collect("spatial::nest_zone", *controller->nz_tracker());
     collect("blocks::manipulation", *controller->block_manip_recorder());
 
     const auto *task = dynamic_cast<const cta::polled_task*>(controller->current_task());
     if (nullptr == task) {
       return;
     }
-    collect("fsm::interference_counts", *task->mechanism());
     collect("blocks::transporter", *task->mechanism());
-    collect_if("fsm::interference_locs2D",
-               *task->mechanism(),
-               [&](const rmetrics::base_metrics& metrics) {
-                 const auto & m = dynamic_cast<const csmetrics::interference_metrics&>(metrics);
-                 return m.exp_interference();
-               });
     collect_if(
-        "blocks::acq_counts",
+        "blocks::acq::counts",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
@@ -172,7 +165,7 @@ class d1_metrics_manager : public d0::d0_metrics_manager,
           return fsm::foraging_acq_goal::ekBLOCK == m.acquisition_goal();
         });
     collect_if(
-        "blocks::acq_locs2D",
+        "blocks::acq::locs2D",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
@@ -186,7 +179,7 @@ class d1_metrics_manager : public d0::d0_metrics_manager,
      * robots explore.
      */
     collect_if(
-        "blocks::acq_explore_locs2D",
+        "blocks::acq::explore_locs2D",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
@@ -195,7 +188,7 @@ class d1_metrics_manager : public d0::d0_metrics_manager,
               m.is_exploring_for_goal().is_exploring;
         });
     collect_if(
-        "blocks::acq_vector_locs2D",
+        "blocks::acq::vector_locs2D",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
@@ -205,7 +198,7 @@ class d1_metrics_manager : public d0::d0_metrics_manager,
         });
 
     collect_if(
-        "caches::acq_counts",
+        "caches::acq::counts",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
@@ -213,7 +206,7 @@ class d1_metrics_manager : public d0::d0_metrics_manager,
           return fsm::foraging_acq_goal::ekEXISTING_CACHE == m.acquisition_goal();
         });
     collect_if(
-        "caches::acq_locs2D",
+        "caches::acq::locs2D",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
@@ -227,7 +220,7 @@ class d1_metrics_manager : public d0::d0_metrics_manager,
      * robots explore.
      */
     collect_if(
-        "caches::acq_explore_locs2D",
+        "caches::acq::explore_locs2D",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
@@ -236,7 +229,7 @@ class d1_metrics_manager : public d0::d0_metrics_manager,
               m.is_exploring_for_goal().is_exploring;
         });
     collect_if(
-        "caches::acq_vector_locs2D",
+        "caches::acq::vector_locs2D",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(

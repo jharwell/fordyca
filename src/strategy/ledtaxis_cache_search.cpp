@@ -35,21 +35,12 @@ NS_START(fordyca, strategy, explore);
  * Constructors/Destructor
  ******************************************************************************/
 ledtaxis_cache_search::ledtaxis_cache_search(
-    const foraging_strategy::params* const c_params,
+    const fstrategy::strategy_params* params,
     rmath::rng* rng)
-    : ledtaxis_cache_search(c_params->saa,
-                            c_params->accessor,
-                            c_params->ledtaxis_target,
-                            rng) {}
-ledtaxis_cache_search::ledtaxis_cache_search(
-    csubsystem::saa_subsystemQ3D* saa,
-    const fsperception::known_objects_accessor* accessor,
-    const rutils::color& ledtaxis_target,
-    rmath::rng* rng)
-    : foraging_strategy(saa, accessor, rng),
+    : foraging_strategy(params, rng),
       ER_CLIENT_INIT("fordyca.fsm.strategy.ledtaxis_cache_search"),
-      m_crw(saa, accessor, rng),
-      m_taxis(saa, accessor, ledtaxis_target, rng) {}
+      m_crw(params, rng),
+      m_taxis(params, rng) {}
 
 
 /*******************************************************************************
@@ -94,43 +85,5 @@ void ledtaxis_cache_search::task_reset(void) {
   m_taxis.task_reset();
   m_crw.task_reset();
 } /* task_reset() */
-
-/*******************************************************************************
- * Interference Metrics
- ******************************************************************************/
-bool ledtaxis_cache_search::exp_interference(void) const {
-  return (m_taxis.task_running() && m_taxis.exp_interference()) ||
-         (m_crw.task_running() && m_crw.exp_interference());
-} /* exp_interference() */
-
-bool ledtaxis_cache_search::entered_interference(void) const {
-  return (m_taxis.task_running() && m_taxis.entered_interference()) ||
-         (m_crw.task_running() && m_crw.entered_interference());
-} /* entered_interference() */
-
-bool ledtaxis_cache_search::exited_interference(void) const {
-  return (m_taxis.task_running() && m_taxis.exited_interference()) ||
-         (m_crw.task_running() && m_crw.exited_interference());
-} /* exited_interference() */
-
-rtypes::timestep ledtaxis_cache_search::interference_duration(void) const {
-  if (m_taxis.task_running()) {
-    return m_taxis.interference_duration();
-  } else if (m_crw.task_running()) {
-    return m_crw.interference_duration();
-  } else {
-    return rtypes::timestep(0);
-  }
-} /* interference_duration() */
-
-rmath::vector3z ledtaxis_cache_search::interference_loc3D(void) const {
-  ER_ASSERT(m_taxis.task_running() || m_crw.task_running(),
-            "In collision interference without running task?");
-  if (m_taxis.task_running()) {
-    return m_taxis.interference_loc3D();
-  } else {
-    return m_crw.interference_loc3D();
-  }
-} /* interference_loc3D() */
 
 NS_END(explore, strategy, fordyca);

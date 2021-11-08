@@ -70,7 +70,7 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
  public:
   block_to_goal_fsm(csfsm::acquire_goal_fsm* goal_fsm,
                     csfsm::acquire_goal_fsm* block_fsm,
-                    csubsystem::saa_subsystemQ3D* saa,
+                    const csfsm::fsm_params* c_no,
                     rmath::rng* rng);
   ~block_to_goal_fsm(void) override = default;
 

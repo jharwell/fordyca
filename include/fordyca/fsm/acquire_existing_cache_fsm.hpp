@@ -69,8 +69,8 @@ class acquire_existing_cache_fsm : public rer::client<acquire_existing_cache_fsm
    * \param for_pickup Are we acquiring a cache for pickup or block drop?
    */
   acquire_existing_cache_fsm(
-      const fsm_ro_params* c_params,
-      csubsystem::saa_subsystemQ3D* saa,
+      const fsm_ro_params* c_ro,
+      const csfsm::fsm_params* c_no,
       std::unique_ptr<csstrategy::base_strategy> exp_behavior,
       rmath::rng* rng,
       bool for_pickup);

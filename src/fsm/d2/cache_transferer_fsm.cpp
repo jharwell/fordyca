@@ -34,13 +34,13 @@ NS_START(fordyca, fsm, d2);
  * Constructors/Destructors
  ******************************************************************************/
 cache_transferer_fsm::cache_transferer_fsm(
-    const fsm_ro_params* c_params,
-    csubsystem::saa_subsystemQ3D* saa,
+    const fsm_ro_params* c_ro,
+    const csfsm::fsm_params* c_no,
     std::unique_ptr<csstrategy::base_strategy> exp_behavior,
     rmath::rng* rng)
-    : block_to_goal_fsm(&m_dest_cache_fsm, &m_src_cache_fsm, saa, rng),
-      m_src_cache_fsm(c_params, saa, exp_behavior->clone(), rng, true),
-      m_dest_cache_fsm(c_params, saa, exp_behavior->clone(), rng, false) {}
+    : block_to_goal_fsm(&m_dest_cache_fsm, &m_src_cache_fsm, c_no, rng),
+      m_src_cache_fsm(c_ro, c_no, exp_behavior->clone(), rng, true),
+      m_dest_cache_fsm(c_ro, c_no, exp_behavior->clone(), rng, false) {}
 
 /*******************************************************************************
  * Block Acquisition Metrics

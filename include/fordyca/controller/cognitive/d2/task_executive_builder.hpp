@@ -49,10 +49,14 @@ NS_START(fordyca, controller, cognitive, d2);
 class task_executive_builder : public d1::task_executive_builder,
                                public rer::client<task_executive_builder> {
  public:
-  task_executive_builder(const controller::cognitive::block_sel_matrix* bsel_matrix,
-                      const controller::cognitive::cache_sel_matrix* csel_matrix,
-                      csubsystem::saa_subsystemQ3D* saa,
-                         fsperception::foraging_perception_subsystem* perception) RCPPSW_COLD;
+  task_executive_builder(
+      const controller::cognitive::block_sel_matrix* bsel_matrix,
+      const controller::cognitive::cache_sel_matrix* csel_matrix,
+      cspatial::interference_tracker* inta,
+      cspatial::nest_zone_tracker* nz,
+      csubsystem::saa_subsystemQ3D* saa,
+      fsperception::foraging_perception_subsystem* perception) RCPPSW_COLD;
+
   ~task_executive_builder(void) override RCPPSW_COLD;
 
   RCPPSW_COLD std::unique_ptr<cta::bi_tdgraph_executive>

@@ -47,11 +47,7 @@ NS_START(fordyca, strategy, explore);
  */
 class likelihood_block_search : public localized_search {
  public:
-  likelihood_block_search(const foraging_strategy::params* const c_params,
-                          rmath::rng* rng);
-
-  likelihood_block_search(csubsystem::saa_subsystemQ3D* saa,
-                          const fsperception::known_objects_accessor* accessor,
+  likelihood_block_search(const fstrategy::strategy_params* const c_params,
                           rmath::rng* rng);
 
   ~likelihood_block_search(void) override = default;
@@ -63,9 +59,20 @@ class likelihood_block_search : public localized_search {
 
   /* prototype overrides */
   std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
-    return std::make_unique<likelihood_block_search>(saa(),
-                                                     accessor(),
-                                                     rng());
+    csfsm::fsm_params fsm_params {
+      saa(),
+      inta_tracker(),
+      nz_tracker(),
+    };
+    fstrategy::strategy_params params {
+      &fsm_params,
+      nullptr,
+      nullptr,
+      accessor(),
+      {}
+    };
+
+    return std::make_unique<likelihood_block_search>(&params, rng());
   }
 };
 

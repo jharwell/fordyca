@@ -46,6 +46,11 @@ namespace ds {
 class bi_tdgraph;
 } /* namespace ds */
 }
+namespace cosm::spatial {
+class interference_tracker;
+class nest_zone_tracker;
+} /* namespace cosm::spatial */
+
 namespace fordyca::controller::config::d1 {
  class controller_repository;
 } /* namespace fordyca::controller::config::d1 */
@@ -71,6 +76,8 @@ class task_executive_builder : public rer::client<task_executive_builder> {
  public:
   task_executive_builder(const controller::cognitive::block_sel_matrix* bsel_matrix,
                          const controller::cognitive::cache_sel_matrix* csel_matrix,
+                         cspatial::interference_tracker* inta,
+                         cspatial::nest_zone_tracker* nz,
                          csubsystem::saa_subsystemQ3D* saa,
                          fsperception::foraging_perception_subsystem* perception) RCPPSW_COLD;
 
@@ -95,6 +102,13 @@ class task_executive_builder : public rer::client<task_executive_builder> {
   RCPPSW_COLD csubsystem::saa_subsystemQ3D* saa(void) const {
     return m_saa;
   }
+  RCPPSW_COLD cspatial::interference_tracker* inta_tracker(void) const {
+    return m_inta_tracker;
+  }
+  RCPPSW_COLD cspatial::nest_zone_tracker* nz_tracker(void) const {
+    return m_nz_tracker;
+  }
+
 
   RCPPSW_COLD const cognitive::block_sel_matrix* block_sel_matrix(void) const {
     return mc_bsel_matrix;
@@ -125,6 +139,8 @@ class task_executive_builder : public rer::client<task_executive_builder> {
   const controller::cognitive::cache_sel_matrix* const mc_csel_matrix;
   const controller::cognitive::block_sel_matrix* const mc_bsel_matrix;
 
+  cspatial::interference_tracker* const                m_inta_tracker;
+  cspatial::nest_zone_tracker* const                   m_nz_tracker;
   csubsystem::saa_subsystemQ3D* const                  m_saa;
   fsperception::foraging_perception_subsystem* const   m_perception;
 

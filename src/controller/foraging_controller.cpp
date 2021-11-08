@@ -38,6 +38,8 @@
 #include "cosm/subsystem/config/sensing_subsystemQ3D_config.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/tv/robot_dynamics_applicator.hpp"
+#include "cosm/spatial/interference_tracker.hpp"
+#include "cosm/spatial/nest_zone_tracker.hpp"
 
 #include "fordyca/controller/config/foraging_controller_repository.hpp"
 
@@ -57,11 +59,6 @@ foraging_controller::~foraging_controller(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool foraging_controller::in_nest(void) const {
-  return saa()->sensing()->ground()->detect(
-      chal::sensors::ground_sensor::kNestTarget);
-} /* in_nest() */
-
 bool foraging_controller::block_detected(void) const {
   return saa()->sensing()->ground()->detect("block");
 } /* block_detected() */
@@ -93,6 +90,11 @@ void foraging_controller::init(ticpp::Element& node) {
 
   /* initialize supervisor */
   supervisor(std::make_unique<cfsm::supervisor_fsm>(saa()));
+
+  /* initialize state trackers */
+  inta_tracker(std::make_unique<cspatial::interference_tracker>(saa()->sensing()));
+  m_nz_tracker = std::make_unique<cspatial::nest_zone_tracker>(saa()->sensing());
+
   ndc_pop();
 } /* init() */
 
@@ -277,5 +279,14 @@ rmath::vector3d foraging_controller::ts_velocity(
   }
   return {};
 } /* ts_velocity() */
+
+/*******************************************************************************
+ * Nest Zone Metrics
+ ******************************************************************************/
+RCPPSW_WRAP_DEF(foraging_controller, in_nest, *m_nz_tracker, const)
+RCPPSW_WRAP_DEF(foraging_controller, entered_nest, *m_nz_tracker, const);
+RCPPSW_WRAP_DEF(foraging_controller, exited_nest, *m_nz_tracker, const);
+RCPPSW_WRAP_DEF(foraging_controller, nest_duration, *m_nz_tracker, const);
+RCPPSW_WRAP_DEF(foraging_controller, nest_entry_time, *m_nz_tracker, const);
 
 NS_END(controller, fordyca);

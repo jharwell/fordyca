@@ -63,7 +63,7 @@ class crw_fsm final : public cffsm::foraging_util_hfsm,
                       public cfsm::metrics::block_transporter_metrics,
                       public cta::taskable {
  public:
-  crw_fsm(csubsystem::saa_subsystemQ3D* saa,
+  crw_fsm(const csfsm::fsm_params* params,
           std::unique_ptr<csstrategy::base_strategy> explore,
           std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
           const rmath::vector2d& nest_loc,
@@ -71,13 +71,6 @@ class crw_fsm final : public cffsm::foraging_util_hfsm,
 
   crw_fsm(const crw_fsm&) = delete;
   crw_fsm& operator=(const crw_fsm&) = delete;
-
-  /* interference metrics */
-  bool exp_interference(void) const override RCPPSW_PURE;
-  bool entered_interference(void) const override RCPPSW_PURE;
-  bool exited_interference(void) const override RCPPSW_PURE;
-  rtypes::timestep interference_duration(void) const override RCPPSW_PURE;
-  rmath::vector3z interference_loc3D(void) const override RCPPSW_PURE;
 
   /* goal acquisition metrics */
   csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCPPSW_PURE;

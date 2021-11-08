@@ -28,7 +28,7 @@
 
 #include "rcppsw/patterns/fsm/base_fsm.hpp"
 
-#include "fordyca//controller/foraging_controller.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -128,8 +128,14 @@ void dpo_controller::private_init(
   const auto* strat_config =
       config_repo.config_get<fsconfig::strategy_config>();
 
-  auto strategy_params = fstrategy::foraging_strategy::params{
-    saa(),
+  csfsm::fsm_params fsm_params {
+      saa(),
+      inta_tracker(),
+      nz_tracker(),
+    };
+
+  auto strategy_params = fstrategy::strategy_params{
+    &fsm_params,
     nullptr,
     nullptr,
     nullptr,
@@ -144,11 +150,13 @@ void dpo_controller::private_init(
   };
   m_fsm = std::make_unique<fsm::d0::dpo_fsm>(
       &fsm_ro_params,
-      saa(),
-      fsexplore::block_factory().create(
-          strat_config->explore.block_strategy, &strategy_params, rng()),
-      csstrategy::nest_acq::factory().create(
-          strat_config->nest_acq.strategy, saa(), rng()),
+      &fsm_params,
+      fsexplore::block_factory().create(strat_config->explore.block_strategy,
+                                        &strategy_params,
+                                        rng()),
+      csstrategy::nest_acq::factory().create(strat_config->nest_acq.strategy,
+                                             &fsm_params,
+                                             rng()),
       rng());
 
   /* Set DPO FSM supervision */

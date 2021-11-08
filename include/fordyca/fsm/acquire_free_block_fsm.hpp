@@ -57,8 +57,8 @@ NS_START(fordyca, fsm);
 class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
                                public csfsm::acquire_goal_fsm {
  public:
-  acquire_free_block_fsm(const fsm_ro_params* c_params,
-                         csubsystem::saa_subsystemQ3D* saa,
+  acquire_free_block_fsm(const fsm_ro_params* c_ro,
+                         const csfsm::fsm_params* c_no,
                          std::unique_ptr<csstrategy::base_strategy> exp_behavior,
                          rmath::rng* rng);
 

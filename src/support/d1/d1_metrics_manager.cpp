@@ -126,7 +126,7 @@ void d1_metrics_manager::task_finish_or_abort_cb(
 } /* task_finish_or_abort_cb() */
 
 void d1_metrics_manager::task_start_cb(const cta::polled_task* const,
-                                          const cta::ds::bi_tab* const tab) {
+                                       const cta::ds::bi_tab* const tab) {
   /* Not using stochastic nbhd policy */
   if (nullptr == tab) {
     return;
@@ -153,7 +153,7 @@ void d1_metrics_manager::register_standard(
   rmetrics::creatable_collector_set creatable_set = {
     { typeid(csmetrics::goal_acq_metrics_collector),
       "cache_acq_counts",
-      "caches::acq_counts",
+      "caches::acq::counts",
       rmetrics::output_mode::ekAPPEND },
     { typeid(ctametrics::execution_metrics_collector),
       "task_execution_collector",
@@ -220,15 +220,15 @@ void d1_metrics_manager::register_with_arena_dims2D(
   rmetrics::creatable_collector_set creatable_set = {
     { typeid(csmetrics::goal_acq_locs2D_metrics_collector),
       "cache_acq_locs2D",
-      "caches::acq_locs2D",
+      "caches::acq::locs2D",
       rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE },
     { typeid(csmetrics::explore_locs2D_metrics_collector),
       "cache_acq_explore_locs2D",
-      "caches::acq_explore_locs2D",
+      "caches::acq::explore_locs2D",
       rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE },
     { typeid(csmetrics::vector_locs2D_metrics_collector),
       "cache_acq_vector_locs2D",
-      "caches::acq_vector_locs2D",
+      "caches::acq::vector_locs2D",
       rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE },
     { typeid(cametrics::caches::location_metrics_collector),
       "cache_locations",

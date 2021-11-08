@@ -51,11 +51,7 @@ NS_START(strategy, explore);
  */
 class likelihood_cache_search : public localized_search {
  public:
-  likelihood_cache_search(const foraging_strategy::params* const c_params,
-                          rmath::rng* rng);
-
-  likelihood_cache_search(csubsystem::saa_subsystemQ3D* saa,
-                          const fsperception::known_objects_accessor* accessor,
+  likelihood_cache_search(const fstrategy::strategy_params* const c_params,
                           rmath::rng* rng);
 
   ~likelihood_cache_search(void) override = default;
@@ -67,7 +63,20 @@ class likelihood_cache_search : public localized_search {
 
   /* prototype overrides */
   std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
-    return std::make_unique<likelihood_cache_search>(saa(), accessor(), rng());
+    csfsm::fsm_params fsm_params {
+      saa(),
+      inta_tracker(),
+      nz_tracker(),
+    };
+    fstrategy::strategy_params params {
+      &fsm_params,
+      nullptr,
+      nullptr,
+      accessor(),
+      {}
+    };
+
+    return std::make_unique<likelihood_cache_search>(&params, rng());
   }
 };
 
