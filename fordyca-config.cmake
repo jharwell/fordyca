@@ -4,6 +4,11 @@
 # We are building a shared library
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+# Each conference tag=minor increment. Each minor feature added=patch increment.
+set(PROJECT_VERSION_MAJOR 1)
+set(PROJECT_VERSION_MINOR 3)
+set(PROJECT_VERSION_PATCH 0)
+
 set(FORDYCA_WITH_ROBOT_RAB "NO" CACHE STRING "Enable robots to read/write over the RAB medium via sensors/actuators.")
 set(FORDYCA_WITH_ROBOT_BATTERY "NO" CACHE STRING "Enable robots to use the battery.")
 set(FORDYCA_WITH_ROBOT_LEDS "NO" CACHE STRING "Enable robots to use their LEDs.")
@@ -118,6 +123,20 @@ target_include_directories(${target} PUBLIC ${${target}_INCLUDE_DIRS})
 target_include_directories(${target} SYSTEM PUBLIC ${${target}_SYS_INCLUDE_DIRS})
 target_link_libraries(${target} ${${target}_LIBRARIES})
 target_link_directories(${target} PUBLIC ${${target}_LIBRARY_DIRS})
+
+################################################################################
+# Installation                                                                 #
+################################################################################
+# Define package dependencies
+set(${target}_PACKAGE_DEPENDS
+  ${cosm_PACKAGE_DEPENDS}
+  )
+
+set(CPACK_DEBIAN_PACKAGE_DEPENDS
+  ${cosm_PACKAGE_DEPENDS}
+  )
+
+set(CPACK_PACKAGE_CONTACT "John Harwell")
 
 ################################################################################
 # Compile Options/Definitions                                                  #
