@@ -29,6 +29,12 @@
 #include "fordyca/support/mpl/free_block_pickup_spec.hpp"
 #include "fordyca/support/mpl/nest_block_drop_spec.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
+#include "fordyca/controller/cognitive/d0/events/nest_block_drop.hpp"
+#include "fordyca/controller/cognitive/d0/events/free_block_pickup.hpp"
+#include "fordyca/controller/cognitive/d0/events/block_vanished.hpp"
+#include "fordyca/controller/reactive/d0/events/nest_block_drop.hpp"
+#include "fordyca/controller/reactive/d0/events/free_block_pickup.hpp"
+#include "fordyca/controller/reactive/d0/events/block_vanished.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,9 +56,12 @@ NS_START(fordyca, support, d0);
  * - Picking up a free block.
  * - Dropping a carried block in the nest.
  */
-template <typename TController, typename TArenaMap>
-class robot_arena_interactor final : public rer::client<robot_arena_interactor<TController,
-                                                                               TArenaMap>> {
+template <typename TController,
+          typename TArenaMap>
+class robot_arena_interactor final : public rer::client<
+  robot_arena_interactor<TController,
+                         TArenaMap>
+  > {
  public:
   robot_arena_interactor(TArenaMap* const map,
                          d0_metrics_manager *const metrics_agg,
@@ -86,8 +95,33 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
   }
 
  private:
-  using pickup_spec = mpl::free_block_pickup_spec<controller::d0::typelist>;
-  using drop_spec = mpl::nest_block_drop_spec<controller::d0::typelist>;
+  using robot_block_vanished_visitor_type = typename std::conditional<
+   fcontroller::d0::is_cognitive<TController>::value,
+   fccd0::events::block_vanished_visitor,
+   fcrd0::events::block_vanished_visitor
+   >::type;
+
+  using robot_free_block_pickup_visitor_type = typename std::conditional<
+   fcontroller::d0::is_cognitive<TController>::value,
+   fccd0::events::free_block_pickup_visitor,
+   fcrd0::events::free_block_pickup_visitor
+    >::type;
+
+  using robot_nest_block_drop_visitor_type = typename std::conditional<
+   fcontroller::d0::is_cognitive<TController>::value,
+   fccd0::events::nest_block_drop_visitor,
+   fcrd0::events::nest_block_drop_visitor
+    >::type;
+
+  using pickup_spec = mpl::free_block_pickup_spec<
+    controller::d0::typelist,
+    robot_block_vanished_visitor_type,
+    robot_free_block_pickup_visitor_type
+    >;
+  using drop_spec = mpl::nest_block_drop_spec<
+    controller::d0::typelist,
+    robot_nest_block_drop_visitor_type
+    >;
 
   /* clang-format off */
   free_block_pickup_interactor<TController, pickup_spec> m_free_pickup;

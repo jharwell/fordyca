@@ -34,14 +34,13 @@
 #include "cosm/ta/polled_task.hpp"
 
 #include "fordyca/subsystem/perception/ds/dpo_store.hpp"
-#include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
-#include "fordyca/events/robot_cached_block_pickup.hpp"
 #include "fordyca/fsm/cache_acq_validator.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/support/interactor_status.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
+#include "fordyca/support/base_loop_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,10 +57,18 @@ NS_START(fordyca, support);
  * \brief Handles a robot's (possible) \ref cached_block_pickup event on a given
  * timestep.
  */
-template <typename TController>
-class cached_block_pickup_interactor
-    : public rer::client<cached_block_pickup_interactor<TController>> {
+template <typename TController, typename TControllerSpecMap>
+class cached_block_pickup_interactor : public rer::client<
+  cached_block_pickup_interactor<TController, TControllerSpecMap>
+  > {
  public:
+  using controller_spec =
+      typename boost::mpl::at<TControllerSpecMap, TController>::type;
+  using robot_cache_vanished_visitor_type =
+      typename controller_spec::robot_cache_vanished_visitor_type;
+  using robot_cached_block_pickup_visitor_type =
+      typename controller_spec::robot_cached_block_pickup_visitor_type;
+
   cached_block_pickup_interactor(carena::caching_arena_map* const map_in,
                                  argos::CFloorEntity* const floor_in,
                                  tv::env_dynamics* envd,
@@ -155,7 +162,7 @@ class cached_block_pickup_interactor
       m_map->unlock_wr(m_map->block_mtx());
       m_map->unlock_wr(m_map->cache_mtx());
 
-      events::cache_vanished_visitor vanished_op(p.id());
+      robot_cache_vanished_visitor_type vanished_op(p.id());
       vanished_op.visit(controller);
     } else {
       fsm::cache_acq_validator v(controller.perception()->known_objects()->known_caches(),
@@ -258,7 +265,7 @@ class cached_block_pickup_interactor
       ER_ASSERT(zombie_it != m_map->zombie_caches().end(),
                 "Depleted cache%d is not a zombie?",
                 penalty.id().v());
-      events::robot_cached_block_pickup_visitor robot_zombie_pickup(
+      robot_cached_block_pickup_visitor_type robot_zombie_pickup(
           zombie_it->get(), to_pickup, controller.entity_id(), t);
 
       /* 2nd, visit the controller (depletion case) */
@@ -273,7 +280,7 @@ class cached_block_pickup_interactor
       m_cache_manager->cache_depleted(t - (*zombie_it)->creation_ts());
       return interactor_status::ekCACHE_DEPLETION;
     } else {
-      events::robot_cached_block_pickup_visitor robot_real_pickup(
+      robot_cached_block_pickup_visitor_type robot_real_pickup(
           *real_it, to_pickup, controller.entity_id(), t);
 
       /* 2nd, visit the controller (normal case) */

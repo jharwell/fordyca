@@ -48,7 +48,8 @@ NS_START(fordyca, support, config, tv);
  * \brief Parses XML parameters for \ref env_dynamics into \ref
  * env_dynamics_config.
  */
-class env_dynamics_parser final : public rconfig::xml::xml_config_parser {
+class env_dynamics_parser final : public rer::client<env_dynamics_parser>,
+                                  public rconfig::xml::xml_config_parser {
  public:
   using config_type = env_dynamics_config;
 

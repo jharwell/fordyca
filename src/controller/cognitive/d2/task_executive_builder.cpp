@@ -221,13 +221,13 @@ void task_executive_builder::d2_exec_est_init(
     graph->tab_child(graph->root_tab(), graph->root_tab()->child2())
         ->last_subtask(cache_collector);
   }
-  rmath::rangeu cs_bounds =
+  rmath::rangez cs_bounds =
       task_config->exec_est.ranges.find("cache_starter")->second;
-  rmath::rangeu cf_bounds =
+  rmath::rangez cf_bounds =
       task_config->exec_est.ranges.find("cache_finisher")->second;
-  rmath::rangeu ct_bounds =
+  rmath::rangez ct_bounds =
       task_config->exec_est.ranges.find("cache_transferer")->second;
-  rmath::rangeu cc_bounds =
+  rmath::rangez cc_bounds =
       task_config->exec_est.ranges.find("cache_collector")->second;
 
   ER_INFO("Seeding exec estimate for tasks: '%s'=%s, '%s'=%s",

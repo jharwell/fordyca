@@ -24,8 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "cosm/pal/tv/argos_pd_adaptor.hpp"
-#include "cosm/pal/argos_controller2D_adaptor.hpp"
+#include "cosm/pal/argos/tv/pd_adaptor.hpp"
+#include "cosm/pal/controller/controller2D.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -51,10 +51,10 @@ NS_START(fordyca, support, tv);
  * during population dynamics application.
  */
 class fordyca_pd_adaptor final : rer::client<fordyca_pd_adaptor>,
-                                 public cptv::argos_pd_adaptor<cpal::argos_controller2D_adaptor>{
+                                 public cpargos::tv::pd_adaptor<cpcontroller::controller2D>{
  public:
   fordyca_pd_adaptor(const ctv::config::population_dynamics_config* config,
-                     cpal::argos_sm_adaptor* sm,
+                     cpargos::swarm_manager_adaptor* sm,
                      env_dynamics_type *envd,
                      carena::caching_arena_map* map,
                      rmath::rng* rng);
@@ -64,7 +64,7 @@ class fordyca_pd_adaptor final : rer::client<fordyca_pd_adaptor>,
   const fordyca_pd_adaptor& operator=(const fordyca_pd_adaptor&) = delete;
 
   /* ARGoS PD apdaptor overrides */
-  void pre_kill_cleanup(cpal::argos_controller2D_adaptor* controller) override;
+  void pre_kill_cleanup(cpcontroller::controller2D* controller) override;
 
  private:
   /* clang-format off */

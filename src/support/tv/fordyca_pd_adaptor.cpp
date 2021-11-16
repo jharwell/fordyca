@@ -27,7 +27,7 @@
 #include "cosm/arena/operations/free_block_drop.hpp"
 #include "cosm/repr/base_block3D.hpp"
 
-#include "fordyca//controller/foraging_controller.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -39,12 +39,12 @@ NS_START(fordyca, support, tv);
  ******************************************************************************/
 fordyca_pd_adaptor::fordyca_pd_adaptor(
     const ctv::config::population_dynamics_config* config,
-    cpal::argos_sm_adaptor* sm,
+    cpargos::swarm_manager_adaptor* sm,
     env_dynamics_type* envd,
     carena::caching_arena_map* map,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.support.tv.fordyca_pd_adaptor"),
-      argos_pd_adaptor<cpal::argos_controller2D_adaptor>(
+      pd_adaptor<cpcontroller::controller2D>(
           config,
           sm,
           envd,
@@ -56,7 +56,7 @@ fordyca_pd_adaptor::fordyca_pd_adaptor(
  * Member Functions
  ******************************************************************************/
 void fordyca_pd_adaptor::pre_kill_cleanup(
-    cpal::argos_controller2D_adaptor* controller) {
+    cpcontroller::controller2D* controller) {
   auto* foraging = static_cast<controller::foraging_controller*>(controller);
   /*
    * If the robot is carrying a block, drop/distribute it in the arena to avoid

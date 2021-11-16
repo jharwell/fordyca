@@ -183,7 +183,7 @@
             <avoidance_force lookahead="0.5"
                              max="0.08"/>
             <arrival_force slowing_radius="0.2"
-                           slowing_speed_min="1.0"
+                           slowing_speed_min="0.01"
                            max="0.08"/>
             <wander_force circle_distance="4.0"
                           circle_radius="100.0"
@@ -412,7 +412,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,10,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      
+
       <entity quantity="1" max_trials="1000">
         <foot-bot id="fb" omnidirectional_camera_aperture="89">
           <controller config="fbc" />

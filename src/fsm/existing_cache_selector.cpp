@@ -85,14 +85,14 @@ existing_cache_selector::operator()(const fspds::dp_cache_map& existing_caches,
     }
   } /* for(existing_cache..) */
 
-  ER_CHECKI(nullptr != best,
+  ER_CONDI(nullptr != best,
             "Best utility: existing_cache%d@%s/%s w/%zu blocks: %f",
             best->id().v(),
             rcppsw::to_string(best->rcenter2D()).c_str(),
             rcppsw::to_string(best->dcenter2D()).c_str(),
             best->n_blocks(),
             max_utility);
-  ER_CHECKD(nullptr != best,
+  ER_CONDD(nullptr == best,
             "No best existing cache found: all known caches excluded!");
   return best;
 } /* operator()() */

@@ -82,14 +82,14 @@ new_cache_selector::operator()(const fspds::dp_block_map& new_caches,
     }
   } /* for(new_cache..) */
 
-  ER_CHECKI(nullptr != best,
+  ER_CONDI(nullptr != best,
             "Best utility: new cache%d@%s/%s: %f",
             best->id().v(),
             rcppsw::to_string(best->ranchor2D()).c_str(),
             rcppsw::to_string(best->danchor2D()).c_str(),
             max_utility);
 
-  ER_CHECKW(nullptr != best,
+  ER_CONDW(nullptr == best,
             "No best new cache found: all known new caches excluded!");
   return best;
 } /* operator() */

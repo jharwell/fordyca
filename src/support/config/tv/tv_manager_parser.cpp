@@ -45,6 +45,10 @@ void tv_manager_parser::parse(const ticpp::Element& node) {
     return;
   }
 
+  ER_DEBUG("Parent node=%s: search for child=%s",
+           node.Value().c_str(),
+           kXMLRoot.c_str());
+
   ticpp::Element tvnode = node_get(node, kXMLRoot);
 
   m_envd.parse(tvnode);
@@ -62,7 +66,13 @@ void tv_manager_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 bool tv_manager_parser::validate(void) const {
-  return m_envd.validate() && m_popd.validate();
+  ER_CHECK(m_envd.validate(), "Environmental dynamics validation failed");
+  ER_CHECK(m_popd.validate(), "Population dynamics validation failed");
+
+  return true;
+
+error:
+  return false;
 } /* validate() */
 
 NS_END(tv, config, support, fordyca);

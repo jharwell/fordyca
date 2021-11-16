@@ -37,6 +37,10 @@ void perception_parser::parse(const ticpp::Element& node) {
     return;
   }
 
+  ER_DEBUG("Parent node=%s: search for child=%s",
+           node.Value().c_str(),
+           kXMLRoot.c_str());
+
   ticpp::Element pnode = node_get(node, kXMLRoot);
   m_config = std::make_unique<config_type>();
 
@@ -57,8 +61,8 @@ bool perception_parser::validate(void) const {
   if (!is_parsed()) {
     return true;
   }
-  RCPPSW_CHECK(m_dpo.validate());
-  RCPPSW_CHECK(m_mdpo.validate());
+  ER_CHECK(m_dpo.validate(), "DPO validation failed");
+  ER_CHECK(m_mdpo.validate(), "MDPO validation failed");
 
   return true;
 

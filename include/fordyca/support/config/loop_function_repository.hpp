@@ -26,7 +26,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "cosm/pal/config/xml/base_sm_repository.hpp"
+#include "cosm/pal/config/xml/base_swarm_manager_repository.hpp"
 
 #include "fordyca/fordyca.hpp"
 
@@ -45,7 +45,7 @@ NS_START(fordyca, support, config);
  * \brief Extra loop function XML parsers/results specific to the FORDYCA
  * project.
  */
-class loop_function_repository : public cpal::config::xml::base_sm_repository {
+class loop_function_repository : public cpal::config::xml::base_swarm_manager_repository {
  public:
   loop_function_repository(void) noexcept RCPPSW_COLD;
 };

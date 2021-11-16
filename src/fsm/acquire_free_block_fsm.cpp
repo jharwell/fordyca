@@ -85,7 +85,7 @@ acquire_free_block_fsm::acquire_free_block_fsm(
  * Member Functions
  ******************************************************************************/
 bool acquire_free_block_fsm::block_exploration_term_cb(void) const {
-  return saa()->sensing()->ground()->detect("block");
+  return saa()->sensing()->env()->detect("block");
 } /* block_exploration_term_cb() */
 
 bool acquire_free_block_fsm::block_acquired_cb(bool explore_result) const {
@@ -94,7 +94,7 @@ bool acquire_free_block_fsm::block_acquired_cb(bool explore_result) const {
               "No block detected after successful exploration?");
     return true;
   } else {
-    if (saa()->sensing()->ground()->detect("block")) {
+    if (saa()->sensing()->env()->detect("block")) {
       return true;
     }
     ER_WARN("Robot arrived at goal, but no block was detected.");

@@ -48,9 +48,13 @@ NS_START(fordyca, controller, config, block_sel);
  * \brief Parses XML parameters for the \ref block_sel_matrix at the start
  * of simulation.
  */
-class block_sel_matrix_parser final : public rconfig::xml::xml_config_parser {
+class block_sel_matrix_parser final : public rer::client<block_sel_matrix_parser>,
+                                      public rconfig::xml::xml_config_parser {
  public:
   using config_type = block_sel_matrix_config;
+
+  block_sel_matrix_parser(void)
+      : ER_CLIENT_INIT("fordyca.controller.config.block_sel.block_sel_matrix_parser") {}
 
   /**
    * \brief The root tag that all block sel matrix parameters should lie

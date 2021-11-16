@@ -25,9 +25,9 @@
 
 #include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 
-#include "fordyca/events/cache_vanished.hpp"
-#include "fordyca/events/robot_cached_block_pickup.hpp"
-#include "fordyca/events/robot_nest_block_drop.hpp"
+#include "fordyca/controller/cognitive/d1/events/cache_vanished.hpp"
+#include "fordyca/controller/cognitive/d1/events/cached_block_pickup.hpp"
+#include "fordyca/controller/cognitive/d1/events/nest_block_drop.hpp"
 #include "fordyca/fsm/d1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/tasks/argument.hpp"
@@ -104,13 +104,13 @@ void collector::active_interface_update(int) {
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void collector::accept(events::detail::robot_cached_block_pickup& visitor) {
+void collector::accept(fccd1::events::cached_block_pickup& visitor) {
   visitor.visit(*this);
 }
-void collector::accept(events::detail::robot_nest_block_drop& visitor) {
+void collector::accept(fccd1::events::nest_block_drop& visitor) {
   visitor.visit(*this);
 }
-void collector::accept(events::detail::cache_vanished& visitor) {
+void collector::accept(fccd1::events::cache_vanished& visitor) {
   visitor.visit(*this);
 }
 

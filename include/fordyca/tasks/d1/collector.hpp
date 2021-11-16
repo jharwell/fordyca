@@ -51,8 +51,8 @@ NS_START(fordyca, tasks, d1);
  * nest. It is abortable, and has one task interface.
  */
 class collector : public foraging_task,
-                  public events::existing_cache_interactor,
-                  public events::nest_interactor,
+                  public fevents::existing_cache_interactor,
+                  public fevents::nest_interactor,
                   public rer::client<collector> {
  public:
   collector(const struct cta::config::task_alloc_config* config,
@@ -63,15 +63,27 @@ class collector : public foraging_task,
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,
-   * because when visiting a \ref existing_cache_interactor, you have no way to
-   * way which task the object ACTUALLY is without using a set of if()
-   * statements, which is a brittle design. This is not the cleanest, but is
-   * still more elegant than the alternative.
+   * because when visiting a given task which is a member of a set of tasks
+   * which all implement the same interface, you have no way to way which task
+   * the object ACTUALLY is without using a set of if() statements, which is a
+   * brittle design. This is not the cleanest, but is still more elegant than
+   * the alternative.
+   *
+   * I wish you didn't have to stub out the d0 and d2 events.
    */
-  void accept(events::detail::robot_cached_block_pickup& visitor) override;
-  void accept(events::detail::robot_nest_block_drop& visitor) override;
-  void accept(events::detail::cache_vanished& visitor) override;
-  void accept(events::detail::robot_cache_block_drop&) override {}
+  /* cache interaction events */
+  void accept(fccd1::events::cached_block_pickup& visitor) override;
+  void accept(fccd1::events::cache_vanished& visitor) override;
+  void accept(fccd1::events::cache_block_drop&) override {}
+
+  void accept(fccd2::events::cached_block_pickup&) override {}
+  void accept(fccd2::events::cache_vanished&) override {}
+  void accept(fccd2::events::cache_block_drop&) override {}
+
+  /* nest interaction events */
+  void accept(fccd0::events::nest_block_drop&) override {}
+  void accept(fccd1::events::nest_block_drop& visitor) override;
+  void accept(fccd2::events::nest_block_drop&) override {}
 
   /* goal acquisition metrics */
   RCPPSW_WRAP_DECL_OVERRIDE(bool, goal_acquired, const);

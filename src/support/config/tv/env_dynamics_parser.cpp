@@ -32,7 +32,7 @@ NS_START(fordyca, support, config, tv);
  * Constructors/Destructor
  ******************************************************************************/
 env_dynamics_parser::env_dynamics_parser(void)
-     {
+      : ER_CLIENT_INIT("fordyca.support.config.env_dynamics_parser") {
        m_motion.xml_root("motion_throttle");
        m_block_manip.xml_root("manipulation_penalty");
        m_block_carry.xml_root("carry_throttle");
@@ -49,6 +49,10 @@ void env_dynamics_parser::parse(const ticpp::Element& node) {
   if (nullptr == node.FirstChild(kXMLRoot, false)) {
     return;
   }
+
+  ER_DEBUG("Parent node=%s: search for child=%s",
+           node.Value().c_str(),
+           kXMLRoot.c_str());
 
   ticpp::Element tvnode = node_get(node, kXMLRoot);
   m_config = std::make_unique<config_type>();
@@ -89,8 +93,15 @@ void env_dynamics_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 bool env_dynamics_parser::validate(void) const {
-  return m_block_manip.validate() && m_block_carry.validate() &&
-         m_cache_usage.validate();
+  ER_CHECK(m_block_manip.validate(),
+           "Block manipulation dynamics validation faild");
+  ER_CHECK(m_block_carry.validate(), "Block carry validation failed");
+  ER_CHECK(m_cache_usage.validate(), "Cache usage validation failed");
+
+  return true;
+
+error:
+  return false;
 } /* validate() */
 
 NS_END(tv, config, support, fordyca);

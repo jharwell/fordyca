@@ -25,9 +25,9 @@ v * \file generalist.cpp
 
 #include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 
-#include "fordyca/events/block_vanished.hpp"
-#include "fordyca/events/robot_free_block_pickup.hpp"
-#include "fordyca/events/robot_nest_block_drop.hpp"
+#include "fordyca/controller/cognitive/d0/events/block_vanished.hpp"
+#include "fordyca/controller/cognitive/d0/events/free_block_pickup.hpp"
+#include "fordyca/controller/cognitive/d0/events/nest_block_drop.hpp"
 #include "fordyca/fsm/d0/free_block_to_nest_fsm.hpp"
 
 /*******************************************************************************
@@ -58,13 +58,13 @@ rtypes::timestep generalist::current_time(void) const {
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void generalist::accept(events::detail::robot_nest_block_drop& visitor) {
+void generalist::accept(fccd0::events::nest_block_drop& visitor) {
   visitor.visit(*this);
 }
-void generalist::accept(events::detail::robot_free_block_pickup& visitor) {
+void generalist::accept(fccd0::events::free_block_pickup& visitor) {
   visitor.visit(*this);
 }
-void generalist::accept(events::detail::block_vanished& visitor) {
+void generalist::accept(fccd0::events::block_vanished& visitor) {
   visitor.visit(*this);
 }
 

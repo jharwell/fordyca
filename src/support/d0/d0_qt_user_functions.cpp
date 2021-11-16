@@ -89,6 +89,7 @@ RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
 RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 REGISTER_QTOPENGL_USER_FUNCTIONS(d0_qt_user_functions,
                                  "d0_qt_user_functions"); // NOLINT
+
 RCPPSW_WARNING_DISABLE_POP()
 
 NS_END(d0, support, fordyca);

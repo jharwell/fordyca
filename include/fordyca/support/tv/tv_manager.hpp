@@ -27,7 +27,6 @@
 #include "cosm/tv/tv_manager.hpp"
 
 #include "fordyca/support/tv/env_dynamics.hpp"
-#include "cosm/pal/tv/argos_pd_adaptor.hpp"
 #include "fordyca/support/tv/fordyca_pd_adaptor.hpp"
 
 /*******************************************************************************

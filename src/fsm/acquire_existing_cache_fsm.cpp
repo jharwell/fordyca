@@ -149,7 +149,7 @@ bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) const {
     ER_FATAL_SENTINEL("Robot acquired cache via exploration");
     return false;
   } else {
-    if (saa()->sensing()->ground()->detect("cache")) {
+    if (saa()->sensing()->env()->detect("cache")) {
       return true;
     }
     ER_WARN("Robot arrived at goal, but no cache was detected");

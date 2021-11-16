@@ -116,7 +116,7 @@ void occupancy_grid::cell_state_update(size_t i, size_t j) {
              i,
              j,
              kEPSILON);
-    events::cell2D_unknown_visitor op(cell.loc());
+    fevents::cell2D_unknown_visitor op(cell.loc());
     op.visit(*this);
     density.reset();
   }

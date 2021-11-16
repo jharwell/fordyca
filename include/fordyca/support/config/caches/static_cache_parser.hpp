@@ -46,9 +46,13 @@ NS_START(fordyca, support, config, caches);
  *
  * \brief Parses XML parameters for relating to cache into \ref caches_config.
  */
-class static_cache_parser final: public rconfig::xml::xml_config_parser {
+class static_cache_parser final: public rer::client<static_cache_parser>,
+                                 public rconfig::xml::xml_config_parser {
  public:
   using config_type = static_cache_config;
+
+  static_cache_parser(void)
+      : ER_CLIENT_INIT("fordyca.support.config.caches.static_cache_parser") {}
 
   /**
    * \brief The root tag that all static cache parameters should lie under in

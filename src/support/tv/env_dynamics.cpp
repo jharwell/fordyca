@@ -60,17 +60,17 @@ rtypes::timestep env_dynamics::cache_usage_penalty(void) const {
       ->penalty_calc(m_timestep);
 } /* cache_usage_penalty() */
 
-void env_dynamics::register_controller(const cpal::argos_controller2D_adaptor& c) {
+void env_dynamics::register_controller(const cpcontroller::controller2D& c) {
   m_rda.register_controller(c.entity_id());
 } /* register_controller() */
 
 void env_dynamics::unregister_controller(
-    const cpal::argos_controller2D_adaptor& c) {
+    const cpcontroller::controller2D& c) {
   m_rda.unregister_controller(c.entity_id());
   penalties_flush(c);
 } /* unregister_controller() */
 
-bool env_dynamics::penalties_flush(const cpal::argos_controller2D_adaptor& c) {
+bool env_dynamics::penalties_flush(const cpcontroller::controller2D& c) {
   bool aborted = false;
   for (auto& h : all_penalty_handlers()) {
     if (h->is_serving_penalty(c)) {

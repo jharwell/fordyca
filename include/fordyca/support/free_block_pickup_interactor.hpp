@@ -53,15 +53,22 @@ NS_START(fordyca, support);
 template <typename TController, typename TControllerSpecMap>
 class free_block_pickup_interactor final :
 
-    public cinteractors::base_arena_block_pickup<TController, TControllerSpecMap> {
+    public cinteractors::base_arena_block_pickup<
+  TController,
+  TControllerSpecMap> {
  public:
-  using typename cinteractors::
-      base_arena_block_pickup<TController, TControllerSpecMap>::arena_map_type;
-  using typename cinteractors::
-  base_arena_block_pickup<TController, TControllerSpecMap>::robot_block_vanished_visitor_type;
+  using typename cinteractors::base_arena_block_pickup<
+   TController,
+   TControllerSpecMap
+   >::arena_map_type;
+  using typename cinteractors::base_arena_block_pickup<
+    TController,
+    TControllerSpecMap
+    >::robot_block_vanished_visitor_type;
   using typename cinteractors::base_arena_block_pickup<
       TController,
-      TControllerSpecMap>::penalty_handler_type;
+      TControllerSpecMap
+    >::penalty_handler_type;
 
   free_block_pickup_interactor(arena_map_type* const map,
                                argos::CFloorEntity* const floor,

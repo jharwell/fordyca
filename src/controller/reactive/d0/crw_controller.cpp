@@ -137,6 +137,7 @@ bool crw_controller::is_phototaxiing_to_goal(bool include_ca) const {
   return m_fsm->is_phototaxiing_to_goal(include_ca);
 } /* is_phototaxiing_to_goal() */
 
+#if defined(COSM_PAL_TARGET_ARGOS)
 using namespace argos; // NOLINT
 
 RCPPSW_WARNING_DISABLE_PUSH()
@@ -147,5 +148,7 @@ RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 REGISTER_CONTROLLER(crw_controller, "crw_controller");
 
 RCPPSW_WARNING_DISABLE_POP()
+
+#endif
 
 NS_END(reactive, d0, controller, fordyca);

@@ -49,9 +49,13 @@ NS_START(fordyca, strategy, config);
  * \brief Parses XML configuration for how robots should DO things into \ref
  * strategy_config.
  */
-class strategy_parser final : public rconfig::xml::xml_config_parser {
+class strategy_parser final : public rer::client<strategy_parser>,
+                              public rconfig::xml::xml_config_parser {
  public:
   using config_type = strategy_config;
+
+  strategy_parser(void) : ER_CLIENT_INIT("fordyca.strategy.config.strategy_parser") {}
+
 
   /**
    * \brief The root tag that all XML configuration for strategy should lie

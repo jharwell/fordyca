@@ -49,9 +49,13 @@ NS_START(fordyca, subsystem, perception, config);
  * \brief Parses XML parameters relating to the DPO perception subsystem into
  * \ref dpo_config.
  */
-class dpo_parser : public rconfig::xml::xml_config_parser {
+class dpo_parser : public rer::client<dpo_parser>,
+                   public rconfig::xml::xml_config_parser {
  public:
   using config_type = dpo_config;
+
+  dpo_parser(void)
+      : ER_CLIENT_INIT("fordyca.subsystem.perception.config.dpo_parser") {}
 
   /**
    * \brief The root tag that all dpo parameters should lie under in the

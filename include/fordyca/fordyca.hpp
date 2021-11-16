@@ -175,8 +175,14 @@ namespace config {}
 } /* namespace strategy */
 
 namespace controller {
-namespace cognitive {}
-namespace reactive {}
+namespace cognitive {
+namespace d0 {}
+namespace d1 {}
+namespace d2 {}
+}
+namespace reactive {
+namespace d0 {}
+}
 namespace config {
 namespace strategy {}
 } /* namespace config */
@@ -189,28 +195,47 @@ namespace subsystem {
 namespace perception {
 namespace ds {}
 namespace config {}
+namespace events {}
 } /* namespace perception */
 
 } /* namespace subsystem */
 
+namespace fsm {}
+namespace tasks {
+namespace d0 {}
+namespace d1 {}
+namespace d2 {}
+} /* namespace tasks */
+namespace events {}
 } /* namespace fordyca */
 
 namespace fds = fordyca::ds;
 
+namespace ffsm = fordyca::fsm;
+
 namespace fsubsystem = fordyca::subsystem;
 namespace fsperception = fsubsystem::perception;
 namespace fspds = fsperception::ds;
+namespace fspevents = fsperception::events;
 namespace fspconfig = fsperception::config;
 
 namespace fstrategy = fordyca::strategy;
 namespace fsexplore = fstrategy::explore;
 namespace fsconfig = fstrategy::config;
 
+namespace ftasks = fordyca::tasks;
+
+namespace fevents = fordyca::events;
+
 namespace fcontroller = fordyca::controller;
 namespace fccognitive = fcontroller::cognitive;
+namespace fccd0 = fccognitive::d0;
+namespace fccd1 = fccognitive::d1;
+namespace fccd2 = fccognitive::d2;
 namespace fcconfig = fcontroller::config;
 namespace fccstrategy = fcconfig::strategy;
-
 namespace fcreactive = fcontroller::reactive;
+namespace fcreactive = fcontroller::reactive;
+namespace fcrd0 = fcreactive::d0;
 
 #endif /* INCLUDE_FORDYCA_FORDYCA_HPP_ */

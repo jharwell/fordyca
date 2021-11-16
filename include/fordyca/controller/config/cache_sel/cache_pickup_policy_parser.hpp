@@ -46,9 +46,13 @@ NS_START(fordyca, controller, config, cache_sel);
  * \brief Parses XML parameters for \ref cache_pickup_policy_config at the
  * start of simulation.
  */
-class cache_pickup_policy_parser : public rconfig::xml::xml_config_parser {
+class cache_pickup_policy_parser : public rer::client<cache_pickup_policy_parser>,
+                                   public rconfig::xml::xml_config_parser {
  public:
   using config_type = cache_pickup_policy_config;
+
+  cache_pickup_policy_parser(void)
+      : ER_CLIENT_INIT("fordyca.controller.config.cache_sela.cache_pickup_policy_parser") {}
 
   /**
    * \brief The root tag that all cache sel matrix parameters should lie

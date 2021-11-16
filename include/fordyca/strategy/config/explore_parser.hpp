@@ -46,9 +46,13 @@ NS_START(fordyca, strategy, config);
  * \brief Parses XML configuration for how robots should explore for things into
  * \ref explore_config.
  */
-class explore_parser final : public rconfig::xml::xml_config_parser {
+class explore_parser final : public rer::client<explore_parser>,
+                             public rconfig::xml::xml_config_parser {
  public:
   using config_type = explore_config;
+
+  explore_parser(void) : ER_CLIENT_INIT("fordyca.xx.config.explore_parser") {}
+
 
   /**
    * \brief The root tag that all XML configuration for explore should lie

@@ -35,7 +35,7 @@
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/utils/color.hpp"
 
-#include "cosm/pal/argos_sm_adaptor.hpp"
+#include "cosm/pal/argos/swarm_manager_adaptor.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
@@ -51,9 +51,9 @@ struct convergence_config;
 } /* namespace config */
 } /* namespace cosm::convergence */
 
-namespace cosm::pal {
+namespace cosm::pal::argos {
 template <class TController>
-class argos_convergence_calculator;
+class convergence_calculator;
 } /* namespace cosm::pal */
 
 namespace cosm::pal::config {
@@ -90,11 +90,11 @@ struct tv_manager_config;
  * could not just be free functions because they require access to members in
  * the \ref argos::CLoopFunctions class.
  */
-class base_loop_functions : public cpal::argos_sm_adaptor,
+class base_loop_functions : public cpargos::swarm_manager_adaptor,
                             public rer::client<base_loop_functions> {
  public:
   using convergence_calculator_type =
-      cpal::argos_convergence_calculator<cpal::argos_controller2D_adaptor>;
+      cpargos::convergence_calculator<cpcontroller::controller2D>;
 
   base_loop_functions(void) RCPPSW_COLD;
   ~base_loop_functions(void) override RCPPSW_COLD;

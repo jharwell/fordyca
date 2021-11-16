@@ -26,15 +26,13 @@
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
-#include "fordyca/fordyca.hpp"
+#include "fordyca/controller/cognitive/events_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
-namespace detail {
-class robot_nest_block_drop;
-}
+
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
@@ -46,7 +44,11 @@ class robot_nest_block_drop;
  * interact with the nest in FORDYCA.
  */
 class nest_interactor
-    : public rpvisitor::polymorphic_accept_set<detail::robot_nest_block_drop> {};
+    : public rpvisitor::polymorphic_accept_set<
+  fccd0::events::nest_block_drop,
+  fccd1::events::nest_block_drop,
+  fccd2::events::nest_block_drop
+  > {};
 
 NS_END(tasks, fordyca);
 

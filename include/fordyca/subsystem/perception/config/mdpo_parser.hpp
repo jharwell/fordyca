@@ -49,9 +49,13 @@ NS_START(fordyca, subsystem, perception, config);
  * \brief Parses XML parameters relating to the MDPO perception subsystem into
  * \ref mdpo_config.
  */
-class mdpo_parser : public rconfig::xml::xml_config_parser {
+class mdpo_parser : public rer::client<mdpo_parser>,
+                    public rconfig::xml::xml_config_parser {
  public:
   using config_type = mdpo_config;
+
+  mdpo_parser(void)
+      : ER_CLIENT_INIT("fordyca.subsystem.perception.config.mdpo_parser") {}
 
   /**
    * \brief The root tag that all mdpo parameters should lie under in the

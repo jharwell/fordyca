@@ -33,8 +33,8 @@
 #include "fordyca/subsystem/perception/los_proc_verify.hpp"
 #include "fordyca/subsystem/perception/oracular_info_receptor.hpp"
 #include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
-#include "fordyca/events/block_found.hpp"
-#include "fordyca/events/cache_found.hpp"
+#include "fordyca/subsystem/perception/events/block_found.hpp"
+#include "fordyca/subsystem/perception/events/cache_found.hpp"
 #include "fordyca/events/cell2D_empty.hpp"
 
 /*******************************************************************************
@@ -144,7 +144,7 @@ void mdpo_perception_subsystem::process_los_blocks(
       } else if (c_los->access(i, j).state_is_known() &&
                  !map()->access<occupancy_grid::kCell>(d).state_is_known()) {
         ER_TRACE("Cell@%s now known to be empty", d.to_str().c_str());
-        events::cell2D_empty_visitor e(d);
+        fevents::cell2D_empty_visitor e(d);
         e.visit(*map());
       }
     } /* for(j..) */

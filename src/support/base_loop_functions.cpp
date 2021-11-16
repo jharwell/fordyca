@@ -31,8 +31,8 @@
 #include "cosm/pal/config/output_config.hpp"
 #include "cosm/oracle/config/aggregate_oracle_config.hpp"
 #include "cosm/oracle/tasking_oracle.hpp"
-#include "cosm/pal/argos_convergence_calculator.hpp"
-#include "cosm/pal/argos_swarm_iterator.hpp"
+#include "cosm/pal/argos/convergence_calculator.hpp"
+#include "cosm/pal/argos/swarm_iterator.hpp"
 #include "cosm/vis/config/visualization_config.hpp"
 
 #include "fordyca/controller/foraging_controller.hpp"
@@ -61,7 +61,7 @@ base_loop_functions::~base_loop_functions(void) = default;
  * Initialization Functions
  ******************************************************************************/
 void base_loop_functions::init(ticpp::Element& node) {
-  argos_sm_adaptor::init(node);
+  swarm_manager_adaptor::init(node);
 
   /* parse simulation input file */
   config_parse(node);
@@ -137,13 +137,13 @@ void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
     c->irv_init(m_tv_manager->dynamics<ctv::dynamics_type::ekENVIRONMENT>()
                     ->rda_adaptor());
   };
-  cpal::argos_swarm_iterator::controllers<controller::foraging_controller,
+  cpargos::swarm_iterator::controllers<controller::foraging_controller,
                                           cpal::iteration_order::ekSTATIC>(
-      this, cb, cpal::kARGoSRobotType);
+      this, cb, cpal::kRobotType);
 } /* tv_init() */
 
 void base_loop_functions::output_init(const cpconfig::output_config* output) {
-  argos_sm_adaptor::output_init(output);
+  swarm_manager_adaptor::output_init(output);
 
 #if (LIBRA_ER == LIBRA_ER_ALL)
   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.events"),
@@ -171,7 +171,7 @@ void base_loop_functions::oracle_init(
  * ARGoS Hooks
  ******************************************************************************/
 void base_loop_functions::pre_step(void) {
-  argos_sm_adaptor::pre_step();
+  swarm_manager_adaptor::pre_step();
 
   /* update the arena map, which MIGHT require a redraw of the floor */
   auto status = arena_map()->pre_step_update(timestep());
@@ -193,7 +193,7 @@ void base_loop_functions::pre_step(void) {
 } /* pre_step() */
 
 void base_loop_functions::post_step(void) {
-  argos_sm_adaptor::post_step();
+  swarm_manager_adaptor::post_step();
   /*
    * Needs to be after robot controllers are run, because computing convergence
    * before that gives you the convergence status for the LAST timestep.
@@ -204,7 +204,7 @@ void base_loop_functions::post_step(void) {
 } /* post_step() */
 
 void base_loop_functions::reset(void) {
-  argos_sm_adaptor::reset();
+  swarm_manager_adaptor::reset();
   arena_map()->initialize(this, nullptr);
 } /* reset() */
 
@@ -213,10 +213,10 @@ void base_loop_functions::reset(void) {
  ******************************************************************************/
 const carena::caching_arena_map* base_loop_functions::arena_map(void) const {
   return static_cast<const carena::caching_arena_map*>(
-      argos_sm_adaptor::arena_map());
+      swarm_manager_adaptor::arena_map());
 }
 carena::caching_arena_map* base_loop_functions::arena_map(void) {
-  return static_cast<carena::caching_arena_map*>(argos_sm_adaptor::arena_map());
+  return static_cast<carena::caching_arena_map*>(swarm_manager_adaptor::arena_map());
 }
 
 NS_END(support, fordyca);

@@ -28,8 +28,8 @@
 
 #include "cosm/arena/caching_arena_map.hpp"
 
-#include "fordyca//controller/foraging_controller.hpp"
-#include "fordyca/events/cache_proximity.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca/controller/cognitive/d2/events/cache_proximity.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -156,7 +156,7 @@ class cache_prox_checker : public rer::client<cache_prox_checker> {
                            mc_map->caches().end(),
                            [&](const auto& c) { return c->id() == cache_id; });
 
-    events::cache_proximity_visitor prox_op(*it);
+    fccd2::events::cache_proximity_visitor prox_op(*it);
     prox_op.visit(controller);
     mc_map->maybe_unlock_rd(mc_map->cache_mtx(), need_lock);
     return true;

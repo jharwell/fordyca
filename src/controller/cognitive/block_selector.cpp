@@ -82,14 +82,14 @@ block_selector::operator()(const fspds::dp_block_map& blocks,
     }
   } /* for(block..) */
 
-  ER_CHECKI(nullptr != best,
+  ER_CONDI(nullptr != best,
             "Best utility: block%d@%s/%s: %f",
             best->id().v(),
             rcppsw::to_string(best->ranchor2D()).c_str(),
             rcppsw::to_string(best->danchor2D()).c_str(),
             max_utility);
 
-  ER_CHECKW(nullptr != best, "No best block found: all known blocks excluded!");
+  ER_CONDW(nullptr == best, "No best block found: all known blocks excluded!");
   return best;
 } /* operator() */
 

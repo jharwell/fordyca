@@ -31,8 +31,8 @@
 #include "cosm/foraging/metrics/block_transportee_metrics_collector.hpp"
 #include "cosm/foraging/oracle/foraging_oracle.hpp"
 #include "cosm/interactors/applicator.hpp"
-#include "cosm/pal/argos_convergence_calculator.hpp"
-#include "cosm/pal/argos_swarm_iterator.hpp"
+#include "cosm/pal/argos/convergence_calculator.hpp"
+#include "cosm/pal/argos/swarm_iterator.hpp"
 #include "cosm/pal/pal.hpp"
 
 #include "fordyca/controller/cognitive/d0/dpo_controller.hpp"
@@ -178,9 +178,9 @@ void d0_loop_functions::private_init(void) {
    * threads are not set up yet so doing dynamicaly causes a deadlock. Also, it
    * only happens once, so it doesn't really matter if it is slow.
    */
-  cpal::argos_swarm_iterator::controllers<controller::foraging_controller,
+  cpargos::swarm_iterator::controllers<controller::foraging_controller,
                                           cpal::iteration_order::ekSTATIC>(
-      this, cb, cpal::kARGoSRobotType);
+      this, cb, cpal::kRobotType);
 } /* private_init() */
 
 /*******************************************************************************
@@ -196,7 +196,7 @@ void d0_loop_functions::pre_step(void) {
     robot_pre_step(dynamic_cast<chal::robot&>(robot->GetParent()));
     ndc_pop();
   };
-  cpal::argos_swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
+  cpargos::swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
 } /* pre_step() */
 
 void d0_loop_functions::post_step(void) {
@@ -210,7 +210,7 @@ void d0_loop_functions::post_step(void) {
     robot_post_step(dynamic_cast<chal::robot&>(robot->GetParent()));
     ndc_pop();
   };
-  cpal::argos_swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
+  cpargos::swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
 
   ndc_push();
 

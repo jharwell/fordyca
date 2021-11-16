@@ -35,7 +35,17 @@
 #include "fordyca/support/task_abort_interactor.hpp"
 #include "fordyca/support/mpl/free_block_pickup_spec.hpp"
 #include "fordyca/support/mpl/nest_block_drop_spec.hpp"
+#include "fordyca/support/mpl/free_block_drop_spec.hpp"
+#include "fordyca/support/mpl/cached_block_pickup_spec.hpp"
+#include "fordyca/support/mpl/cache_block_drop_spec.hpp"
 #include "fordyca/support/mpl/task_abort_spec.hpp"
+#include "fordyca/controller/cognitive/d2/events/nest_block_drop.hpp"
+#include "fordyca/controller/cognitive/d2/events/free_block_pickup.hpp"
+#include "fordyca/controller/cognitive/d2/events/block_vanished.hpp"
+#include "fordyca/controller/cognitive/d2/events/cache_vanished.hpp"
+#include "fordyca/controller/cognitive/d2/events/free_block_drop.hpp"
+#include "fordyca/controller/cognitive/d2/events/cache_block_drop.hpp"
+#include "fordyca/controller/cognitive/d2/events/cached_block_pickup.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -138,18 +148,77 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
 
 
  private:
-  using free_pickup_spec = mpl::free_block_pickup_spec<controller::d2::typelist>;
-  using nest_drop_spec = mpl::nest_block_drop_spec<controller::d2::typelist>;
-  using task_abort_spec = mpl::task_abort_spec<controller::d2::typelist>;
+    using robot_block_vanished_visitor_type = fccd2::events::block_vanished_visitor;
+  using robot_free_block_pickup_visitor_type = fccd2::events::free_block_pickup_visitor;
+  using robot_nest_block_drop_visitor_type = fccd2::events::nest_block_drop_visitor;
+  using robot_free_block_drop_visitor_type = fccd2::events::free_block_drop_visitor;
+  using robot_cache_block_drop_visitor_type = fccd2::events::cache_block_drop_visitor;
+  using robot_cached_block_pickup_visitor_type = fccd2::events::cached_block_pickup_visitor;
+  using robot_cache_vanished_visitor_type = fccd2::events::cache_vanished_visitor;
+
+  using free_pickup_spec = mpl::free_block_pickup_spec<
+    controller::d2::typelist,
+    robot_block_vanished_visitor_type,
+    robot_free_block_pickup_visitor_type
+    >;
+  using nest_drop_spec = mpl::nest_block_drop_spec<
+    controller::d2::typelist,
+    robot_nest_block_drop_visitor_type
+    >;
+  using cached_pickup_spec = mpl::cached_block_pickup_spec<
+    controller::d2::typelist,
+    robot_cached_block_pickup_visitor_type,
+    robot_cache_vanished_visitor_type
+    >;
+  using cache_drop_spec = mpl::cache_block_drop_spec<
+    controller::d2::typelist,
+    robot_cache_block_drop_visitor_type,
+    robot_cache_vanished_visitor_type
+    >;
+
+  using cache_site_drop_spec = mpl::free_block_drop_spec<
+    controller::d2::typelist,
+    robot_free_block_drop_visitor_type
+    >;
+  using new_cache_drop_spec = mpl::free_block_drop_spec<
+    controller::d2::typelist,
+    robot_free_block_drop_visitor_type
+    >;
+
+  using task_abort_spec = mpl::task_abort_spec<
+    controller::d2::typelist,
+    robot_free_block_drop_visitor_type
+    >;
 
   /* clang-format off */
-  free_block_pickup_interactor<TController, free_pickup_spec> m_free_pickup;
-  nest_block_drop_interactor<TController, nest_drop_spec>     m_nest_drop;
-  task_abort_interactor<TController, task_abort_spec>         m_task_abort;
-  cached_block_pickup_interactor<TController>                 m_cached_pickup;
-  existing_cache_block_drop_interactor<TController>           m_existing_cache_drop;
-  cache_site_block_drop_interactor<TController>               m_cache_site_drop;
-  new_cache_block_drop_interactor<TController>                m_new_cache_drop;
+  free_block_pickup_interactor<
+    TController,
+    free_pickup_spec
+    > m_free_pickup;
+  nest_block_drop_interactor<
+    TController,
+    nest_drop_spec
+    > m_nest_drop;
+  task_abort_interactor<
+    TController,
+    task_abort_spec
+    > m_task_abort;
+  cached_block_pickup_interactor<
+    TController,
+    cached_pickup_spec
+    > m_cached_pickup;
+  existing_cache_block_drop_interactor<
+    TController,
+    cache_drop_spec
+    > m_existing_cache_drop;
+  cache_site_block_drop_interactor<
+    TController,
+    cache_site_drop_spec
+    > m_cache_site_drop;
+  new_cache_block_drop_interactor<
+    TController,
+    new_cache_drop_spec
+    > m_new_cache_drop;
   /* clang-format on */
 };
 

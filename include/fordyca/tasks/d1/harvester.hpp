@@ -26,13 +26,14 @@
  ******************************************************************************/
 #include <memory>
 
-#include "fordyca/tasks/d1/foraging_task.hpp"
-#include "fordyca/events/existing_cache_interactor.hpp"
-#include "fordyca/events/free_block_interactor.hpp"
+#include "rcppsw/er/client.hpp"
 
 #include "cosm/ta/abort_probability.hpp"
 #include "cosm/ta/polled_task.hpp"
-#include "rcppsw/er/client.hpp"
+
+#include "fordyca/tasks/d1/foraging_task.hpp"
+#include "fordyca/events/existing_cache_interactor.hpp"
+#include "fordyca/events/free_block_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -60,18 +61,36 @@ class harvester final : public foraging_task,
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,
-   * because when visiting a \ref existing_cache_interactor, you have no way to
-   * way which task the object ACTUALLY is without using a set of if()
-   * statements, which is a brittle design. This is not the cleanest, but is
-   * still more elegant than the alternative.
+   * because when visiting a given task which is a member of a set of tasks
+   * which all implement the same interface, you have no way to way which task
+   * the object ACTUALLY is without using a set of if() statements, which is a
+   * brittle design. This is not the cleanest, but is still more elegant than
+   * the alternative.
+   *
+   * I wish you didn't have to stub out the d0 and d2 events.
    */
-  void accept(events::detail::robot_free_block_pickup& visitor) override;
-  void accept(events::detail::robot_free_block_drop&) override {}
-  void accept(events::detail::block_vanished&) override;
 
-  void accept(events::detail::robot_cache_block_drop& visitor) override;
-  void accept(events::detail::robot_cached_block_pickup&) override {}
-  void accept(events::detail::cache_vanished& visitor) override;
+  /* free block interaction events */
+  void accept(fccd0::events::free_block_pickup&) override {}
+  void accept(fccd0::events::free_block_drop&) override {}
+  void accept(fccd0::events::block_vanished&) override {}
+
+  void accept(fccd1::events::free_block_pickup& visitor) override;
+  void accept(fccd1::events::free_block_drop&) override {}
+  void accept(fccd1::events::block_vanished& visitor) override;
+
+  void accept(fccd2::events::free_block_pickup&) override {}
+  void accept(fccd2::events::free_block_drop&) override {}
+  void accept(fccd2::events::block_vanished&) override {}
+
+  /* cache interaction events */
+  void accept(fccd1::events::cache_block_drop& visitor) override;
+  void accept(fccd1::events::cached_block_pickup&) override {}
+  void accept(fccd1::events::cache_vanished& visitor) override;
+
+  void accept(fccd2::events::cache_block_drop&) override {}
+  void accept(fccd2::events::cached_block_pickup&) override {}
+  void accept(fccd2::events::cache_vanished&) override {}
 
   /* goal acquisition metrics */
   RCPPSW_WRAP_DECL_OVERRIDE(bool, goal_acquired, const);

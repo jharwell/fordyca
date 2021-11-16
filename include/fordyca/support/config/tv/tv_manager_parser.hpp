@@ -48,9 +48,13 @@ NS_START(fordyca, support, config, tv);
  *
  * \brief Parses XML parameters for \ref tv_manager into \ref tv_manager_config.
  */
-class tv_manager_parser final : public rconfig::xml::xml_config_parser {
+class tv_manager_parser final : public rer::client<tv_manager_parser>,
+                                public rconfig::xml::xml_config_parser {
  public:
   using config_type = tv_manager_config;
+
+  tv_manager_parser(void)
+      : ER_CLIENT_INIT("fordyca.support.config.tv_manager_parser") {}
 
   /**
    * \brief The root tag that all temporal variance parameters should lie under

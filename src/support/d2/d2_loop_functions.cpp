@@ -33,10 +33,10 @@
 #include "cosm/foraging/block_dist/base_distributor.hpp"
 #include "cosm/foraging/metrics/block_transportee_metrics_collector.hpp"
 #include "cosm/foraging/oracle/foraging_oracle.hpp"
-#include "cosm/hal/subsystem/config/saa_xml_names.hpp"
+#include "cosm/hal/argos/subsystem/config/xml/saa_names.hpp"
 #include "cosm/interactors/applicator.hpp"
-#include "cosm/pal/argos_convergence_calculator.hpp"
-#include "cosm/pal/argos_swarm_iterator.hpp"
+#include "cosm/pal/argos/convergence_calculator.hpp"
+#include "cosm/pal/argos/swarm_iterator.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
 #include "cosm/spatial/nest_zone_tracker.hpp"
@@ -211,9 +211,9 @@ void d2_loop_functions::private_init(void) {
    * threads are not set up yet so doing dynamicaly causes a deadlock. Also, it
    * only happens once, so it doesn't really matter if it is slow.
    */
-  cpal::argos_swarm_iterator::controllers<controller::foraging_controller,
+  cpargos::swarm_iterator::controllers<controller::foraging_controller,
                                           cpal::iteration_order::ekSTATIC>(
-      this, cb, cpal::kARGoSRobotType);
+      this, cb, cpal::kRobotType);
 } /* private_init() */
 
 void d2_loop_functions::cache_handling_init(
@@ -222,8 +222,8 @@ void d2_loop_functions::cache_handling_init(
             "FATAL: Caches not enabled in d2 loop functions");
   m_cache_manager =
       std::make_unique<dynamic_cache_manager>(cachep, arena_map(), rng());
-  using saa_names = chsubsystem::config::saa_xml_names;
-  argos_sm_adaptor::led_medium(saa_names::leds_saa);
+  using saa_names = chargos::subsystem::config::xml::saa_names;
+  swarm_manager_adaptor::led_medium(saa_names::leds_saa);
   cache_creation_handle(false);
 } /* cache_handlng_init() */
 
@@ -244,9 +244,9 @@ std::vector<int> d2_loop_functions::robot_tasks_extract(uint) const {
     v.push_back(boost::apply_visitor(
         applicator, m_task_extractor_map->at(controller->type_index())));
   };
-  cpal::argos_swarm_iterator::controllers<controller::foraging_controller,
+  cpargos::swarm_iterator::controllers<controller::foraging_controller,
                                           cpal::iteration_order::ekSTATIC>(
-      this, cb, cpal::kARGoSRobotType);
+      this, cb, cpal::kRobotType);
   return v;
 } /* robot_tasks_extract() */
 
@@ -264,7 +264,7 @@ void d2_loop_functions::pre_step() {
     robot_pre_step(dynamic_cast<chal::robot&>(robot->GetParent()));
     ndc_pop();
   };
-  cpal::argos_swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
+  cpargos::swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
 } /* pre_step() */
 
 void d2_loop_functions::post_step(void) {
@@ -278,7 +278,7 @@ void d2_loop_functions::post_step(void) {
     robot_post_step(dynamic_cast<chal::robot&>(robot->GetParent()));
     ndc_pop();
   };
-  cpal::argos_swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
+  cpargos::swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
 
   ndc_push();
   /*

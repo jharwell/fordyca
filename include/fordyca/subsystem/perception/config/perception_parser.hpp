@@ -48,9 +48,13 @@ NS_START(fordyca, subsystem, perception, config);
  * \brief Parses XML parameters for various perception subsystems into
  * \ref perception_config.
  */
-class perception_parser final : public rconfig::xml::xml_config_parser {
+class perception_parser final : public rer::client<perception_parser>,
+                                public rconfig::xml::xml_config_parser {
  public:
   using config_type = perception_config;
+
+  perception_parser(void)
+      : ER_CLIENT_INIT("fordyca.subsystem.perception.config.perception_parser") {}
 
   /**
    * \brief The root tag that all perception  parameters should lie under in

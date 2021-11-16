@@ -33,6 +33,10 @@ NS_START(fordyca, controller, config, block_sel);
  ******************************************************************************/
 void block_priorities_parser::parse(const ticpp::Element& node) {
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
+    ER_DEBUG("Parent node=%s: search for child=%s",
+             node.Value().c_str(),
+             kXMLRoot.c_str());
+
     ticpp::Element bnode = node_get(node, kXMLRoot);
     m_config = std::make_unique<config_type>();
 
@@ -46,8 +50,8 @@ bool block_priorities_parser::validate(void) const {
     return true;
   }
 
-  RCPPSW_CHECK(m_config->cube >= 1.0);
-  RCPPSW_CHECK(m_config->ramp >= 1.0);
+  ER_CHECK(m_config->cube >= 1.0, "Cube priority must be >= 1.0");
+  ER_CHECK(m_config->ramp >= 1.0, "Ramp priority must be >= 1.0");
   return true;
 
 error:

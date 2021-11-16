@@ -210,7 +210,7 @@ void crw_fsm::run(void) {
 } /* run() */
 
 bool crw_fsm::block_detected(void) const {
-  return saa()->sensing()->ground()->detect("block");
+  return saa()->sensing()->env()->detect("block");
 } /* block_detected() */
 
 foraging_transport_goal crw_fsm::block_transport_goal(void) const {

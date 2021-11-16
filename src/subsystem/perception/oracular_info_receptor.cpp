@@ -33,8 +33,8 @@
 #include "cosm/ta/time_estimate.hpp"
 
 #include "fordyca/subsystem/perception/ds/dpo_store.hpp"
-#include "fordyca/events/block_found.hpp"
-#include "fordyca/events/cache_found.hpp"
+#include "fordyca/subsystem/perception/events/block_found.hpp"
+#include "fordyca/subsystem/perception/events/cache_found.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -56,7 +56,7 @@ void oracular_info_receptor::dpo_store_update(ds::dpo_store* const store) {
                rcppsw::to_string(store->known_blocks()).c_str());
     }
     for (auto* b : blocks) {
-      events::block_found_visitor visitor(b);
+      fspevents::block_found_visitor visitor(b);
       visitor.visit(*store);
     } /* for(&e..) */
   }
@@ -71,7 +71,7 @@ void oracular_info_receptor::dpo_store_update(ds::dpo_store* const store) {
                rcppsw::to_string(store->known_caches()).c_str());
     }
     for (auto* c : caches) {
-      events::cache_found_visitor visitor(c);
+      fspevents::cache_found_visitor visitor(c);
       visitor.visit(*store);
     } /* for(&e..) */
   }

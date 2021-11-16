@@ -38,7 +38,7 @@ NS_START(fordyca, tasks, d0);
  ******************************************************************************/
 /**
  * \class generalist
- * \ingroup tasks
+ * \ingroup tasks d0
  *
  * \brief Class representing depth 0 task allocation: Perform the whole foraging
  * task: (1) Find a free block, and (2) bring it to the nest.
@@ -54,11 +54,34 @@ class generalist final : public foraging_task {
   generalist(const cta::config::task_alloc_config* config,
              std::unique_ptr<cta::taskable> mechanism);
 
-  /* event handling */
-  void accept(events::detail::robot_free_block_pickup& visitor) override;
-  void accept(events::detail::robot_free_block_drop&) override {}
-  void accept(events::detail::robot_nest_block_drop& visitor) override;
-  void accept(events::detail::block_vanished& visitor) override;
+  /*
+   * Event handling. This CANNOT be done using the regular visitor pattern,
+   * because when visiting a given task which is a member of a set of tasks
+   * which all implement the same interface, you have no way to way which task
+   * the object ACTUALLY is without using a set of if() statements, which is a
+   * brittle design. This is not the cleanest, but is still more elegant than
+   * the alternative.
+   *
+   * I wish you didn't have to stub out the d1 and d2 events.
+   */
+
+  /* free block interaction events */
+  void accept(fccd0::events::free_block_pickup& visitor) override;
+  void accept(fccd0::events::free_block_drop&) override {}
+  void accept(fccd0::events::block_vanished& visitor) override;
+
+  void accept(fccd1::events::free_block_pickup&) override {}
+  void accept(fccd1::events::free_block_drop&) override {}
+  void accept(fccd1::events::block_vanished&) override {}
+
+  void accept(fccd2::events::free_block_pickup&) override {}
+  void accept(fccd2::events::free_block_drop&) override {}
+  void accept(fccd2::events::block_vanished&) override {}
+
+  /* nest interaction events */
+  void accept(fccd0::events::nest_block_drop& visitor) override;
+  void accept(fccd1::events::nest_block_drop&) override {}
+  void accept(fccd2::events::nest_block_drop&) override {}
 
   /* goal acquisition metrics */
   RCPPSW_WRAP_DECL_OVERRIDE(bool, goal_acquired, const);

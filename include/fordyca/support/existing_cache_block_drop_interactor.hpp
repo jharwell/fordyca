@@ -31,9 +31,7 @@
 #include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/arena/operations/cache_block_drop.hpp"
 
-#include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
-#include "fordyca/events/robot_cache_block_drop.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/tasks/d1/foraging_task.hpp"
@@ -53,10 +51,19 @@ NS_START(fordyca, support);
  * \brief Handles a robot's (possible) \ref cache_block_drop event for existing
  * caches on a given timestep.
  */
-template <typename TController>
+template <typename TController, typename TControllerSpecMap>
 class existing_cache_block_drop_interactor
-    : public rer::client<existing_cache_block_drop_interactor<TController>> {
+    : public rer::client<
+  existing_cache_block_drop_interactor<TController, TControllerSpecMap>
+  > {
  public:
+  using controller_spec =
+      typename boost::mpl::at<TControllerSpecMap, TController>::type;
+  using robot_cache_vanished_visitor_type =
+      typename controller_spec::robot_cache_vanished_visitor_type;
+  using robot_cache_block_drop_visitor_type =
+      typename controller_spec::robot_cache_block_drop_visitor_type;
+
   existing_cache_block_drop_interactor(carena::caching_arena_map* const map_in,
                                        tv::env_dynamics* envd)
       : ER_CLIENT_INIT("fordyca.support.existing_cache_block_drop_interactor"),
@@ -145,7 +152,7 @@ class existing_cache_block_drop_interactor
       m_map->unlock_rd(m_map->block_mtx());
       m_map->unlock_wr(m_map->cache_mtx());
 
-      events::cache_vanished_visitor vanished_op(penalty.id());
+      robot_cache_vanished_visitor_type vanished_op(penalty.id());
       vanished_op.visit(controller);
     } else {
       execute_cache_block_drop(controller, penalty);
@@ -184,8 +191,9 @@ class existing_cache_block_drop_interactor
         *cache_it,
         m_map->grid_resolution(),
         carena::locking::ekCACHES_HELD | carena::locking::ekBLOCKS_HELD);
-    events::robot_cache_block_drop_visitor rdrop_op(
-        controller.block_release(), *cache_it, m_map->grid_resolution());
+    robot_cache_block_drop_visitor_type rdrop_op(controller.block_release(),
+                                                 *cache_it,
+                                                 m_map->grid_resolution());
 
     (*cache_it)->penalty_served(penalty.penalty());
     controller.block_manip_recorder()->record(

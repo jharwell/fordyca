@@ -31,7 +31,6 @@
 
 #include "cosm/arena/caching_arena_map.hpp"
 
-#include "fordyca/events/robot_free_block_drop.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
 
 /*******************************************************************************
@@ -42,26 +41,37 @@ NS_START(fordyca, support, mpl, detail);
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
+template<typename TFreeBlockDropVisitor>
 struct task_abort_spec_value {
   using arena_map_type = carena::caching_arena_map;
   using env_dynamics_type = tv::env_dynamics;
-  using robot_free_block_drop_visitor_type = events::robot_free_block_drop_visitor;
+  using robot_free_block_drop_visitor_type = TFreeBlockDropVisitor;
 };
 
 /*
  * First argument is the map as it is built, second in the thing to insert,
  * built from each type in the specified typelist.
  */
-using task_abort_inserter = boost::mpl::insert<boost::mpl::_1,
-                                              boost::mpl::pair<boost::mpl::_2,
-                                                               task_abort_spec_value>>;
+template<typename TFreeBlockDropVisitor>
+using task_abort_inserter = boost::mpl::insert<
+  boost::mpl::_1,
+  boost::mpl::pair<boost::mpl::_2,
+                   task_abort_spec_value<
+                     TFreeBlockDropVisitor>
+                   >
+  >;
 
 NS_END(detail);
 
-template<typename TTypelist>
-using task_abort_spec = typename boost::mpl::fold<TTypelist,
-                                                  boost::mpl::map0<>,
-                                                  detail::task_abort_inserter>::type;
+template<typename TTypelist, typename TFreeBlockDropVisitor>
+using task_abort_spec = typename boost::mpl::fold<
+  TTypelist,
+  boost::mpl::map0<>,
+  detail::task_abort_inserter<
+    TFreeBlockDropVisitor
+    >
+  >::type;
+
 NS_END(mpl, support, fordyca);
 
 #endif /* INCLUDE_FORDYCA_SUPPORT_MPL_TASK_ABORT_SPEC_HPP_ */

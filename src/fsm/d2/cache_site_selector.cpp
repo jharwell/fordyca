@@ -140,9 +140,9 @@ void cache_site_selector::opt_initialize(const opt_init_conditions* cond,
           std::get<1>(m_constraints).size());
 
   auto xrange =
-      boost::get<rmath::rangeu>(mc_matrix->find(cselm::kSiteXRange)->second);
+      boost::get<rmath::rangez>(mc_matrix->find(cselm::kSiteXRange)->second);
   auto yrange =
-      boost::get<rmath::rangeu>(mc_matrix->find(cselm::kSiteYRange)->second);
+      boost::get<rmath::rangez>(mc_matrix->find(cselm::kSiteYRange)->second);
   *utility_data = { cond->position, nest_loc };
   m_alg.set_max_objective(&__site_utility_func, utility_data);
   m_alg.set_ftol_rel(kUTILITY_TOL);

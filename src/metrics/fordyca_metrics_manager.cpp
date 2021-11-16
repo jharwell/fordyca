@@ -31,7 +31,7 @@
 
 #include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/foraging/block_dist/base_distributor.hpp"
-#include "cosm/pal/argos_convergence_calculator.hpp"
+#include "cosm/pal/argos/convergence_calculator.hpp"
 
 #include "fordyca/controller/foraging_controller.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"

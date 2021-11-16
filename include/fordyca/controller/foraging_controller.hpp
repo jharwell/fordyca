@@ -27,6 +27,7 @@
 #include <memory>
 #include <string>
 #include <typeindex>
+#include <any>
 
 #include "cosm/controller/block_carrying_controller.hpp"
 #include "cosm/controller/irv_recipient_controller.hpp"
@@ -34,7 +35,7 @@
 #include "cosm/fsm/block_transporter.hpp"
 #include "cosm/fsm/metrics/block_transporter_metrics.hpp"
 #include "cosm/pal/config/output_config.hpp"
-#include "cosm/pal/argos_controller2D_adaptor.hpp"
+#include "cosm/pal/controller/controller2D.hpp"
 #include "cosm/subsystem/subsystem_fwd.hpp"
 #include "cosm/spatial/metrics/nest_zone_metrics.hpp"
 
@@ -45,9 +46,12 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::hal::subsystem::config {
+struct sensing_subsystemQ3D_config;
+} /* namespace cosm::hal::subsystem::config */
+
 namespace cosm::subsystem::config {
 struct actuation_subsystem2D_config;
-struct sensing_subsystemQ3D_config;
 } // namespace cosm::subsystem::config
 namespace cosm::steer2D::config {
 struct force_calculator_config;
@@ -87,7 +91,7 @@ NS_START(fordyca, controller);
  * overlays.
  */
 class foraging_controller
-    : public cpal::argos_controller2D_adaptor,
+    : public cpal::controller::controller2D,
       public ccontroller::block_carrying_controller,
       public cfsm::block_transporter<fsm::foraging_transport_goal>,
       public cfsm::metrics::block_transporter_metrics,
@@ -104,10 +108,9 @@ class foraging_controller
   foraging_controller(const foraging_controller&) = delete;
   foraging_controller& operator=(const foraging_controller&) = delete;
 
-  /* argos_controller2D overrides */
+  /* controller2D overrides */
   void init(ticpp::Element& node) override RCPPSW_COLD;
   void reset(void) override RCPPSW_COLD;
-  rtypes::type_uuid entity_id(void) const override final;
 
   /* rda_recipient_controller overrides */
   double applied_movement_throttle(void) const override final;
@@ -142,8 +145,12 @@ class foraging_controller
 
  private:
   void
-  saa_init(const csubsystem::config::actuation_subsystem2D_config* actuation_p,
-           const csubsystem::config::sensing_subsystemQ3D_config* sensing_p);
+  saa_init(const csubsystem::config::actuation_subsystem2D_config* actuation,
+           const chal::subsystem::config::sensing_subsystemQ3D_config* sensing);
+  std::any
+  actuation_init(const csubsystem::config::actuation_subsystem2D_config* actuation);
+  std::any
+  sensing_init(const chal::subsystem::config::sensing_subsystemQ3D_config* sensing);
   fs::path output_init(const cpconfig::output_config* outputp) override;
 
   /* clang-format off */

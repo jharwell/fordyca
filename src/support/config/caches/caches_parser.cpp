@@ -36,6 +36,11 @@ void caches_parser::parse(const ticpp::Element& node) {
   if (nullptr == node.FirstChild(kXMLRoot, false)) {
     return;
   }
+
+  ER_DEBUG("Parent node=%s: search for child=%s",
+           node.Value().c_str(),
+           kXMLRoot.c_str());
+
   ticpp::Element cnode = node_get(node, kXMLRoot);
   m_config = std::make_unique<config_type>();
 
@@ -59,9 +64,9 @@ bool caches_parser::validate(void) const {
     return true;
   }
 
-  RCPPSW_CHECK(m_config->dimension > 0.0);
-  RCPPSW_CHECK(m_dynamic.validate());
-  RCPPSW_CHECK(m_static.validate());
+  ER_CHECK(m_config->dimension > 0.0, "Dimension must be > 0");
+  ER_CHECK(m_dynamic.validate(), "Dynamic validation failed");
+  ER_CHECK(m_static.validate(), "Static validation failed");
   return true;
 
 error:

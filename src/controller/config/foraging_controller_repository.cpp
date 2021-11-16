@@ -23,12 +23,9 @@
  ******************************************************************************/
 #include "fordyca/controller/config/foraging_controller_repository.hpp"
 
-#include "rcppsw/math/config/xml/rng_parser.hpp"
-#include "cosm/pal/config/xml/output_parser.hpp"
-
 #include "cosm/repr/config/xml/nest_parser.hpp"
 #include "cosm/subsystem/config/xml/actuation_subsystem2D_parser.hpp"
-#include "cosm/subsystem/config/xml/sensing_subsystemQ3D_parser.hpp"
+#include "cosm/hal/subsystem/config/xml/sensing_subsystemQ3D_parser.hpp"
 
 #include "fordyca/strategy/config/strategy_parser.hpp"
 
@@ -36,34 +33,28 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller, config);
-namespace csconfig = csubsystem::config;
-namespace cscxml = csconfig::xml;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 foraging_controller_repository::foraging_controller_repository(void) {
-  parser_register<cpcxml::output_parser, cpconfig::output_config>(
-      cpcxml::output_parser::kXMLRoot);
-  parser_register<cscxml::actuation_subsystem2D_parser,
+  parser_register<csconfig::xml::actuation_subsystem2D_parser,
                   csconfig::actuation_subsystem2D_config>(
-      cscxml::actuation_subsystem2D_parser::kXMLRoot);
-  parser_register<cscxml::sensing_subsystemQ3D_parser,
-                  csconfig::sensing_subsystemQ3D_config>(
-      cscxml::sensing_subsystemQ3D_parser::kXMLRoot);
+                      csconfig::xml::actuation_subsystem2D_parser::kXMLRoot);
+  parser_register<chsubsystem::config::xml::sensing_subsystemQ3D_parser,
+                  chsubsystem::config::sensing_subsystemQ3D_config>(
+                      chsubsystem::config::xml::sensing_subsystemQ3D_parser::kXMLRoot);
   parser_register<fsconfig::strategy_parser, fsconfig::strategy_config>(
       fsconfig::strategy_parser::kXMLRoot);
-  parser_register<rmath::config::xml::rng_parser, rmath::config::rng_config>(
-      rmath::config::xml::rng_parser::kXMLRoot);
   parser_register<crepr::config::xml::nest_parser, crepr::config::nest_config>(
       crepr::config::xml::nest_parser::kXMLRoot);
 
-  parser_find<cscxml::sensing_subsystemQ3D_parser>(
-      cscxml::sensing_subsystemQ3D_parser::kXMLRoot)
-      ->ground_detection_add("nest");
-  parser_find<cscxml::sensing_subsystemQ3D_parser>(
-      cscxml::sensing_subsystemQ3D_parser::kXMLRoot)
-      ->ground_detection_add("block");
+  parser_find<chsubsystem::config::xml::sensing_subsystemQ3D_parser>(
+      chsubsystem::config::xml::sensing_subsystemQ3D_parser::kXMLRoot)
+      ->env_detection_add("nest");
+  parser_find<chsubsystem::config::xml::sensing_subsystemQ3D_parser>(
+      chsubsystem::config::xml::sensing_subsystemQ3D_parser::kXMLRoot)
+      ->env_detection_add("block");
 }
 
 NS_END(config, controller, fordyca);

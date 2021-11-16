@@ -23,11 +23,11 @@
  ******************************************************************************/
 #include "fordyca/tasks/d2/cache_starter.hpp"
 
-#include "fordyca/events/block_proximity.hpp"
-#include "fordyca/events/block_vanished.hpp"
-#include "fordyca/events/cache_proximity.hpp"
-#include "fordyca/events/robot_free_block_drop.hpp"
-#include "fordyca/events/robot_free_block_pickup.hpp"
+#include "fordyca/controller/cognitive/d2/events/block_vanished.hpp"
+#include "fordyca/controller/cognitive/d2/events/block_proximity.hpp"
+#include "fordyca/controller/cognitive/d2/events/cache_proximity.hpp"
+#include "fordyca/controller/cognitive/d2/events/free_block_drop.hpp"
+#include "fordyca/controller/cognitive/d2/events/free_block_pickup.hpp"
 #include "fordyca/fsm/d2/block_to_cache_site_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
 
@@ -165,19 +165,19 @@ RCPPSW_WRAP_DEF_OVERRIDE(
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void cache_starter::accept(events::detail::robot_free_block_drop& visitor) {
+void cache_starter::accept(fccd2::events::free_block_drop& visitor) {
   visitor.visit(*this);
 }
-void cache_starter::accept(events::detail::robot_free_block_pickup& visitor) {
+void cache_starter::accept(fccd2::events::free_block_pickup& visitor) {
   visitor.visit(*this);
 }
-void cache_starter::accept(events::detail::block_vanished& visitor) {
+void cache_starter::accept(fccd2::events::block_vanished& visitor) {
   visitor.visit(*this);
 }
-void cache_starter::accept(events::detail::block_proximity& visitor) {
+void cache_starter::accept(fccd2::events::block_proximity& visitor) {
   visitor.visit(*this);
 }
-void cache_starter::accept(events::detail::cache_proximity& visitor) {
+void cache_starter::accept(fccd2::events::cache_proximity& visitor) {
   visitor.visit(*this);
 }
 

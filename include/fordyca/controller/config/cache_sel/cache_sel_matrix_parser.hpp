@@ -47,9 +47,13 @@ NS_START(fordyca, controller, config, cache_sel);
  * \brief Parses XML parameters for the \ref cache_sel_matrix at the start
  * of simulation.
  */
-class cache_sel_matrix_parser final : public rconfig::xml::xml_config_parser {
+class cache_sel_matrix_parser final : public rer::client<cache_sel_matrix_parser>,
+                                      public rconfig::xml::xml_config_parser {
  public:
   using config_type = cache_sel_matrix_config;
+
+  cache_sel_matrix_parser(void)
+      : ER_CLIENT_INIT("fordyca.controller.config.cache_sel.cache_sel_matrix_parser") {}
 
   /**
    * \brief The root tag that all cache sel matrix parameters should lie

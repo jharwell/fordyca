@@ -38,6 +38,10 @@ void static_cache_parser::parse(const ticpp::Element& node) {
   if (nullptr == node.FirstChild(kXMLRoot, false)) {
     return;
   }
+  ER_DEBUG("Parent node=%s: search for child=%s",
+           node.Value().c_str(),
+           kXMLRoot.c_str());
+
   ticpp::Element cnode = node_get(node, kXMLRoot);
   m_config = std::make_unique<config_type>();
 
@@ -53,8 +57,8 @@ bool static_cache_parser::validate(void) const {
     return true;
   }
 
-  RCPPSW_CHECK(m_config->size > 0);
-  RCPPSW_CHECK(m_config->respawn_scale_factor > 0);
+  ER_CHECK(m_config->size > 0, "Size must be > 0");
+  ER_CHECK(m_config->respawn_scale_factor > 0, "Scale factor must be > 0");
   return true;
 
 error:

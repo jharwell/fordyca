@@ -46,9 +46,13 @@ NS_START(fordyca, controller, config, block_sel);
  * \brief Parses XML parameters related to block priorties into \ref
  * block_priority_config.
  */
-class block_priorities_parser final : public rconfig::xml::xml_config_parser {
+class block_priorities_parser final : public rer::client<block_priorities_parser>,
+                                      public rconfig::xml::xml_config_parser {
  public:
   using config_type = block_priority_config;
+
+  block_priorities_parser(void)
+      : ER_CLIENT_INIT("fordyca.controller.config.block_sel.block_priorities_parser") {}
 
   /**
    * \brief The root tag that all block parameters should lie under in the

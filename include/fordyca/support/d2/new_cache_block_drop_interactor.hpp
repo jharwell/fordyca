@@ -31,11 +31,9 @@
 #include "cosm/arena/caching_arena_map.hpp"
 
 #include "fordyca/support/tv/env_dynamics.hpp"
-#include "fordyca/events/cache_proximity.hpp"
 #include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "fordyca/support/d2/dynamic_cache_manager.hpp"
 #include "fordyca/support/interactor_status.hpp"
-#include "fordyca/events/robot_free_block_drop.hpp"
 #include "fordyca/support/cache_prox_checker.hpp"
 
 /*******************************************************************************
@@ -53,9 +51,16 @@ NS_START(fordyca, support, d2);
  * \brief Handles a robot's (possible) \ref free_block_drop event at a new cache
  * on a given timestep.
  */
-template <typename TController>
-class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_interactor<TController>> {
+template <typename TController, typename TControllerSpecMap>
+class new_cache_block_drop_interactor : public rer::client<
+  new_cache_block_drop_interactor<TController, TControllerSpecMap>
+  > {
  public:
+    using controller_spec =
+      typename boost::mpl::at<TControllerSpecMap, TController>::type;
+  using robot_free_block_drop_visitor_type =
+      typename controller_spec::robot_free_block_drop_visitor_type;
+
   new_cache_block_drop_interactor(carena::caching_arena_map* const map_in,
                                   argos::CFloorEntity* const floor_in,
                                   tv::env_dynamics* const envd,
@@ -152,9 +157,9 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
                                             loc,
                                             m_map->grid_resolution(),
                                             carena::locking::ekNONE_HELD);
-    events::robot_free_block_drop_visitor rdrop_op(controller.block_release(),
-                                                   loc,
-                                                   m_map->grid_resolution());
+    robot_free_block_drop_visitor_type rdrop_op(controller.block_release(),
+                                                loc,
+                                                m_map->grid_resolution());
 
     controller.block_manip_recorder()->record(metrics::blocks::block_manip_events::ekFREE_DROP,
                                               penalty.penalty());

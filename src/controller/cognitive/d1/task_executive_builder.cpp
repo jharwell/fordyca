@@ -195,7 +195,7 @@ void task_executive_builder::d1_exec_est_init(
     graph->root_tab()->last_subtask(collector);
   }
 
-  rmath::rangeu g_bounds =
+  rmath::rangez g_bounds =
       task_config->exec_est.ranges.find("generalist")->second;
 
   auto h_bounds = task_config->exec_est.ranges.find("harvester")->second;

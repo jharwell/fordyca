@@ -29,7 +29,7 @@
 #include "rcppsw/er/client.hpp"
 
 #include "cosm/tv/temporal_penalty_handler.hpp"
-#include "cosm/pal/tv/argos_rda_adaptor.hpp"
+#include "cosm/pal/argos/tv/rda_adaptor.hpp"
 #include "cosm/tv/env_dynamics.hpp"
 
 #include "fordyca/support/tv/block_op_penalty_handler.hpp"
@@ -42,10 +42,6 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-namespace cosm::pal {
-class argos_controller2D_adaptor;
-} /* namespace cosm::pal */
-
 NS_START(fordyca, support);
 
 namespace config::tv {
@@ -66,7 +62,7 @@ NS_START(tv);
  * conditions to the swarm.
  */
 class env_dynamics final : public rer::client<env_dynamics>,
-                           public ctv::env_dynamics<cpal::argos_controller2D_adaptor>,
+                           public ctv::env_dynamics<cpcontroller::controller2D>,
                            public metrics::tv::env_dynamics_metrics {
  public:
   using const_penalty_handlers = std::list<const ctv::temporal_penalty_handler*>;
@@ -78,7 +74,7 @@ class env_dynamics final : public rer::client<env_dynamics>,
    * ccontroller::irv_recipient_controller that it derives from within the RDA
    * class.
    */
-  using rda_adaptor_type = cpal::tv::argos_rda_adaptor<controller::foraging_controller>;
+  using rda_adaptor_type = cpargos::tv::rda_adaptor<controller::foraging_controller>;
 
   env_dynamics(const config::tv::env_dynamics_config * config,
                const support::base_loop_functions* lf,
@@ -95,9 +91,9 @@ class env_dynamics final : public rer::client<env_dynamics>,
   rtypes::timestep cache_usage_penalty(void) const override;
 
   /* COSM env dynamics overrides */
-  void register_controller(const cpal::argos_controller2D_adaptor& c) override;
-  void unregister_controller(const cpal::argos_controller2D_adaptor& c) override;
-  bool penalties_flush(const cpal::argos_controller2D_adaptor& c) override;
+  void register_controller(const cpcontroller::controller2D& c) override;
+  void unregister_controller(const cpcontroller::controller2D& c) override;
+  bool penalties_flush(const cpcontroller::controller2D& c) override;
 
   /**
    * \brief Update the state of applied variances. Should be called once per

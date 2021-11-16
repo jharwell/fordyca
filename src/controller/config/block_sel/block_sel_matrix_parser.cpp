@@ -36,6 +36,10 @@ void block_sel_matrix_parser::parse(const ticpp::Element& node) {
   if (nullptr == node.FirstChild(kXMLRoot, false)) {
     return;
   }
+  ER_DEBUG("Parent node=%s: search for child=%s",
+           node.Value().c_str(),
+           kXMLRoot.c_str());
+
   ticpp::Element cnode = node_get(node, kXMLRoot);
   m_config = std::make_unique<config_type>();
 
@@ -56,7 +60,13 @@ bool block_sel_matrix_parser::validate(void) const {
   if (!is_parsed()) {
     return true;
   }
-  return m_priorities.validate() && m_pickup_policy.validate();
+  ER_CHECK(m_priorities.validate(), "Priority validation failed");
+  ER_CHECK(m_pickup_policy.validate(), "Pickup policy validation failed");
+
+  return true;
+
+error:
+  return false;
 } /* validate() */
 
 NS_END(block_sel, config, controller, fordyca);

@@ -30,8 +30,8 @@
 #include "fordyca/subsystem/perception/los_proc_verify.hpp"
 #include "fordyca/subsystem/perception/oracular_info_receptor.hpp"
 #include "fordyca/subsystem/perception/ds/dpo_store.hpp"
-#include "fordyca/events/block_found.hpp"
-#include "fordyca/events/cache_found.hpp"
+#include "fordyca/subsystem/perception/events/block_found.hpp"
+#include "fordyca/subsystem/perception/events/cache_found.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -146,12 +146,12 @@ void dpo_perception_subsystem::process_los_blocks(
               rcppsw::to_string(block->ranchor2D()).c_str(),
               rcppsw::to_string(block->danchor2D()).c_str());
 
-    ER_CHECKI(!store()->contains(block),
+    ER_CONDI(!store()->contains(block),
               "Discovered block%d@%s/%s",
               block->id().v(),
               rcppsw::to_string(block->ranchor2D()).c_str(),
               rcppsw::to_string(block->danchor2D()).c_str());
-    ER_CHECKD(store()->contains(block),
+    ER_CONDD(store()->contains(block),
               "Block%d@%s/%s already known",
               block->id().v(),
               rcppsw::to_string(block->ranchor2D()).c_str(),

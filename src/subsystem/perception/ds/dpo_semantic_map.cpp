@@ -26,8 +26,8 @@
 #include "cosm/arena/repr/base_cache.hpp"
 
 #include "fordyca/events/cell2D_empty.hpp"
-#include "fordyca/events/block_found.hpp"
-#include "fordyca/events/cache_found.hpp"
+#include "fordyca/subsystem/perception/events/block_found.hpp"
+#include "fordyca/subsystem/perception/events/cache_found.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -95,7 +95,7 @@ model_update_result dpo_semantic_map::cache_update(tracked_cache_type&& cache) {
     auto* found = store()->find(cache.ent());
 
     /* update cache host cell */
-    events::cache_found_visitor e(found->ent());
+    fspevents::cache_found_visitor e(found->ent());
     e.visit(access<occupancy_grid::kCell>(found->ent()->dcenter2D()));
 
     /* copy density from DPO store to new cell  */
@@ -122,7 +122,7 @@ bool dpo_semantic_map::block_remove(crepr::base_block3D* const victim) {
   if (m_store.block_remove(victim)) {
     ER_DEBUG("Updating cell@%s for removed block",
              victim->danchor2D().to_str().c_str());
-    events::cell2D_empty_visitor op(victim->danchor2D());
+    fevents::cell2D_empty_visitor op(victim->danchor2D());
     op.visit(access<occupancy_grid::kCell>(victim->danchor2D()));
 
     /* reset density */
