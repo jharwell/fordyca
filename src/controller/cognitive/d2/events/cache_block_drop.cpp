@@ -56,7 +56,7 @@ cache_block_drop::cache_block_drop(
  * Controllers
  ******************************************************************************/
 void cache_block_drop::visit(fccd2::birtd_dpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   if (dispatch_cache_interactor(controller.current_task(),
                                    controller.cache_sel_matrix())) {
@@ -72,7 +72,7 @@ void cache_block_drop::visit(fccd2::birtd_dpo_controller& controller) {
 } /* visit() */
 
 void cache_block_drop::visit(fccd2::birtd_mdpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   if (dispatch_cache_interactor(controller.current_task(),
                                 controller.cache_sel_matrix())) {
@@ -89,7 +89,7 @@ void cache_block_drop::visit(fccd2::birtd_mdpo_controller& controller) {
 } /* visit() */
 
 void cache_block_drop::visit(fccd2::birtd_odpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   if (dispatch_cache_interactor(controller.current_task(),
                                    controller.cache_sel_matrix())) {
@@ -105,7 +105,7 @@ void cache_block_drop::visit(fccd2::birtd_odpo_controller& controller) {
 } /* visit() */
 
 void cache_block_drop::visit(fccd2::birtd_omdpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   if (dispatch_cache_interactor(controller.current_task(),
                                    controller.cache_sel_matrix())) {

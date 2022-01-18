@@ -51,7 +51,7 @@ nest_block_drop::nest_block_drop(crepr::base_block3D* block,
  * Controllers
  ******************************************************************************/
 void nest_block_drop::visit(fccd0::dpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   visit(*controller.fsm());
   ER_INFO("Dropped block%d in nest", block()->id().v());
@@ -60,7 +60,7 @@ void nest_block_drop::visit(fccd0::dpo_controller& controller) {
 } /* visit() */
 
 void nest_block_drop::visit(fccd0::odpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   visit(*controller.fsm());
   ER_INFO("Dropped block%d in nest", block()->id().v());
@@ -69,7 +69,7 @@ void nest_block_drop::visit(fccd0::odpo_controller& controller) {
 } /* visit() */
 
 void nest_block_drop::visit(fccd0::mdpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   visit(*controller.fsm());
   ER_INFO("Dropped block%d in nest", block()->id().v());
@@ -78,7 +78,7 @@ void nest_block_drop::visit(fccd0::mdpo_controller& controller) {
 } /* visit() */
 
 void nest_block_drop::visit(fccd0::omdpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   visit(*controller.fsm());
   ER_INFO("Dropped block%d in nest", block()->id().v());

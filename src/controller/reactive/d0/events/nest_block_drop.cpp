@@ -47,7 +47,7 @@ nest_block_drop::nest_block_drop(crepr::base_block3D* block,
  * CRW Foraging
  ******************************************************************************/
 void nest_block_drop::visit(fcreactive::d0::crw_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
   visit(*controller.fsm());
 
   ER_INFO("Dropped block%d in nest", m_block->id().v());

@@ -48,7 +48,7 @@ cache_found::cache_found(carepr::base_cache* cache)
  * Controllers
  ******************************************************************************/
 void cache_found::visit(fccd2::birtd_mdpo_controller& c) {
-  c.ndc_pusht();
+  c.ndc_push();
 
   fspevents::cache_found found(m_cache);
   found.visit(*c.perception()->model<fspds::dpo_semantic_map>());
@@ -57,7 +57,7 @@ void cache_found::visit(fccd2::birtd_mdpo_controller& c) {
 } /* visit() */
 
 void cache_found::visit(fccd2::birtd_dpo_controller& c) {
-  c.ndc_pusht();
+  c.ndc_push();
 
   fspevents::cache_found found(m_cache);
   found.visit(*c.perception()->model<fspds::dpo_store>());
@@ -66,7 +66,7 @@ void cache_found::visit(fccd2::birtd_dpo_controller& c) {
 } /* visit() */
 
 void cache_found::visit(fccd2::birtd_omdpo_controller& c) {
-  c.ndc_pusht();
+  c.ndc_push();
 
   fspevents::cache_found found(m_cache);
   found.visit(*c.perception()->model<fspds::dpo_semantic_map>());
@@ -75,7 +75,7 @@ void cache_found::visit(fccd2::birtd_omdpo_controller& c) {
 } /* visit() */
 
 void cache_found::visit(fccd2::birtd_odpo_controller& c) {
-  c.ndc_pusht();
+  c.ndc_push();
 
   fspevents::cache_found found(m_cache);
   found.visit(*c.perception()->model<fspds::dpo_store>());

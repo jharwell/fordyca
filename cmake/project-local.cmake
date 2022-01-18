@@ -126,20 +126,12 @@ add_library(
   ${fordyca_components_SRC}
   )
 
-# Single-component alias
-# add_library(
-#   fordyca::fordyca
-#   ALIAS
-#   fordyca
-#   )
-
-# Alias so we plug into the LIBRA framework properly
-
 target_include_directories(
   fordyca
   PUBLIC
   $<BUILD_INTERFACE:${fordyca_DIR}/include>
   $<BUILD_INTERFACE:${cosm_INCLUDE_DIRS}>
+  $<INSTALL_INTERFACE:include>
   )
 
 target_link_libraries(fordyca

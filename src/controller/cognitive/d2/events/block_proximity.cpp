@@ -50,7 +50,7 @@ block_proximity::block_proximity(crepr::base_block3D* block)
  * Controllers
  ******************************************************************************/
 void block_proximity::visit(fccd2::birtd_dpo_controller& c) {
-  c.ndc_pusht();
+  c.ndc_push();
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
   fccd2::events::block_found_visitor found_op(m_block);
@@ -61,7 +61,7 @@ void block_proximity::visit(fccd2::birtd_dpo_controller& c) {
 } /* visit() */
 
 void block_proximity::visit(fccd2::birtd_mdpo_controller& c) {
-  c.ndc_pusht();
+  c.ndc_push();
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
   fccd2::events::block_found_visitor found_op(m_block);
@@ -72,7 +72,7 @@ void block_proximity::visit(fccd2::birtd_mdpo_controller& c) {
 } /* visit() */
 
 void block_proximity::visit(fccd2::birtd_odpo_controller& c) {
-  c.ndc_pusht();
+  c.ndc_push();
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
   fccd2::events::block_found_visitor found_op(m_block);
@@ -83,7 +83,7 @@ void block_proximity::visit(fccd2::birtd_odpo_controller& c) {
 } /* visit() */
 
 void block_proximity::visit(fccd2::birtd_omdpo_controller& c) {
-  c.ndc_pusht();
+  c.ndc_push();
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
   fccd2::events::block_found_visitor found_op(m_block);

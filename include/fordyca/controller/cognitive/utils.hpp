@@ -39,7 +39,7 @@ NS_START(free_block_pickup);
 
 template<typename TController, typename TPerceptionModel>
 void controller_visit(TController& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   base_pickup::visit(*controller.perception()->template model<TPerceptionModel>());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));

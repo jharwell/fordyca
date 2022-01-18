@@ -55,7 +55,7 @@ cache_proximity::cache_proximity(carepr::base_cache* cache)
  * Controllers
  ******************************************************************************/
 void cache_proximity::visit(fccd2::birtd_dpo_controller& c) {
-  c.ndc_pusht();
+  c.ndc_push();
 
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
 
@@ -68,7 +68,7 @@ void cache_proximity::visit(fccd2::birtd_dpo_controller& c) {
 } /* visit() */
 
 void cache_proximity::visit(fccd2::birtd_mdpo_controller& c) {
-  c.ndc_pusht();
+  c.ndc_push();
 
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
 
@@ -81,7 +81,7 @@ void cache_proximity::visit(fccd2::birtd_mdpo_controller& c) {
 } /* visit() */
 
 void cache_proximity::visit(fccd2::birtd_odpo_controller& c) {
-  c.ndc_pusht();
+  c.ndc_push();
 
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
 
@@ -94,7 +94,7 @@ void cache_proximity::visit(fccd2::birtd_odpo_controller& c) {
 } /* visit() */
 
 void cache_proximity::visit(fccd2::birtd_omdpo_controller& c) {
-  c.ndc_pusht();
+  c.ndc_push();
 
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
 

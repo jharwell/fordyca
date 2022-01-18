@@ -36,7 +36,7 @@ void mdpo_parser::parse(const ticpp::Element& node) {
   if (nullptr == node.FirstChild(kXMLRoot, false)) {
     return;
   }
-  ER_DEBUG("Parent node=%s: search for child=%s",
+  ER_DEBUG("Parent node=%s: child=%s",
            node.Value().c_str(),
            kXMLRoot.c_str());
 
@@ -55,7 +55,7 @@ bool mdpo_parser::validate(void) const {
     return true;
   }
   ER_CHECK(m_pheromone.validate(), "Pheromone validation failed");
-  ER_CHECK(m_rlos.validate(), "RLOS validationb failed");
+  ER_CHECK(m_rlos.validate(), "RLOS validation failed");
 
   return true;
 

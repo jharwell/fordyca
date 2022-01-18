@@ -56,7 +56,7 @@ free_block_pickup::free_block_pickup(crepr::base_block3D* block,
  * Controllers
  ******************************************************************************/
 void free_block_pickup::visit(fccd1::bitd_dpo_controller& c) {
-  c.ndc_pusht();
+  c.ndc_push();
 
   controller_visit_impl(c, *c.perception()->template model<fspds::dpo_store>());
   ER_INFO("Picked up block%d", block()->id().v());
@@ -65,7 +65,7 @@ void free_block_pickup::visit(fccd1::bitd_dpo_controller& c) {
 } /* visit() */
 
 void free_block_pickup::visit(fccd1::bitd_odpo_controller& c) {
-  c.ndc_pusht();
+  c.ndc_push();
 
   controller_visit_impl(c, *c.perception()->template model<fspds::dpo_store>());
   ER_INFO("Picked up block%d", block()->id().v());
@@ -74,7 +74,7 @@ void free_block_pickup::visit(fccd1::bitd_odpo_controller& c) {
 } /* visit() */
 
 void free_block_pickup::visit(fccd1::bitd_mdpo_controller& c) {
-  c.ndc_pusht();
+  c.ndc_push();
 
   controller_visit_impl(c, *c.perception()->template model<fspds::dpo_semantic_map>());
   ER_INFO("Picked up block%d", block()->id().v());
@@ -83,7 +83,7 @@ void free_block_pickup::visit(fccd1::bitd_mdpo_controller& c) {
 } /* visit() */
 
 void free_block_pickup::visit(fccd1::bitd_omdpo_controller& c) {
-  c.ndc_pusht();
+  c.ndc_push();
 
   controller_visit_impl(c, *c.perception()->template model<fspds::dpo_semantic_map>());
   ER_INFO("Picked up block%d", block()->id().v());

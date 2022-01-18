@@ -48,7 +48,7 @@ block_vanished::block_vanished(const rtypes::type_uuid& block_id)
  * Controllers
  ******************************************************************************/
 void block_vanished::visit(fccd2::birtd_mdpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   dispatch_free_block_interactor(controller.current_task());
 
@@ -56,7 +56,7 @@ void block_vanished::visit(fccd2::birtd_mdpo_controller& controller) {
 } /* visit() */
 
 void block_vanished::visit(fccd2::birtd_dpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   dispatch_free_block_interactor(controller.current_task());
 
@@ -64,7 +64,7 @@ void block_vanished::visit(fccd2::birtd_dpo_controller& controller) {
 } /* visit() */
 
 void block_vanished::visit(fccd2::birtd_omdpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   dispatch_free_block_interactor(controller.current_task());
 
@@ -72,7 +72,7 @@ void block_vanished::visit(fccd2::birtd_omdpo_controller& controller) {
 } /* visit() */
 
 void block_vanished::visit(fccd2::birtd_odpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   dispatch_free_block_interactor(controller.current_task());
 

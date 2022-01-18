@@ -48,7 +48,7 @@ block_vanished::block_vanished(const rtypes::type_uuid& block_id)
  * Controllers
  ******************************************************************************/
 void block_vanished::visit(fccd0::dpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   ER_INFO("Abort pickup: block%d vanished", mc_block_id.v());
   visit(*controller.fsm());
@@ -57,7 +57,7 @@ void block_vanished::visit(fccd0::dpo_controller& controller) {
 } /* visit() */
 
 void block_vanished::visit(fccd0::mdpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   ER_INFO("Abort pickup: block%d vanished", mc_block_id.v());
   visit(*controller.fsm());
@@ -66,7 +66,7 @@ void block_vanished::visit(fccd0::mdpo_controller& controller) {
 } /* visit() */
 
 void block_vanished::visit(fccd0::odpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   ER_INFO("Abort pickup: block%d vanished", mc_block_id.v());
   visit(*controller.fsm());
@@ -75,7 +75,7 @@ void block_vanished::visit(fccd0::odpo_controller& controller) {
 } /* visit() */
 
 void block_vanished::visit(fccd0::omdpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   ER_INFO("Abort pickup: block%d vanished", mc_block_id.v());
   visit(*controller.fsm());

@@ -48,7 +48,7 @@ block_found::block_found(crepr::base_block3D* block)
  * Depth2 Foraging
  ******************************************************************************/
 void block_found::visit(controller::cognitive::d2::birtd_mdpo_controller& c) {
-  c.ndc_pusht();
+  c.ndc_push();
 
   fspevents::block_found found(m_block);
   found.visit(*c.perception()->model<fspds::dpo_semantic_map>());
@@ -57,7 +57,7 @@ void block_found::visit(controller::cognitive::d2::birtd_mdpo_controller& c) {
 } /* visit() */
 
 void block_found::visit(controller::cognitive::d2::birtd_dpo_controller& c) {
-  c.ndc_pusht();
+  c.ndc_push();
 
   fspevents::block_found found(m_block);
   found.visit(*c.perception()->model<fspds::dpo_store>());
@@ -66,7 +66,7 @@ void block_found::visit(controller::cognitive::d2::birtd_dpo_controller& c) {
 } /* visit() */
 
 void block_found::visit(controller::cognitive::d2::birtd_omdpo_controller& c) {
-  c.ndc_pusht();
+  c.ndc_push();
 
   fspevents::block_found found(m_block);
   found.visit(*c.perception()->model<fspds::dpo_semantic_map>());
@@ -75,7 +75,7 @@ void block_found::visit(controller::cognitive::d2::birtd_omdpo_controller& c) {
 } /* visit() */
 
 void block_found::visit(controller::cognitive::d2::birtd_odpo_controller& c) {
-  c.ndc_pusht();
+  c.ndc_push();
 
   fspevents::block_found found(m_block);
   found.visit(*c.perception()->model<fspds::dpo_store>());

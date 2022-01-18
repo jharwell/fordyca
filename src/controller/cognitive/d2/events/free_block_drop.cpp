@@ -55,7 +55,7 @@ free_block_drop::free_block_drop(
  * Controllers
  ******************************************************************************/
 void free_block_drop::visit(fccd2::birtd_mdpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   if (dispatch_free_block_interactor(controller.current_task(),
                                      controller.block_sel_matrix())) {
@@ -66,7 +66,7 @@ void free_block_drop::visit(fccd2::birtd_mdpo_controller& controller) {
 } /* visit() */
 
 void free_block_drop::visit(fccd2::birtd_dpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   if (dispatch_free_block_interactor(controller.current_task(),
                                      controller.block_sel_matrix())) {
@@ -77,7 +77,7 @@ void free_block_drop::visit(fccd2::birtd_dpo_controller& controller) {
 } /* visit() */
 
 void free_block_drop::visit(fccd2::birtd_omdpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   if (dispatch_free_block_interactor(controller.current_task(),
                                      controller.block_sel_matrix())) {
@@ -88,7 +88,7 @@ void free_block_drop::visit(fccd2::birtd_omdpo_controller& controller) {
 } /* visit() */
 
 void free_block_drop::visit(fccd2::birtd_odpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   if (dispatch_free_block_interactor(controller.current_task(),
                                      controller.block_sel_matrix())) {

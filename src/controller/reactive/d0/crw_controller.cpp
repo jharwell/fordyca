@@ -52,8 +52,8 @@ crw_controller::~crw_controller(void) = default;
  * Member Functions
  ******************************************************************************/
 void crw_controller::init(ticpp::Element& node) {
-  foraging_controller::init(node);
   ndc_push();
+  foraging_controller::init(node);
   ER_INFO("Initializing...");
 
   config::foraging_controller_repository repo;

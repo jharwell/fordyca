@@ -24,9 +24,7 @@
           (add-to-list 'flycheck-clang-args "-std=c++17")
           (add-to-list 'flycheck-clang-args "-fPIC")
           (add-to-list 'flycheck-clang-args (concat "-isystem" (substitute-in-file-name
-                                                                 "$rcppsw/ext")))
-          (add-to-list 'flycheck-clang-args (concat "-isystem" (substitute-in-file-name
-                                                                "$localroot/include")))
+                                                                "$localroot/system/include")))
           (add-to-list 'flycheck-clang-args (concat "-isystem" "/usr/include/eigen3"))
           (add-to-list 'flycheck-clang-args "-ftemplate-backtrace-limit=0")
           (add-to-list 'flycheck-clang-definitions "COSM_HAL_TARGET=COSM_HAL_TARGET_ARGOS_FOOTBOT")
@@ -40,7 +38,7 @@
           (add-to-list 'flycheck-gcc-args (concat "-isystem" (substitute-in-file-name
                                                               "$rcppsw/ext")))
           (add-to-list 'flycheck-gcc-args (concat "-isystem" (substitute-in-file-name
-                                                              "$localroot/include")))
+                                                              "$localroot/system/include")))
           (add-to-list 'flycheck-gcc-args (concat "-isystem" "/usr/include/eigen3"))
           (add-to-list 'flycheck-gcc-definitions "LIBRA_ER=LIBRA_ER_ALL")
           )

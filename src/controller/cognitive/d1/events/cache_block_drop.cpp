@@ -61,7 +61,7 @@ cache_block_drop::cache_block_drop(
  ******************************************************************************/
 void cache_block_drop::visit(
     controller::cognitive::d1::bitd_dpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   dispatch_cache_interactor(controller.current_task());
 
@@ -76,7 +76,7 @@ void cache_block_drop::visit(
 
 void cache_block_drop::visit(
     controller::cognitive::d1::bitd_mdpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   visit(*controller.perception()->model<fspds::dpo_semantic_map>());
   dispatch_cache_interactor(controller.current_task());
@@ -92,7 +92,7 @@ void cache_block_drop::visit(
 
 void cache_block_drop::visit(
     controller::cognitive::d1::bitd_odpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   dispatch_cache_interactor(controller.current_task());
 
@@ -107,7 +107,7 @@ void cache_block_drop::visit(
 
 void cache_block_drop::visit(
     controller::cognitive::d1::bitd_omdpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   visit(*controller.perception()->model<fspds::dpo_semantic_map>());
   dispatch_cache_interactor(controller.current_task());

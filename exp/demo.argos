@@ -51,7 +51,7 @@
           <explore
               block_strategy="CRW"/>
           <nest_acq
-              strategy="random_thresh"
+              strategy="wander"
               />
           </strategy>
         <sensing_subsystemQ3D>
@@ -90,8 +90,8 @@
           </force_calculator>
 
           <!-- 25 degrees soft_turn_max. -->
-          <diff_drive soft_turn_max="0.436"
-                      max_speed="0.1" />
+          <diff_drive soft_turn_max="0.836"
+                      max_speed="0.09" />
         </actuation_subsystem2D>
       </params>
     </crw_controller>
@@ -137,10 +137,10 @@
       <blocks>
         <distribution
             arena_resolution="0.2"
-            dist_type="single_source">
+            dist_type="random">
           <manifest
-              n_cube="10"
-              n_ramp="10"
+              n_cube="100"
+              n_ramp="0"
               unit_dim="0.2"
               />
         </distribution>
@@ -182,7 +182,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="1" max_trials="1000">
+      <entity quantity="16" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->

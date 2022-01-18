@@ -66,7 +66,7 @@ cached_block_pickup::~cached_block_pickup(void) = default;
  * Controllers
  ******************************************************************************/
 void cached_block_pickup::visit(fccd2::birtd_dpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   base_pickup::visit(*controller.perception()->model<fspds::dpo_semantic_map>());
   base_pickup::visit(static_cast<ccontroller::block_carrying_controller&>(controller));
@@ -80,7 +80,7 @@ void cached_block_pickup::visit(fccd2::birtd_dpo_controller& controller) {
 } /* visit() */
 
 void cached_block_pickup::visit(fccd2::birtd_mdpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   base_pickup::visit(*controller.perception()->model<fspds::dpo_semantic_map>());
   base_pickup::visit(static_cast<ccontroller::block_carrying_controller&>(controller));
@@ -93,7 +93,7 @@ void cached_block_pickup::visit(fccd2::birtd_mdpo_controller& controller) {
 } /* visit() */
 
 void cached_block_pickup::visit(fccd2::birtd_odpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   base_pickup::visit(*controller.perception()->model<fspds::dpo_store>());
   base_pickup::visit(static_cast<ccontroller::block_carrying_controller&>(controller));
@@ -107,7 +107,7 @@ void cached_block_pickup::visit(fccd2::birtd_odpo_controller& controller) {
 } /* visit() */
 
 void cached_block_pickup::visit(fccd2::birtd_omdpo_controller& controller) {
-  controller.ndc_pusht();
+  controller.ndc_push();
 
   base_pickup::visit(*controller.perception()->model<fspds::dpo_semantic_map>());
   base_pickup::visit(static_cast<ccontroller::block_carrying_controller&>(controller));

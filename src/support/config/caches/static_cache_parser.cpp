@@ -38,7 +38,7 @@ void static_cache_parser::parse(const ticpp::Element& node) {
   if (nullptr == node.FirstChild(kXMLRoot, false)) {
     return;
   }
-  ER_DEBUG("Parent node=%s: search for child=%s",
+  ER_DEBUG("Parent node=%s: child=%s",
            node.Value().c_str(),
            kXMLRoot.c_str());
 

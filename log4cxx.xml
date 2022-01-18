@@ -4,10 +4,8 @@
   <appender
       name="__console__"
   class="log4cxx.ConsoleAppender">
-    <param name="Target" value="System.out"/>
-        <layout class="colored_pattern_layout">
-            <param name="ConversionPattern" value="%x [%-5p] %c - %m%n"/>
-        </layout>
+    <!-- <param name="Target" value="System.out"/> -->
+    <!--     <layout class="PatternLayout"/> -->
   </appender>
 
   <root>
