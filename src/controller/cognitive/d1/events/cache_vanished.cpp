@@ -49,35 +49,35 @@ cache_vanished::cache_vanished(const rtypes::type_uuid& cache_id)
  * Controllers
  ******************************************************************************/
 void cache_vanished::visit(fccd1::bitd_dpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   dispatch_cache_interactor(controller.current_task());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void cache_vanished::visit(fccd1::bitd_mdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   dispatch_cache_interactor(controller.current_task());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void cache_vanished::visit(fccd1::bitd_odpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   dispatch_cache_interactor(controller.current_task());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void cache_vanished::visit(fccd1::bitd_omdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   dispatch_cache_interactor(controller.current_task());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 /*******************************************************************************

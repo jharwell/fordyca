@@ -53,35 +53,35 @@ cache_found::cache_found(carepr::base_cache* cache)
  * Controllers
  ******************************************************************************/
 void cache_found::visit(fccd1::bitd_mdpo_controller& c) {
-  c.ndc_push();
+  c.ndc_uuid_push();
 
   visit(*c.perception()->model<fspds::dpo_semantic_map>());
 
-  c.ndc_pop();
+  c.ndc_uuid_pop();
 } /* visit() */
 
 void cache_found::visit(fccd1::bitd_dpo_controller& c) {
-  c.ndc_push();
+  c.ndc_uuid_push();
 
   visit(*c.perception()->model<fspds::dpo_store>());
 
-  c.ndc_pop();
+  c.ndc_uuid_pop();
 } /* visit() */
 
 void cache_found::visit(fccd1::bitd_omdpo_controller& c) {
-  c.ndc_push();
+  c.ndc_uuid_push();
 
   visit(*c.perception()->model<fspds::dpo_semantic_map>());
 
-  c.ndc_pop();
+  c.ndc_uuid_pop();
 } /* visit() */
 
 void cache_found::visit(fccd1::bitd_odpo_controller& c) {
-  c.ndc_push();
+  c.ndc_uuid_push();
 
   visit(*c.perception()->model<fspds::dpo_store>());
 
-  c.ndc_pop();
+  c.ndc_uuid_pop();
 } /* visit() */
 
 /*******************************************************************************

@@ -67,43 +67,43 @@ cached_block_pickup::~cached_block_pickup(void) = default;
  * Controllers
  ******************************************************************************/
 void cached_block_pickup::visit(fccd1::bitd_dpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   visit(*controller.perception()->model<fspds::dpo_store>());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   dispatch_cache_interactor(controller.current_task());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void cached_block_pickup::visit(fccd1::bitd_mdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   visit(*controller.perception()->model<fspds::dpo_store>());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   dispatch_cache_interactor(controller.current_task());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void cached_block_pickup::visit(fccd1::bitd_odpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   visit(*controller.perception()->model<fspds::dpo_store>());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   dispatch_cache_interactor(controller.current_task());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void cached_block_pickup::visit(fccd1::bitd_omdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   visit(*controller.perception()->model<fspds::dpo_store>());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   dispatch_cache_interactor(controller.current_task());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 /*******************************************************************************

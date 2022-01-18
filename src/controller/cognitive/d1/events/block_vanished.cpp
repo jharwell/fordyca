@@ -47,35 +47,35 @@ block_vanished::block_vanished(const rtypes::type_uuid& block_id)
  * Controllers
  ******************************************************************************/
 void block_vanished::visit(fccd1::bitd_dpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   dispatch_free_block_interactor(controller.current_task());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void block_vanished::visit(fccd1::bitd_mdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   dispatch_free_block_interactor(controller.current_task());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void block_vanished::visit(fccd1::bitd_odpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   dispatch_free_block_interactor(controller.current_task());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void block_vanished::visit(fccd1::bitd_omdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   dispatch_free_block_interactor(controller.current_task());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 /*******************************************************************************

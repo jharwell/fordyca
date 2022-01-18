@@ -56,7 +56,7 @@ cache_block_drop::cache_block_drop(
  * Controllers
  ******************************************************************************/
 void cache_block_drop::visit(fccd2::birtd_dpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   if (dispatch_cache_interactor(controller.current_task(),
                                    controller.cache_sel_matrix())) {
@@ -68,11 +68,11 @@ void cache_block_drop::visit(fccd2::birtd_dpo_controller& controller) {
       cache()->id().v(),
       dynamic_cast<cta::logical_task*>(controller.current_task())->name().c_str());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void cache_block_drop::visit(fccd2::birtd_mdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   if (dispatch_cache_interactor(controller.current_task(),
                                 controller.cache_sel_matrix())) {
@@ -85,11 +85,11 @@ void cache_block_drop::visit(fccd2::birtd_mdpo_controller& controller) {
       cache()->id().v(),
       dynamic_cast<cta::logical_task*>(controller.current_task())->name().c_str());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void cache_block_drop::visit(fccd2::birtd_odpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   if (dispatch_cache_interactor(controller.current_task(),
                                    controller.cache_sel_matrix())) {
@@ -101,11 +101,11 @@ void cache_block_drop::visit(fccd2::birtd_odpo_controller& controller) {
       cache()->id().v(),
       dynamic_cast<cta::logical_task*>(controller.current_task())->name().c_str());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void cache_block_drop::visit(fccd2::birtd_omdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   if (dispatch_cache_interactor(controller.current_task(),
                                    controller.cache_sel_matrix())) {
@@ -118,7 +118,7 @@ void cache_block_drop::visit(fccd2::birtd_omdpo_controller& controller) {
       cache()->id().v(),
       dynamic_cast<cta::logical_task*>(controller.current_task())->name().c_str());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void cache_block_drop::visit(tasks::d2::cache_transferer& task) {

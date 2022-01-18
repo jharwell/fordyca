@@ -53,39 +53,39 @@ nest_block_drop::nest_block_drop(crepr::base_block3D* block,
  * Controllers
  ******************************************************************************/
 void nest_block_drop::visit(fccd1::bitd_dpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   dispatch_nest_interactor(controller.current_task());
   ER_INFO("Dropped block%d in nest", m_block->id().v());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void nest_block_drop::visit(fccd1::bitd_odpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   dispatch_nest_interactor(controller.current_task());
   ER_INFO("Dropped block%d in nest", m_block->id().v());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void nest_block_drop::visit(fccd1::bitd_mdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   dispatch_nest_interactor(controller.current_task());
   ER_INFO("Dropped block%d in nest", m_block->id().v());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void nest_block_drop::visit(fccd1::bitd_omdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   dispatch_nest_interactor(controller.current_task());
   ER_INFO("Dropped block%d in nest", m_block->id().v());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 /*******************************************************************************

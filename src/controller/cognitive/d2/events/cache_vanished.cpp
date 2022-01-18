@@ -49,39 +49,39 @@ cache_vanished::cache_vanished(const rtypes::type_uuid& cache_id)
  * Depth2 Foraging
  ******************************************************************************/
 void cache_vanished::visit(fccd2::birtd_dpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", cache_id().v());
   dispatch_cache_interactor(controller.current_task());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void cache_vanished::visit(fccd2::birtd_mdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", cache_id().v());
   dispatch_cache_interactor(controller.current_task());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void cache_vanished::visit(fccd2::birtd_odpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", cache_id().v());
   dispatch_cache_interactor(controller.current_task());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void cache_vanished::visit(fccd2::birtd_omdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", cache_id().v());
   dispatch_cache_interactor(controller.current_task());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 /*******************************************************************************

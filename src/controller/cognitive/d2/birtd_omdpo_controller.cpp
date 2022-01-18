@@ -50,7 +50,8 @@ birtd_omdpo_controller::~birtd_omdpo_controller(void) = default;
  * Member Functions
  ******************************************************************************/
 void birtd_omdpo_controller::control_step(void) {
-  ndc_pusht();
+  mdc_ts_update();
+ndc_uuid_push();
   ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
@@ -64,7 +65,7 @@ void birtd_omdpo_controller::control_step(void) {
    */
   supervisor()->run();
 
-  ndc_pop();
+  ndc_uuid_pop();
 } /* control_step() */
 
 void birtd_omdpo_controller::oracle_init(

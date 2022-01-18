@@ -45,39 +45,39 @@ nest_block_drop::nest_block_drop(crepr::base_block3D* block,
  * Controllers
  ******************************************************************************/
 void nest_block_drop::visit(fccd2::birtd_mdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   dispatch_nest_interactor(controller.current_task());
   ER_INFO("Dropped block%d in nest", block()->id().v());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void nest_block_drop::visit(fccd2::birtd_dpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   dispatch_nest_interactor(controller.current_task());
   ER_INFO("Dropped block%d in nest", block()->id().v());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void nest_block_drop::visit(fccd2::birtd_odpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   dispatch_nest_interactor(controller.current_task());
   ER_INFO("Dropped block%d in nest", block()->id().v());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void nest_block_drop::visit(fccd2::birtd_omdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   dispatch_nest_interactor(controller.current_task());
   ER_INFO("Dropped block%d in nest", block()->id().v());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 NS_END(events, d2, cognitive, controller, fordyca);

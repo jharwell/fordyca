@@ -67,10 +67,12 @@ void foraging_controller::init(ticpp::Element& node) {
   /* verify environment variables set up for logging */
   ER_ENV_VERIFY();
 
+  mdc_ts_update();
+
   config::foraging_controller_repository repo;
   repo.parse_all(node);
 
-  ndc_push();
+  ndc_uuid_push();
   if (!repo.validate_all()) {
     ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);
@@ -95,7 +97,7 @@ void foraging_controller::init(ticpp::Element& node) {
   inta_tracker(std::make_unique<cspatial::interference_tracker>(saa()->sensing()));
   m_nz_tracker = std::make_unique<cspatial::nest_zone_tracker>(saa()->sensing());
 
-  ndc_pop();
+  ndc_uuid_pop();
 } /* init() */
 
 void foraging_controller::reset(void) { block_carrying_controller::reset(); }

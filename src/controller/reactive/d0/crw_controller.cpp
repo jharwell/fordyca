@@ -52,8 +52,8 @@ crw_controller::~crw_controller(void) = default;
  * Member Functions
  ******************************************************************************/
 void crw_controller::init(ticpp::Element& node) {
-  ndc_push();
   foraging_controller::init(node);
+  ndc_uuid_push();
   ER_INFO("Initializing...");
 
   config::foraging_controller_repository repo;
@@ -93,7 +93,7 @@ void crw_controller::init(ticpp::Element& node) {
   /* Set CRW FSM supervision */
   supervisor()->supervisee_update(m_fsm.get());
   ER_INFO("Initialization finished");
-  ndc_pop();
+  ndc_uuid_pop();
 } /* init() */
 
 void crw_controller::reset(void) {
@@ -104,7 +104,8 @@ void crw_controller::reset(void) {
 } /* reset() */
 
 void crw_controller::control_step(void) {
-  ndc_pusht();
+  mdc_ts_update();
+  ndc_uuid_push();
   ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
@@ -115,7 +116,7 @@ void crw_controller::control_step(void) {
    * abnormal operation state.
    */
   supervisor()->run();
-  ndc_pop();
+  ndc_uuid_pop();
 } /* control_step() */
 
 /*******************************************************************************

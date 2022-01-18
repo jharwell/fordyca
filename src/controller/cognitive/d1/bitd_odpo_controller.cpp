@@ -50,7 +50,8 @@ bitd_odpo_controller::~bitd_odpo_controller(void) = default;
  * Member Functions
  ******************************************************************************/
 void bitd_odpo_controller::control_step(void) {
-  ndc_pusht();
+  mdc_ts_update();
+ndc_uuid_push();
   ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
@@ -65,7 +66,7 @@ void bitd_odpo_controller::control_step(void) {
    */
   supervisor()->run();
 
-  ndc_pop();
+  ndc_uuid_pop();
 } /* control_step() */
 
 void bitd_odpo_controller::oracle_init(

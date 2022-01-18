@@ -39,13 +39,13 @@ NS_START(free_block_pickup);
 
 template<typename TController, typename TPerceptionModel>
 void controller_visit(TController& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   base_pickup::visit(*controller.perception()->template model<TPerceptionModel>());
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   dispatch_free_block_interactor(controller.current_task());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 }
 
 NS_END(cognitive, controller, fordyca);

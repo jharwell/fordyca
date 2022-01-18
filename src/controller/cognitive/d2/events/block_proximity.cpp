@@ -50,47 +50,47 @@ block_proximity::block_proximity(crepr::base_block3D* block)
  * Controllers
  ******************************************************************************/
 void block_proximity::visit(fccd2::birtd_dpo_controller& c) {
-  c.ndc_push();
+  c.ndc_uuid_push();
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
   fccd2::events::block_found_visitor found_op(m_block);
   found_op.visit(c);
   dispatch_cache_starter(c.current_task());
 
-  c.ndc_pop();
+  c.ndc_uuid_pop();
 } /* visit() */
 
 void block_proximity::visit(fccd2::birtd_mdpo_controller& c) {
-  c.ndc_push();
+  c.ndc_uuid_push();
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
   fccd2::events::block_found_visitor found_op(m_block);
   found_op.visit(c);
   dispatch_cache_starter(c.current_task());
 
-  c.ndc_pop();
+  c.ndc_uuid_pop();
 } /* visit() */
 
 void block_proximity::visit(fccd2::birtd_odpo_controller& c) {
-  c.ndc_push();
+  c.ndc_uuid_push();
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
   fccd2::events::block_found_visitor found_op(m_block);
   found_op.visit(c);
   dispatch_cache_starter(c.current_task());
 
-  c.ndc_pop();
+  c.ndc_uuid_pop();
 } /* visit() */
 
 void block_proximity::visit(fccd2::birtd_omdpo_controller& c) {
-  c.ndc_push();
+  c.ndc_uuid_push();
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
   fccd2::events::block_found_visitor found_op(m_block);
   found_op.visit(c);
   dispatch_cache_starter(c.current_task());
 
-  c.ndc_pop();
+  c.ndc_uuid_pop();
 } /* visit() */
 
 /*******************************************************************************

@@ -51,7 +51,7 @@ birtd_mdpo_controller::~birtd_mdpo_controller(void) = default;
  ******************************************************************************/
 void birtd_mdpo_controller::init(ticpp::Element& node) {
   foraging_controller::init(node);
-  ndc_push();
+  ndc_uuid_push();
   ER_INFO("Initializing");
 
   config::d2::controller_repository config_repo;
@@ -64,7 +64,7 @@ void birtd_mdpo_controller::init(ticpp::Element& node) {
   shared_init(config_repo);
 
   ER_INFO("Initialization finished");
-  ndc_pop();
+  ndc_uuid_pop();
 } /* init() */
 
 void birtd_mdpo_controller::shared_init(

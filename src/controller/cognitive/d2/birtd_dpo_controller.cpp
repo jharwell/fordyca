@@ -54,7 +54,8 @@ birtd_dpo_controller::birtd_dpo_controller(void)
  * Member Functions
  ******************************************************************************/
 void birtd_dpo_controller::control_step(void) {
-  ndc_pusht();
+  mdc_ts_update();
+ndc_uuid_push();
   ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
@@ -70,12 +71,12 @@ void birtd_dpo_controller::control_step(void) {
    */
   supervisor()->run();
 
-  ndc_pop();
+  ndc_uuid_pop();
 } /* control_step() */
 
 void birtd_dpo_controller::init(ticpp::Element& node) {
   foraging_controller::init(node);
-  ndc_push();
+  ndc_uuid_push();
   ER_INFO("Initializing");
 
   config::d2::controller_repository config_repo;
@@ -89,7 +90,7 @@ void birtd_dpo_controller::init(ticpp::Element& node) {
   private_init(config_repo);
 
   ER_INFO("Initialization finished");
-  ndc_pop();
+  ndc_uuid_pop();
 } /* init() */
 
 void birtd_dpo_controller::private_init(

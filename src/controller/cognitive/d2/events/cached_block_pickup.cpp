@@ -66,7 +66,7 @@ cached_block_pickup::~cached_block_pickup(void) = default;
  * Controllers
  ******************************************************************************/
 void cached_block_pickup::visit(fccd2::birtd_dpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   base_pickup::visit(*controller.perception()->model<fspds::dpo_semantic_map>());
   base_pickup::visit(static_cast<ccontroller::block_carrying_controller&>(controller));
@@ -76,11 +76,11 @@ void cached_block_pickup::visit(fccd2::birtd_dpo_controller& controller) {
     controller.csel_exception_added(true);
   }
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void cached_block_pickup::visit(fccd2::birtd_mdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   base_pickup::visit(*controller.perception()->model<fspds::dpo_semantic_map>());
   base_pickup::visit(static_cast<ccontroller::block_carrying_controller&>(controller));
@@ -89,11 +89,11 @@ void cached_block_pickup::visit(fccd2::birtd_mdpo_controller& controller) {
                                    controller.cache_sel_matrix())) {
     controller.csel_exception_added(true);
   }
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void cached_block_pickup::visit(fccd2::birtd_odpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   base_pickup::visit(*controller.perception()->model<fspds::dpo_store>());
   base_pickup::visit(static_cast<ccontroller::block_carrying_controller&>(controller));
@@ -103,11 +103,11 @@ void cached_block_pickup::visit(fccd2::birtd_odpo_controller& controller) {
     controller.csel_exception_added(true);
   }
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void cached_block_pickup::visit(fccd2::birtd_omdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   base_pickup::visit(*controller.perception()->model<fspds::dpo_semantic_map>());
   base_pickup::visit(static_cast<ccontroller::block_carrying_controller&>(controller));
@@ -116,7 +116,7 @@ void cached_block_pickup::visit(fccd2::birtd_omdpo_controller& controller) {
                                    controller.cache_sel_matrix())) {
     controller.csel_exception_added(true);
   }
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 /*******************************************************************************

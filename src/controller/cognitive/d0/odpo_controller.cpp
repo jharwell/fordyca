@@ -49,7 +49,8 @@ odpo_controller::~odpo_controller(void) = default;
  * Member Functions
  ******************************************************************************/
 void odpo_controller::control_step(void) {
-  ndc_pusht();
+  mdc_ts_update();
+ndc_uuid_push();
   ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
@@ -58,7 +59,7 @@ void odpo_controller::control_step(void) {
   perception()->update(m_receptor.get());
   fsm()->run();
   saa()->steer_force2D_apply();
-  ndc_pop();
+  ndc_uuid_pop();
 } /* control_step() */
 
 void odpo_controller::oracle_init(

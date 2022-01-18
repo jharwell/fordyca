@@ -43,12 +43,12 @@ block_vanished::block_vanished(const rtypes::type_uuid& block_id)
  * Controllers
  ******************************************************************************/
 void block_vanished::visit(fcreactive::d0::crw_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   ER_INFO("Abort pickup: block%d vanished", mc_block_id.v());
   visit(*controller.fsm());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 /*******************************************************************************

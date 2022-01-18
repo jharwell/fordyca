@@ -51,39 +51,39 @@ nest_block_drop::nest_block_drop(crepr::base_block3D* block,
  * Controllers
  ******************************************************************************/
 void nest_block_drop::visit(fccd0::dpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   visit(*controller.fsm());
   ER_INFO("Dropped block%d in nest", block()->id().v());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void nest_block_drop::visit(fccd0::odpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   visit(*controller.fsm());
   ER_INFO("Dropped block%d in nest", block()->id().v());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void nest_block_drop::visit(fccd0::mdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   visit(*controller.fsm());
   ER_INFO("Dropped block%d in nest", block()->id().v());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void nest_block_drop::visit(fccd0::omdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   visit(*controller.fsm());
   ER_INFO("Dropped block%d in nest", block()->id().v());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 /*******************************************************************************

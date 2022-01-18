@@ -138,14 +138,15 @@ d2_loop_functions::~d2_loop_functions(void) = default;
  * Initialization Functions
  ******************************************************************************/
 void d2_loop_functions::init(ticpp::Element& node) {
-  ndc_push();
+  mdc_ts_update();
+  ndc_uuid_push();
   ER_INFO("Initializing...");
 
   shared_init(node);
   private_init();
 
   ER_INFO("Initialization finished");
-  ndc_pop();
+  ndc_uuid_pop();
 } /* init() */
 
 void d2_loop_functions::shared_init(ticpp::Element& node) {
@@ -254,33 +255,34 @@ std::vector<int> d2_loop_functions::robot_tasks_extract(uint) const {
  * ARGoS Hooks
  ******************************************************************************/
 void d2_loop_functions::pre_step() {
-  ndc_push();
+  mdc_ts_update();
+  ndc_uuid_push();
   base_loop_functions::pre_step();
-  ndc_pop();
+  ndc_uuid_pop();
 
   /* Process all robots */
   auto cb = [&](argos::CControllableEntity* robot) {
-    ndc_push();
+    ndc_uuid_push();
     robot_pre_step(dynamic_cast<chal::robot&>(robot->GetParent()));
-    ndc_pop();
+    ndc_uuid_pop();
   };
   cpargos::swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
 } /* pre_step() */
 
 void d2_loop_functions::post_step(void) {
-  ndc_push();
+  ndc_uuid_push();
   base_loop_functions::post_step();
-  ndc_pop();
+  ndc_uuid_pop();
 
   /* Process all robots: environment interactions then collect metrics */
   auto cb = [&](argos::CControllableEntity* robot) {
-    ndc_push();
+    ndc_uuid_push();
     robot_post_step(dynamic_cast<chal::robot&>(robot->GetParent()));
-    ndc_pop();
+    ndc_uuid_pop();
   };
   cpargos::swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
 
-  ndc_push();
+  ndc_uuid_push();
   /*
    * Run dynamic cache creation if it was triggered. We don't wan't to run it
    * unconditionally each timestep, because it is VERRRYYYYY expensive to
@@ -347,15 +349,15 @@ void d2_loop_functions::post_step(void) {
   m_metrics_manager->interval_reset();
   m_metrics_manager->timestep_inc();
 
-  ndc_pop();
+  ndc_uuid_pop();
 } /* post_step() */
 
 void d2_loop_functions::reset(void) {
-  ndc_push();
+  ndc_uuid_push();
   base_loop_functions::reset();
   m_metrics_manager->initialize();
   cache_creation_handle(false);
-  ndc_pop();
+  ndc_uuid_pop();
 }
 
 void d2_loop_functions::destroy(void) {

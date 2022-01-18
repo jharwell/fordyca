@@ -45,12 +45,12 @@ free_block_pickup::free_block_pickup(crepr::base_block3D* block,
  * CRW Foraging
  ******************************************************************************/
 void free_block_pickup::visit(fcreactive::d0::crw_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_uuid_push();
 
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   visit(*controller.fsm());
 
-  controller.ndc_pop();
+  controller.ndc_uuid_pop();
 } /* visit() */
 
 void free_block_pickup::visit(ffsm::d0::crw_fsm& fsm) {

@@ -118,17 +118,18 @@ d0_loop_functions::d0_loop_functions(void)
 d0_loop_functions::~d0_loop_functions(void) = default;
 
 /*******************************************************************************
- * Initialization Functions
+ * Initialization
  ******************************************************************************/
 void d0_loop_functions::init(ticpp::Element& node) {
-  ndc_push();
+  mdc_ts_update();
+  ndc_uuid_push();
   ER_INFO("Initializing...");
 
   shared_init(node);
   private_init();
 
   ER_INFO("Initialization finished");
-  ndc_pop();
+  ndc_uuid_pop();
 } /* init() */
 
 void d0_loop_functions::shared_init(ticpp::Element& node) {
@@ -187,32 +188,34 @@ void d0_loop_functions::private_init(void) {
  * ARGoS Hooks
  ******************************************************************************/
 void d0_loop_functions::pre_step(void) {
-  ndc_push();
+  mdc_ts_update();
+  ndc_uuid_push();
   base_loop_functions::pre_step();
-  ndc_pop();
+  ndc_uuid_pop();
+
   /* Process all robots */
   auto cb = [&](argos::CControllableEntity* robot) {
-    ndc_push();
+    ndc_uuid_push();
     robot_pre_step(dynamic_cast<chal::robot&>(robot->GetParent()));
-    ndc_pop();
+    ndc_uuid_pop();
   };
   cpargos::swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
 } /* pre_step() */
 
 void d0_loop_functions::post_step(void) {
-  ndc_push();
+  ndc_uuid_push();
   base_loop_functions::post_step();
-  ndc_pop();
+  ndc_uuid_pop();
 
   /* Process all robots: interact with environment then collect metrics */
   auto cb = [&](argos::CControllableEntity* robot) {
-    ndc_push();
+    ndc_uuid_push();
     robot_post_step(dynamic_cast<chal::robot&>(robot->GetParent()));
-    ndc_pop();
+    ndc_uuid_pop();
   };
   cpargos::swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
 
-  ndc_push();
+  ndc_uuid_push();
 
   const auto* collector =
       m_metrics_manager->get<cfmetrics::block_transportee_metrics_collector>("blocks:"
@@ -243,24 +246,24 @@ void d0_loop_functions::post_step(void) {
   m_metrics_manager->interval_reset();
   m_metrics_manager->timestep_inc();
 
-  ndc_pop();
+  ndc_uuid_pop();
 } /* post_step() */
 
 void d0_loop_functions::destroy(void) {
-  if (nullptr != m_metrics_manager) {
+ if (nullptr != m_metrics_manager) {
     m_metrics_manager->finalize();
   }
 } /* destroy() */
 
 void d0_loop_functions::reset(void) {
-  ndc_push();
+  ndc_uuid_push();
   base_loop_functions::reset();
   m_metrics_manager->initialize();
-  ndc_pop();
+  ndc_uuid_pop();
 } /* reset() */
 
 /*******************************************************************************
- * General Member Functions
+ * General Member
  ******************************************************************************/
 void d0_loop_functions::robot_pre_step(chal::robot& robot) {
   auto* controller = static_cast<controller::foraging_controller*>(

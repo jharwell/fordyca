@@ -180,7 +180,8 @@ d1_loop_functions::~d1_loop_functions(void) = default;
  * Initialization Functions
  ******************************************************************************/
 void d1_loop_functions::init(ticpp::Element& node) {
-  ndc_push();
+  mdc_ts_update();
+  ndc_uuid_push();
   ER_INFO("Initializing...");
 
   config_parse(node);
@@ -193,7 +194,7 @@ void d1_loop_functions::init(ticpp::Element& node) {
   private_init();
 
   ER_INFO("Initialization finished");
-  ndc_pop();
+  ndc_uuid_pop();
 } /* init() */
 
 void d1_loop_functions::shared_init(ticpp::Element& node) {
@@ -360,23 +361,24 @@ std::vector<int> d1_loop_functions::robot_tasks_extract(uint) const {
  * ARGoS Hooks
  ******************************************************************************/
 void d1_loop_functions::pre_step() {
-  ndc_push();
+  mdc_ts_update();
+  ndc_uuid_push();
   base_loop_functions::pre_step();
-  ndc_pop();
+  ndc_uuid_pop();
 
   /* Process all robots */
   auto cb = [&](argos::CControllableEntity* robot) {
-    ndc_push();
+    ndc_uuid_push();
     robot_pre_step(dynamic_cast<chal::robot&>(robot->GetParent()));
-    ndc_pop();
+    ndc_uuid_pop();
   };
   cpargos::swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
 } /* pre_step() */
 
 void d1_loop_functions::post_step(void) {
-  ndc_push();
+  ndc_uuid_push();
   base_loop_functions::post_step();
-  ndc_pop();
+  ndc_uuid_pop();
 
   /*
    * Parallel iteration over the swarm within the following set of ordered
@@ -389,15 +391,15 @@ void d1_loop_functions::post_step(void) {
    * allowed 1 usage of ARGoS threads per PreStep()/PostStep() function call.
    */
   auto cb = [&](argos::CControllableEntity* robot) {
-    ndc_push();
+    ndc_uuid_push();
     robot_post_step(dynamic_cast<chal::robot&>(robot->GetParent()));
     caches_recreation_task_counts_collect(
         &static_cast<controller::foraging_controller&>(robot->GetController()));
-    ndc_pop();
+    ndc_uuid_pop();
   };
   cpargos::swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
 
-  ndc_push();
+  ndc_uuid_push();
 
   /*
    * Manage the static cache and handle cache removal/re-creation as a result of
@@ -462,11 +464,11 @@ void d1_loop_functions::post_step(void) {
   m_metrics_manager->interval_reset();
   m_metrics_manager->timestep_inc();
 
-  ndc_pop();
+  ndc_uuid_pop();
 } /* post_step() */
 
 void d1_loop_functions::reset(void) {
-  ndc_push();
+  ndc_uuid_push();
   base_loop_functions::reset();
   m_metrics_manager->initialize();
 
@@ -482,7 +484,7 @@ void d1_loop_functions::reset(void) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }
-  ndc_pop();
+  ndc_uuid_pop();
 } /* reset() */
 
 void d1_loop_functions::destroy(void) {

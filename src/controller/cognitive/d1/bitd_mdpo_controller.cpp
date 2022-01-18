@@ -54,7 +54,7 @@ bitd_mdpo_controller::~bitd_mdpo_controller(void) = default;
 void bitd_mdpo_controller::init(ticpp::Element& node) {
   foraging_controller::init(node);
 
-  ndc_push();
+  ndc_uuid_push();
   ER_INFO("Initializing...");
   config::d1::controller_repository config_repo;
 
@@ -66,11 +66,12 @@ void bitd_mdpo_controller::init(ticpp::Element& node) {
 
   shared_init(config_repo);
   ER_INFO("Initialization finished");
-  ndc_pop();
+  ndc_uuid_pop();
 } /* init() */
 
 void bitd_mdpo_controller::control_step(void) {
-  ndc_pusht();
+  mdc_ts_update();
+ndc_uuid_push();
   ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
@@ -85,7 +86,7 @@ void bitd_mdpo_controller::control_step(void) {
    */
   supervisor()->run();
 
-  ndc_pop();
+  ndc_uuid_pop();
 } /* control_step() */
 
 void bitd_mdpo_controller::shared_init(
