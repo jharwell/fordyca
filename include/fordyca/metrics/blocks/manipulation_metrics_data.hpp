@@ -27,7 +27,7 @@
 #include <atomic>
 #include <array>
 
-#include "rcppsw/metrics/base_metrics_data.hpp"
+#include "rcppsw/metrics/base_data.hpp"
 #include "fordyca/metrics/blocks/block_manip_events.hpp"
 
 /*******************************************************************************
@@ -53,7 +53,7 @@ struct manipulation_metrics_data {
 
 NS_END(detail);
 
-struct manipulation_metrics_data : public rmetrics::base_metrics_data {
+struct manipulation_metrics_data : public rmetrics::base_data {
   using array_type = std::array<detail::manipulation_metrics_data,
                                 block_manip_events::ekMAX_EVENTS>;
   array_type interval{};

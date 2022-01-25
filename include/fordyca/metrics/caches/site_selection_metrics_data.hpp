@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <vector>
 
-#include "rcppsw/metrics/base_metrics_data.hpp"
+#include "rcppsw/metrics/base_data.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -54,7 +54,7 @@ struct site_selection_metrics_data {
 
 NS_END(detail);
 
-struct site_selection_metrics_data : public rmetrics::base_metrics_data {
+struct site_selection_metrics_data : public rmetrics::base_data {
   detail::site_selection_metrics_data interval{};
   detail::site_selection_metrics_data cum{};
 };

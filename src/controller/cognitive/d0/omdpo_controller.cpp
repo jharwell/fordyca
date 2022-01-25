@@ -27,6 +27,7 @@
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/ds/cell2D.hpp"
+#include "cosm/fsm/supervisor_fsm.hpp"
 
 #include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/subsystem/perception/oracular_info_receptor.hpp"
@@ -50,15 +51,27 @@ omdpo_controller::~omdpo_controller(void) = default;
  ******************************************************************************/
 void omdpo_controller::control_step(void) {
   mdc_ts_update();
-ndc_uuid_push();
+  ndc_uuid_push();
   ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
             block()->md()->robot_id().v());
 
   perception()->update(m_receptor.get());
-  fsm()->run();
-  saa()->steer_force2D_apply();
+
+    /*
+   * Reset steering forces tracking so per-timestep visualizations are
+   * correct. This can't be done when applying the steering forces because then
+   * they are always 0 during loop function visualization.
+   */
+  saa()->steer_force2D().tracking_reset();
+
+    /*
+   * Run the FSM and apply steering forces if normal operation, otherwise handle
+   * abnormal operation state.
+   */
+  supervisor()->run();
+
   ndc_uuid_pop();
 } /* control_step() */
 
@@ -67,7 +80,10 @@ void omdpo_controller::oracle_init(
   m_receptor = std::move(receptor);
 } /* oracle_init() */
 
-using namespace argos; // NOLINT
+NS_END(cognitive, d0, controller, fordyca);
+
+
+using namespace fccd0; // NOLINT
 
 RCPPSW_WARNING_DISABLE_PUSH()
 RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
@@ -77,5 +93,3 @@ RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 REGISTER_CONTROLLER(omdpo_controller, "omdpo_controller");
 
 RCPPSW_WARNING_DISABLE_POP()
-
-NS_END(cognitive, d0, controller, fordyca);

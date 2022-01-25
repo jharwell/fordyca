@@ -49,7 +49,7 @@ NS_START(fordyca, controller, cognitive, d0, events);
 free_block_pickup::free_block_pickup(crepr::base_block3D* block,
                                      const rtypes::type_uuid& id,
                                      const rtypes::timestep& t)
-    : ER_CLIENT_INIT("fordyca.controller.cognitive.d0.events.free_block_pickup"),
+    : ER_CLIENT_INIT("fordyca.controller.cognitive.d3.events.free_block_pickup"),
       ccops::base_block_pickup(block, id, t) {}
 
 
@@ -59,8 +59,10 @@ free_block_pickup::free_block_pickup(crepr::base_block3D* block,
 void free_block_pickup::visit(fccd0::mdpo_controller& c) {
   c.ndc_uuid_push();
 
-  controller_visit_impl(c, *c.perception()->template model<fspds::dpo_semantic_map>());
-  ER_INFO("Picked up block%d", block()->id().v());
+  visit(*c.perception()->template model<fspds::dpo_semantic_map>());
+  ccops::base_block_pickup::visit(static_cast<ccontroller::block_carrying_controller&>(c));
+  visit(*c.fsm());
+  ER_INFO("Block%d", block()->id().v());
 
   c.ndc_uuid_pop();
 } /* visit() */
@@ -68,8 +70,10 @@ void free_block_pickup::visit(fccd0::mdpo_controller& c) {
 void free_block_pickup::visit(fccd0::omdpo_controller& c) {
   c.ndc_uuid_push();
 
-  controller_visit_impl(c, *c.perception()->template model<fspds::dpo_semantic_map>());
-  ER_INFO("Picked up block%d", block()->id().v());
+  visit(*c.perception()->template model<fspds::dpo_semantic_map>());
+  ccops::base_block_pickup::visit(static_cast<ccontroller::block_carrying_controller&>(c));
+  visit(*c.fsm());
+  ER_INFO("Block%d", block()->id().v());
 
   c.ndc_uuid_pop();
 } /* visit() */
@@ -77,8 +81,10 @@ void free_block_pickup::visit(fccd0::omdpo_controller& c) {
 void free_block_pickup::visit(fccd0::dpo_controller& c) {
   c.ndc_uuid_push();
 
-  controller_visit_impl(c, *c.perception()->template model<fspds::dpo_store>());
-  ER_INFO("Picked up block%d", block()->id().v());
+  visit(*c.perception()->template model<fspds::dpo_store>());
+  ccops::base_block_pickup::visit(static_cast<ccontroller::block_carrying_controller&>(c));
+  visit(*c.fsm());
+  ER_INFO("Block%d", block()->id().v());
 
   c.ndc_uuid_pop();
 } /* visit() */
@@ -86,8 +92,10 @@ void free_block_pickup::visit(fccd0::dpo_controller& c) {
 void free_block_pickup::visit(fccd0::odpo_controller& c) {
   c.ndc_uuid_push();
 
-  controller_visit_impl(c, *c.perception()->template model<fspds::dpo_store>());
-  ER_INFO("Picked up block%d", block()->id().v());
+  visit(*c.perception()->template model<fspds::dpo_store>());
+  ccops::base_block_pickup::visit(static_cast<ccontroller::block_carrying_controller&>(c));
+  visit(*c.fsm());
+  ER_INFO("Block%d", block()->id().v());
 
   c.ndc_uuid_pop();
 } /* visit() */

@@ -55,14 +55,27 @@ mdpo_controller::~mdpo_controller(void) = default;
  ******************************************************************************/
 void mdpo_controller::control_step(void) {
   mdc_ts_update();
-ndc_uuid_push();
+  ndc_uuid_push();
   ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
             block()->md()->robot_id().v());
+
+  /*
+   * Reset steering forces tracking so per-timestep visualizations are
+   * correct. This can't be done when applying the steering forces because then
+   * they are always 0 during loop function visualization.
+   */
+  saa()->steer_force2D().tracking_reset();
+
   perception()->update(nullptr);
-  saa()->steer_force2D_apply();
-  fsm()->run();
+
+  /*
+   * Run the FSM and apply steering forces if normal operation, otherwise handle
+   * abnormal operation state.
+   */
+  supervisor()->run();
+
   ndc_uuid_pop();
 } /* control_step() */
 
@@ -144,7 +157,10 @@ void mdpo_controller::private_init(
   supervisor()->supervisee_update(fsm());
 } /* private_init() */
 
-using namespace argos; // NOLINT
+NS_END(cognitive, d0, controller, fordyca);
+
+
+using namespace fccd0; // NOLINT
 
 RCPPSW_WARNING_DISABLE_PUSH()
 RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
@@ -154,5 +170,3 @@ RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 REGISTER_CONTROLLER(mdpo_controller, "mdpo_controller");
 
 RCPPSW_WARNING_DISABLE_POP()
-
-NS_END(cognitive, d0, controller, fordyca);

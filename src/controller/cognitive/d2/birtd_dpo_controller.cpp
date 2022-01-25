@@ -65,6 +65,13 @@ ndc_uuid_push();
   perception()->update(nullptr);
 
   /*
+   * Reset steering forces tracking so per-timestep visualizations are
+   * correct. This can't be done when applying the steering forces because then
+   * they are always 0 during loop function visualization.
+   */
+  saa()->steer_force2D().tracking_reset();
+
+  /*
    * Execute the current task/allocate a new task/abort a task/etc and apply
    * steering forces if normal operation, otherwise handle abnormal operation
    * state.
@@ -150,7 +157,9 @@ void birtd_dpo_controller::task_start_cb(cta::polled_task* const task,
   current_task(dynamic_cast<tasks::base_foraging_task*>(task));
 } /* task_start_cb() */
 
-using namespace argos; // NOLINT
+NS_END(cognitive, d2, controller, fordyca);
+
+using namespace fccd2; // NOLINT
 
 RCPPSW_WARNING_DISABLE_PUSH()
 RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
@@ -161,5 +170,3 @@ REGISTER_CONTROLLER(birtd_dpo_controller,
                     "birtd_dpo_controller"); // NOLINT
 
 RCPPSW_WARNING_DISABLE_POP()
-
-NS_END(cognitive, d2, controller, fordyca);

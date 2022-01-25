@@ -112,10 +112,18 @@ void crw_controller::control_step(void) {
             block()->md()->robot_id().v());
 
   /*
+   * Reset steering forces tracking so per-timestep visualizations are
+   * correct. This can't be done when applying the steering forces because then
+   * they are always 0 during loop function visualization.
+   */
+  saa()->steer_force2D().tracking_reset();
+
+  /*
    * Run the FSM and apply steering forces if normal operation, otherwise handle
    * abnormal operation state.
    */
   supervisor()->run();
+
   ndc_uuid_pop();
 } /* control_step() */
 
@@ -138,8 +146,10 @@ bool crw_controller::is_phototaxiing_to_goal(bool include_ca) const {
   return m_fsm->is_phototaxiing_to_goal(include_ca);
 } /* is_phototaxiing_to_goal() */
 
+NS_END(reactive, d0, controller, fordyca);
+
 #if defined(COSM_PAL_TARGET_ARGOS)
-using namespace argos; // NOLINT
+using namespace fcrd0; // NOLINT
 
 RCPPSW_WARNING_DISABLE_PUSH()
 RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
@@ -151,5 +161,3 @@ REGISTER_CONTROLLER(crw_controller, "crw_controller");
 RCPPSW_WARNING_DISABLE_POP()
 
 #endif
-
-NS_END(reactive, d0, controller, fordyca);

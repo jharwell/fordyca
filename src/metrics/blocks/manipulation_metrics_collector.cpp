@@ -36,8 +36,8 @@ NS_START(fordyca, metrics, blocks);
  * Constructors/Destructor
  ******************************************************************************/
 manipulation_metrics_collector::manipulation_metrics_collector(
-    std::unique_ptr<rmetrics::base_metrics_sink> sink)
-    : base_metrics_collector(std::move(sink)) {}
+    std::unique_ptr<rmetrics::base_sink> sink)
+    : base_collector(std::move(sink)) {}
 
 /*******************************************************************************
  * Member Functions

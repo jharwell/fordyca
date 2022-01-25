@@ -60,6 +60,13 @@ void bitd_omdpo_controller::control_step(void) {
   perception()->update(m_receptor.get());
 
   /*
+   * Reset steering forces tracking so per-timestep visualizations are
+   * correct. This can't be done when applying the steering forces because then
+   * they are always 0 during loop function visualization.
+   */
+  saa()->steer_force2D().tracking_reset();
+
+  /*
    * Execute the current task/allocate a new task/abort a task/etc and apply
    * steering forces if normal operation, otherwise handle abnormal operation
    * state.
@@ -74,7 +81,9 @@ void bitd_omdpo_controller::oracle_init(
   m_receptor = std::move(receptor);
 } /* oracle_init() */
 
-using namespace argos; // NOLINT
+NS_END(cognitive, d1, controller, fordyca);
+
+using namespace fccd1; // NOLINT
 
 RCPPSW_WARNING_DISABLE_PUSH()
 RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
@@ -84,5 +93,3 @@ RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 REGISTER_CONTROLLER(bitd_omdpo_controller, "bitd_omdpo_controller");
 
 RCPPSW_WARNING_DISABLE_POP()
-
-NS_END(cognitive, d1, controller, fordyca);

@@ -71,13 +71,20 @@ void bitd_mdpo_controller::init(ticpp::Element& node) {
 
 void bitd_mdpo_controller::control_step(void) {
   mdc_ts_update();
-ndc_uuid_push();
+  ndc_uuid_push();
   ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
             block()->md()->robot_id().v());
 
   perception()->update(nullptr);
+
+  /*
+   * Reset steering forces tracking so per-timestep visualizations are
+   * correct. This can't be done when applying the steering forces because then
+   * they are always 0 during loop function visualization.
+   */
+  saa()->steer_force2D().tracking_reset();
 
   /*
    * Execute the current task/allocate a new task/abort a task/etc and apply
@@ -118,7 +125,9 @@ void bitd_mdpo_controller::shared_init(
       &bitd_mdpo_controller::task_abort_cb, this, std::placeholders::_1));
 } /* shared_init() */
 
-using namespace argos; // NOLINT
+NS_END(cognitive, d1, controller, fordyca);
+
+using namespace fccd1; // NOLINT
 
 RCPPSW_WARNING_DISABLE_PUSH()
 RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
@@ -128,5 +137,3 @@ RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 REGISTER_CONTROLLER(bitd_mdpo_controller, "bitd_mdpo_controller");
 
 RCPPSW_WARNING_DISABLE_POP()
-
-NS_END(cognitive, d1, controller, fordyca);

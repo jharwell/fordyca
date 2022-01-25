@@ -68,6 +68,14 @@ void dpo_controller::fsm(std::unique_ptr<fsm::d0::dpo_fsm> fsm) {
 void dpo_controller::control_step(void) {
   mdc_ts_update();
   ndc_uuid_push();
+
+  /*
+   * Reset steering forces tracking so per-timestep visualizations are
+   * correct. This can't be done when applying the steering forces because then
+   * they are always 0 during loop function visualization.
+   */
+  saa()->steer_force2D().tracking_reset();
+
   ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
@@ -171,15 +179,46 @@ void dpo_controller::reset(void) {
 /*******************************************************************************
  * Goal Acquisition Metrics
  ******************************************************************************/
-RCPPSW_WRAP_DEF_OVERRIDE(dpo_controller, goal_acquired, *m_fsm, const);
-RCPPSW_WRAP_DEF_OVERRIDE(dpo_controller, entity_acquired_id, *m_fsm, const);
-RCPPSW_WRAP_DEF_OVERRIDE(dpo_controller, is_exploring_for_goal, *m_fsm, const);
-RCPPSW_WRAP_DEF_OVERRIDE(dpo_controller, is_vectoring_to_goal, *m_fsm, const);
-RCPPSW_WRAP_DEF_OVERRIDE(dpo_controller, acquisition_goal, *m_fsm, const);
-RCPPSW_WRAP_DEF_OVERRIDE(dpo_controller, block_transport_goal, *m_fsm, const);
-RCPPSW_WRAP_DEF_OVERRIDE(dpo_controller, acquisition_loc3D, *m_fsm, const);
-RCPPSW_WRAP_DEF_OVERRIDE(dpo_controller, vector_loc3D, *m_fsm, const);
-RCPPSW_WRAP_DEF_OVERRIDE(dpo_controller, explore_loc3D, *m_fsm, const);
+RCPPSW_WRAP_DEFP_OVERRIDE(dpo_controller,
+                          goal_acquired,
+                          m_fsm,
+                          false,
+                          const);
+RCPPSW_WRAP_DEFP_OVERRIDE(dpo_controller,
+                          entity_acquired_id,
+                          m_fsm,
+                          rtypes::constants::kNoUUID,
+                          const);
+RCPPSW_WRAP_DEFP_OVERRIDE(dpo_controller,
+                          is_exploring_for_goal,
+                          m_fsm,
+                          csmetrics::goal_acq_metrics::exp_status(),
+                          const);
+RCPPSW_WRAP_DEFP_OVERRIDE(dpo_controller, is_vectoring_to_goal, m_fsm, false, const);
+RCPPSW_WRAP_DEFP_OVERRIDE(dpo_controller,
+                          acquisition_goal,
+                          m_fsm,
+                          ffsm::to_goal_type(ffsm::foraging_acq_goal::ekNONE),
+                          const);
+RCPPSW_WRAP_DEFP_OVERRIDE(dpo_controller, block_transport_goal,
+                          m_fsm,
+                          ffsm::foraging_transport_goal::ekNONE,
+                          const);
+RCPPSW_WRAP_DEFP_OVERRIDE(dpo_controller,
+                          acquisition_loc3D,
+                          m_fsm,
+                          rmath::vector3z(),
+                          const);
+RCPPSW_WRAP_DEFP_OVERRIDE(dpo_controller,
+                          vector_loc3D,
+                          m_fsm,
+                          rmath::vector3z(),
+                          const);
+RCPPSW_WRAP_DEFP_OVERRIDE(dpo_controller,
+                          explore_loc3D,
+                          m_fsm,
+                          rmath::vector3z(),
+                          const);
 
 /*******************************************************************************
  * Block Transportation Metrics
@@ -188,15 +227,15 @@ bool dpo_controller::is_phototaxiing_to_goal(bool include_ca) const {
   return m_fsm->is_phototaxiing_to_goal(include_ca);
 } /* is_phototaxiing_to_goal() */
 
-using namespace argos; // NOLINT
+NS_END(cognitive, d0, controller, fordyca);
 
 RCPPSW_WARNING_DISABLE_PUSH()
 RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
 RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
 RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 
+using namespace fccd0; // NOLINT
+
 REGISTER_CONTROLLER(dpo_controller, "dpo_controller");
 
 RCPPSW_WARNING_DISABLE_POP()
-
-NS_END(cognitive, d0, controller, fordyca);

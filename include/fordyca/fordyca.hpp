@@ -207,6 +207,25 @@ namespace d1 {}
 namespace d2 {}
 } /* namespace tasks */
 namespace events {}
+
+namespace metrics {
+namespace specs {}
+}
+namespace argos {
+namespace metrics {}
+namespace support {
+namespace tv {}
+namespace caches {}
+namespace d0 {}
+namespace d1 {}
+namespace d2 {}
+namespace mpl {}
+} /* namespace support */
+
+} /* namespace argos */
+
+namespace support {}
+
 } /* namespace fordyca */
 
 namespace fds = fordyca::ds;
@@ -227,6 +246,9 @@ namespace ftasks = fordyca::tasks;
 
 namespace fevents = fordyca::events;
 
+namespace fmetrics = fordyca::metrics;
+namespace fmspecs = fmetrics::specs;
+
 namespace fcontroller = fordyca::controller;
 namespace fccognitive = fcontroller::cognitive;
 namespace fccd0 = fccognitive::d0;
@@ -237,5 +259,17 @@ namespace fccstrategy = fcconfig::strategy;
 namespace fcreactive = fcontroller::reactive;
 namespace fcreactive = fcontroller::reactive;
 namespace fcrd0 = fcreactive::d0;
+
+namespace fargos = fordyca::argos;
+namespace fametrics = fargos::metrics;
+namespace fasupport = fargos::support;
+namespace fsupport = fordyca::support;
+namespace fastv = fasupport::tv;
+namespace fascaches = fasupport::caches;
+namespace fasmpl = fasupport::mpl;
+
+namespace fasd0 = fasupport::d0;
+namespace fasd1 = fasupport::d1;
+namespace fasd2 = fasupport::d2;
 
 #endif /* INCLUDE_FORDYCA_FORDYCA_HPP_ */

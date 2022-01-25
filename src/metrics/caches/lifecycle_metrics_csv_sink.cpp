@@ -43,7 +43,7 @@ lifecycle_metrics_csv_sink::lifecycle_metrics_csv_sink(
  * Member Functions
  ******************************************************************************/
 std::list<std::string> lifecycle_metrics_csv_sink::csv_header_cols(
-    const rmetrics::base_metrics_data*) const {
+    const rmetrics::base_data*) const {
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
     /* clang-format off */
@@ -67,7 +67,7 @@ std::list<std::string> lifecycle_metrics_csv_sink::csv_header_cols(
 } /* csv_header_cols() */
 
 boost::optional<std::string> lifecycle_metrics_csv_sink::csv_line_build(
-    const rmetrics::base_metrics_data* data,
+    const rmetrics::base_data* data,
     const rtypes::timestep& t) {
   if (!ready_to_flush(t)) {
     return boost::none;
