@@ -92,12 +92,6 @@ class free_block_pickup : public rer::client<free_block_pickup>,
   /* FSMs */
   void visit(ffsm::d0::dpo_fsm& fsm);
   void visit(ffsm::d0::free_block_to_nest_fsm& fsm);
-
-  template<typename TController, typename TPerceptionModel>
-  void controller_visit_impl(TController& controller, TPerceptionModel& model) {
-    visit(model);
-    ccops::base_block_pickup::visit(static_cast<ccontroller::block_carrying_controller&>(controller));
-  }
 };
 
 /**

@@ -106,6 +106,7 @@ class robot_configurer {
       c->display_los(mc_config->robot_los);
       c->display_id(mc_config->robot_id);
       c->display_task(mc_config->robot_task);
+      c->display_steer2D(mc_config->robot_steer2D);
     }
   } /* controller_config_vis() */
 

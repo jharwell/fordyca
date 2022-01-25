@@ -48,26 +48,43 @@ class robot_configurer : public boost::static_visitor<void> {
  public:
   using controller_type = TController;
   robot_configurer(const cvconfig::visualization_config* const config,
-                   cforacle::foraging_oracle* const oracle)
+                   const cforacle::foraging_oracle* const oracle)
       : mc_config(config),
         mc_oracle(oracle) {}
 
   template<typename U = TController,
-           RCPPSW_SFINAE_TYPELIST_REJECT(controller::d0::oracular_typelist,
+           RCPPSW_SFINAE_TYPELIST_REQUIRE(fcontroller::d0::reactive_typelist,
                                          U)>
   void operator()(U* const c) const {
     if (nullptr != mc_config) {
-      c->display_los(mc_config->robot_los);
       c->display_id(mc_config->robot_id);
+      c->display_steer2D(mc_config->robot_steer2D);
     }
   }
   template<typename U = TController,
-           RCPPSW_SFINAE_TYPELIST_REQUIRE(controller::d0::oracular_typelist,
-                                          U)>
+           typename V = TController,
+           RCPPSW_SFINAE_TYPELIST_REJECT(fcontroller::d0::oracular_typelist,
+                                         U),
+           RCPPSW_SFINAE_TYPELIST_REQUIRE(fcontroller::d0::cognitive_typelist,
+                                         V)>
   void operator()(U* const c) const {
     if (nullptr != mc_config) {
       c->display_los(mc_config->robot_los);
       c->display_id(mc_config->robot_id);
+      c->display_steer2D(mc_config->robot_steer2D);
+    }
+  }
+  template<typename U = TController,
+           typename V = TController,
+           RCPPSW_SFINAE_TYPELIST_REQUIRE(fcontroller::d0::oracular_typelist,
+                                          U),
+           RCPPSW_SFINAE_TYPELIST_REQUIRE(fcontroller::d0::cognitive_typelist,
+                                          V)>
+  void operator()(U* const c) const {
+    if (nullptr != mc_config) {
+      c->display_los(mc_config->robot_los);
+      c->display_id(mc_config->robot_id);
+      c->display_steer2D(mc_config->robot_steer2D);
     }
     if (nullptr != mc_oracle) {
       auto receptor = std::make_unique<fsperception::oracular_info_receptor>(mc_oracle);

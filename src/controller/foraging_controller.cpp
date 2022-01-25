@@ -223,7 +223,7 @@ std::any foraging_controller::actuation_init(
               saa_names::diff_steering_saa)));
 
 #ifdef FORDYCA_WITH_ROBOT_LEDS
-  auto diag_handle = GetActuator<chactuators::led_actuator::impl_type>(saa_names::leds_saa)
+  auto diag_handle = GetActuator<chargos::actuators::led_actuator::impl_type>(saa_names::leds_saa);
 #else
   auto diag_handle = nullptr;
 #endif /* FORDYCA_WITH_ROBOT_LEDS */

@@ -51,12 +51,20 @@ birtd_omdpo_controller::~birtd_omdpo_controller(void) = default;
  ******************************************************************************/
 void birtd_omdpo_controller::control_step(void) {
   mdc_ts_update();
-ndc_uuid_push();
+  ndc_uuid_push();
+
   ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
             block()->md()->robot_id().v());
   perception()->update(m_receptor.get());
+
+  /*
+   * Reset steering forces tracking so per-timestep visualizations are
+   * correct. This can't be done when applying the steering forces because then
+   * they are always 0 during loop function visualization.
+   */
+  saa()->steer_force2D().tracking_reset();
 
   /*
    * Execute the current task/allocate a new task/abort a task/etc and apply

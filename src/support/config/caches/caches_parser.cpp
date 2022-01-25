@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/support/config/caches/caches_parser.hpp"
 
+#include "rcppsw/math/math.hpp"
+
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -56,6 +58,7 @@ void caches_parser::parse(const ticpp::Element& node) {
   }
 
   XML_PARSE_ATTR(cnode, m_config, dimension);
+  m_config->dimension += rtypes::spatial_dist(rmath::kDOUBLE_EPSILON);
   XML_PARSE_ATTR_DFLT(cnode, m_config, strict_constraints, true);
 } /* parse() */
 

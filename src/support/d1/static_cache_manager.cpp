@@ -88,8 +88,9 @@ static_cache_manager::create(const cache_create_ro_params& c_params,
     using checker = cspatial::dimension_checker;
     auto even_multiple = checker::even_multiple(arena_map()->grid_resolution(),
                                                 config()->dimension);
-    auto odd_dsize =
-        checker::odd_dsize(arena_map()->grid_resolution(), even_multiple);
+
+    auto odd_dsize = checker::odd_dsize(arena_map()->grid_resolution(),
+                                        even_multiple);
 
     static_cache_creator creator(arena_map(), mc_cache_locs, odd_dsize);
 

@@ -55,7 +55,7 @@ base_cache_creator::create_single_cache(const rmath::vector2d& center,
                                         cds::block3D_vectorno&& blocks,
                                         const rtypes::timestep& t,
                                         bool pre_dist) {
-  ER_ASSERT(center.x() > 0 && center.y() > 0,
+  ER_ASSERT(center.is_pd(),
             "Center@%s is not positive definite",
             center.to_str().c_str());
   auto dcenter = rmath::dvec2zvec(center, m_map->grid_resolution().v());
@@ -145,7 +145,8 @@ base_cache_creator::create_single_cache(const rmath::vector2d& center,
   /* create the cache! */
   cds::block3D_vectorno for_cache(blocks.begin(), blocks.end());
   auto ret = std::make_shared<carepr::arena_cache>(
-      carepr::arena_cache::params{ mc_cache_dim,
+      carepr::arena_cache::params{
+        mc_cache_dim,
             m_map->grid_resolution(),
             center,
             std::move(for_cache),
@@ -161,8 +162,8 @@ base_cache_creator::create_single_cache(const rmath::vector2d& center,
    * here.
    */
   ret->blocks_map_enable();
-  ER_ASSERT(dcenter == ret->dcenter2D(),
-            "Created cache%d has bad center: %s != %s",
+  ER_CONDW(dcenter != ret->dcenter2D(),
+            "Created cache%d has bad center? %s != %s",
             ret->id().v(),
             rcppsw::to_string(ret->dcenter2D()).c_str(),
             rcppsw::to_string(dcenter).c_str());

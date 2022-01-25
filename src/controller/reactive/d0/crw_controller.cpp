@@ -112,10 +112,18 @@ void crw_controller::control_step(void) {
             block()->md()->robot_id().v());
 
   /*
+   * Reset steering forces tracking so per-timestep visualizations are
+   * correct. This can't be done when applying the steering forces because then
+   * they are always 0 during loop function visualization.
+   */
+  saa()->steer_force2D().tracking_reset();
+
+  /*
    * Run the FSM and apply steering forces if normal operation, otherwise handle
    * abnormal operation state.
    */
   supervisor()->run();
+
   ndc_uuid_pop();
 } /* control_step() */
 

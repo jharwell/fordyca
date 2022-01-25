@@ -26,11 +26,19 @@ RCPPSW_WARNING_DISABLE_PUSH()
 RCPPSW_WARNING_DISABLE_OVERLOADED_VIRTUAL()
 #include "fordyca/support/d0/d0_qt_user_functions.hpp"
 RCPPSW_WARNING_DISABLE_POP()
+/*
+ * QT defines this as a macro which expands to nothing, which causes the
+ * diagnostic actuator compilation to fail.
+ */
+#undef emit
+
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
 #include <argos3/core/simulator/entity/controllable_entity.h>
 
 #include "cosm/vis/block_carry_visualizer.hpp"
 #include "cosm/vis/polygon2D_visualizer.hpp"
+#include "cosm/vis/steer2D_visualizer.hpp"
 
 #include "fordyca/controller/cognitive/d0/mdpo_controller.hpp"
 #include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
@@ -78,6 +86,13 @@ void d0_qt_user_functions::Draw(chal::robot& c_entity) {
     };
     cvis::polygon2D_visualizer(this).relative_draw(
         rmath::vector3d(base->rpos2D()), points, rutils::color::kBLUE);
+  }
+  if (base->display_steer2D()) {
+    auto steering = cvis::steer2D_visualizer(this, kTEXT_VIS_OFFSET);
+    steering(rmath::vector3d(base->rpos2D()),
+             c_entity.GetEmbodiedEntity().GetOriginAnchor().Orientation,
+             base->saa()->steer_force2D().tracker(),
+             false);
   }
 }
 
