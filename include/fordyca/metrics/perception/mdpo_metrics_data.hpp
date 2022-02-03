@@ -27,7 +27,7 @@
 #include <atomic>
 #include <array>
 
-#include "rcppsw/metrics/base_metrics_data.hpp"
+#include "rcppsw/metrics/base_data.hpp"
 #include "cosm/fsm/cell2D_state.hpp"
 #include "fordyca/fordyca.hpp"
 
@@ -56,7 +56,7 @@ struct mdpo_metrics_data {
 
 NS_END(detail);
 
-struct mdpo_metrics_data : public rmetrics::base_metrics_data {
+struct mdpo_metrics_data : public rmetrics::base_data {
   detail::mdpo_metrics_data interval{};
   detail::mdpo_metrics_data cum{};
 };

@@ -157,7 +157,9 @@ void birtd_dpo_controller::task_start_cb(cta::polled_task* const task,
   current_task(dynamic_cast<tasks::base_foraging_task*>(task));
 } /* task_start_cb() */
 
-using namespace argos; // NOLINT
+NS_END(cognitive, d2, controller, fordyca);
+
+using namespace fccd2; // NOLINT
 
 RCPPSW_WARNING_DISABLE_PUSH()
 RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
@@ -168,5 +170,3 @@ REGISTER_CONTROLLER(birtd_dpo_controller,
                     "birtd_dpo_controller"); // NOLINT
 
 RCPPSW_WARNING_DISABLE_POP()
-
-NS_END(cognitive, d2, controller, fordyca);

@@ -80,7 +80,10 @@ void omdpo_controller::oracle_init(
   m_receptor = std::move(receptor);
 } /* oracle_init() */
 
-using namespace argos; // NOLINT
+NS_END(cognitive, d0, controller, fordyca);
+
+
+using namespace fccd0; // NOLINT
 
 RCPPSW_WARNING_DISABLE_PUSH()
 RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
@@ -90,5 +93,3 @@ RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 REGISTER_CONTROLLER(omdpo_controller, "omdpo_controller");
 
 RCPPSW_WARNING_DISABLE_POP()
-
-NS_END(cognitive, d0, controller, fordyca);

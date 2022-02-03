@@ -83,7 +83,9 @@ void birtd_odpo_controller::oracle_init(
   }
 } /* oracle_init() */
 
-using namespace argos; // NOLINT
+NS_END(cognitive, d2, controller, fordyca);
+
+using namespace fccd2; // NOLINT
 
 RCPPSW_WARNING_DISABLE_PUSH()
 RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
@@ -93,5 +95,3 @@ RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 REGISTER_CONTROLLER(birtd_odpo_controller, "birtd_odpo_controller"); // NOLINT
 
 RCPPSW_WARNING_DISABLE_POP()
-
-NS_END(cognitive, d2, controller, fordyca);

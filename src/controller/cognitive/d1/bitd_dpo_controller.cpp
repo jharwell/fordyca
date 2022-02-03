@@ -223,7 +223,9 @@ int bitd_dpo_controller::current_task_tab(void) const {
   return executive()->graph()->active_tab_id();
 } /* current_task_tab() */
 
-using namespace argos; // NOLINT
+NS_END(cognitive, d1, controller, fordyca);
+
+using namespace fccd1; // NOLINT
 
 RCPPSW_WARNING_DISABLE_PUSH()
 RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
@@ -233,5 +235,3 @@ RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 REGISTER_CONTROLLER(bitd_dpo_controller, "bitd_dpo_controller");
 
 RCPPSW_WARNING_DISABLE_POP()
-
-NS_END(cognitive, d1, controller, fordyca);

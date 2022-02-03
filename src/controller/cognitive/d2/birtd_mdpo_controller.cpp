@@ -82,7 +82,9 @@ void birtd_mdpo_controller::shared_init(
   perception(factory.create(p.type, &p));
 } /* shared_init() */
 
-using namespace argos; // NOLINT
+NS_END(cognitive, d2, controller, fordyca);
+
+using namespace fccd2; // NOLINT
 
 RCPPSW_WARNING_DISABLE_PUSH()
 RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
@@ -93,5 +95,3 @@ REGISTER_CONTROLLER(birtd_mdpo_controller,
                     "birtd_mdpo_controller"); // NOLINT
 
 RCPPSW_WARNING_DISABLE_POP()
-
-NS_END(cognitive, d2, controller, fordyca);

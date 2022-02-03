@@ -31,7 +31,8 @@ endif()
 # Components                                                                      #
 ################################################################################
 string(CONCAT common_regex
-  "src/math"
+  "src/math|"
+  "src/metrics"
   )
 component_register_as_src(
   fordyca_common_SRC
@@ -50,7 +51,8 @@ if ("${COSM_BUILD_FOR}" MATCHES "ARGOS")
       "src/repr|"
       "src/strategy|"
       "src/metrics|"
-      "src/tasks"
+      "src/tasks|"
+      "src/argos"
       )
   component_register_as_src(
     fordyca_argos_SRC
