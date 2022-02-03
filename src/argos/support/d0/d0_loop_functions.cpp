@@ -110,7 +110,7 @@ NS_END(detail);
  * Constructors/Destructor
  ******************************************************************************/
 d0_loop_functions::d0_loop_functions(void)
-    : ER_CLIENT_INIT("fordyca.loop.d0"),
+    : ER_CLIENT_INIT("fordyca.argos.loop.d0"),
       m_metrics_manager(nullptr),
       m_interactor_map(nullptr),
       m_metrics_map(nullptr),

@@ -165,7 +165,7 @@ NS_END(detail);
  * Constructors/Destructor
  ******************************************************************************/
 d1_loop_functions::d1_loop_functions(void)
-    : ER_CLIENT_INIT("fordyca.loop.d1"),
+    : ER_CLIENT_INIT("fordyca.argos.loop.d1"),
       m_interactor_map(nullptr),
       m_metric_extractor_map(nullptr),
       m_los_update_map(nullptr),
