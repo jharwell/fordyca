@@ -11,6 +11,7 @@
                (substitute-in-file-name "$rcppsw/include")
                (substitute-in-file-name "$fordyca/include")
                (substitute-in-file-name "$cosm/include")
+               (substitute-in-file-name "/opt/ros/noetic/include")
                (concat
                 (projectile-project-root)
                 "include")

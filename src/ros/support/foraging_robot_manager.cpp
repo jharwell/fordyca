@@ -1,5 +1,5 @@
 /**
- * \file d0_robot_metrics_manager.hpp
+ * \file foraging_robot_manager.cpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,44 +18,49 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ROS_METRICS_D0_D0_ROBOT_METRICS_MANAGER_HPP_
-#define INCLUDE_FORDYCA_ROS_METRICS_D0_D0_ROBOT_METRICS_MANAGER_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
+#include "fordyca/ros/support/foraging_robot_manager.hpp"
 
-#include "cosm/ros/metrics/robot_metrics_manager.hpp"
-
-#include "fordyca/controller/foraging_controller.hpp"
+#include "cosm/pal/config/output_config.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, ros, metrics, d0);
+NS_START(fordyca, ros, support);
 
 /*******************************************************************************
- * Class Definitions
+ * Constructors/Destructors
  ******************************************************************************/
-/**
- * \class d0_robot_metrics_manager
- * \ingroup ros metrics d0
- *
- * \brief Writes metrics gathered from robots to ROS topics to be ent to the ROS
- * master for aggregation and processing. Currently includes:
- *
- * - FSM distance/block acquisition metrics
- */
+foraging_robot_manager::foraging_robot_manager(void)
+    : ER_CLIENT_INIT("fordyca.support.ros.foraging_robot_manager") {}
 
-class d0_robot_metrics_manager : public crmetrics::robot_metrics_manager,
-                                 public rer::client<d0_robot_metrics_manager> {
- public:
-  explicit d0_robot_metrics_manager(const rmconfig::metrics_config* mconfig);
+foraging_robot_manager::~foraging_robot_manager(void) = default;
 
-  void collect_from_controller(const fcontroller::foraging_controller* c);
-};
+/*******************************************************************************
+ * Initialization Functions
+ ******************************************************************************/
+void foraging_robot_manager::init(ticpp::Element& node) {
+  foraging_robot_manager_adaptor::init(node);
 
-NS_END(d0, metrics, ros, fordyca);
+  /* parse simulation input file */
+  config_parse(node);
 
-#endif /* INCLUDE_FORDYCA_ROS_METRICS_D0_D0_ROBOT_METRICS_MANAGER_HPP_ */
+  /* initialize RNG */
+  rng_init(config()->config_get<rmath::config::rng_config>());
+
+  /* initialize output and metrics collection */
+  output_init(m_config.config_get<cpconfig::output_config>());
+} /* init() */
+
+void foraging_robot_manager::config_parse(ticpp::Element& node) {
+  m_config.parse_all(node);
+
+  if (!m_config.validate_all()) {
+    ER_FATAL_SENTINEL("Not all parameters were validated");
+    std::exit(EXIT_FAILURE);
+  }
+} /* config_parse() */
+
+NS_END(support, ros, fordyca);

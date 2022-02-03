@@ -29,17 +29,17 @@
 #include "rcppsw/utils/maskable_enum.hpp"
 #include "rcppsw/metrics/register_with_sink.hpp"
 #include "rcppsw/metrics/register_using_config.hpp"
-#include "rcppsw/metrics/file_sink_registerer.hpp"
+#include "rcppsw/metrics/network_sink_registerer.hpp"
 #include "rcppsw/mpl/identity.hpp"
 
 #include "cosm/repr/base_block3D.hpp"
-#include "cosm/spatial/metrics/goal_acq_metrics.hpp"
-#include "cosm/spatial/metrics/movement_metrics.hpp"
-#include "cosm/ds/cell2D.hpp"
 #include "cosm/metrics/specs.hpp"
+#include "cosm/ros/metrics/topic_sink.hpp"
 
 #include "fordyca/controller/reactive/d0/crw_controller.hpp"
 #include "fordyca/metrics/specs.hpp"
+#include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
+#include "fordyca/ros/metrics/blocks/manipulation_metrics_topic_sink.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -54,6 +54,10 @@ d0_robot_metrics_manager::d0_robot_metrics_manager(
     : crmetrics::robot_metrics_manager(mconfig),
       ER_CLIENT_INIT("fordyca.ros.metrics.d0.d0_manager") {
 
+  using sink_list = rmpl::typelist<
+    rmpl::identity<frmetrics::blocks::manipulation_metrics_topic_sink>
+    >;
+
   /* register collectors common to all of FORDYCA */
   rmetrics::creatable_collector_set creatable_set = {
     { typeid(fmetrics::blocks::manipulation_metrics_collector),
@@ -63,23 +67,30 @@ d0_robot_metrics_manager::d0_robot_metrics_manager(
   };
 
   rmetrics::register_with_sink<frmetrics::d0::d0_robot_metrics_manager,
-                               rmetrics::file_sink_registerer> csv(this,
-                                                                   creatable_set);
-  rmetrics::register_using_config<decltype(csv),
-                                  rmconfig::file_sink_config> registerer(
-                                      std::move(csv),
-                                      &mconfig->csv);
+                               rmetrics::network_sink_registerer> topic(this,
+                                                                      creatable_set);
+  rmetrics::register_using_config<decltype(topic),
+                                  rmconfig::network_sink_config> registerer(
+                                      std::move(topic),
+                                      &mconfig->network);
 
-  boost::mpl::for_each<detail::sink_list>(registerer);
+  boost::mpl::for_each<sink_list>(registerer);
 
   /* setup metric collection for all collector groups in all sink groups */
   initialize();
 }
 
 /*******************************************************************************
- * Template Instantiations
+ * Member Functions
  ******************************************************************************/
-template void d0_robot_metrics_manager::collect_from_controller(
-    const controller::reactive::d0::crw_controller* const c);
+void d0_robot_metrics_manager::collect_from_controller(
+    const fcontroller::foraging_controller* const c) {
+  crmetrics::robot_metrics_manager::collect_from_controller(c);
+
+  /*
+   * All d0 controllers provide these.
+   */
+  collect(cmspecs::blocks::kManipulation.scoped, *c->block_manip_recorder());
+} /* collect_from_controller() */
 
 NS_END(d0, metrics, ros, fordyca);

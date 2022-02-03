@@ -27,12 +27,11 @@
 
 #include "cosm/controller/operations/applicator.hpp"
 #include "cosm/interactors/applicator.hpp"
-#include "cosm/pal/swarm_iterator.hpp"
 #include "cosm/pal/pal.hpp"
 #include "cosm/metrics/specs.hpp"
 
 #include "fordyca/controller/reactive/d0/crw_controller.hpp"
-#include "fordyca/ros/metrics/d0/d0_metrics_manager.hpp"
+#include "fordyca/ros/metrics/d0/d0_robot_metrics_manager.hpp"
 #include "fordyca/ros/support/d0/robot_arena_interactor.hpp"
 
 /*******************************************************************************
@@ -56,19 +55,15 @@ NS_START(detail);
 struct functor_maps_initializer {
   RCPPSW_COLD functor_maps_initializer(d0_robot_manager* const lf_in)
 
-      : lf(lf_in), config_map(cmap) {}
+      : lf(lf_in) {}
   template <typename T>
   RCPPSW_COLD void operator()(const T& controller) const {
     lf->m_interactor_map->emplace(
         typeid(controller),
-        robot_arena_interactor<T, carena::caching_arena_map>(
-            lf->arena_map(),
-            lf->m_metrics_manager.get(),
-            lf->floor(),
-            lf->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>()));
+        robot_arena_interactor<T>(lf->m_metrics_manager.get()));
     lf->m_metrics_map->emplace(typeid(controller),
                                ccops::metrics_extract<T,
-                               fametrics::d0::d0_metrics_manager>(
+                               frmetrics::d0::d0_robot_metrics_manager>(
                                    lf->m_metrics_manager.get()));
   }
 
@@ -83,7 +78,7 @@ NS_END(detail);
  * Constructors/Destructor
  ******************************************************************************/
 d0_robot_manager::d0_robot_manager(fcontroller::foraging_controller* c)
-    : ER_CLIENT_INIT("fordyca.ros.loop.d0"),
+    : ER_CLIENT_INIT("fordyca.ros.support.d0_robot_manager"),
       m_controller(c),
       m_metrics_manager(nullptr),
       m_interactor_map(nullptr),
@@ -107,16 +102,15 @@ void d0_robot_manager::init(ticpp::Element& node) {
 } /* init() */
 
 void d0_robot_manager::shared_init(ticpp::Element& node) {
-  ros_swarm_manager::init(node);
+  foraging_robot_manager::init(node);
 } /* shared_init() */
 
 void d0_robot_manager::private_init(void) {
   /* initialize output and metrics collection */
   const auto* output = config()->config_get<cpconfig::output_config>();
-  m_metrics_manager = std::make_unique<fametrics::d0::d0_metrics_manager>(
-      &output->metrics,
-      output_root());
-
+  m_metrics_manager = std::make_unique<frmetrics::d0::d0_robot_metrics_manager>(
+      &output->metrics);
+  output_root();
   /* this starts at 0, and ROS starts at 1, so sync up */
   m_metrics_manager->timestep_inc();
 
@@ -127,27 +121,19 @@ void d0_robot_manager::private_init(void) {
    * Intitialize controller interactions with environment via various
    * functors/type maps for all d0 controller types.
    */
-  detail::functor_maps_initializer f_initializer(&config_map, this);
-  boost::mpl::for_each<controller::d0::typelist>(f_initializer);
+  detail::functor_maps_initializer f_initializer(this);
+  boost::mpl::for_each<fcontroller::d0::reactive_typelist>(f_initializer);
 } /* private_init() */
 
 void d0_robot_manager::post_step(void) {
   ndc_uuid_push();
-  ros_swarm_manager::post_step();
+  foraging_robot_manager::post_step();
   ndc_uuid_pop();
 
-  /*  Collect metrics */
-  auto cb = [&](cros::topic& ns) {
-    ndc_uuid_push();
-    robot_post_step(ns);
-    ndc_uuid_pop();
-  };
-  cpros::swarm_iterator::robots(this, cb);
+  /*  Collect metrics from robot */
+  robot_post_step();
 
   ndc_uuid_push();
-
-  /* Collect metrics from loop functions */
-  m_metrics_manager->collect_from_sm(this);
 
   /* all metrics collected--send to ROS master node for processing */
   m_metrics_manager->flush(rmetrics::output_mode::ekSTREAM);
@@ -166,7 +152,7 @@ void d0_robot_manager::destroy(void) {
 
 void d0_robot_manager::reset(void) {
   ndc_uuid_push();
-  ros_swarm_manager::reset();
+  foraging_robot_manager::reset();
   m_metrics_manager->initialize();
   ndc_uuid_pop();
 } /* reset() */
@@ -185,26 +171,27 @@ void d0_robot_manager::robot_post_step(void) {
   auto id = m_controller->type_index();
   auto it = m_interactor_map->find(id);
   ER_ASSERT(m_interactor_map->end() != it,
-            "Controller '%s' type '%s' not in d0 interactor map",
-            controller->GetId().c_str(),
+            "Controller type '%s' not in d0 interactor map",
             id.name());
 
   auto iapplicator = cinteractors::applicator<controller::foraging_controller,
-                                              d0::robot_arena_interactor,
-                                              carena::caching_arena_map>(
+                                              d0::robot_arena_interactor>(
                                                   m_controller,
                                                   timestep());
-  auto status = boost::apply_visitor(iapplicator, m_interactor_map->at(id));
+  boost::apply_visitor(iapplicator, m_interactor_map->at(id));
 
   /*
    * Collect metrics from robot, now that it has finished interacting with the
    * environment and no more changes to its state will occur this timestep.
    */
-  auto mapplicator = ccops::applicator<controller::foraging_controller,
-                                       ccops::metrics_extract,
-                                       fametrics::d0::d0_metrics_manager>(controller);
+  auto mapplicator = ccops::applicator<
+    controller::foraging_controller,
+    ccops::metrics_extract,
+    frmetrics::d0::d0_robot_metrics_manager
+    >(m_controller);
+
   boost::apply_visitor(mapplicator, m_metrics_map->at(id));
-  controller->block_manip_recorder()->reset();
+  m_controller->block_manip_recorder()->reset();
 } /* robot_post_step() */
 
 NS_END(d0, support, ros, fordyca);

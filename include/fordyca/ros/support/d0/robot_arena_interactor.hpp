@@ -25,13 +25,14 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/ros/support/free_block_pickup_interactor.hpp"
-/* #include "fordyca/ros/support/nest_block_drop_interactor.hpp" */
+#include "fordyca/ros/support/nest_block_drop_interactor.hpp"
 #include "fordyca/ros/support/mpl/free_block_pickup_spec.hpp"
-/* #include "fordyca/ros/support/mpl/nest_block_drop_spec.hpp" */
+#include "fordyca/ros/support/mpl/nest_block_drop_spec.hpp"
 
 #include "fordyca/controller/reactive/d0/events/nest_block_drop.hpp"
 #include "fordyca/controller/reactive/d0/events/free_block_pickup.hpp"
 #include "fordyca/controller/reactive/d0/events/block_vanished.hpp"
+#include "fordyca/ros/metrics/d0/d0_robot_metrics_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,14 +54,12 @@ NS_START(fordyca, ros, support, d0);
  * - Picking up a free block.
  * - Dropping a carried block in the nest.
  */
-template <typename TController,
-          typename TArenaMap>
+template <typename TController>
 class robot_arena_interactor final : public rer::client<
-  robot_arena_interactor<TController,
-                         TArenaMap>
+  robot_arena_interactor<TController>
   > {
  public:
-  explicit robot_arena_interactor(frmetrics::d0::d0_metrics_manager *const metrics)
+  explicit robot_arena_interactor(frmetrics::d0::d0_robot_metrics_manager *const metrics)
       : ER_CLIENT_INIT("fordyca.ros.support.d0.robot_arena_interactor"),
         m_nest_drop(metrics) {}
 

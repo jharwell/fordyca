@@ -27,21 +27,26 @@
 #include <memory>
 
 #include "rcppsw/ds/type_map.hpp"
+#include "rcppsw/mpl/typelist.hpp"
 
 #include "cosm/controller/operations/metrics_extract.hpp"
 #include "cosm/hal/robot.hpp"
 #include "cosm/ros/topic.hpp"
 
-#include "fordyca/ros/support/ros_swarm_manager.hpp"
+#include "fordyca/ros/support/foraging_robot_manager.hpp"
+#include "fordyca/controller/controller_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 namespace fordyca::ros::metrics::d0 {
-class d0_metrics_manager;
+class d0_robot_metrics_manager;
 } /* namespace fordyca::ros::metrics::d0 */
 
 NS_START(fordyca, ros, support, d0);
+
+template<typename Controller>
+class robot_arena_interactor;
 
 namespace detail {
 struct functor_maps_initializer;
@@ -59,7 +64,7 @@ struct functor_maps_initializer;
  *
  * - Metric collection from robots
  */
-class d0_robot_manager : public fasupport::ros_swarm_manager,
+class d0_robot_manager : public frsupport::foraging_robot_manager,
                           public rer::client<d0_robot_manager> {
  public:
   d0_robot_manager(fcontroller::foraging_controller* c) RCPPSW_COLD;
@@ -82,15 +87,14 @@ class d0_robot_manager : public fasupport::ros_swarm_manager,
 
 private:
   using interactor_map_type = rds::type_map<
-    rmpl::typelist_wrap_apply<controller::d0::typelist,
-                              robot_arena_interactor,
-                              carena::caching_arena_map>::type
+    rmpl::typelist_wrap_apply<fcontroller::d0::reactive_typelist,
+                              robot_arena_interactor>::type
     >;
 
   using metric_extraction_map_type = rds::type_map<
-    rmpl::typelist_wrap_apply<controller::d0::typelist,
+    rmpl::typelist_wrap_apply<fcontroller::d0::reactive_typelist,
                               ccops::metrics_extract,
-                              fametrics::d0::d0_metrics_manager>::type>;
+                              frmetrics::d0::d0_robot_metrics_manager>::type>;
   /**
    * \brief These are friend classes because they are basically just pieces of
    * the loop functions pulled out for increased clarity/modularity, and are not
@@ -117,10 +121,10 @@ private:
   void robot_post_step(void);
 
   /* clang-format off */
-  fcontroller::foraging_controller*                  m_controller;
-  std::unique_ptr<fametrics::d0::d0_metrics_manager> m_metrics_manager;
-  std::unique_ptr<interactor_map_type>               m_interactor_map;
-  std::unique_ptr<metric_extraction_map_type>        m_metrics_map;
+  fcontroller::foraging_controller*                        m_controller;
+  std::unique_ptr<frmetrics::d0::d0_robot_metrics_manager> m_metrics_manager;
+  std::unique_ptr<interactor_map_type>                     m_interactor_map;
+  std::unique_ptr<metric_extraction_map_type>              m_metrics_map;
   /* clang-format on */
 };
 

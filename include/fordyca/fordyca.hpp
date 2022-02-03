@@ -210,9 +210,12 @@ namespace events {}
 
 namespace metrics {
 namespace specs {}
-}
+namespace blocks {}
+} /* namespace metrics */
+
 namespace argos {
 namespace metrics {}
+
 namespace support {
 namespace tv {}
 namespace caches {}
@@ -223,6 +226,14 @@ namespace mpl {}
 } /* namespace support */
 
 } /* namespace argos */
+
+namespace ros {
+namespace metrics {}
+namespace support {
+namespace d0 {}
+} /* namespace support */
+
+} /* namespace ros */
 
 namespace support {}
 
@@ -248,6 +259,7 @@ namespace fevents = fordyca::events;
 
 namespace fmetrics = fordyca::metrics;
 namespace fmspecs = fmetrics::specs;
+namespace fmblocks = fmetrics::blocks;
 
 namespace fcontroller = fordyca::controller;
 namespace fccognitive = fcontroller::cognitive;
@@ -271,5 +283,10 @@ namespace fasmpl = fasupport::mpl;
 namespace fasd0 = fasupport::d0;
 namespace fasd1 = fasupport::d1;
 namespace fasd2 = fasupport::d2;
+
+namespace fros = fordyca::ros;
+namespace frmetrics = fros::metrics;
+namespace frsupport = fros::support;
+namespace frsd0 = frsupport::d0;
 
 #endif /* INCLUDE_FORDYCA_FORDYCA_HPP_ */

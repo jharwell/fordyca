@@ -1,5 +1,5 @@
 /**
- * \file free_block_pickup_interactor.hpp
+ * \file nest_block_drop_interactor.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,19 +18,18 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ROS_SUPPORT_FREE_BLOCK_PICKUP_INTERACTOR_HPP_
-#define INCLUDE_FORDYCA_ROS_SUPPORT_FREE_BLOCK_PICKUP_INTERACTOR_HPP_
+#ifndef INCLUDE_FORDYCA_ROS_SUPPORT_NEST_BLOCK_DROP_INTERACTOR_HPP_
+#define INCLUDE_FORDYCA_ROS_SUPPORT_NEST_BLOCK_DROP_INTERACTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <memory>
 
-#include "cosm/ros/interactors/free_block_pickup.hpp"
+#include "cosm/ros/interactors/nest_block_process.hpp"
 
 #include "fordyca/fsm/foraging_acq_goal.hpp"
+#include "fordyca/fsm/foraging_transport_goal.hpp"
 #include "fordyca/metrics/blocks/block_manip_events.hpp"
-#include "fordyca/support/interactor_status.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,34 +41,38 @@ NS_START(fordyca, ros, support);
  ******************************************************************************/
 
 /**
- * \class free_block_pickup_interactor
+ * \class nest_block_drop_interactor
  * \ingroup ros support
  *
- * \brief Handle's a robot's (possible) free block pickup event on a given
+ * \brief Handle's a robot's (possible) \ref nest_block_drop event on a given
  * timestep.
  */
 template <typename TController, typename TControllerSpecMap>
-class free_block_pickup_interactor final
-    : public crinteractors::free_block_pickup<TController, TControllerSpecMap> {
+class nest_block_drop_interactor final
+    : public crinteractors::nest_block_process<TController, TControllerSpecMap> {
  public:
   using controller_spec =
       typename boost::mpl::at<TControllerSpecMap, TController>::type;
-  using robot_block_pickup_visitor_type =
-      typename controller_spec::robot_block_pickup_visitor_type;
 
-  free_block_pickup_interactor(void) = default;
+  using robot_metrics_manager_type = typename controller_spec::robot_metrics_manager_type;
+  using interactor_status_type = typename controller_spec::interactor_status_type;
+  using robot_nest_block_process_visitor_type =
+      typename controller_spec::robot_nest_block_process_visitor_type;
 
-  free_block_pickup_interactor(free_block_pickup_interactor&&) = default;
+  nest_block_drop_interactor(robot_metrics_manager_type* const metrics)
+      : crinteractors::nest_block_process<TController,
+                                          TControllerSpecMap>(metrics) {}
+
+  nest_block_drop_interactor(nest_block_drop_interactor&&) = default;
 
   /* Not copy-constructible/assignable by default. */
-  free_block_pickup_interactor(const free_block_pickup_interactor&) = delete;
-  free_block_pickup_interactor&
-  operator=(const free_block_pickup_interactor&) = delete;
+  nest_block_drop_interactor(const nest_block_drop_interactor&) = delete;
+  nest_block_drop_interactor&
+  operator=(const nest_block_drop_interactor&) = delete;
 
- private:
   bool robot_goal_acquired(const TController& controller) const override {
-    return controller.goal_acquired() &&
-        fsm::foraging_acq_goal::ekBLOCK == controller.acquisition_goal();
+    return controller.goal_acquired() && fsm::foraging_transport_goal::ekNEST ==
+        controller.block_transport_goal();
   }
 
   void robot_previsit_hook(TController& controller) const override {
@@ -82,11 +85,11 @@ class free_block_pickup_interactor final
      * robots. This may be revisited later.
      */
     controller.block_manip_recorder()->record(
-        fmetrics::blocks::block_manip_events::ekFREE_PICKUP,
+        fmetrics::blocks::block_manip_events::ekFREE_DROP,
         rtypes::timestep(0));
   }
 };
 
 NS_END(support, ros, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ROS_SUPPORT_FREE_BLOCK_PICKUP_INTERACTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_ROS_SUPPORT_NEST_BLOCK_DROP_INTERACTOR_HPP_ */

@@ -1,5 +1,5 @@
 /**
- * \file free_block_pickup_spec.hpp
+ * \file nest_block_drop_spec.hpp
  *
  * \copyright 2020 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ROS_SUPPORT_MPL_FREE_BLOCK_PICKUP_SPEC_HPP_
-#define INCLUDE_FORDYCA_ROS_SUPPORT_MPL_FREE_BLOCK_PICKUP_SPEC_HPP_
+#ifndef INCLUDE_FORDYCA_ROS_SUPPORT_MPL_NEST_BLOCK_DROP_SPEC_HPP_
+#define INCLUDE_FORDYCA_ROS_SUPPORT_MPL_NEST_BLOCK_DROP_SPEC_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,9 +29,8 @@
 
 #include "rcppsw/mpl/typelist.hpp"
 
-#include "cosm/arena/caching_arena_map.hpp"
-
 #include "fordyca/support/interactor_status.hpp"
+#include "fordyca/ros/metrics/d0/d0_robot_metrics_manager.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -41,38 +40,37 @@ NS_START(fordyca, ros, support, mpl, detail);
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-template<typename TFreeBlockPickupVisitor>
-struct free_pickup_spec_value {
-  using robot_block_pickup_visitor_type = TFreeBlockPickupVisitor;
+template<typename TNestBlockProcessVisitor>
+struct nest_drop_spec_value {
   using interactor_status_type = fsupport::interactor_status;
+  using robot_metrics_manager_type = frmetrics::d0::d0_robot_metrics_manager;
+  using robot_nest_block_process_visitor_type = TNestBlockProcessVisitor;
 };
 
 /*
- * First argument is the map as it is built, second is the thing to insert,
+ * First argument is the map as it is built, second in the thing to insert,
  * built from each type in the specified typelist.
  */
-template<typename TFreeBlockPickupVisitor>
-using free_pickup_inserter = boost::mpl::insert<
+template<typename TNestBlockProcessVisitor>
+using nest_drop_inserter = boost::mpl::insert<
   boost::mpl::_1,
   boost::mpl::pair<boost::mpl::_2,
-                   free_pickup_spec_value<
-                     TFreeBlockPickupVisitor
+                   nest_drop_spec_value<
+                     TNestBlockProcessVisitor
                      >
                    >
   >;
 
 NS_END(detail);
 
-template<typename TTypelist,
-         typename TFreeBlockPickupVisitor>
-using free_block_pickup_spec = typename boost::mpl::fold<
+template<typename TTypelist, typename TNestBlockProcessVisitor>
+using nest_block_drop_spec = typename boost::mpl::fold<
   TTypelist,
   boost::mpl::map0<>,
-  detail::free_pickup_inserter<
-    TFreeBlockPickupVisitor
+  detail::nest_drop_inserter<
+    TNestBlockProcessVisitor
     >
   >::type;
-
 NS_END(mpl, support, ros, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ROS_SUPPORT_MPL_FREE_BLOCK_PICKUP_SPEC_HPP_ */
+#endif /* INCLUDE_FORDYCA_ROS_SUPPORT_MPL_NEST_BLOCK_DROP_SPEC_HPP_ */
