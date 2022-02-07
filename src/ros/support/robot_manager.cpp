@@ -1,5 +1,5 @@
 /**
- * \file manipulation_metrics_collector.cpp
+ * \file robot_manager.cpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,45 +21,46 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
+#include "fordyca/ros/support/robot_manager.hpp"
 
-#include "cosm/controller/metrics/manipulation_metrics.hpp"
-
-#include "fordyca/metrics/blocks/block_manip_events.hpp"
+#include "cosm/pal/config/output_config.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, blocks);
+NS_START(fordyca, ros, support);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Constructors/Destructors
  ******************************************************************************/
-manipulation_metrics_collector::manipulation_metrics_collector(
-    std::unique_ptr<rmetrics::base_sink> sink)
-    : base_collector(std::move(sink)) {}
+robot_manager::robot_manager(void)
+    : ER_CLIENT_INIT("fordyca.ros.support.robot_manager") {}
+
+robot_manager::~robot_manager(void) = default;
 
 /*******************************************************************************
- * Member Functions
+ * Initialization Functions
  ******************************************************************************/
-void manipulation_metrics_collector::collect(
-    const rmetrics::base_metrics& metrics) {
-  const auto& m = dynamic_cast<const ccmetrics::manipulation_metrics&>(metrics);
+void robot_manager::init(ticpp::Element& node) {
+  robot_manager_adaptor::init(node);
 
-  for (uint i = 0; i < block_manip_events::ekMAX_EVENTS; ++i) {
-    m_data.interval[i].events += m.status(i);
-    m_data.interval[i].penalties += m.penalty(i).v();
+  /* parse simulation input file */
+  config_parse(node);
 
-    m_data.cum[i].events += m.status(i);
-    m_data.cum[i].penalties += m.penalty(i).v();
-  } /* for(i..) */
-} /* collect() */
+  /* initialize RNG */
+  rng_init(config()->config_get<rmath::config::rng_config>());
 
-void manipulation_metrics_collector::reset_after_interval(void) {
-  for (auto& e : m_data.interval) {
-    ral::mt_init(&e.events, 0UL);
-    ral::mt_init(&e.penalties, 0UL);
-  } /* for(e..) */
-} /* reset_after_interval() */
+  /* initialize output and metrics collection */
+  output_init(m_config.config_get<cpconfig::output_config>());
+} /* init() */
 
-NS_END(blocks, metrics, fordyca);
+void robot_manager::config_parse(ticpp::Element& node) {
+  m_config.parse_all(node);
+
+  if (!m_config.validate_all()) {
+    ER_FATAL_SENTINEL("Not all parameters were validated");
+    std::exit(EXIT_FAILURE);
+  }
+} /* config_parse() */
+
+NS_END(support, ros, fordyca);

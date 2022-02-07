@@ -28,7 +28,7 @@
 #include "rcppsw/math/vector2.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/repr/base_block3D.hpp"
+#include "cosm/repr/sim_block3D.hpp"
 #include "cosm/subsystem/perception/base_memory_model.hpp"
 #include "cosm/arena/ds/cache_vector.hpp"
 
@@ -86,7 +86,7 @@ class foraging_memory_model : public csperception::base_memory_model,
    * \brief Does the model currently contain the specified block (i.e., is it
    * tracked?). Searches by block UUID.
    */
-  bool contains(const crepr::base_block3D* block) const {
+  bool contains(const crepr::sim_block3D* block) const {
     return nullptr != find(block);
   }
 
@@ -105,11 +105,11 @@ class foraging_memory_model : public csperception::base_memory_model,
     return tracked_caches().find(cache->dcenter2D());
   }
 
-  const tracked_block_type* find(const crepr::base_block3D* block) const  {
+  const tracked_block_type* find(const crepr::sim_block3D* block) const  {
     return tracked_blocks().find(block->id());
   }
 
-  tracked_block_type* find(const crepr::base_block3D* block) {
+  tracked_block_type* find(const crepr::sim_block3D* block) {
     return tracked_blocks().find(block->id());
   }
 
@@ -145,7 +145,7 @@ class foraging_memory_model : public csperception::base_memory_model,
    *
    * \return \c TRUE if a block was removed, \c FALSE otherwise.
    */
-  virtual bool block_remove(crepr::base_block3D* victim) = 0;
+  virtual bool block_remove(crepr::sim_block3D* victim) = 0;
 
  private:
   /* clang-format off */

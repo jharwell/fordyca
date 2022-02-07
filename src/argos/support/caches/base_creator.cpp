@@ -30,7 +30,7 @@
 #include "cosm/arena/repr/light_type_index.hpp"
 #include "cosm/ds/operations/cell2D_cache_extent.hpp"
 #include "cosm/foraging/block_dist/base_distributor.hpp"
-#include "cosm/repr/base_block3D.hpp"
+#include "cosm/repr/sim_block3D.hpp"
 #include "cosm/arena/free_blocks_calculator.hpp"
 
 /*******************************************************************************

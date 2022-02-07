@@ -46,6 +46,10 @@ namespace cosm::arena::repr {
 class arena_cache;
 } // namespace cosm::arena::repr
 
+namespace cosm::repr {
+class sim_block3D;
+} /* namespace cosm::repr */
+
 namespace fordyca::controller::cognitive {
 class cache_sel_matrix;
 }
@@ -111,6 +115,8 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
   void visit(fspds::dpo_store& store);
 
   const carepr::arena_cache* cache(void) const { return mc_cache; }
+
+  crepr::sim_block3D* block(void);
 
  private:
 

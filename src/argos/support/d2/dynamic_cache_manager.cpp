@@ -25,7 +25,7 @@
 #include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/foraging/repr/block_cluster.hpp"
-#include "cosm/repr/base_block3D.hpp"
+#include "cosm/repr/sim_block3D.hpp"
 #include "cosm/spatial/dimension_checker.hpp"
 
 #include "fordyca/events/cell2D_empty.hpp"
@@ -103,7 +103,7 @@ dynamic_cache_manager::create(const fascaches::create_ro_params& c_params,
 } /* create() */
 
 bool dynamic_cache_manager::block_alloc_usable_filter(
-    const crepr::base_block3D* block,
+    const crepr::sim_block3D* block,
     const cads::acache_vectorno& existing_caches,
     const cfds::block3D_cluster_vectorro& clusters) {
   /*
@@ -137,7 +137,7 @@ bool dynamic_cache_manager::block_alloc_usable_filter(
 } /* block_alloc_usable_filter() */
 
 bool dynamic_cache_manager::block_alloc_absorbable_filter(
-    const crepr::base_block3D* block,
+    const crepr::sim_block3D* block,
     const cads::acache_vectorno& existing_caches,
     const cfds::block3D_cluster_vectorro&) {
   /* blocks cannot be carried by a robot */

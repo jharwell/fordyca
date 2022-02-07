@@ -29,7 +29,7 @@
 #include "rcppsw/types/type_uuid.hpp"
 #include "rcppsw/er/stringizable.hpp"
 
-#include "cosm/repr/base_block3D.hpp"
+#include "cosm/repr/sim_block3D.hpp"
 
 #include "fordyca/subsystem/perception/ds/dpo_map.hpp"
 #include "fordyca/fordyca.hpp"
@@ -53,11 +53,11 @@ NS_START(fordyca, subsystem, perception, ds);
  * give correct results.
  */
 class dp_block_map : public dpo_map<rtypes::type_uuid,
-                                    crepr::base_block3D>,
+                                    crepr::sim_block3D>,
                      public rer::stringizable {
  public:
   using dpo_map<rtypes::type_uuid,
-                crepr::base_block3D>::dpo_map;
+                crepr::sim_block3D>::dpo_map;
   ~dp_block_map(void) override = default;
 
 

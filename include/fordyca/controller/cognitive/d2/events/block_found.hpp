@@ -29,7 +29,6 @@
 #include "rcppsw/er/client.hpp"
 
 #include "cosm/ds/operations/cell2D_op.hpp"
-#include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/controller/controller_fwd.hpp"
@@ -37,6 +36,10 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::repr {
+class sim_block3D;
+} /* namespace cosm::crepr */
+
 NS_START(fordyca, controller, cognitive, d2, events);
 
 /*******************************************************************************
@@ -58,7 +61,7 @@ class block_found : public rer::client<block_found> {
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  explicit block_found(crepr::base_block3D* block);
+  explicit block_found(crepr::sim_block3D* block);
   ~block_found(void) override = default;
 
   block_found(const block_found&) = delete;
@@ -72,7 +75,7 @@ class block_found : public rer::client<block_found> {
 
  private:
   /* clang-format off */
-  crepr::base_block3D* m_block;
+  crepr::sim_block3D* m_block;
   /* clang-format on */
 };
 

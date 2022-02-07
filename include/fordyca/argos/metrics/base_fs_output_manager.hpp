@@ -27,7 +27,7 @@
 #include <string>
 
 #include "cosm/ds/config/grid2D_config.hpp"
-#include "cosm/pal/metrics/fs_output_manager.hpp"
+#include "cosm/argos/metrics/fs_output_manager.hpp"
 
 #include "fordyca/fordyca.hpp"
 
@@ -56,7 +56,7 @@ namespace fs = std::filesystem;
  * when building for ARGoS.
  */
 class base_fs_output_manager : public rer::client<base_fs_output_manager>,
-                               public cpmetrics::fs_output_manager {
+                               public cargos::metrics::fs_output_manager {
  public:
   base_fs_output_manager(const rmconfig::metrics_config* mconfig,
                           const cdconfig::grid2D_config* gconfig,

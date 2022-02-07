@@ -48,7 +48,7 @@ NS_START(fordyca, controller, cognitive, d2);
  * Constructors/Destructor
  ******************************************************************************/
 birtd_dpo_controller::birtd_dpo_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.d2.birtd_dpo") {}
+    : ER_CLIENT_INIT("fordyca.controller.cognitive.d2.birtd_dpo") {}
 
 /*******************************************************************************
  * Member Functions

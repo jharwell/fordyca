@@ -44,7 +44,7 @@ NS_START(fordyca, controller, reactive, d0);
  * Constructors/Destructor
  ******************************************************************************/
 crw_controller::crw_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.d0.crw"), m_fsm() {}
+    : ER_CLIENT_INIT("fordyca.controller.reactive.d0.crw") {}
 
 crw_controller::~crw_controller(void) = default;
 
@@ -63,6 +63,7 @@ void crw_controller::init(ticpp::Element& node) {
     ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);
   }
+  ER_INFO("All parameters parsed successfully");
 
   csfsm::fsm_params fsm_params {
     saa(),
@@ -77,19 +78,26 @@ void crw_controller::init(ticpp::Element& node) {
         rutils::color()
         };
 
+  ER_DEBUG("Creating strategies");
   const auto* nest = repo.config_get<crepr::config::nest_config>();
   const auto* strat_config = repo.config_get<fsconfig::strategy_config>();
 
+  auto block_factory = fsexplore::block_factory();
+  auto block_acq = block_factory.create(fsexplore::block_factory::kCRW,
+                                        &strategy_params,
+                                        rng());
+  auto nest_factory = csstrategy::nest_acq::factory();
+  auto nest_acq = nest_factory.create(strat_config->nest_acq.strategy,
+                                         &fsm_params,
+                                      rng());
+  ER_DEBUG("Create FSM");
   m_fsm = std::make_unique<fsm::d0::crw_fsm>(
       &fsm_params,
-      fsexplore::block_factory().create(fsexplore::block_factory::kCRW,
-                                        &strategy_params,
-                                        rng()),
-      csstrategy::nest_acq::factory().create(strat_config->nest_acq.strategy,
-                                             &fsm_params,
-                                             rng()),
+      std::move(block_acq),
+      std::move(nest_acq),
       nest->center,
       rng());
+
   /* Set CRW FSM supervision */
   supervisor()->supervisee_update(m_fsm.get());
   ER_INFO("Initialization finished");

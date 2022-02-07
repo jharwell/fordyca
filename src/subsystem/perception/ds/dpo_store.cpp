@@ -92,12 +92,12 @@ dpo_store::block_update(tracked_block_type&& block_in) {
 
   auto it1 = std::find_if(range.begin(),
                           range.end(),
-                          [&block_in](const dpo_entity<crepr::base_block3D>& b) {
+                          [&block_in](const dpo_entity<crepr::sim_block3D>& b) {
                             return b.ent()->idcmp(*block_in.ent());
                           });
   auto it2 = std::find_if(range.begin(),
                           range.end(),
-                          [&block_in](const dpo_entity<crepr::base_block3D>& b) {
+                          [&block_in](const dpo_entity<crepr::sim_block3D>& b) {
                             return b.ent()->dloccmp(*block_in.ent()) &&
                                    !b.ent()->idcmp(*block_in.ent());
                           });
@@ -171,7 +171,7 @@ dpo_store::block_update(tracked_block_type&& block_in) {
   return { model_update_status::ekNO_CHANGE, rmath::vector2z() };
 } /* block_update() */
 
-bool dpo_store::block_remove(crepr::base_block3D* const victim) {
+bool dpo_store::block_remove(crepr::sim_block3D* const victim) {
   auto range = tracked_blocks().values_range();
   auto it = std::find_if(range.begin(), range.end(), [&](const auto& b) {
     return b.ent()->idcmp(*victim);

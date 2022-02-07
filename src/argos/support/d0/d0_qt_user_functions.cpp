@@ -39,6 +39,7 @@ RCPPSW_WARNING_DISABLE_POP()
 #include "cosm/argos/vis/block_carry_visualizer.hpp"
 #include "cosm/argos/vis/polygon2D_visualizer.hpp"
 #include "cosm/argos/vis/steer2D_visualizer.hpp"
+#include "cosm/repr/sim_block3D.hpp"
 
 #include "fordyca/controller/cognitive/d0/mdpo_controller.hpp"
 #include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
@@ -73,7 +74,8 @@ void d0_qt_user_functions::Draw(chal::robot& c_entity) {
 
   if (base->is_carrying_block()) {
     cavis::block_carry_visualizer(this, kBLOCK_VIS_OFFSET, kTEXT_VIS_OFFSET)
-        .draw(base->block(), base->GetId().size());
+        .draw(static_cast<const crepr::sim_block3D*>(base->block()),
+              base->GetId().size());
   }
   if (nullptr != mdpo && mdpo->display_los()) {
     const auto* los = mdpo->perception()->los();

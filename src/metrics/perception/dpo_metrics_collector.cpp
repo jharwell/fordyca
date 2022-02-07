@@ -66,19 +66,14 @@ void dpo_metrics_collector::collect(
   m_data.cum.known_blocks += m->n_known_blocks();
   m_data.cum.known_caches += m->n_known_caches();
 
-  auto int_bsum = m_data.interval.block_density_sum.load();
-  auto int_csum = m_data.interval.cache_density_sum.load();
-  m_data.interval.block_density_sum.compare_exchange_strong(
-      int_bsum, int_bsum + m->avg_block_density().v());
-  m_data.interval.cache_density_sum.compare_exchange_strong(
-      int_csum, int_csum + m->avg_cache_density().v());
-
-  auto cum_bsum = m_data.cum.block_density_sum.load();
-  auto cum_csum = m_data.cum.cache_density_sum.load();
-  m_data.cum.block_density_sum.compare_exchange_strong(
-      cum_bsum, cum_bsum + m->avg_block_density().v());
-  m_data.cum.cache_density_sum.compare_exchange_strong(
-      cum_csum, cum_csum + m->avg_cache_density().v());
+  ral::mt_add(m_data.interval.block_density_sum,
+               m->avg_block_density().v());
+  ral::mt_add(m_data.cum.block_density_sum,
+               m->avg_block_density().v());
+  ral::mt_add(m_data.interval.cache_density_sum,
+               m->avg_cache_density().v());
+  ral::mt_add(m_data.cum.block_density_sum,
+               m->avg_cache_density().v());
 } /* collect() */
 
 void dpo_metrics_collector::reset_after_interval(void) {

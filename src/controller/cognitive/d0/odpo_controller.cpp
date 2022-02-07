@@ -43,7 +43,7 @@ NS_START(fordyca, controller, cognitive, d0);
  * Constructors/Destructor
  ******************************************************************************/
 odpo_controller::odpo_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.d0.odpo"), m_receptor(nullptr) {}
+    : ER_CLIENT_INIT("fordyca.controller.cognitive.d0.odpo"), m_receptor(nullptr) {}
 
 odpo_controller::~odpo_controller(void) = default;
 

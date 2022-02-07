@@ -52,7 +52,7 @@ class block_alloc_map {
   using map_type = std::map<int, cds::block3D_vectorno>;
   block_alloc_map(void) = default;
 
-  bool contains(const crepr::base_block3D* block) const {
+  bool contains(const crepr::sim_block3D* block) const {
     auto cache_i_alloc = [&](const auto& alloc_i) {
       return alloc_i.second.end() !=
              std::find(alloc_i.second.begin(), alloc_i.second.end(), block);

@@ -29,7 +29,7 @@
 #include "rcppsw/er/client.hpp"
 
 #include "cosm/ds/operations/cell2D_op.hpp"
-#include "cosm/repr/base_block3D.hpp"
+#include "cosm/repr/sim_block3D.hpp"
 
 #include "fordyca/subsystem/perception/model_update_result.hpp"
 #include "fordyca/subsystem/perception/perception_fwd.hpp"
@@ -61,7 +61,7 @@ class block_found : public rer::client<block_found>, public cdops::cell2D_op {
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  explicit block_found(crepr::base_block3D* block);
+  explicit block_found(crepr::sim_block3D* block);
   ~block_found(void) override = default;
 
   block_found(const block_found&) = delete;
@@ -77,7 +77,7 @@ class block_found : public rer::client<block_found>, public cdops::cell2D_op {
 
  private:
   /* clang-format off */
-  crepr::base_block3D* m_block;
+  crepr::sim_block3D* m_block;
   /* clang-format on */
 };
 

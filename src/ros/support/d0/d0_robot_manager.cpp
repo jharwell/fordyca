@@ -102,7 +102,7 @@ void d0_robot_manager::init(ticpp::Element& node) {
 } /* init() */
 
 void d0_robot_manager::shared_init(ticpp::Element& node) {
-  foraging_robot_manager::init(node);
+  robot_manager::init(node);
 } /* shared_init() */
 
 void d0_robot_manager::private_init(void) {
@@ -110,7 +110,7 @@ void d0_robot_manager::private_init(void) {
   const auto* output = config()->config_get<cpconfig::output_config>();
   m_metrics_manager = std::make_unique<frmetrics::d0::d0_robot_metrics_manager>(
       &output->metrics);
-  output_root();
+
   /* this starts at 0, and ROS starts at 1, so sync up */
   m_metrics_manager->timestep_inc();
 
@@ -127,7 +127,7 @@ void d0_robot_manager::private_init(void) {
 
 void d0_robot_manager::post_step(void) {
   ndc_uuid_push();
-  foraging_robot_manager::post_step();
+  robot_manager::post_step();
   ndc_uuid_pop();
 
   /*  Collect metrics from robot */
@@ -152,7 +152,7 @@ void d0_robot_manager::destroy(void) {
 
 void d0_robot_manager::reset(void) {
   ndc_uuid_push();
-  foraging_robot_manager::reset();
+  robot_manager::reset();
   m_metrics_manager->initialize();
   ndc_uuid_pop();
 } /* reset() */

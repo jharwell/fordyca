@@ -45,7 +45,7 @@ using base_pickup = fccd1::events::free_block_pickup;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-free_block_pickup::free_block_pickup(crepr::base_block3D* block,
+free_block_pickup::free_block_pickup(crepr::sim_block3D* block,
                                      const rtypes::type_uuid& id,
                                      const rtypes::timestep& t)
     : ER_CLIENT_INIT("fordyca.controller.cognitive.d2.events.free_block_pickup"),

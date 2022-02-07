@@ -26,7 +26,6 @@
  ******************************************************************************/
 #include <vector>
 #include <memory>
-#include <atomic>
 #include <utility>
 
 #include "cosm/controller/operations/grid_los_update.hpp"

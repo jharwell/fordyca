@@ -137,7 +137,7 @@ void cache_found::visit(fspds::dpo_store& store) {
   auto it = blocks.begin();
   while (it != blocks.end()) {
     if (m_cache->contains_point((*it)->rcenter2D())) {
-      crepr::base_block3D* tmp = (*it);
+      crepr::sim_block3D* tmp = (*it);
       ++it;
       ER_TRACE("Remove block%d hidden behind cache%d",
                tmp->id().v(),
@@ -203,7 +203,7 @@ void cache_found::visit(fspds::dpo_semantic_map& map) {
    * created. When we return to the arena and find a new cache there, we are
    * tracking blocks that no longer exist in our perception.
    */
-  std::vector<crepr::base_block3D*> rms;
+  std::vector<crepr::sim_block3D*> rms;
   auto blocks = map.known_blocks();
   for (auto&& b : blocks) {
     if (m_cache->contains_point(b->rcenter2D())) {

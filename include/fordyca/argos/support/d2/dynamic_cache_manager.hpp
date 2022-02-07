@@ -96,7 +96,7 @@ class dynamic_cache_manager final : public fascaches::base_manager,
    * are eligible to be USED during cache creation this timestep.
    */
   bool block_alloc_usable_filter(
-      const crepr::base_block3D* block,
+      const crepr::sim_block3D* block,
       const cads::acache_vectorno& existing_caches,
       const cfds::block3D_cluster_vectorro& clusters);
 
@@ -114,7 +114,7 @@ class dynamic_cache_manager final : public fascaches::base_manager,
    * considered during the creation process otherwise.
    */
   bool block_alloc_absorbable_filter(
-      const crepr::base_block3D* block,
+      const crepr::sim_block3D* block,
       const cads::acache_vectorno& existing_caches,
       const cfds::block3D_cluster_vectorro&);
 

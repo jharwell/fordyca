@@ -32,11 +32,11 @@ NS_START(perception);
 
 cmspecs::name_spec kDPO = {
   "perception_dpo",
-  "perception::dpo",
+  "perception/dpo",
 };
 cmspecs::name_spec kMDPO = {
   "perception_mdpo",
-  "perception::mdpo",
+  "perception/mdpo",
 };
 
 NS_END(perception);
@@ -45,37 +45,37 @@ NS_START(caches);
 
 cmspecs::name_spec kAcqCounts = {
   "cache_acq_counts",
-  "caches::acq_counts"
+  "caches/acq_counts"
 };
 
 cmspecs::name_spec kAcqLocs2D  = {
   "cache_acq_locs2D",
-  "caches::acq::locs2D"
+  "caches/acq/locs2D"
 };
 cmspecs::name_spec kAcqExploreLocs2D = {
   "cache_acq_explore_locs2D",
-  "caches::acq::explore_locs2D"
+  "caches/acq/explore_locs2D"
 };
 cmspecs::name_spec kAcqVectorLocs2D = {
   "cache_acq_vector_locs2D",
-  "caches::acq::vector_locs2D"
+  "caches/acq/vector_locs2D"
 };
 
 cmspecs::name_spec kSiteSelection = {
   "cache_site_selection",
-  "caches::site_selection"
+  "caches/site_selection"
 };
 cmspecs::name_spec kUtilization = {
   "cache_utilization",
-  "caches::utilization"
+  "caches/utilization"
 };
 cmspecs::name_spec kLocations = {
   "cache_locations",
-  "caches::locations"
+  "caches/locations"
 };
 cmspecs::name_spec kLifecycle = {
   "cache_lifecycle",
-  "caches::lifecycle"
+  "caches/lifecycle"
 };
 
 NS_END(caches);
@@ -84,15 +84,15 @@ NS_START(tasks, tab);
 
 cmspecs::name_spec kGeneralist = {
   "task_tab_generalist",
-  "tasks::tab::generalist"
+  "tasks/tab/generalist"
 };
 cmspecs::name_spec kHarvester = {
   "task_tab_harvester",
-  "tasks::tab::harvester"
+  "tasks/tab/harvester"
 };
 cmspecs::name_spec kCollector = {
   "task_tab_collector",
-  "tasks::tab::collector"
+  "tasks/tab/collector"
 };
 
 NS_END(tab, tasks);

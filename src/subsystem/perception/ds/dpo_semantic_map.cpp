@@ -118,7 +118,7 @@ bool dpo_semantic_map::cache_remove(carepr::base_cache* const victim) {
   return false;
 } /* cache_remove() */
 
-bool dpo_semantic_map::block_remove(crepr::base_block3D* const victim) {
+bool dpo_semantic_map::block_remove(crepr::sim_block3D* const victim) {
   if (m_store.block_remove(victim)) {
     ER_DEBUG("Updating cell@%s for removed block",
              victim->danchor2D().to_str().c_str());

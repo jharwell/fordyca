@@ -23,8 +23,7 @@
  ******************************************************************************/
 #include "fordyca/controller/cognitive/d1/events/free_block_pickup.hpp"
 
-#include "cosm/repr/base_block3D.hpp"
-
+#include "cosm/repr/sim_block3D.hpp"
 
 #include "fordyca/controller/cognitive/d1/bitd_dpo_controller.hpp"
 #include "fordyca/controller/cognitive/d1/bitd_mdpo_controller.hpp"
@@ -45,7 +44,7 @@ NS_START(fordyca, controller, cognitive, d1, events);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-free_block_pickup::free_block_pickup(crepr::base_block3D* block,
+free_block_pickup::free_block_pickup(crepr::sim_block3D* block,
                                      const rtypes::type_uuid& id,
                                      const rtypes::timestep& t)
     : ER_CLIENT_INIT("fordyca.controller.cognitive.d1.events.free_block_pickup"),

@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/controller/cognitive/d0/events/free_block_pickup.hpp"
 
-#include "cosm/repr/base_block3D.hpp"
+#include "cosm/repr/sim_block3D.hpp"
 
 #include "fordyca/controller/cognitive/d0/dpo_controller.hpp"
 #include "fordyca/controller/cognitive/d0/mdpo_controller.hpp"
@@ -46,10 +46,10 @@ NS_START(fordyca, controller, cognitive, d0, events);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-free_block_pickup::free_block_pickup(crepr::base_block3D* block,
+free_block_pickup::free_block_pickup(crepr::sim_block3D* block,
                                      const rtypes::type_uuid& id,
                                      const rtypes::timestep& t)
-    : ER_CLIENT_INIT("fordyca.controller.cognitive.d3.events.free_block_pickup"),
+    : ER_CLIENT_INIT("fordyca.controller.cognitive.d2.events.free_block_pickup"),
       ccops::base_block_pickup(block, id, t) {}
 
 
@@ -134,7 +134,7 @@ void free_block_pickup::visit(fspds::dpo_store& store) {
 } /* visit() */
 
 void free_block_pickup::visit(fspds::dpo_semantic_map& map) {
-  auto& cell = map.access<fspds::occupancy_grid::kCell>(coord());
+  auto& cell = map.access<fspds::occupancy_grid::kCell>(block()->danchor2D());
 
   ER_ASSERT(block()->danchor2D() == cell.loc(),
             "Coordinates for block%d@%s/cell@%s do not agree",
@@ -160,5 +160,12 @@ void free_block_pickup::visit(fspds::dpo_semantic_map& map) {
     map.block_remove(cell.block3D());
   }
 } /* visit() */
+
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+crepr::sim_block3D* free_block_pickup::block(void) {
+  return static_cast<crepr::sim_block3D*>(ccops::base_block_pickup::block());
+}
 
 NS_END(events, d0, cognitive, controller, fordyca);

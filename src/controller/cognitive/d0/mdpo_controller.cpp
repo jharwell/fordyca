@@ -46,7 +46,7 @@ NS_START(fordyca, controller, cognitive, d0);
  * Constructors/Destructor
  ******************************************************************************/
 mdpo_controller::mdpo_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.d0.mdpo") {}
+    : ER_CLIENT_INIT("fordyca.controller.cognitive.d0.mdpo") {}
 
 mdpo_controller::~mdpo_controller(void) = default;
 

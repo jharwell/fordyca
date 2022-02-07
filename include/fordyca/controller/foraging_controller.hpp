@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_FORAGING_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_FORAGING_CONTROLLER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -91,7 +90,7 @@ NS_START(fordyca, controller);
  * overlays.
  */
 class foraging_controller
-    : public cpal::controller::controller2D,
+    : public cpcontroller::controller2D,
       public ccontroller::block_carrying_controller,
       public cfsm::block_transporter<fsm::foraging_transport_goal>,
       public cfsm::metrics::block_transporter_metrics,
@@ -154,10 +153,6 @@ protected:
   void
   saa_init(const csubsystem::config::actuation_subsystem2D_config* actuation,
            const chal::subsystem::config::sensing_subsystemQ3D_config* sensing);
-  std::any
-  actuation_init(const csubsystem::config::actuation_subsystem2D_config* actuation);
-  std::any
-  sensing_init(const chal::subsystem::config::sensing_subsystemQ3D_config* sensing);
   fs::path output_init(const cpconfig::output_config* outputp) override;
 
   /* clang-format off */
@@ -167,5 +162,3 @@ protected:
 };
 
 NS_END(controller, fordyca);
-
-#endif /* INCLUDE_FORDYCA_CONTROLLER_FORAGING_CONTROLLER_HPP_ */

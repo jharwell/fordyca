@@ -24,9 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <atomic>
-
 #include "rcppsw/metrics/base_data.hpp"
+#include "rcppsw/al/multithread.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -45,11 +44,11 @@ NS_START(fordyca, metrics, perception, detail);
  * collection contexts.
  */
 struct dpo_metrics_data {
-  std::atomic_size_t  robot_count{0};
-  std::atomic_size_t  known_blocks{0};
-  std::atomic_size_t  known_caches{0};
-  std::atomic<double> block_density_sum{0.0};
-  std::atomic<double> cache_density_sum{0.0};
+  ral::mt_size_t  robot_count{0};
+  ral::mt_size_t  known_blocks{0};
+  ral::mt_size_t  known_caches{0};
+  ral::mt_double_t block_density_sum{0.0};
+  ral::mt_double_t cache_density_sum{0.0};
 };
 
 NS_END(detail);

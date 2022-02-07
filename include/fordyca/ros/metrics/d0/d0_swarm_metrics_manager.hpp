@@ -1,5 +1,5 @@
 /**
- * \file manipulation_metrics_collector.hpp
+ * \file d0_swarm_metrics_manager.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,59 +18,53 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_ROS_METRICS_D0_D0_SWARM_METRICS_MANAGER_HPP_
+#define INCLUDE_FORDYCA_ROS_METRICS_D0_D0_SWARM_METRICS_MANAGER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <memory>
+#include <vector>
 
-#include "rcppsw/metrics/base_collector.hpp"
+#include "cosm/ros/metrics/swarm_metrics_manager.hpp"
 
 #include "fordyca/metrics/blocks/manipulation_metrics_data.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, blocks);
+NS_START(fordyca, ros, metrics, d0);
+namespace fs = std::filesystem;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class manipulation_metrics_collector
- * \ingroup metrics blocks
+ * \class d0_swarm_metrics_manager
+ * \ingroup ros metrics d0
  *
- * \brief Collector for \ref manipulation_metrics.
- *
- * Metrics CAN be collected in parallel from robots; concurrent updates to the
- * gathered stats are supported. Metrics are written out at the specified
- * collection interval.
+ * \brief Collects metrics from robots via ROS topics and writes the aggregated
+ * result to the filesystem for process. Runs on the ROS master. Currently
+ * includes:
  */
-class manipulation_metrics_collector final : public rmetrics::base_collector {
+
+class d0_swarm_metrics_manager : public crmetrics::swarm_metrics_manager,
+                                 public rer::client<d0_swarm_metrics_manager> {
  public:
-  /**
-   * \param sink The metrics sink to use.
-   */
-  explicit manipulation_metrics_collector(
-      std::unique_ptr<rmetrics::base_sink> sink);
-
-  /* base_collector overrides */
-  void collect(const rmetrics::base_metrics& metrics) override;
-  void reset_after_interval(void) override;
-  const rmetrics::base_data* data(void) const override { return &m_data; }
-
-#if !defined(RCPPSW_AL_MT_SAFE_TYPES)
-  void data(const manipulation_metrics_data& data) { m_data = data; }
-#endif
+  explicit d0_swarm_metrics_manager(const rmconfig::metrics_config* mconfig,
+                                    const fs::path& root,
+                                    size_t n_robots);
 
  private:
+  void register_standard(const rmconfig::metrics_config* const mconfig,
+                         size_t n_robots);
+  void collect(const boost::shared_ptr<const fmetrics::blocks::manipulation_metrics_data>& in);
+
   /* clang-format off */
-  manipulation_metrics_data m_data{};
+  std::vector<::ros::Subscriber> m_subs{};
   /* clang-format on */
 };
 
-NS_END(blocks, metrics, fordyca);
+NS_END(d0, metrics, ros, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_ROS_METRICS_D0_D0_SWARM_METRICS_MANAGER_HPP_ */

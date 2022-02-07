@@ -42,7 +42,7 @@ NS_START(fordyca, controller, cognitive, d0);
  * Constructors/Destructor
  ******************************************************************************/
 omdpo_controller::omdpo_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.d0.omdpo"), m_receptor(nullptr) {}
+    : ER_CLIENT_INIT("fordyca.controller.cognitive.d0.omdpo"), m_receptor(nullptr) {}
 
 omdpo_controller::~omdpo_controller(void) = default;
 

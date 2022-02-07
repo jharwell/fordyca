@@ -269,7 +269,7 @@ void dpo_perception_subsystem::los_tracking_sync(
        * avoid iterator invalidation and undefined behavior (I've seen both a
        * segfault and infinite loop). See FORDYCA#589.
        */
-      crepr::base_block3D* tmp = *it;
+      crepr::sim_block3D* tmp = *it;
       ++it;
       store()->block_remove(tmp);
     } else {

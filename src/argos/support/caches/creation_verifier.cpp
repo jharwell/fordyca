@@ -25,7 +25,7 @@
 
 #include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
-#include "cosm/repr/base_block3D.hpp"
+#include "cosm/repr/sim_block3D.hpp"
 #include "cosm/repr/nest.hpp"
 #include "cosm/arena/free_blocks_calculator.hpp"
 #include "cosm/foraging/repr/block_cluster.hpp"

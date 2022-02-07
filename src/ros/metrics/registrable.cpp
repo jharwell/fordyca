@@ -1,5 +1,5 @@
 /**
- * \file mdpo_metrics_data.hpp
+ * \file registrable.cpp
  *
  * \copyright 2021 John Harwell, All rights reserved.
  *
@@ -18,50 +18,28 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_PERCEPTION_MDPO_METRICS_DATA_HPP_
-#define INCLUDE_FORDYCA_METRICS_PERCEPTION_MDPO_METRICS_DATA_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <array>
+#include "fordyca/ros/metrics/registrable.hpp"
 
-#include "rcppsw/metrics/base_data.hpp"
-#include "rcppsw/al/multithread.hpp"
+#include "cosm/metrics/specs.hpp"
 
-#include "cosm/fsm/cell2D_state.hpp"
-#include "fordyca/fordyca.hpp"
+#include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, metrics, perception, detail);
+NS_START(fordyca, ros, metrics, registrable);
 
 /*******************************************************************************
- * Class Definitions
+ * Global Variables
  ******************************************************************************/
-/**
- * \struct mdpo_metrics_data
- * \ingroup metrics perception detail
- *
- * \brief Container for holding collected statistics of \ref
- * mdpo_metrics. Must be atomic so counts are valid in parallel metric
- * collection contexts.
- */
-struct mdpo_metrics_data {
-  std::array<ral::mt_size_t, cfsm::cell2D_state::ekST_MAX_STATES> states;
-  ral::mt_double_t known_percent{0.0};
-  ral::mt_double_t unknown_percent{0.0};
-  ral::mt_size_t   robots{0};
-};
+rmetrics::creatable_collector_set kStandard = {
+    { typeid(fmetrics::blocks::manipulation_metrics_collector),
+      cmspecs::blocks::kManipulation.xml,
+      cmspecs::blocks::kManipulation.scoped,
+      rmetrics::output_mode::ekSTREAM }
+  };
 
-NS_END(detail);
-
-struct mdpo_metrics_data : public rmetrics::base_data {
-  detail::mdpo_metrics_data interval{};
-  detail::mdpo_metrics_data cum{};
-};
-
-NS_END(perception, metrics, fordyca);
-
-#endif /* INCLUDE_FORDYCA_METRICS_PERCEPTION_MDPO_METRICS_DATA_HPP_ */
+NS_END(registrable, metrics, ros, fordyca);

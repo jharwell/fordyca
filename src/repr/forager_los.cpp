@@ -25,7 +25,7 @@
 
 #include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/ds/cell2D.hpp"
-#include "cosm/repr/base_block3D.hpp"
+#include "cosm/repr/sim_block3D.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -55,7 +55,7 @@ cds::block3D_vectorno forager_los::blocks(void) const {
                   "Cell@%s in HAS_BLOCK/BLOCK_EXTENT state, but does not have "
                   "block",
                   rcppsw::to_string(cell.loc()).c_str());
-        blocks.push_back(static_cast<crepr::base_block3D*>(cell.entity()));
+        blocks.push_back(static_cast<crepr::sim_block3D*>(cell.entity()));
       }
     } /* for(j..) */
   } /* for(i..) */

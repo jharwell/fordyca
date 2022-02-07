@@ -26,7 +26,7 @@
 #include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/arena/operations/cache_extent_clear.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
-#include "cosm/repr/base_block3D.hpp"
+#include "cosm/repr/sim_block3D.hpp"
 #include "cosm/spatial/conflict_checker.hpp"
 
 #include "fordyca/events/cell2D_empty.hpp"

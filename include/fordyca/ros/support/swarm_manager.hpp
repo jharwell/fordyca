@@ -1,5 +1,5 @@
 /**
- * \file foraging_robot_manager.hpp
+ * \file swarm_manager.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ROS_SUPPORT_FORAGING_ROBOT_MANAGER_HPP_
-#define INCLUDE_FORDYCA_ROS_SUPPORT_FORAGING_ROBOT_MANAGER_HPP_
+#ifndef INCLUDE_FORDYCA_ROS_SUPPORT_SWARM_MANAGER_HPP_
+#define INCLUDE_FORDYCA_ROS_SUPPORT_SWARM_MANAGER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -30,8 +30,8 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/config/rng_config.hpp"
 
-#include "cosm/ros/robot_manager_adaptor.hpp"
-#include "cosm/ros/config/xml/robot_manager_repository.hpp"
+#include "cosm/pal/ros/swarm_manager_adaptor.hpp"
+#include "cosm/pal/ros/config/xml/swarm_manager_repository.hpp"
 
 #include "fordyca/fordyca.hpp"
 
@@ -44,26 +44,26 @@ struct output_config;
 
 NS_START(fordyca, ros, support);
 
-
 /*******************************************************************************
  * Classes
  ******************************************************************************/
 /**
- * \class foraging_robot_manager
+ * \class swarm_manager
  * \ingroup ros support
  *
  * \brief The base loop functions in FORDYCA that all other loop functions
- * inherit from when FORDYCA is built for ROS.
+ * inherit from when FORDYCA is built for ROS. This code runs on the central ROS
+ * node.
  */
-class foraging_robot_manager : public cros::robot_manager_adaptor,
-                      public rer::client<foraging_robot_manager> {
+class swarm_manager : public cpros::swarm_manager_adaptor,
+                      public rer::client<swarm_manager> {
  public:
-  foraging_robot_manager(void) RCPPSW_COLD;
-  ~foraging_robot_manager(void) override RCPPSW_COLD;
+  swarm_manager(void) RCPPSW_COLD;
+  ~swarm_manager(void) override RCPPSW_COLD;
 
   /* Not copy constructible/assignable by default */
-  foraging_robot_manager(const foraging_robot_manager& s) = delete;
-  foraging_robot_manager& operator=(const foraging_robot_manager& s) = delete;
+  swarm_manager(const swarm_manager& s) = delete;
+  swarm_manager& operator=(const swarm_manager& s) = delete;
 
   /* swarm manager overrides */
   void init(ticpp::Element&) override RCPPSW_COLD;
@@ -72,20 +72,20 @@ class foraging_robot_manager : public cros::robot_manager_adaptor,
   void post_step(void) override {}
 
  protected:
-  const cros::config::xml::robot_manager_repository* config(void) const {
+  const cpros::config::xml::swarm_manager_repository* config(void) const {
     return &m_config;
   }
-  cros::config::xml::robot_manager_repository* config(void) {
+  cpros::config::xml::swarm_manager_repository* config(void) {
     return &m_config;
   }
   void config_parse(ticpp::Element& node) RCPPSW_COLD;
 
  private:
   /* clang-format off */
-  cros::config::xml::robot_manager_repository m_config{};
+  cpros::config::xml::swarm_manager_repository m_config{};
   /* clang-format on */
 };
 
 NS_END(support, ros, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ROS_SUPPORT_FORAGING_ROBOT_MANAGER_HPP_ */
+#endif /* INCLUDE_FORDYCA_ROS_SUPPORT_SWARM_MANAGER_HPP_ */

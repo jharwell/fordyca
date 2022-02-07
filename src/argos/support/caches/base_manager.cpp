@@ -28,7 +28,7 @@
 #include "rcppsw/algorithm/transform.hpp"
 
 #include "cosm/arena/caching_arena_map.hpp"
-#include "cosm/repr/base_block3D.hpp"
+#include "cosm/repr/sim_block3D.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

@@ -27,7 +27,7 @@
 #include "cosm/arena/operations/free_block_drop.hpp"
 #include "cosm/arena/operations/free_block_pickup.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
-#include "cosm/repr/base_block3D.hpp"
+#include "cosm/repr/sim_block3D.hpp"
 #include "cosm/spatial/conflict_checker.hpp"
 #include "cosm/spatial/dimension_checker.hpp"
 
@@ -311,7 +311,7 @@ cds::block3D_vectorno static_cache_manager::cache_i_alloc_from_usable(
 } /* cache_i_alloc_from_usable() */
 
 bool static_cache_manager::block_alloc_usable_filter(
-    const crepr::base_block3D* block,
+    const crepr::sim_block3D* block,
     const cads::acache_vectorno& existing_caches,
     const cfds::block3D_cluster_vectorro&) const {
   cds::block3D_vectorno cache_i_blocks;
@@ -332,7 +332,7 @@ bool static_cache_manager::block_alloc_usable_filter(
 
 
 bool static_cache_manager::block_alloc_absorbable_filter(
-    const crepr::base_block3D* block,
+    const crepr::sim_block3D* block,
     const cads::acache_vectorno& existing_caches,
     const cfds::block3D_cluster_vectorro&) {
   /* blocks cannot be carried by a robot */

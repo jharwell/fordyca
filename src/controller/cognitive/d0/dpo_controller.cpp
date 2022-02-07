@@ -52,7 +52,7 @@ NS_START(fordyca, controller, cognitive, d0);
  * Constructors/Destructor
  ******************************************************************************/
 dpo_controller::dpo_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.d0.dpo"),
+    : ER_CLIENT_INIT("fordyca.controller.cognitive.d0.dpo"),
       m_block_sel_matrix(),
       m_fsm() {}
 

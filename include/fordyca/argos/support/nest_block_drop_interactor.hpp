@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <boost/none.hpp>
 
-#include "cosm/interactors/base_nest_block_process.hpp"
+#include "cosm/argos/interactors/nest_block_process.hpp"
 
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/fsm/foraging_transport_goal.hpp"
@@ -52,22 +52,22 @@ NS_START(fordyca, argos, support);
  */
 template <typename TController, typename TControllerSpecMap>
 class nest_block_drop_interactor final
-    : public cinteractors::base_nest_block_process<TController,
+    : public cainteractors::nest_block_process<TController,
                                                    TControllerSpecMap> {
  public:
-  using typename cinteractors::
-      base_nest_block_process<TController, TControllerSpecMap>::arena_map_type;
-  using typename cinteractors::base_nest_block_process<
+  using typename cainteractors::
+      nest_block_process<TController, TControllerSpecMap>::arena_map_type;
+  using typename cainteractors::nest_block_process<
       TController,
       TControllerSpecMap>::penalty_handler_type;
-  using typename cinteractors::
-      base_nest_block_process<TController, TControllerSpecMap>::metrics_manager_type;
+  using typename cainteractors::
+      nest_block_process<TController, TControllerSpecMap>::metrics_manager_type;
 
   nest_block_drop_interactor(arena_map_type* const map,
                              metrics_manager_type* const metrics_manager,
                              ::argos::CFloorEntity* const floor,
                              tv::env_dynamics* const envd)
-      : cinteractors::base_nest_block_process<TController, TControllerSpecMap>(
+      : cainteractors::nest_block_process<TController, TControllerSpecMap>(
             map,
             metrics_manager,
             floor,

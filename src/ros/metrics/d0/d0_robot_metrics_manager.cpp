@@ -52,7 +52,7 @@ NS_START(fordyca, ros, metrics, d0);
 d0_robot_metrics_manager::d0_robot_metrics_manager(
     const rmconfig::metrics_config* const mconfig)
     : crmetrics::robot_metrics_manager(mconfig),
-      ER_CLIENT_INIT("fordyca.ros.metrics.d0.d0_manager") {
+      ER_CLIENT_INIT("fordyca.ros.metrics.d0.d0_robot_metrics_manager") {
 
   using sink_list = rmpl::typelist<
     rmpl::identity<frmetrics::blocks::manipulation_metrics_topic_sink>

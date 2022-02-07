@@ -40,7 +40,7 @@ NS_START(fordyca, controller, cognitive, d2, events);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_found::block_found(crepr::base_block3D* block)
+block_found::block_found(crepr::sim_block3D* block)
     : ER_CLIENT_INIT("fordyca.controller.cognitive.d2.events.block_found"),
       m_block(block) {}
 

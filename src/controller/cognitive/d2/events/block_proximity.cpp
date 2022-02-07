@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/controller/cognitive/d2/events/block_proximity.hpp"
 
-#include "cosm/repr/base_block3D.hpp"
+#include "cosm/repr/sim_block3D.hpp"
 
 #include "fordyca/controller/cognitive/d2/birtd_dpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
@@ -42,7 +42,7 @@ NS_START(fordyca, controller, cognitive, d2, events);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_proximity::block_proximity(crepr::base_block3D* block)
+block_proximity::block_proximity(crepr::sim_block3D* block)
     : ER_CLIENT_INIT("fordyca.controller.cognitive.d2.events.block_proximity"),
       m_block(block) {}
 

@@ -84,7 +84,7 @@ class free_block_pickup : public rer::client<free_block_pickup>,
   void visit(fsm::block_to_goal_fsm& fsm);
 
  protected:
-  free_block_pickup(crepr::base_block3D* block,
+  free_block_pickup(crepr::sim_block3D* block,
                     const rtypes::type_uuid& id,
                     const rtypes::timestep& t);
 

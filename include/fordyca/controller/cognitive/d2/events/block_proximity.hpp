@@ -29,8 +29,6 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitor.hpp"
 
-#include "cosm/repr/base_block3D.hpp"
-
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
@@ -39,6 +37,10 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::repr {
+class sim_block3D;
+} /* namespace cosm::repr */
+
 NS_START(fordyca, controller, cognitive, d2, events);
 
 /*******************************************************************************
@@ -64,7 +66,7 @@ class block_proximity : public rer::client<block_proximity> {
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  explicit block_proximity(crepr::base_block3D* block);
+  explicit block_proximity(crepr::sim_block3D* block);
   ~block_proximity(void) override = default;
 
   block_proximity(const block_proximity& op) = delete;
@@ -87,7 +89,7 @@ class block_proximity : public rer::client<block_proximity> {
   void dispatch_cache_starter(ftasks::base_foraging_task* task);
 
   /* clang-format off */
-  crepr::base_block3D* m_block;
+  crepr::sim_block3D* m_block;
   /* clang-format on */
 };
 

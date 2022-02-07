@@ -77,7 +77,7 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
 
   /* foraging_memory_model overrides */
   bool cache_remove(carepr::base_cache* victim) override;
-  bool block_remove(crepr::base_block3D* victim) override;
+  bool block_remove(crepr::sim_block3D* victim) override;
   model_update_result block_update(tracked_block_type&& block) override;
   model_update_result cache_update(tracked_cache_type&& cache) override;
 

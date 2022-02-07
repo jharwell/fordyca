@@ -38,6 +38,9 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::repr {
+class sim_block3D;
+} /* namespace cosm::repr */
 
 NS_START(fordyca, controller, cognitive, d0, events);
 
@@ -80,13 +83,15 @@ class free_block_pickup : public rer::client<free_block_pickup>,
   /* tasks */
   void visit(ftasks::d0::generalist& task);
 
-  free_block_pickup(crepr::base_block3D* block,
-                          const rtypes::type_uuid& id,
-                          const rtypes::timestep& t);
+  free_block_pickup(crepr::sim_block3D* block,
+                    const rtypes::type_uuid& id,
+                    const rtypes::timestep& t);
 
   /* data structures */
   void visit(fspds::dpo_store& store);
   void visit(fspds::dpo_semantic_map& map);
+
+  crepr::sim_block3D* block(void);
 
  private:
   /* FSMs */

@@ -24,10 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <atomic>
 #include <array>
 
 #include "rcppsw/metrics/base_data.hpp"
+#include "rcppsw/al/multithread.hpp"
+
 #include "fordyca/metrics/blocks/block_manip_events.hpp"
 
 /*******************************************************************************
@@ -47,8 +48,8 @@ NS_START(fordyca, metrics, blocks, detail);
  * collection contexts.
  */
 struct manipulation_metrics_data {
-  std::atomic_size_t events{0};
-  std::atomic_size_t penalties{0};
+  ral::mt_size_t events{0};
+  ral::mt_size_t penalties{0};
 };
 
 NS_END(detail);

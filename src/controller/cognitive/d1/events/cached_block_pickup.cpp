@@ -169,7 +169,7 @@ void cached_block_pickup::visit(fspds::dpo_store& store) {
     ER_INFO("DPO Store: block%d from cache%d@%s,remaining=[%s] (%zu)",
             block()->id().v(),
             pcache->ent()->id().v(),
-            rcppsw::to_string(coord()).c_str(),
+            rcppsw::to_string(block()->danchor2D()).c_str(),
             rcppsw::to_string(pcache->ent()->blocks()).c_str(),
             pcache->ent()->n_blocks());
 
@@ -180,12 +180,12 @@ void cached_block_pickup::visit(fspds::dpo_store& store) {
     ER_INFO("DPO Store: block%d from cache%d@%s [depleted]",
             block()->id().v(),
             id.v(),
-            rcppsw::to_string(coord()).c_str());
+            rcppsw::to_string(block()->danchor2D()).c_str());
   }
 } /* visit() */
 
 void cached_block_pickup::visit(fspds::dpo_semantic_map& map) {
-  auto& cell = map.access<fspds::occupancy_grid::kCell>(coord());
+  auto& cell = map.access<fspds::occupancy_grid::kCell>(block()->danchor2D());
   ER_ASSERT(cell.state_has_cache(), "Cell does not contain cache");
   ER_ASSERT(cell.cache()->n_blocks() == cell.block_count(),
             "Perceived cache/cell disagree on # of blocks: "
@@ -205,12 +205,12 @@ void cached_block_pickup::visit(fspds::dpo_semantic_map& map) {
     visit(cell);
     ER_ASSERT(cell.state_has_cache(),
               "cell@%s with >= 2 blocks does not have cache",
-              rcppsw::to_string(coord()).c_str());
+              rcppsw::to_string(block()->danchor2D()).c_str());
 
     ER_INFO("DPO Map: block%d from cache%d@%s,remaining=[%s] (%zu)",
             block()->id().v(),
             cell.cache()->id().v(),
-            rcppsw::to_string(coord()).c_str(),
+            rcppsw::to_string(block()->danchor2D()).c_str(),
             rcppsw::to_string(cell.cache()->blocks()).c_str(),
             cell.cache()->n_blocks());
 
@@ -222,7 +222,7 @@ void cached_block_pickup::visit(fspds::dpo_semantic_map& map) {
     ER_INFO("DPO Map: block%d from cache%d@%s [depleted]",
             block()->id().v(),
             id.v(),
-            rcppsw::to_string(coord()).c_str());
+            rcppsw::to_string(block()->danchor2D()).c_str());
   }
 } /* visit() */
 
@@ -242,5 +242,9 @@ void cached_block_pickup::dispatch_cache_interactor(
           mc_cache->id().v(),
           task_name.c_str());
 } /* dispatch_cache_interactor() */
+
+crepr::sim_block3D* cached_block_pickup::block(void) {
+  return static_cast<crepr::sim_block3D*>(ccops::base_block_pickup::block());
+}
 
 NS_END(events, d1, cognitive, controller, fordyca);

@@ -84,7 +84,7 @@ class dpo_store final : public foraging_memory_model<ds::dp_block_map,
 
   /* foraging_memory_model overrides */
   bool cache_remove(carepr::base_cache* victim) override;
-  bool block_remove(crepr::base_block3D* victim) override;
+  bool block_remove(crepr::sim_block3D* victim) override;
   model_update_result cache_update(tracked_cache_type&& cache) override;
 
   /*

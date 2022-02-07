@@ -71,26 +71,18 @@ void mdpo_metrics_collector::collect(
   m_data.cum.states[cfsm::cell2D_state::ekST_HAS_CACHE] +=
       m->cell_state_inaccuracies(cfsm::cell2D_state::ekST_HAS_CACHE);
 
-  auto int_known_percent = m_data.interval.known_percent.load();
-  auto int_unknown_percent = m_data.interval.unknown_percent.load();
-  auto cum_known_percent = m_data.cum.known_percent.load();
-  auto cum_unknown_percent = m_data.cum.unknown_percent.load();
+  ral::mt_add(m_data.interval.known_percent, m->known_percentage());
+  ral::mt_add(m_data.interval.unknown_percent, m->unknown_percentage());
+  ral::mt_add(m_data.cum.known_percent, m->known_percentage());
+  ral::mt_add(m_data.cum.unknown_percent, m->unknown_percentage());
 
-  m_data.interval.known_percent.compare_exchange_strong(
-      int_known_percent, int_known_percent + m->known_percentage());
-  m_data.interval.unknown_percent.compare_exchange_strong(
-      int_unknown_percent, int_unknown_percent + m->unknown_percentage());
-  m_data.cum.known_percent.compare_exchange_strong(
-      cum_known_percent, cum_known_percent + m->known_percentage());
-  m_data.cum.unknown_percent.compare_exchange_strong(
-      cum_unknown_percent, cum_unknown_percent + m->unknown_percentage());
   ++m_data.interval.robots;
   ++m_data.cum.robots;
 } /* collect() */
 
 void mdpo_metrics_collector::reset_after_interval(void) {
   for (auto& state : m_data.interval.states) {
-    std::atomic_init(&state, 0U);
+    ral::mt_init(&state, 0U);
   } /* for(state..) */
 
   m_data.interval.known_percent = 0.0;

@@ -1,5 +1,5 @@
 /**
- * \file manipulation_metrics_topic_sink.hpp
+ * \file manipulation_metrics_glue.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,15 +18,14 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ROS_METRICS_BLOCKS_MANIPULATION_METRICS_TOPIC_SINK_HPP_
-#define INCLUDE_FORDYCA_ROS_METRICS_BLOCKS_MANIPULATION_METRICS_TOPIC_SINK_HPP_
+#ifndef INCLUDE_FORDYCA_ROS_METRICS_BLOCKS_MANIPULATION_METRICS_GLUE_HPP_
+#define INCLUDE_FORDYCA_ROS_METRICS_BLOCKS_MANIPULATION_METRICS_GLUE_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
+#include <ros/ros.h>
 
-#include "cosm/ros/metrics/topic_sink.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_data.hpp"
 #include "fordyca/fordyca.hpp"
 
@@ -86,36 +85,4 @@ struct Serializer<fmblocks::manipulation_metrics_data> {
 
 NS_END(serialization, ros);
 
-/*******************************************************************************
- * Namespaces/Decls
- ******************************************************************************/
-namespace fordyca::metrics::blocks {
-class manipulation_metrics_collector;
-} /* namespace fordyca::metrics::blocks */
-
-NS_START(fordyca, ros, metrics, blocks);
-
-/*******************************************************************************
- * Class Definitions
- ******************************************************************************/
-/**
- * \class manipulation_metrics_topic_sink
- * \ingroup ros blocks metrics
- *
- * \brief Sink for \ref fmblocks::manipulation_metrics and \ref
- * fmblocks::manipulation_metrics_collector to output metrics to a ROS topic.
- */
-class manipulation_metrics_topic_sink final
-    : public cros::metrics::topic_sink<fmblocks::manipulation_metrics_data> {
- public:
-  using collector_type = fmblocks::manipulation_metrics_collector;
-
-  manipulation_metrics_topic_sink(const std::string& topic,
-                              const rmetrics::output_mode& mode,
-                              const rtypes::timestep& interval)
-      : topic_sink(topic, mode, interval) {}
-};
-
-NS_END(blocks, metrics, ros, fordyca);
-
-#endif /* INCLUDE_FORDYCA_ROS_METRICS_BLOCKS_MANIPULATION_METRICS_TOPIC_SINK_HPP_ */
+#endif /* INCLUDE_FORDYCA_ROS_METRICS_BLOCKS_MANIPULATION_METRICS_GLUE_HPP_ */

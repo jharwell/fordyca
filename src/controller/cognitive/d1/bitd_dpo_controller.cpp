@@ -53,7 +53,7 @@ NS_START(fordyca, controller, cognitive, d1);
  * Constructors/Destructor
  ******************************************************************************/
 bitd_dpo_controller::bitd_dpo_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.d1.bitd_dpo"),
+    : ER_CLIENT_INIT("fordyca.controller.cognitive.d1.bitd_dpo"),
       m_cache_sel_matrix(),
       m_executive() {}
 

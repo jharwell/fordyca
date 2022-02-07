@@ -102,7 +102,7 @@ class base_manager : public fmetrics::caches::lifecycle_metrics,
     cds::block3D_htno absorbable{};
   };
   using block_alloc_filter_type = std::function<bool(
-      const crepr::base_block3D* block,
+      const crepr::sim_block3D* block,
       const cads::acache_vectorno& existing_caches,
       const cfds::block3D_cluster_vectorro& clusters)>;
 

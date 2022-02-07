@@ -81,6 +81,7 @@ if ("${COSM_BUILD_FOR}" MATCHES "ARGOS")
 
 elseif("${COSM_BUILD_FOR}" MATCHES "ROS")
   string(CONCAT ros_regex
+    "src/ros|"
     "src/fsm/d0/crw|"
     "src/strategy/explore/block|"
     "src/strategy/explore/crw|"

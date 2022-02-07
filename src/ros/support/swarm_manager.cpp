@@ -1,5 +1,5 @@
 /**
- * \file foraging_robot_manager.cpp
+ * \file swarm_manager.cpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/ros/support/foraging_robot_manager.hpp"
+#include "fordyca/ros/support/swarm_manager.hpp"
 
 #include "cosm/pal/config/output_config.hpp"
 
@@ -33,16 +33,16 @@ NS_START(fordyca, ros, support);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-foraging_robot_manager::foraging_robot_manager(void)
-    : ER_CLIENT_INIT("fordyca.support.ros.foraging_robot_manager") {}
+swarm_manager::swarm_manager(void)
+    : ER_CLIENT_INIT("fordyca.ros.support.swarm_manager") {}
 
-foraging_robot_manager::~foraging_robot_manager(void) = default;
+swarm_manager::~swarm_manager(void) = default;
 
 /*******************************************************************************
  * Initialization Functions
  ******************************************************************************/
-void foraging_robot_manager::init(ticpp::Element& node) {
-  foraging_robot_manager_adaptor::init(node);
+void swarm_manager::init(ticpp::Element& node) {
+  swarm_manager_adaptor::init(node);
 
   /* parse simulation input file */
   config_parse(node);
@@ -54,7 +54,7 @@ void foraging_robot_manager::init(ticpp::Element& node) {
   output_init(m_config.config_get<cpconfig::output_config>());
 } /* init() */
 
-void foraging_robot_manager::config_parse(ticpp::Element& node) {
+void swarm_manager::config_parse(ticpp::Element& node) {
   m_config.parse_all(node);
 
   if (!m_config.validate_all()) {
