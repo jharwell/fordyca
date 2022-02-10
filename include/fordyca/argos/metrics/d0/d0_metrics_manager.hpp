@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_METRICS_D0_D0_METRICS_MANAGER_HPP_
-#define INCLUDE_FORDYCA_ARGOS_METRICS_D0_D0_METRICS_MANAGER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -74,4 +73,3 @@ class d0_metrics_manager : public fametrics::base_fs_output_manager,
 
 NS_END(d0, metrics, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_METRICS_D0_D0_METRICS_MANAGER_HPP_ */

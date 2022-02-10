@@ -23,7 +23,9 @@
  ******************************************************************************/
 #include "fordyca/ros/metrics/registrable.hpp"
 
-#include "cosm/metrics/specs.hpp"
+#include "rcppsw/utils/maskable_enum.hpp"
+
+#include "fordyca/metrics/specs.hpp"
 
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
 
@@ -37,9 +39,9 @@ NS_START(fordyca, ros, metrics, registrable);
  ******************************************************************************/
 rmetrics::creatable_collector_set kStandard = {
     { typeid(fmetrics::blocks::manipulation_metrics_collector),
-      cmspecs::blocks::kManipulation.xml,
-      cmspecs::blocks::kManipulation.scoped,
-      rmetrics::output_mode::ekSTREAM }
+      fmspecs::blocks::kManipulation.xml,
+      fmspecs::blocks::kManipulation.scoped,
+      rmetrics::output_mode::ekSTREAM | rmetrics::output_mode::ekAPPEND }
   };
 
 NS_END(registrable, metrics, ros, fordyca);

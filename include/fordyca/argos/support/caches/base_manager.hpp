@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_BASE_MANAGER_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_BASE_MANAGER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -158,4 +157,3 @@ class base_manager : public fmetrics::caches::lifecycle_metrics,
 
 NS_END(caches, support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_BASE_MANAGER_HPP_ */

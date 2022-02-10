@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_NEST_BLOCK_DROP_INTERACTOR_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_NEST_BLOCK_DROP_INTERACTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -106,4 +105,3 @@ class nest_block_drop_interactor final
 
 NS_END(support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_NEST_BLOCK_DROP_INTERACTOR_HPP_ */

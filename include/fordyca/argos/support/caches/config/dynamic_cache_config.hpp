@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_CONFIG_DYNAMIC_CACHE_CONFIG_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_CONFIG_DYNAMIC_CACHE_CONFIG_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -76,4 +75,3 @@ struct dynamic_cache_config final : public rconfig::base_config {
 
 NS_END(config, caches, support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_CONFIG_DYNAMIC_CACHE_CONFIG_HPP_ */

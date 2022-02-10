@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_CSV_SINK_HPP_
-#define INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_CSV_SINK_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -48,7 +47,9 @@ class manipulation_metrics_collector;
  * \brief Sink for \ref manipulation_metrics and \ref
  * manipulation_metrics_collector to output metrics to .csv.
  */
-class manipulation_metrics_csv_sink final : public rmetrics::csv_sink {
+class manipulation_metrics_csv_sink final
+    : public rer::client<manipulation_metrics_csv_sink>,
+      public rmetrics::csv_sink {
  public:
   using collector_type = manipulation_metrics_collector;
 
@@ -70,4 +71,3 @@ class manipulation_metrics_csv_sink final : public rmetrics::csv_sink {
 
 NS_END(blocks, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_CSV_SINK_HPP_ */

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_PERCEPTION_MDPO_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_PERCEPTION_MDPO_METRICS_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -77,4 +76,3 @@ class mdpo_metrics : public virtual rmetrics::base_metrics {
 
 NS_END(perception, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_PERCEPTION_MDPO_METRICS_HPP_ */

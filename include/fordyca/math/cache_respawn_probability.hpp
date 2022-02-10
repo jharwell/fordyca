@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_MATH_CACHE_RESPAWN_PROBABILITY_HPP_
-#define INCLUDE_FORDYCA_MATH_CACHE_RESPAWN_PROBABILITY_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -65,4 +64,3 @@ class cache_respawn_probability : public rmath::expression<double> {
 
 NS_END(math, fordyca);
 
-#endif /* INCLUDE_FORDYCA_MATH_CACHE_RESPAWN_PROBABILITY_HPP_ */

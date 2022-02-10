@@ -77,8 +77,12 @@ NS_END(detail);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-d0_robot_manager::d0_robot_manager(fcontroller::foraging_controller* c)
+d0_robot_manager::d0_robot_manager(const cros::topic& robot_ns,
+                                   const cros::config::sierra_config* config,
+                                   fcontroller::foraging_controller* c)
     : ER_CLIENT_INIT("fordyca.ros.support.d0_robot_manager"),
+      robot_manager(config),
+      mc_robot_ns(robot_ns),
       m_controller(c),
       m_metrics_manager(nullptr),
       m_interactor_map(nullptr),
@@ -109,21 +113,27 @@ void d0_robot_manager::private_init(void) {
   /* initialize output and metrics collection */
   const auto* output = config()->config_get<cpconfig::output_config>();
   m_metrics_manager = std::make_unique<frmetrics::d0::d0_robot_metrics_manager>(
-      &output->metrics);
+      mc_robot_ns, &output->metrics);
 
-  /* this starts at 0, and ROS starts at 1, so sync up */
-  m_metrics_manager->timestep_inc();
+   m_interactor_map = std::make_unique<interactor_map_type>();
+   m_metrics_map = std::make_unique<metric_extraction_map_type>();
 
-  m_interactor_map = std::make_unique<interactor_map_type>();
-  m_metrics_map = std::make_unique<metric_extraction_map_type>();
-
-  /*
+   /*
    * Intitialize controller interactions with environment via various
    * functors/type maps for all d0 controller types.
    */
   detail::functor_maps_initializer f_initializer(this);
   boost::mpl::for_each<fcontroller::d0::reactive_typelist>(f_initializer);
 } /* private_init() */
+
+void d0_robot_manager::pre_step(void) {
+  ndc_uuid_push();
+  robot_manager::pre_step();
+  ndc_uuid_pop();
+
+  /* Update robot position, time */
+  robot_pre_step();
+} /* pre_step() */
 
 void d0_robot_manager::post_step(void) {
   ndc_uuid_push();
@@ -136,16 +146,17 @@ void d0_robot_manager::post_step(void) {
   ndc_uuid_push();
 
   /* all metrics collected--send to ROS master node for processing */
-  m_metrics_manager->flush(rmetrics::output_mode::ekSTREAM);
+  if (m_metrics_manager->flush(rmetrics::output_mode::ekSTREAM, timestep())) {
+    ER_DEBUG("Flushed metrics to ROS master");
+  }
 
-  m_metrics_manager->interval_reset();
-  m_metrics_manager->timestep_inc();
+  m_metrics_manager->interval_reset(timestep());
 
   ndc_uuid_pop();
 } /* post_step() */
 
 void d0_robot_manager::destroy(void) {
- if (nullptr != m_metrics_manager) {
+  if (nullptr != m_metrics_manager) {
     m_metrics_manager->finalize();
   }
 } /* destroy() */
@@ -193,5 +204,15 @@ void d0_robot_manager::robot_post_step(void) {
   boost::apply_visitor(mapplicator, m_metrics_map->at(id));
   m_controller->block_manip_recorder()->reset();
 } /* robot_post_step() */
+
+void d0_robot_manager::robot_pre_step(void) {
+  /*
+   * Unless and until I need to handle more complex controllers than CRW,
+   * cheating and just setting the resolution to something reasonable for the
+   * purpose of metric collection I think is fine.
+   */
+  m_controller->sensing_update(timestep(),
+                               rtypes::discretize_ratio(0.2));
+} /* robot_pre_step() */
 
 NS_END(d0, support, ros, fordyca);

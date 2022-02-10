@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_D0_D0_LOOP_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_D0_D0_LOOP_FUNCTIONS_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -155,4 +154,3 @@ private:
 
 NS_END(d0, support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_D0_D0_LOOP_FUNCTIONS_HPP_ */

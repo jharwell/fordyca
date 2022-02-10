@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_MODEL_UPDATE_RESULT_HPP_
-#define INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_MODEL_UPDATE_RESULT_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -58,4 +57,3 @@ struct model_update_result {
 
 NS_END(perception, subsystem, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_MODEL_UPDATE_RESULT_HPP_ */

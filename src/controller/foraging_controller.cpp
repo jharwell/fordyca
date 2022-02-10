@@ -51,10 +51,10 @@ NS_START(fordyca, controller);
 /*******************************************************************************
  * Static Functions
  ******************************************************************************/
+#if defined(COSM_HAL_TARGET_ARGOS_ROBOT)
 csubsystem::sensing_subsystemQ3D::sensor_map
 static sensing_init(foraging_controller* c,
              const chal::subsystem::config::sensing_subsystemQ3D_config* sensing) {
-#if defined(COSM_HAL_TARGET_ARGOS_ROBOT)
   using saa_names = chargos::subsystem::config::xml::saa_names;
   auto proximity_handle = c->GetSensor<chargos::sensors::ir_sensor::impl_type>(
       saa_names::ir_sensor);
@@ -94,28 +94,37 @@ static sensing_init(foraging_controller* c,
       auto env = chal::sensors::env_sensor(env_handle, &sensing->env);
       auto position = chargos::sensors::position_sensor(position_handle);
       auto steering = chargos::sensors::diff_drive_sensor(steering_handle);
-      auto odometry = chal::sensors::odometry_sensor(position, steering);
+      auto odometry = chal::sensors::odometry_sensor(std::move(position),
+                                                     std::move(steering));
 
       auto rabs = chargos::sensors::wifi_sensor(rab_handle);
       auto battery = chargos::sensors::battery_sensor(battery_handle);
       auto blobs = chargos::sensors::colored_blob_camera_sensor(blobs_handle);
 
 
-  return csubsystem::sensing_subsystemQ3D::sensor_map {
+      using subsystem = csubsystem::sensing_subsystemQ3D;
+      subsystem::sensor_map sensors;
 #if defined(FORDYCA_WITH_ROBOT_RAB)
-    csubsystem::sensing_subsystemQ3D::map_entry_create(rabs),
+      sensors.emplace(subsystem::map_entry_create(std::move(rabs)));
 #endif
 
 #if defined(FORDYCA_WITH_ROBOT_BATTERY)
-    csubsystem::sensing_subsystemQ3D::map_entry_create(battery),
+      sensors.emplace(subsystem::map_entry_create(std::move(battery)));
 #endif
-    csubsystem::sensing_subsystemQ3D::map_entry_create(proximity),
-    csubsystem::sensing_subsystemQ3D::map_entry_create(blobs),
-    csubsystem::sensing_subsystemQ3D::map_entry_create(light),
-    csubsystem::sensing_subsystemQ3D::map_entry_create(env),
-    csubsystem::sensing_subsystemQ3D::map_entry_create(odometry)
-  };
-#elif defined(COSM_HAL_TARGET_ROS_ROBOT)
+      sensors.emplace(subsystem::map_entry_create(std::move(proximity)));
+      sensors.emplace(subsystem::map_entry_create(std::move(blobs)));
+      sensors.emplace(subsystem::map_entry_create(std::move(light)));
+      sensors.emplace(subsystem::map_entry_create(std::move(env)));
+      sensors.emplace(subsystem::map_entry_create(std::move(odometry)));
+
+      return sensors;
+} /* sensing_init() */
+#endif /* COSM_HAL_TARGET_ARGOS_ROBOT */
+
+#if defined(COSM_HAL_TARGET_ROS_ROBOT)
+csubsystem::sensing_subsystemQ3D::sensor_map
+static sensing_init(foraging_controller* c,
+             const chal::subsystem::config::sensing_subsystemQ3D_config* sensing) {
   auto robot_ns = cros::to_ns(c->entity_id());
   auto light = chros::sensors::light_sensor(robot_ns);
   auto lidar = chros::sensors::lidar_sensor(robot_ns);
@@ -132,13 +141,13 @@ static sensing_init(foraging_controller* c,
   sensors.emplace(subsystem::map_entry_create(std::move(odometry)));
   sensors.emplace(subsystem::map_entry_create(std::move(env)));
   return sensors;
-#endif /* COSM_HAL_TARGET_ARGOS_ROBOT */
 } /* sensing_init() */
+#endif /* COSM_HAL_TARGET_ROS_ROBOT */
 
+#if defined(COSM_HAL_TARGET_ARGOS_ROBOT)
 csubsystem::actuation_subsystem2D::actuator_map
 static actuation_init(foraging_controller* c,
                      const csubsystem::config::actuation_subsystem2D_config* actuation) {
-#if defined(COSM_HAL_TARGET_ARGOS_ROBOT)
   using saa_names = chargos::subsystem::config::xml::saa_names;
 
   auto diff_drive = ckin2D::governed_diff_drive(
@@ -162,17 +171,22 @@ static actuation_init(foraging_controller* c,
 
   auto rab = chargos::actuators::wifi_actuator(rab_handle);
 
-  return csubsystem::actuation_subsystem2D::actuator_map {
-    csubsystem::actuation_subsystem2D::map_entry_create(diff_drive),
-        csubsystem::actuation_subsystem2D::map_entry_create(diag),
+  using subsystem = csubsystem::actuation_subsystem2D;
+  subsystem::actuator_map actuators;
+  actuators.emplace(subsystem::map_entry_create(std::move(diff_drive)));
+  actuators.emplace(subsystem::map_entry_create(std::move(diag)));
 
 #if defined(FORDYCA_WITH_ROBOT_RAB)
-        csubsystem::actuation_subsystem2D::map_entry_create(rab)
+  actuators.emplace(subsystem::map_entry_create(std::move(rab)));
 #endif
-        };
+  return actuators;
+} /* actuation_init() */
+#endif /* COSM_HAL_TARGET_ARGOS_ROBOT */
 
-#elif defined(COSM_HAL_TARGET_ROS_ROBOT)
-
+#if defined(COSM_HAL_TARGET_ROS_ROBOT)
+csubsystem::actuation_subsystem2D::actuator_map
+static actuation_init(foraging_controller* c,
+                     const csubsystem::config::actuation_subsystem2D_config* actuation) {
   auto diff_drive = ckin2D::governed_diff_drive(
       &actuation->diff_drive,
       chactuators::diff_drive_actuator(cros::to_ns(c->entity_id())));
@@ -188,8 +202,8 @@ static actuation_init(foraging_controller* c,
   actuators.emplace(subsystem::map_entry_create(std::move(diff_drive)));
   actuators.emplace(subsystem::map_entry_create(std::move(diag)));
   return actuators;
-#endif /* COSM_HAL_TARGET_ARGOS_ROBOT */
 } /* actuation_init() */
+#endif /* COSM_HAL_TARGET_ROS_ROBOT */
 
 /*******************************************************************************
  * Constructors/Destructor

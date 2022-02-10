@@ -41,6 +41,15 @@ cmspecs::name_spec kMDPO = {
 
 NS_END(perception);
 
+NS_START(blocks);
+
+cmspecs::name_spec kManipulation = {
+  "block_manipulation",
+  "blocks/manipulation"
+};
+
+NS_END(blocks);
+
 NS_START(caches);
 
 cmspecs::name_spec kAcqCounts = {

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_D1_STATIC_CACHE_MANAGER_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_D1_STATIC_CACHE_MANAGER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -184,4 +183,3 @@ class static_cache_manager final : public fascaches::base_manager,
 
 NS_END(d1, support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_D1_STATIC_CACHE_MANAGER_HPP_ */

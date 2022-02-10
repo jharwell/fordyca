@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_CONFIG_BLOCK_SEL_BLOCK_SEL_MATRIX_PARSER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_CONFIG_BLOCK_SEL_BLOCK_SEL_MATRIX_PARSER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -81,4 +80,3 @@ class block_sel_matrix_parser final : public rer::client<block_sel_matrix_parser
 
 NS_END(block_sel, config, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_CONFIG_BLOCK_SEL_BLOCK_SEL_MATRIX_PARSER_HPP_ */

@@ -163,8 +163,6 @@ void d2_loop_functions::private_init(void) {
       &arena->grid,
       output_root(),
       arena_map()->block_distributor()->block_clustersro().size());
-  /* this starts at 0, and ARGoS starts at 1, so sync up */
-  m_metrics_manager->timestep_inc();
 
   /* initialize cache handling */
   const auto* cachep = config()->config_get<fascaches::config::caches_config>();
@@ -336,18 +334,17 @@ void d2_loop_functions::post_step(void) {
   /* Collect metrics from loop functions */
   m_metrics_manager->collect_from_sm(this);
 
-  m_metrics_manager->flush(rmetrics::output_mode::ekTRUNCATE);
-  m_metrics_manager->flush(rmetrics::output_mode::ekCREATE);
+  m_metrics_manager->flush(rmetrics::output_mode::ekTRUNCATE, timestep());
+  m_metrics_manager->flush(rmetrics::output_mode::ekCREATE, timestep());
 
   /* Not a clean way to do this in the metrics collectors... */
-  if (m_metrics_manager->flush(rmetrics::output_mode::ekAPPEND)) {
+  if (m_metrics_manager->flush(rmetrics::output_mode::ekAPPEND, timestep())) {
     if (nullptr != conv_calculator()) {
       conv_calculator()->reset_metrics();
     }
     tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>()->reset_metrics();
   }
-  m_metrics_manager->interval_reset();
-  m_metrics_manager->timestep_inc();
+  m_metrics_manager->interval_reset(timestep());
 
   ndc_uuid_pop();
 } /* post_step() */

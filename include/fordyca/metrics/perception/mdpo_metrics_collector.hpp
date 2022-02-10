@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_PERCEPTION_MDPO_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_PERCEPTION_MDPO_METRICS_COLLECTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -67,4 +66,3 @@ class mdpo_metrics_collector final : public rmetrics::base_collector {
 
 NS_END(perception, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_PERCEPTION_MDPO_METRICS_COLLECTOR_HPP_ */

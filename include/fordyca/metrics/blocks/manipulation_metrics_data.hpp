@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_DATA_HPP_
-#define INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_DATA_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -59,8 +58,16 @@ struct manipulation_metrics_data : public rmetrics::base_data {
                                 block_manip_events::ekMAX_EVENTS>;
   array_type interval{};
   array_type cum{};
+
+  manipulation_metrics_data& operator+=(const manipulation_metrics_data& rhs) {
+    for (size_t i = 0; i < fmblocks::block_manip_events::ekMAX_EVENTS; ++i) {
+      this->interval[i].events += rhs.interval[i].events;
+      this->interval[i].penalties += rhs.interval[i].penalties;
+      this->cum[i].events += rhs.cum[i].events;
+      this->cum[i].penalties += rhs.cum[i].penalties;
+    } /* for(i..) */
+    return *this;
+  }
 };
 
 NS_END(blocks, metrics, fordyca);
-
-#endif /* INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_DATA_HPP_ */

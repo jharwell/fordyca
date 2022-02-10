@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_STRATEGY_STRATEGY_PARAMS_HPP_
-#define INCLUDE_FORDYCA_STRATEGY_STRATEGY_PARAMS_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -68,4 +67,3 @@ NS_START(fordyca, strategy);
 
 NS_END(strategy, fordyca);
 
-#endif /* INCLUDE_FORDYCA_STRATEGY_STRATEGY_PARAMS_HPP_ */

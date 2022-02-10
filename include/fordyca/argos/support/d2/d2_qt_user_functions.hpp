@@ -17,8 +17,7 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_D2_D2_QT_USER_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_D2_D2_QT_USER_FUNCTIONS_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -49,4 +48,3 @@ class d2_qt_user_functions : public d1::d1_qt_user_functions {
 
 NS_END(d2, support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_D2_D2_QT_USER_FUNCTIONS_HPP_ */

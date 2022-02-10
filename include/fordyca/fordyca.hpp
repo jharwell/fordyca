@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FORDYCA_HPP_
-#define INCLUDE_FORDYCA_FORDYCA_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -228,10 +227,15 @@ namespace mpl {}
 } /* namespace argos */
 
 namespace ros {
+
 namespace metrics {}
 namespace support {
 namespace d0 {}
 } /* namespace support */
+
+namespace metrics {
+namespace blocks {}
+} /* namespace metrics */
 
 } /* namespace ros */
 
@@ -288,5 +292,4 @@ namespace fros = fordyca::ros;
 namespace frmetrics = fros::metrics;
 namespace frsupport = fros::support;
 namespace frsd0 = frsupport::d0;
-
-#endif /* INCLUDE_FORDYCA_FORDYCA_HPP_ */
+namespace frmblocks = frmetrics::blocks;

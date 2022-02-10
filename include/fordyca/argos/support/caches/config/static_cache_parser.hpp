@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_CONFIG_STATIC_CACHE_PARSER_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_CONFIG_STATIC_CACHE_PARSER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -76,4 +75,3 @@ class static_cache_parser final: public rer::client<static_cache_parser>,
 
 NS_END(config, caches, support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_CONFIG_STATIC_CACHE_PARSER_HPP_ */

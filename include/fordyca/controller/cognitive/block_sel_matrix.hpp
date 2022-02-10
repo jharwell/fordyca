@@ -18,8 +18,7 @@
  * RCPPSW.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_BLOCK_SEL_MATRIX_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_BLOCK_SEL_MATRIX_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -103,4 +102,3 @@ class block_sel_matrix : public std::map<std::string, block_sel_variant> {
 
 NS_END(cognitive, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_BLOCK_SEL_MATRIX_HPP_ */

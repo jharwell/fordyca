@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_EVENTS_CACHE_PROXIMITY_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_EVENTS_CACHE_PROXIMITY_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -102,4 +101,3 @@ using cache_proximity_visitor = rpvisitor::filtered_visitor<cache_proximity>;
 
 NS_END(events, d2, cognitive, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_EVENTS_CACHE_PROXIMITY_HPP_ */

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_TV_MANAGER_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_TV_MANAGER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -41,4 +40,3 @@ using tv_manager = ctv::tv_manager<env_dynamics, fordyca_pd_adaptor>;
 
 NS_END(tv, argos support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_TV_MANAGER_HPP_ */

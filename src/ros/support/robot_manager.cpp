@@ -24,6 +24,7 @@
 #include "fordyca/ros/support/robot_manager.hpp"
 
 #include "cosm/pal/config/output_config.hpp"
+#include "cosm/ros/config/sierra_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,8 +34,9 @@ NS_START(fordyca, ros, support);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-robot_manager::robot_manager(void)
-    : ER_CLIENT_INIT("fordyca.ros.support.robot_manager") {}
+robot_manager::robot_manager(const cros::config::sierra_config* config)
+    : ER_CLIENT_INIT("fordyca.ros.support.robot_manager"),
+      mc_sierra(*config) {}
 
 robot_manager::~robot_manager(void) = default;
 
@@ -62,5 +64,21 @@ void robot_manager::config_parse(ticpp::Element& node) {
     std::exit(EXIT_FAILURE);
   }
 } /* config_parse() */
+
+/*******************************************************************************
+ * ROS Hooks
+ ******************************************************************************/
+void robot_manager::pre_step(void) {
+  /* update current tick */
+  timestep(timestep() + 1);
+
+  /* Update diagnostics with new timestep */
+  mdc_ts_update();
+} /* pre_step() */
+
+bool robot_manager::experiment_finished(void) const {
+  return timestep() >= mc_sierra.experiment.length.v() *
+      mc_sierra.experiment.ticks_per_sec.v();
+} /* experiment_finished() */
 
 NS_END(support, ros, fordyca);

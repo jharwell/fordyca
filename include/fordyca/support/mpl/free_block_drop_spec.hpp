@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_MPL_FREE_BLOCK_DROP_SPEC_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_MPL_FREE_BLOCK_DROP_SPEC_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -68,4 +67,3 @@ using free_block_drop_spec = typename boost::mpl::fold<
 
 NS_END(mpl, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_MPL_FREE_BLOCK_DROP_SPEC_HPP_ */

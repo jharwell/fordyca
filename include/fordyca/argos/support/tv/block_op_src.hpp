@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_BLOCK_OP_SRC_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_BLOCK_OP_SRC_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -46,4 +45,3 @@ enum class block_op_src {
 
 NS_END(tv, argos support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_BLOCK_OP_SRC_HPP_ */

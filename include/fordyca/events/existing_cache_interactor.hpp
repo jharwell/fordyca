@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_EXISTING_CACHE_INTERACTOR_HPP_
-#define INCLUDE_FORDYCA_EVENTS_EXISTING_CACHE_INTERACTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -56,4 +55,3 @@ class existing_cache_interactor : public rpvisitor::polymorphic_accept_set<
 
 NS_END(events, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EVENTS_EXISTING_CACHE_INTERACTOR_HPP_ */

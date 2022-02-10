@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ROS_SUPPORT_D0_ROBOT_ARENA_INTERACTOR_HPP_
-#define INCLUDE_FORDYCA_ROS_SUPPORT_D0_ROBOT_ARENA_INTERACTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -102,4 +101,3 @@ class robot_arena_interactor final : public rer::client<
 
 NS_END(d0, support, ros, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ROS_SUPPORT_D0_ROBOT_ARENA_INTERACTOR_HPP_ */

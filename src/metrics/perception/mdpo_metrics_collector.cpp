@@ -71,10 +71,10 @@ void mdpo_metrics_collector::collect(
   m_data.cum.states[cfsm::cell2D_state::ekST_HAS_CACHE] +=
       m->cell_state_inaccuracies(cfsm::cell2D_state::ekST_HAS_CACHE);
 
-  ral::mt_add(m_data.interval.known_percent, m->known_percentage());
-  ral::mt_add(m_data.interval.unknown_percent, m->unknown_percentage());
-  ral::mt_add(m_data.cum.known_percent, m->known_percentage());
-  ral::mt_add(m_data.cum.unknown_percent, m->unknown_percentage());
+  ral::mt_accum(m_data.interval.known_percent, m->known_percentage());
+  ral::mt_accum(m_data.interval.unknown_percent, m->unknown_percentage());
+  ral::mt_accum(m_data.cum.known_percent, m->known_percentage());
+  ral::mt_accum(m_data.cum.unknown_percent, m->unknown_percentage());
 
   ++m_data.interval.robots;
   ++m_data.cum.robots;

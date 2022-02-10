@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_OP_FILTER_STATUS_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_OP_FILTER_STATUS_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -73,4 +72,3 @@ enum class op_filter_status {
 
 NS_END(tv, argos support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_OP_FILTER_STATUS_HPP_ */

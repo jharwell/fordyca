@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_CACHED_BLOCK_PICKUP_INTERACTOR_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_CACHED_BLOCK_PICKUP_INTERACTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -342,4 +341,3 @@ class cached_block_pickup_interactor : public rer::client<
 
 NS_END(support, caches, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_CACHED_BLOCK_PICKUP_INTERACTOR_HPP_ */

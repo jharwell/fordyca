@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_D0_FREE_BLOCK_TO_NEST_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_D0_FREE_BLOCK_TO_NEST_FSM_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -159,4 +158,3 @@ class free_block_to_nest_fsm final : public cffsm::foraging_util_hfsm,
 
 NS_END(d0, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_D0_FREE_BLOCK_TO_NEST_FSM_HPP_ */

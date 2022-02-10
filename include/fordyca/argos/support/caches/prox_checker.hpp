@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_PROX_CHECKER_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_PROX_CHECKER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -171,4 +170,3 @@ class prox_checker : public rer::client<prox_checker> {
 
 NS_END(caches, support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_PROX_CHECKER_HPP_ */

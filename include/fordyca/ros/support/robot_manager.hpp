@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ROS_SUPPORT_ROBOT_MANAGER_HPP_
-#define INCLUDE_FORDYCA_ROS_SUPPORT_ROBOT_MANAGER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -32,6 +31,7 @@
 
 #include "cosm/ros/robot_manager_adaptor.hpp"
 #include "cosm/ros/config/xml/robot_manager_repository.hpp"
+#include "cosm/ros/config/sierra_config.hpp"
 
 #include "fordyca/fordyca.hpp"
 
@@ -58,7 +58,7 @@ NS_START(fordyca, ros, support);
 class robot_manager : public cros::robot_manager_adaptor,
                       public rer::client<robot_manager> {
  public:
-  robot_manager(void) RCPPSW_COLD;
+  robot_manager(const cros::config::sierra_config* config) RCPPSW_COLD;
   ~robot_manager(void) override RCPPSW_COLD;
 
   /* Not copy constructible/assignable by default */
@@ -68,8 +68,11 @@ class robot_manager : public cros::robot_manager_adaptor,
   /* swarm manager overrides */
   void init(ticpp::Element&) override RCPPSW_COLD;
   void reset(void) override {}
-  void pre_step(void) override {}
+  void pre_step(void) override;
   void post_step(void) override {}
+
+  /* robot manager adaptor overrides */
+  bool experiment_finished(void) const override;
 
  protected:
   const cros::config::xml::robot_manager_repository* config(void) const {
@@ -82,10 +85,9 @@ class robot_manager : public cros::robot_manager_adaptor,
 
  private:
   /* clang-format off */
+  const cros::config::sierra_config           mc_sierra;
   cros::config::xml::robot_manager_repository m_config{};
   /* clang-format on */
 };
 
 NS_END(support, ros, fordyca);
-
-#endif /* INCLUDE_FORDYCA_ROS_SUPPORT_ROBOT_MANAGER_HPP_ */

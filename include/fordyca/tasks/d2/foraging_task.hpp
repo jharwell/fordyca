@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_D2_FORAGING_TASK_HPP_
-#define INCLUDE_FORDYCA_TASKS_D2_FORAGING_TASK_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -75,4 +74,3 @@ class foraging_task
 
 NS_END(d2, tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_TASKS_D2_FORAGING_TASK_HPP_ */

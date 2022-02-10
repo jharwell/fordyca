@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_FORAGING_PERCEPTION_SUBSYSTEM_HPP_
-#define INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_FORAGING_PERCEPTION_SUBSYSTEM_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -97,4 +96,3 @@ class foraging_perception_subsystem
 
 NS_END(perception, subsystem, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_FORAGING_PERCEPTION_SUBSYSTEM_HPP_ */

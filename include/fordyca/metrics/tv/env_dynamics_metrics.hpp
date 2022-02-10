@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_TV_ENV_DYNAMICS_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_TV_ENV_DYNAMICS_METRICS_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -62,4 +61,3 @@ class env_dynamics_metrics : public ctv::metrics::base_env_dynamics_metrics {
 
 NS_END(tv, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_TV_ENV_DYNAMICS_METRICS_HPP_ */

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_D2_BLOCK_TO_NEW_CACHE_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_D2_BLOCK_TO_NEW_CACHE_FSM_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -76,4 +75,3 @@ class block_to_new_cache_fsm final : public block_to_goal_fsm {
 
 NS_END(d2, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_D2_BLOCK_TO_NEW_CACHE_FSM_HPP_ */

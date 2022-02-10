@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ROS_SUPPORT_MPL_FREE_BLOCK_PICKUP_SPEC_HPP_
-#define INCLUDE_FORDYCA_ROS_SUPPORT_MPL_FREE_BLOCK_PICKUP_SPEC_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -28,8 +27,6 @@
 #include <boost/mpl/fold.hpp>
 
 #include "rcppsw/mpl/typelist.hpp"
-
-#include "cosm/arena/caching_arena_map.hpp"
 
 #include "fordyca/support/interactor_status.hpp"
 
@@ -75,4 +72,3 @@ using free_block_pickup_spec = typename boost::mpl::fold<
 
 NS_END(mpl, support, ros, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ROS_SUPPORT_MPL_FREE_BLOCK_PICKUP_SPEC_HPP_ */

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ROS_METRICS_BLOCKS_MANIPULATION_METRICS_TOPIC_SINK_HPP_
-#define INCLUDE_FORDYCA_ROS_METRICS_BLOCKS_MANIPULATION_METRICS_TOPIC_SINK_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -27,64 +26,8 @@
 #include <string>
 
 #include "cosm/ros/metrics/topic_sink.hpp"
-#include "fordyca/metrics/blocks/manipulation_metrics_data.hpp"
-#include "fordyca/fordyca.hpp"
 
-/*******************************************************************************
- * ROS Message Traits
- ******************************************************************************/
-NS_START(ros, message_traits);
-
-template<>
-struct MD5Sum<fmblocks::manipulation_metrics_data> {
-  static const char* value() {
-    return MD5Sum<fmblocks::manipulation_metrics_data>::value();
-  }
-  static const char* value(const fmblocks::manipulation_metrics_data& m) {
-    return MD5Sum<fmblocks::manipulation_metrics_data>::value(m);
-  }
-};
-template <>
-struct DataType<fmblocks::manipulation_metrics_data> {
-  static const char* value() {
-    return DataType<fmblocks::manipulation_metrics_data>::value();
-  }
-  static const char* value(const fmblocks::manipulation_metrics_data& m) {
-    return DataType<fmblocks::manipulation_metrics_data>::value(m);
-  }
-};
-
-template<>
-struct Definition<fmblocks::manipulation_metrics_data> {
-  static const char* value() {
-    return Definition<fmblocks::manipulation_metrics_data>::value();
-  }
-  static const char* value(const fmblocks::manipulation_metrics_data& m) {
-    return Definition<fmblocks::manipulation_metrics_data>::value(m);
-  }
-};
-NS_END(message_traits);
-
-NS_START(serialization);
-
-template<>
-struct Serializer<fmblocks::manipulation_metrics_data> {
-  template<typename Stream, typename T>
-  inline static void allInOne(Stream& stream, T t) {
-    for (size_t i = 0; i < fmblocks::block_manip_events::ekMAX_EVENTS; ++i) {
-      stream.next(t.interval[i].events);
-      stream.next(t.interval[i].penalties);
-    } /* for(i..) */
-
-    for (size_t i = 0; i < fmblocks::block_manip_events::ekMAX_EVENTS; ++i) {
-      stream.next(t.cum[i].events);
-      stream.next(t.cum[i].penalties);
-    } /* for(i..) */
-  }
-  ROS_DECLARE_ALLINONE_SERIALIZER;
-};
-
-NS_END(serialization, ros);
+#include "fordyca/ros/metrics/blocks/manipulation_metrics_glue.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -106,16 +49,15 @@ NS_START(fordyca, ros, metrics, blocks);
  * fmblocks::manipulation_metrics_collector to output metrics to a ROS topic.
  */
 class manipulation_metrics_topic_sink final
-    : public cros::metrics::topic_sink<fmblocks::manipulation_metrics_data> {
+    : public cros::metrics::topic_sink<frmblocks::manipulation_metrics_msg> {
  public:
   using collector_type = fmblocks::manipulation_metrics_collector;
 
   manipulation_metrics_topic_sink(const std::string& topic,
-                              const rmetrics::output_mode& mode,
-                              const rtypes::timestep& interval)
+                                  const rmetrics::output_mode& mode,
+                                  const rtypes::timestep& interval)
       : topic_sink(topic, mode, interval) {}
 };
 
 NS_END(blocks, metrics, ros, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ROS_METRICS_BLOCKS_MANIPULATION_METRICS_TOPIC_SINK_HPP_ */

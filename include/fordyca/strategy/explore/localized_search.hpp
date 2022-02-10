@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_STRATEGY_EXPLORE_LOCALIZED_SEARCH_HPP_
-#define INCLUDE_FORDYCA_STRATEGY_EXPLORE_LOCALIZED_SEARCH_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -117,4 +116,3 @@ class localized_search : public foraging_strategy,
 
 NS_END(explore, strategy, fordyca);
 
-#endif /* INCLUDE_FORDYCA_STRATEGY_EXPLORE_LOCALIZED_SEARCH_HPP_ */

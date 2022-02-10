@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_STRATEGY_EXPLORE_LEDTAXIS_HPP_
-#define INCLUDE_FORDYCA_STRATEGY_EXPLORE_LEDTAXIS_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -91,4 +90,3 @@ class ledtaxis : public foraging_strategy,
 
 NS_END(explore, strategy, fordyca);
 
-#endif /* INCLUDE_FORDYCA_STRATEGY_EXPLORE_LEDTAXIS_HPP_ */

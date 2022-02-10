@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_LOS_PROC_VERIFY_HPP_
-#define INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_LOS_PROC_VERIFY_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -68,4 +67,3 @@ class los_proc_verify : public rer::client<los_proc_verify> {
 
 NS_END(perception, subsystem, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_LOS_PROC_VERIFY_HPP_ */

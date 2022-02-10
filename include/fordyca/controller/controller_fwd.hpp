@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_CONTROLLER_FWD_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_CONTROLLER_FWD_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -191,4 +190,3 @@ using is_d2 = typename boost::mpl::contains<fcontroller::d2::typelist, T>::type;
 
 NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_CONTROLLER_FWD_HPP_ */

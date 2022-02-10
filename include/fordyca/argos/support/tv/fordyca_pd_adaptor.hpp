@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_FORDYCA_PD_ADAPTOR_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_FORDYCA_PD_ADAPTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -74,4 +73,3 @@ class fordyca_pd_adaptor final : rer::client<fordyca_pd_adaptor>,
 
 NS_END(tv, support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_FORDYCA_PD_ADAPTOR_HPP_ */

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_FREE_BLOCK_PICKUP_INTERACTOR_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_FREE_BLOCK_PICKUP_INTERACTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -129,4 +128,3 @@ class free_block_pickup_interactor final :
 
 NS_END(support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_FREE_BLOCK_PICKUP_INTERACTOR_HPP_ */

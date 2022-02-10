@@ -17,8 +17,7 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_D0_D0_QT_USER_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_D0_D0_QT_USER_FUNCTIONS_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -66,4 +65,3 @@ class d0_qt_user_functions : public ::argos::CQTOpenGLUserFunctions {
 
 NS_END(d0, fordyca, argos, support);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_D0_D0_QT_USER_FUNCTIONS_HPP_ */

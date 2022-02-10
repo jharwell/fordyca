@@ -37,7 +37,8 @@ manipulation_metrics_csv_sink::manipulation_metrics_csv_sink(
     fs::path fpath_no_ext,
     const rmetrics::output_mode& mode,
     const rtypes::timestep& interval)
-    : csv_sink(fpath_no_ext, mode, interval) {}
+    : ER_CLIENT_INIT("fordyca.metrics.blocks.manipulation_metrics_csv_sink"),
+      csv_sink(fpath_no_ext, mode, interval) {}
 
 /*******************************************************************************
  * Member Functions
@@ -75,6 +76,7 @@ boost::optional<std::string>
 manipulation_metrics_csv_sink::csv_line_build(
     const rmetrics::base_data* data,
     const rtypes::timestep& t) {
+  ER_DEBUG("Current timestep: %zu, ready? %d", t.v(), ready_to_flush(t));
   if (!ready_to_flush(t)) {
     return boost::none;
   }

@@ -64,6 +64,12 @@ d0_swarm_metrics_manager::d0_swarm_metrics_manager(
    */
   register_standard(mconfig, n_robots);
 
+  std::all_of(std::begin(m_subs),
+              std::end(m_subs),
+              [&](auto& sub) {
+                return wait_for_connection(sub);
+              });
+
   /* setup metric collection for all collector groups in all sink groups */
   initialize();
 }
@@ -89,11 +95,14 @@ void d0_swarm_metrics_manager::register_standard(
 
   boost::mpl::for_each<sink_list>(registerer);
 
+  /* initialize counting map to track received metrics */
+  msg_tracking()->init(fmspecs::blocks::kManipulation.scoped);
+
   /* set ROS callbacks for metric collection */
   ::ros::NodeHandle n;
   auto cb = [&](cros::topic robot_ns) {
-              m_subs.push_back(n.subscribe<fmetrics::blocks::manipulation_metrics_data>(
-                  robot_ns / cmspecs::blocks::kManipulation.scoped,
+              m_subs.push_back(n.subscribe<frmblocks::manipulation_metrics_msg>(
+                  robot_ns / fmspecs::blocks::kManipulation.scoped,
                   kQueueBufferSize,
                   &d0_swarm_metrics_manager::collect,
                   this));
@@ -105,10 +114,12 @@ void d0_swarm_metrics_manager::register_standard(
  * ROS Callbacks
  ******************************************************************************/
 void d0_swarm_metrics_manager::collect(
-    const boost::shared_ptr<const fmetrics::blocks::manipulation_metrics_data>& in) {
+    const boost::shared_ptr<const frmblocks::manipulation_metrics_msg>& msg) {
   auto* collector = get<fmetrics::blocks::manipulation_metrics_collector>(
-      cmspecs::blocks::kManipulation.scoped);
-  collector->data(*in);
+      fmspecs::blocks::kManipulation.scoped);
+  msg_tracking()->update_on_receive(fmspecs::blocks::kManipulation.scoped,
+                                    msg->header.seq);
+  collector->collect(msg->data);
 } /* collect() */
 
 NS_END(d0, metrics, ros, fordyca);

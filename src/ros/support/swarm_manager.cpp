@@ -33,8 +33,10 @@ NS_START(fordyca, ros, support);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-swarm_manager::swarm_manager(void)
-    : ER_CLIENT_INIT("fordyca.ros.support.swarm_manager") {}
+swarm_manager::swarm_manager(const cros::config::sierra_config* config)
+    : ER_CLIENT_INIT("fordyca.ros.support.swarm_manager"),
+      swarm_manager_adaptor(config->experiment.n_robots),
+      mc_sierra(*config) {}
 
 swarm_manager::~swarm_manager(void) = default;
 
@@ -62,5 +64,21 @@ void swarm_manager::config_parse(ticpp::Element& node) {
     std::exit(EXIT_FAILURE);
   }
 } /* config_parse() */
+
+/*******************************************************************************
+ * ROS Hooks
+ ******************************************************************************/
+void swarm_manager::pre_step(void) {
+  /* update current tick */
+  timestep(timestep() + 1);
+
+  /* Update diagnostics with new timestep */
+  mdc_ts_update();
+} /* pre_step() */
+
+bool swarm_manager::experiment_finished(void) const {
+  return timestep() >= mc_sierra.experiment.length.v() *
+      mc_sierra.experiment.ticks_per_sec.v();
+} /* experiment_finished() */
 
 NS_END(support, ros, fordyca);

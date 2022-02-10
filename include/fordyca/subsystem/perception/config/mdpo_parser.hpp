@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_CONFIG_MDPO_PARSER_HPP_
-#define INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_CONFIG_MDPO_PARSER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -82,4 +81,3 @@ class mdpo_parser : public rer::client<mdpo_parser>,
 
 NS_END(config, perception, subsystem, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_CONFIG_MDPO_PARSER_HPP_ */

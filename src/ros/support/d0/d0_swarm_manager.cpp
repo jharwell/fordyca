@@ -44,8 +44,9 @@ NS_START(fordyca, ros, support, d0);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-d0_swarm_manager::d0_swarm_manager(void)
+d0_swarm_manager::d0_swarm_manager(const cros::config::sierra_config* config)
     : ER_CLIENT_INIT("fordyca.ros.support.d0.d0_swarm_manager"),
+      swarm_manager(config),
       m_metrics_manager(nullptr) {}
 
 d0_swarm_manager::~d0_swarm_manager(void) = default;
@@ -76,9 +77,6 @@ void d0_swarm_manager::private_init(void) {
       &output->metrics,
       output_root(),
       swarm_size());
-
-  /* this starts at 0, and ROS starts at 1, so sync up */
-  m_metrics_manager->timestep_inc();
 } /* private_init() */
 
 /*******************************************************************************
@@ -91,12 +89,12 @@ void d0_swarm_manager::post_step(void) {
 
   ndc_uuid_push();
 
-  m_metrics_manager->flush(rmetrics::output_mode::ekTRUNCATE);
-  m_metrics_manager->flush(rmetrics::output_mode::ekCREATE);
-  m_metrics_manager->flush(rmetrics::output_mode::ekAPPEND);
+  m_metrics_manager->flush(rmetrics::output_mode::ekTRUNCATE, timestep());
+  m_metrics_manager->flush(rmetrics::output_mode::ekCREATE, timestep());
+  m_metrics_manager->flush(rmetrics::output_mode::ekAPPEND, timestep());
+  ER_DEBUG("Flushed metrics to file");
 
-  m_metrics_manager->interval_reset();
-  m_metrics_manager->timestep_inc();
+  m_metrics_manager->interval_reset(timestep());
 
   ndc_uuid_pop();
 } /* post_step() */

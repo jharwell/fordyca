@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_METRICS_D2_D2_METRICS_MANAGER_HPP_
-#define INCLUDE_FORDYCA_ARGOS_METRICS_D2_D2_METRICS_MANAGER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -83,4 +82,3 @@ class d2_metrics_manager final : public d1::d1_metrics_manager,
 
 NS_END(d2, metrics, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_METRICS_D2_D2_METRICS_MANAGER_HPP_ */

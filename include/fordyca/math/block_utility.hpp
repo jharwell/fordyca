@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_MATH_BLOCK_UTILITY_HPP_
-#define INCLUDE_FORDYCA_MATH_BLOCK_UTILITY_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -76,4 +75,3 @@ class block_utility : public rmath::expression<double> {
 
 NS_END(math, fordyca);
 
-#endif /* INCLUDE_FORDYCA_MATH_BLOCK_UTILITY_HPP_ */

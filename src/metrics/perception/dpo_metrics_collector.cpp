@@ -66,13 +66,13 @@ void dpo_metrics_collector::collect(
   m_data.cum.known_blocks += m->n_known_blocks();
   m_data.cum.known_caches += m->n_known_caches();
 
-  ral::mt_add(m_data.interval.block_density_sum,
+  ral::mt_accum(m_data.interval.block_density_sum,
                m->avg_block_density().v());
-  ral::mt_add(m_data.cum.block_density_sum,
+  ral::mt_accum(m_data.cum.block_density_sum,
                m->avg_block_density().v());
-  ral::mt_add(m_data.interval.cache_density_sum,
+  ral::mt_accum(m_data.interval.cache_density_sum,
                m->avg_cache_density().v());
-  ral::mt_add(m_data.cum.block_density_sum,
+  ral::mt_accum(m_data.cum.block_density_sum,
                m->avg_cache_density().v());
 } /* collect() */
 

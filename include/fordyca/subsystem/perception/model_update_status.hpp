@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_MODEL_UPDATE_STATUS_HPP_
-#define INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_MODEL_UPDATE_STATUS_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -77,4 +76,3 @@ enum class model_update_status {
 
 NS_END(perception, subsystem, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_MODEL_UPDATE_STATUS_HPP_ */

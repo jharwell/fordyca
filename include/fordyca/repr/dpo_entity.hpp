@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPR_DPO_ENTITY_HPP_
-#define INCLUDE_FORDYCA_REPR_DPO_ENTITY_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -82,4 +81,3 @@ class dpo_entity {
 
 NS_END(repr, fordyca);
 
-#endif /* INCLUDE_FORDYCA_REPR_DPO_ENTITY_HPP_ */

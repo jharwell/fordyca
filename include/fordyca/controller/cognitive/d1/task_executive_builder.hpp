@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D1_TASK_EXECUTIVE_BUILDER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D1_TASK_EXECUTIVE_BUILDER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -149,4 +148,3 @@ class task_executive_builder : public rer::client<task_executive_builder> {
 
 NS_END(cognitive, d1, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D1_TASK_EXECUTIVE_BUILDER_HPP_ */

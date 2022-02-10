@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPR_FORAGER_LOS_HPP_
-#define INCLUDE_FORDYCA_REPR_FORAGER_LOS_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -62,4 +61,3 @@ class forager_los final : public crepr::grid2D_los, public rer::client<forager_l
 
 NS_END(repr, fordyca);
 
-#endif /* INCLUDE_FORDYCA_REPR_FORAGER_LOS_HPP_ */

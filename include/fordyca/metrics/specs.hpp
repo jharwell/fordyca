@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_SPECS_HPP_
-#define INCLUDE_FORDYCA_METRICS_SPECS_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -40,6 +39,12 @@ extern cmspecs::name_spec kDPO;
 extern cmspecs::name_spec kMDPO;
 
 NS_END(perception);
+
+NS_START(blocks);
+
+extern cmspecs::name_spec kManipulation;
+
+NS_END(blocks);
 
 NS_START(caches);
 
@@ -64,4 +69,3 @@ NS_END(tab, tasks);
 
 NS_END(specs, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_SPECS_HPP_ */

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_TASK_STATUS_HPP_
-#define INCLUDE_FORDYCA_TASKS_TASK_STATUS_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -64,4 +63,3 @@ enum class task_status {
 
 NS_END(tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_TASKS_TASK_STATUS_HPP_ */

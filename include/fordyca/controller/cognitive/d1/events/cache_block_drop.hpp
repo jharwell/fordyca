@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D1_EVENTS_CACHE_BLOCK_DROP_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D1_EVENTS_CACHE_BLOCK_DROP_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -151,4 +150,3 @@ class cache_block_drop_visitor
 
 NS_END(events, d1, cognitive, controller,fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D1_EVENTS_CACHE_BLOCK_DROP_HPP_ */

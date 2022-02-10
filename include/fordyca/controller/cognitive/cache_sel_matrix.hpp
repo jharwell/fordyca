@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_CACHE_SEL_MATRIX_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_CACHE_SEL_MATRIX_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -126,4 +125,3 @@ class cache_sel_matrix final
 
 NS_END(cognitive, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_CACHE_SEL_MATRIX_HPP_ */

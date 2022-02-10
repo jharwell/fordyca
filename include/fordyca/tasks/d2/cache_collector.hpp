@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_D2_CACHE_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_TASKS_D2_CACHE_COLLECTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -56,4 +55,3 @@ class cache_collector final : public d1::collector {
 
 NS_END(d2, tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_TASKS_D2_CACHE_COLLECTOR_HPP_ */

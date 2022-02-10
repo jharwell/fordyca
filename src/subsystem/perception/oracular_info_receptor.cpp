@@ -108,7 +108,7 @@ void oracular_info_receptor::exec_est_update(cta::polled_task* const task) {
   ER_ASSERT(exec_result,
             "Bad oracle query 'exec_est.%s': no such task",
             task->name().c_str());
-  auto oracle_exec_est = boost::get<cta::time_estimate>(exec_result.get());
+  auto oracle_exec_est = std::get<cta::time_estimate>(exec_result.get());
   RCPPSW_UNUSED int exec_old = task->task_exec_estimate().v();
   task->exec_estimate_update(rtypes::timestep(oracle_exec_est.v()));
   ER_INFO("Update 'exec_est.%s' with oracular estimate %d: %d -> %d",
@@ -123,7 +123,7 @@ void oracular_info_receptor::int_est_update(cta::polled_task* const task) {
   ER_ASSERT(int_result,
             "Bad oracle query 'interface_est.%s': no such task",
             task->name().c_str());
-  auto oracle_int_est = boost::get<cta::time_estimate>(int_result.get());
+  auto oracle_int_est = std::get<cta::time_estimate>(int_result.get());
   RCPPSW_UNUSED int int_old = task->task_interface_estimate(0).v();
   task->interface_estimate_update(0, rtypes::timestep(oracle_int_est.v()));
   ER_INFO("Update 'interface_est.%s' with oracular estimate %d: %d -> %d",

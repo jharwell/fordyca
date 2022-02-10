@@ -18,16 +18,31 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ROS_METRICS_BLOCKS_MANIPULATION_METRICS_GLUE_HPP_
-#define INCLUDE_FORDYCA_ROS_METRICS_BLOCKS_MANIPULATION_METRICS_GLUE_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <ros/ros.h>
 
-#include "fordyca/metrics/blocks/manipulation_metrics_data.hpp"
-#include "fordyca/fordyca.hpp"
+#include "cosm/pal/pal.hpp"
+
+#include "fordyca/ros/metrics/blocks/manipulation_metrics_msg.hpp"
+#include "cosm/ros/metrics/msg_traits.hpp"
+
+/*******************************************************************************
+ * Namespaces/Decls
+ ******************************************************************************/
+
+NS_START(cosm, ros, metrics, msg_traits);
+
+template<>
+struct payload_type<frmblocks::manipulation_metrics_msg> {
+  using type = fmblocks::manipulation_metrics_data;
+};
+
+NS_END(msg_traits, metrics, ros, cosm);
+
 
 /*******************************************************************************
  * ROS Message Traits
@@ -35,54 +50,56 @@
 NS_START(ros, message_traits);
 
 template<>
-struct MD5Sum<fmblocks::manipulation_metrics_data> {
+struct MD5Sum<frmblocks::manipulation_metrics_msg> {
   static const char* value() {
-    return MD5Sum<fmblocks::manipulation_metrics_data>::value();
+    return cpal::kMsgTraitsMD5.c_str();
   }
-  static const char* value(const fmblocks::manipulation_metrics_data& m) {
-    return MD5Sum<fmblocks::manipulation_metrics_data>::value(m);
+  static const char* value(const frmblocks::manipulation_metrics_msg&) {
+    return value();
   }
 };
 template <>
-struct DataType<fmblocks::manipulation_metrics_data> {
+struct DataType<frmblocks::manipulation_metrics_msg> {
   static const char* value() {
-    return DataType<fmblocks::manipulation_metrics_data>::value();
+    return "fordyca_msgs/manipulation_metrics_data";
   }
-  static const char* value(const fmblocks::manipulation_metrics_data& m) {
-    return DataType<fmblocks::manipulation_metrics_data>::value(m);
+  static const char* value(const frmblocks::manipulation_metrics_msg&) {
+    return value();
   }
 };
 
 template<>
-struct Definition<fmblocks::manipulation_metrics_data> {
+struct Definition<frmblocks::manipulation_metrics_msg> {
   static const char* value() {
-    return Definition<fmblocks::manipulation_metrics_data>::value();
+    return "See FORDYCA docs for documentation.";
   }
-  static const char* value(const fmblocks::manipulation_metrics_data& m) {
-    return Definition<fmblocks::manipulation_metrics_data>::value(m);
+  static const char* value(const frmblocks::manipulation_metrics_msg&) {
+    return value();
   }
 };
+
+template <>
+struct HasHeader<frmblocks::manipulation_metrics_msg> : TrueType {};
+
 NS_END(message_traits);
 
 NS_START(serialization);
 
 template<>
-struct Serializer<fmblocks::manipulation_metrics_data> {
+struct Serializer<frmblocks::manipulation_metrics_msg> {
   template<typename Stream, typename T>
   inline static void allInOne(Stream& stream, T t) {
-    for (size_t i = 0; i < fmblocks::block_manip_events::ekMAX_EVENTS; ++i) {
-      stream.next(t.interval[i].events);
-      stream.next(t.interval[i].penalties);
-    } /* for(i..) */
+    stream.next(t.header);
 
     for (size_t i = 0; i < fmblocks::block_manip_events::ekMAX_EVENTS; ++i) {
-      stream.next(t.cum[i].events);
-      stream.next(t.cum[i].penalties);
+      stream.next(t.data.interval[i].events);
+      stream.next(t.data.interval[i].penalties);
+
+      stream.next(t.data.cum[i].events);
+      stream.next(t.data.cum[i].penalties);
     } /* for(i..) */
   }
   ROS_DECLARE_ALLINONE_SERIALIZER;
 };
 
 NS_END(serialization, ros);
-
-#endif /* INCLUDE_FORDYCA_ROS_METRICS_BLOCKS_MANIPULATION_METRICS_GLUE_HPP_ */

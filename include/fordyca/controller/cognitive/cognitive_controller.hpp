@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_COGNITIVE_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_COGNITIVE_CONTROLLER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -93,4 +92,3 @@ class cognitive_controller : public foraging_controller,
 
 NS_END(cognitive, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_COGNITIVE_CONTROLLER_HPP_ */

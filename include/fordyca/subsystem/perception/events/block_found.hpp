@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_EVENTS_BLOCK_FOUND_HPP_
-#define INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_EVENTS_BLOCK_FOUND_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -91,4 +90,3 @@ using block_found_visitor = rpvisitor::filtered_visitor<block_found>;
 
 NS_END(events, perception, subsystem, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_EVENTS_BLOCK_FOUND_HPP_ */

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_METRICS_D1_D1_METRICS_MANAGER_HPP_
-#define INCLUDE_FORDYCA_ARGOS_METRICS_D1_D1_METRICS_MANAGER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -152,7 +151,7 @@ class d1_metrics_manager : public d0::d0_metrics_manager,
   template<typename Controller>
   void collect_controller_common(const Controller* const controller) {
     collect(cmspecs::spatial::kNestZone.scoped, *controller->nz_tracker());
-    collect(cmspecs::blocks::kManipulation.scoped, *controller->block_manip_recorder());
+    collect(fmspecs::blocks::kManipulation.scoped, *controller->block_manip_recorder());
 
     const auto *task = dynamic_cast<const cta::polled_task*>(controller->current_task());
     if (nullptr == task) {
@@ -251,4 +250,3 @@ class d1_metrics_manager : public d0::d0_metrics_manager,
 
 NS_END(d1, metrics, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_METRICS_D1_D1_METRICS_MANAGER_HPP_ */

@@ -40,6 +40,7 @@
 #include "fordyca/metrics/specs.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
 #include "fordyca/ros/metrics/blocks/manipulation_metrics_topic_sink.hpp"
+#include "fordyca/ros/metrics/registrable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,25 +51,20 @@ NS_START(fordyca, ros, metrics, d0);
  * Constructors/Destructors
  ******************************************************************************/
 d0_robot_metrics_manager::d0_robot_metrics_manager(
+    const cros::topic& robot_ns,
     const rmconfig::metrics_config* const mconfig)
-    : crmetrics::robot_metrics_manager(mconfig),
+    : crmetrics::robot_metrics_manager(robot_ns, mconfig),
       ER_CLIENT_INIT("fordyca.ros.metrics.d0.d0_robot_metrics_manager") {
 
   using sink_list = rmpl::typelist<
     rmpl::identity<frmetrics::blocks::manipulation_metrics_topic_sink>
     >;
 
-  /* register collectors common to all of FORDYCA */
-  rmetrics::creatable_collector_set creatable_set = {
-    { typeid(fmetrics::blocks::manipulation_metrics_collector),
-      cmspecs::blocks::kManipulation.xml,
-      cmspecs::blocks::kManipulation.scoped,
-      rmetrics::output_mode::ekAPPEND }
-  };
+  ER_INFO("Registering collectors");
 
   rmetrics::register_with_sink<frmetrics::d0::d0_robot_metrics_manager,
                                rmetrics::network_sink_registerer> topic(this,
-                                                                      creatable_set);
+                                                                        frmetrics::registrable::kStandard);
   rmetrics::register_using_config<decltype(topic),
                                   rmconfig::network_sink_config> registerer(
                                       std::move(topic),
@@ -77,6 +73,7 @@ d0_robot_metrics_manager::d0_robot_metrics_manager(
   boost::mpl::for_each<sink_list>(registerer);
 
   /* setup metric collection for all collector groups in all sink groups */
+  ER_INFO("Initializing collectors");
   initialize();
 }
 
@@ -90,7 +87,7 @@ void d0_robot_metrics_manager::collect_from_controller(
   /*
    * All d0 controllers provide these.
    */
-  collect(cmspecs::blocks::kManipulation.scoped, *c->block_manip_recorder());
+  collect(fmspecs::blocks::kManipulation.scoped, *c->block_manip_recorder());
 } /* collect_from_controller() */
 
 NS_END(d0, metrics, ros, fordyca);

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_STRATEGY_CONFIG_STRATEGY_PARSER_HPP_
-#define INCLUDE_FORDYCA_STRATEGY_CONFIG_STRATEGY_PARSER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -80,4 +79,3 @@ class strategy_parser final : public rer::client<strategy_parser>,
 
 NS_END(config, strategy, fordyca);
 
-#endif /* INCLUDE_FORDYCA_STRATEGY_CONFIG_STRATEGY_PARSER_HPP_ */

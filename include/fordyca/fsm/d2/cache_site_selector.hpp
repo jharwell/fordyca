@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_D2_CACHE_SITE_SELECTOR_HPP_
-#define INCLUDE_FORDYCA_FSM_D2_CACHE_SITE_SELECTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -200,4 +199,3 @@ double __site_utility_func(const std::vector<double>& x,
 
 NS_END(d2, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_D2_CACHE_SITE_SELECTOR_HPP_ */

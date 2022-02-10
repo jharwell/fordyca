@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_REACTIVE_D0_EVENTS_FREE_BLOCK_PICKUP_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_REACTIVE_D0_EVENTS_FREE_BLOCK_PICKUP_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -87,4 +86,3 @@ using free_block_pickup_visitor = rpvisitor::filtered_visitor<free_block_pickup>
 
 NS_END(events, d0, reactive, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_REACTIVE_D0_EVENTS_FREE_BLOCK_PICKUP_HPP_ */

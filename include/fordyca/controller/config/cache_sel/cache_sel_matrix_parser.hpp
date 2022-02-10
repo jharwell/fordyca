@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_CONFIG_CACHE_SEL_CACHE_SEL_MATRIX_PARSER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_CONFIG_CACHE_SEL_CACHE_SEL_MATRIX_PARSER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -79,4 +78,3 @@ class cache_sel_matrix_parser final : public rer::client<cache_sel_matrix_parser
 
 NS_END(cache_sel, config, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_CONFIG_CACHE_SEL_CACHE_SEL_MATRIX_PARSER_HPP_ */

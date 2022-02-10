@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_BASE_VISIT_SET_HPP_
-#define INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_BASE_VISIT_SET_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -55,4 +54,3 @@ using block_pickup_base_visit_typelist = rmpl::typelist<cfds::arena_map,
                                                         crepr::base_block3D>;
 NS_END(detail, events, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_BASE_VISIT_SET_HPP_ */

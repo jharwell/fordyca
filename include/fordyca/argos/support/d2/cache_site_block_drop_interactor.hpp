@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_D2_CACHE_SITE_BLOCK_DROP_INTERACTOR_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_D2_CACHE_SITE_BLOCK_DROP_INTERACTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -228,4 +227,3 @@ class cache_site_block_drop_interactor : public rer::client<
 
 NS_END(d2, support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_D2_CACHE_SITE_BLOCK_DROP_INTERACTOR_HPP_ */

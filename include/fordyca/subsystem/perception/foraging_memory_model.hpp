@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_FORAGING_MEMORY_MODEL_HPP_
-#define INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_FORAGING_MEMORY_MODEL_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -156,4 +155,3 @@ class foraging_memory_model : public csperception::base_memory_model,
 
 NS_END(perception, subsystem, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_FORAGING_MEMORY_MODEL_HPP_ */

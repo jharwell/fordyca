@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ROS_METRICS_D0_D0_SWARM_METRICS_MANAGER_HPP_
-#define INCLUDE_FORDYCA_ROS_METRICS_D0_D0_SWARM_METRICS_MANAGER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -28,7 +27,7 @@
 
 #include "cosm/ros/metrics/swarm_metrics_manager.hpp"
 
-#include "fordyca/metrics/blocks/manipulation_metrics_data.hpp"
+#include "fordyca/ros/metrics/blocks/manipulation_metrics_msg.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,7 +57,7 @@ class d0_swarm_metrics_manager : public crmetrics::swarm_metrics_manager,
  private:
   void register_standard(const rmconfig::metrics_config* const mconfig,
                          size_t n_robots);
-  void collect(const boost::shared_ptr<const fmetrics::blocks::manipulation_metrics_data>& in);
+  void collect(const boost::shared_ptr<const frmblocks::manipulation_metrics_msg>& msg);
 
   /* clang-format off */
   std::vector<::ros::Subscriber> m_subs{};
@@ -66,5 +65,3 @@ class d0_swarm_metrics_manager : public crmetrics::swarm_metrics_manager,
 };
 
 NS_END(d0, metrics, ros, fordyca);
-
-#endif /* INCLUDE_FORDYCA_ROS_METRICS_D0_D0_SWARM_METRICS_MANAGER_HPP_ */

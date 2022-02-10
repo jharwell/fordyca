@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_D2_DYNAMIC_CACHE_CREATOR_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_D2_DYNAMIC_CACHE_CREATOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -182,4 +181,3 @@ class dynamic_cache_creator : public fascaches::base_creator,
 
 NS_END(d2, support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_D2_DYNAMIC_CACHE_CREATOR_HPP_ */

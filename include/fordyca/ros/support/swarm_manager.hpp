@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ROS_SUPPORT_SWARM_MANAGER_HPP_
-#define INCLUDE_FORDYCA_ROS_SUPPORT_SWARM_MANAGER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -32,6 +31,7 @@
 
 #include "cosm/pal/ros/swarm_manager_adaptor.hpp"
 #include "cosm/pal/ros/config/xml/swarm_manager_repository.hpp"
+#include "cosm/ros/config/sierra_config.hpp"
 
 #include "fordyca/fordyca.hpp"
 
@@ -55,10 +55,10 @@ NS_START(fordyca, ros, support);
  * inherit from when FORDYCA is built for ROS. This code runs on the central ROS
  * node.
  */
-class swarm_manager : public cpros::swarm_manager_adaptor,
-                      public rer::client<swarm_manager> {
+class swarm_manager : public rer::client<swarm_manager>,
+                      public cpros::swarm_manager_adaptor {
  public:
-  swarm_manager(void) RCPPSW_COLD;
+  swarm_manager(const cros::config::sierra_config* config) RCPPSW_COLD;
   ~swarm_manager(void) override RCPPSW_COLD;
 
   /* Not copy constructible/assignable by default */
@@ -68,8 +68,11 @@ class swarm_manager : public cpros::swarm_manager_adaptor,
   /* swarm manager overrides */
   void init(ticpp::Element&) override RCPPSW_COLD;
   void reset(void) override {}
-  void pre_step(void) override {}
+  void pre_step(void) override;
   void post_step(void) override {}
+
+  /* swarm_manager_adaptor overrides */
+  bool experiment_finished(void) const override;
 
  protected:
   const cpros::config::xml::swarm_manager_repository* config(void) const {
@@ -82,10 +85,10 @@ class swarm_manager : public cpros::swarm_manager_adaptor,
 
  private:
   /* clang-format off */
+  const cros::config::sierra_config            mc_sierra;
+
   cpros::config::xml::swarm_manager_repository m_config{};
   /* clang-format on */
 };
 
 NS_END(support, ros, fordyca);
-
-#endif /* INCLUDE_FORDYCA_ROS_SUPPORT_SWARM_MANAGER_HPP_ */

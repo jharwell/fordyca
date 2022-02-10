@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_CONFIG_TV_MANAGER_PARSER_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_CONFIG_TV_MANAGER_PARSER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -81,4 +80,3 @@ class tv_manager_parser final : public rer::client<tv_manager_parser>,
 
 NS_END(config, tv, support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_CONFIG_TV_MANAGER_PARSER_HPP_ */

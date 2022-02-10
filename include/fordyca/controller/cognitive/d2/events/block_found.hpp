@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_EVENTS_BLOCK_FOUND_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_EVENTS_BLOCK_FOUND_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -89,4 +88,3 @@ using block_found_visitor = rpvisitor::filtered_visitor<block_found>;
 
 NS_END(events, d2, cognitive, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_EVENTS_BLOCK_FOUND_HPP_ */

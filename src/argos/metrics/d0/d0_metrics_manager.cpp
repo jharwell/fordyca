@@ -116,7 +116,7 @@ void d0_metrics_manager::collect_from_controller(const TController* const contro
   collect(cmspecs::strategy::kNestAcq.scoped, *controller->fsm());
   collect(cmspecs::blocks::kAcqCounts.scoped, *controller);
   collect(cmspecs::blocks::kTransporter.scoped, *controller);
-  collect(cmspecs::blocks::kManipulation.scoped, *controller->block_manip_recorder());
+  collect(fmspecs::blocks::kManipulation.scoped, *controller->block_manip_recorder());
 
   collect_if(cmspecs::blocks::kAcqLocs2D.scoped,
              *controller,

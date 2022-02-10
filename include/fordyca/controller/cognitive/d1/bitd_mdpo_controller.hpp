@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D1_BITD_MDPO_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D1_BITD_MDPO_CONTROLLER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -83,4 +82,3 @@ class bitd_mdpo_controller : public d1::bitd_dpo_controller,
 
 NS_END(cognitive, d1, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D1_BITD_MDPO_CONTROLLER_HPP_ */

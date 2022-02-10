@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_ORACULAR_INFO_RECEPTOR_HPP_
-#define INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_ORACULAR_INFO_RECEPTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -110,4 +109,3 @@ class oracular_info_receptor final : public rer::client<oracular_info_receptor> 
 
 NS_END(perception, subsystem,fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_ORACULAR_INFO_RECEPTOR_HPP_ */

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_MATH_NEW_CACHE_UTILITY_HPP_
-#define INCLUDE_FORDYCA_MATH_NEW_CACHE_UTILITY_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -39,4 +38,3 @@ using new_cache_utility = existing_cache_utility;
 
 NS_END(math, fordyca);
 
-#endif /* INCLUDE_FORDYCA_MATH_NEW_CACHE_UTILITY_HPP_ */

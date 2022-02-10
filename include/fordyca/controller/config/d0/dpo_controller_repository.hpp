@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_CONFIG_D0_DPO_CONTROLLER_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_CONFIG_D0_DPO_CONTROLLER_REPOSITORY_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -48,4 +47,3 @@ class dpo_controller_repository: public cognitive_controller_repository {
 
 NS_END(d0, config, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_CONFIG_D0_DPO_CONTROLLER_REPOSITORY_HPP_ */

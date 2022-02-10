@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D0_DPO_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D0_DPO_CONTROLLER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -140,4 +139,3 @@ class dpo_controller : public cognitive::cognitive_controller,
 
 NS_END(cognitive, d0, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D0_DPO_CONTROLLER_HPP_ */

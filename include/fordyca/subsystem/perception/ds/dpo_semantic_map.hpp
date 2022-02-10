@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DS_DPO_SEMANTIC_MAP_HPP_
-#define INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DS_DPO_SEMANTIC_MAP_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -143,4 +142,3 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
 
 NS_END(ds, perception, subsystem, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DS_DPO_SEMANTIC_MAP_HPP_ */

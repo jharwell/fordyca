@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_BASE_SWARM_MANAGER_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_BASE_SWARM_MANAGER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -77,4 +76,3 @@ class base_swarm_manager : public cpal::swarm_manager,
 
 NS_END(support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_BASE_SWARM_MANAGER_HPP_ */

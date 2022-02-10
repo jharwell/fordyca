@@ -280,7 +280,7 @@ std::unique_ptr<cta::bi_tdgraph_executive> task_executive_builder::operator()(
       config_repo.config_get<cta::config::task_alloc_config>();
   auto variant =
       std::make_unique<cta::ds::ds_variant>(cta::ds::bi_tdgraph(task_config));
-  auto* graph = boost::get<cta::ds::bi_tdgraph>(variant.get());
+  auto* graph = &std::get<cta::ds::bi_tdgraph>(*variant.get());
   const auto* execp =
       config_repo.config_get<cta::config::task_executive_config>();
   const auto* allocp = config_repo.config_get<cta::config::task_alloc_config>();

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_CACHE_ACQ_VALIDATOR_HPP_
-#define INCLUDE_FORDYCA_FSM_CACHE_ACQ_VALIDATOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -94,4 +93,3 @@ class cache_acq_validator : public rer::client<cache_acq_validator> {
 
 NS_END(fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_CACHE_ACQ_VALIDATOR_HPP_ */

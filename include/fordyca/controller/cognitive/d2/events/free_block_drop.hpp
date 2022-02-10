@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_EVENTS_FREE_BLOCK_DROP_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_EVENTS_FREE_BLOCK_DROP_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -120,4 +119,3 @@ class free_block_drop_visitor
 
 NS_END(events, d2, cognitive, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_EVENTS_FREE_BLOCK_DROP_HPP_ */

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_DS_BLOCK_ALLOC_MAP_HPP_
-#define INCLUDE_FORDYCA_DS_BLOCK_ALLOC_MAP_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -79,4 +78,3 @@ class block_alloc_map {
 
 NS_END(ds, fordyca);
 
-#endif /* INCLUDE_FORDYCA_DS_BLOCK_ALLOC_MAP_HPP_ */

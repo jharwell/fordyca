@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_EXISTING_CACHE_SELECTOR_HPP_
-#define INCLUDE_FORDYCA_FSM_EXISTING_CACHE_SELECTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -100,4 +99,3 @@ class existing_cache_selector : public rer::client<existing_cache_selector> {
 
 NS_END(fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_EXISTING_CACHE_SELECTOR_HPP_ */

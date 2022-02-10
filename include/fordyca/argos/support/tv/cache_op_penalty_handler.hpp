@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_CACHE_OP_PENALTY_HANDLER_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_CACHE_OP_PENALTY_HANDLER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -128,4 +127,3 @@ class cache_op_penalty_handler final
 };
 NS_END(tv, support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_CACHE_OP_PENALTY_HANDLER_HPP_ */

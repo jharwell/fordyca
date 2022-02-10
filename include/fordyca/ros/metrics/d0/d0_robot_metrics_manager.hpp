@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ROS_METRICS_D0_D0_ROBOT_METRICS_MANAGER_HPP_
-#define INCLUDE_FORDYCA_ROS_METRICS_D0_D0_ROBOT_METRICS_MANAGER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -51,11 +50,10 @@ NS_START(fordyca, ros, metrics, d0);
 class d0_robot_metrics_manager : public crmetrics::robot_metrics_manager,
                                  public rer::client<d0_robot_metrics_manager> {
  public:
-  explicit d0_robot_metrics_manager(const rmconfig::metrics_config* mconfig);
+  d0_robot_metrics_manager(const cros::topic& robot_ns,
+                           const rmconfig::metrics_config* mconfig);
 
   void collect_from_controller(const fcontroller::foraging_controller* c);
 };
 
 NS_END(d0, metrics, ros, fordyca);
-
-#endif /* INCLUDE_FORDYCA_ROS_METRICS_D0_D0_ROBOT_METRICS_MANAGER_HPP_ */

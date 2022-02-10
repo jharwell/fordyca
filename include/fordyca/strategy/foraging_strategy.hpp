@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_STRATEGY_FORAGING_STRATEGY_HPP_
-#define INCLUDE_FORDYCA_STRATEGY_FORAGING_STRATEGY_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -64,4 +63,3 @@ class foraging_strategy : public csstrategy::base_strategy {
 
 NS_END(strategy, fordyca);
 
-#endif /* INCLUDE_FORDYCA_STRATEGY_FORAGING_STRATEGY_HPP_ */

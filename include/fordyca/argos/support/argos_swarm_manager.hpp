@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_ARGOS_SWARM_MANAGER_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_ARGOS_SWARM_MANAGER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -177,4 +176,3 @@ class argos_swarm_manager : public cpargos::swarm_manager_adaptor,
 
 NS_END(support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_ARGOS_SWARM_MANAGER_HPP_ */

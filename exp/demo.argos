@@ -17,7 +17,7 @@
   <controllers>
 
     <crw_controller id="ffc"
-                               library="libfordyca">
+                               library="libfordyca-argos-footbot">
       <actuators>
         <differential_steering implementation="default" />
         <leds implementation="default" medium="leds" />
@@ -101,14 +101,14 @@
   <!-- ****************** -->
   <!-- * Loop functions * -->
   <!-- ****************** -->
-  <loop_functions library="libfordyca"
+  <loop_functions library="libfordyca-argos-footbot"
                   label="d0_loop_functions">
     <output output_parent="output"
             output_leaf="__current_date__">
       <metrics
           metrics_path="metrics">
         <sinks>
-          <csv>
+          <file>
             <append
                 output_interval="1000"
                 block_transporter="block-transporter.csv"
@@ -126,7 +126,7 @@
                 block_acq_explore_locs2D="block-acq-explore-locs.csv"
                 block_acq_vector_locs2D="block-acq-vector-locs.csv"
                 spatial_dist_pos2D="spatial-dist-pos2D.csv"/>
-          </csv>
+          </file>
         </sinks>
       </metrics>
     </output>

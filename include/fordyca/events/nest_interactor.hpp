@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_NEST_INTERACTOR_HPP_
-#define INCLUDE_FORDYCA_EVENTS_NEST_INTERACTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -52,4 +51,3 @@ class nest_interactor
 
 NS_END(tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EVENTS_NEST_INTERACTOR_HPP_ */

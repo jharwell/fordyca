@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_D1_D1_LOOP_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_D1_D1_LOOP_FUNCTIONS_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -27,6 +26,8 @@
 #include <vector>
 #include <memory>
 #include <utility>
+
+#include "rcppsw/al/multithread.hpp"
 
 #include "cosm/controller/operations/grid_los_update.hpp"
 #include "cosm/controller/operations/task_id_extract.hpp"
@@ -104,8 +105,8 @@ class d1_loop_functions : public d0::d0_loop_functions,
 
  private:
   struct cache_counts {
-    std::atomic_uint n_harvesters{0};
-    std::atomic_uint n_collectors{0};
+    ral::mt_size_t n_harvesters{0};
+    ral::mt_size_t n_collectors{0};
   };
 
   using interactor_map_type = rds::type_map<
@@ -220,4 +221,3 @@ class d1_loop_functions : public d0::d0_loop_functions,
 
 NS_END(d1, support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_D1_D1_LOOP_FUNCTIONS_HPP_ */

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ROS_SUPPORT_D0_D0_SWARM_MANAGER_HPP_
-#define INCLUDE_FORDYCA_ROS_SUPPORT_D0_D0_SWARM_MANAGER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -60,10 +59,10 @@ class robot_arena_interactor;
  *
  * - Metric collection from robots
  */
-class d0_swarm_manager : public frsupport::swarm_manager,
-                          public rer::client<d0_swarm_manager> {
+class d0_swarm_manager : public rer::client<d0_swarm_manager>,
+                         public frsupport::swarm_manager {
  public:
-  d0_swarm_manager(void) RCPPSW_COLD;
+  d0_swarm_manager(const cros::config::sierra_config* config) RCPPSW_COLD;
   ~d0_swarm_manager(void) override RCPPSW_COLD;
 
   /* swarm manager overrides */
@@ -103,5 +102,3 @@ class d0_swarm_manager : public frsupport::swarm_manager,
 };
 
 NS_END(d0, support, ros, fordyca);
-
-#endif /* INCLUDE_FORDYCA_ROS_SUPPORT_D0_D0_SWARM_MANAGER_HPP_ */

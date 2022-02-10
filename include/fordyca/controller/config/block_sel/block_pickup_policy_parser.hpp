@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_CONFIG_BLOCK_SEL_BLOCK_PICKUP_POLICY_PARSER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_CONFIG_BLOCK_SEL_BLOCK_PICKUP_POLICY_PARSER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -75,4 +74,3 @@ class block_pickup_policy_parser : public rer::client<block_pickup_policy_parser
 
 NS_END(block_sel, config, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_CONFIG_BLOCK_SEL_BLOCK_PICKUP_POLICY_PARSER_HPP_ */

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_ARGUMENT_HPP_
-#define INCLUDE_FORDYCA_TASKS_ARGUMENT_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -60,4 +59,3 @@ class foraging_signal_argument : public cta::taskable_argument {
 
 NS_END(tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_TASKS_ARGUMENT_HPP_ */

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_EVENTS_FWD_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_EVENTS_FWD_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -69,4 +68,3 @@ class cache_proximity;
 
 NS_END(events, controller, cognitive);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_EVENTS_FWD_HPP_ */

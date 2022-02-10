@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_TRACKED_OBJECTS_ACCESSOR_HPP_
-#define INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_TRACKED_OBJECTS_ACCESSOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -68,4 +67,3 @@ class tracked_objects_accessor {
 
 NS_END(perception, subsystem, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_TRACKED_OBJECTS_ACCESSOR_HPP_ */

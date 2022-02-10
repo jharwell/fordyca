@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ROS_SUPPORT_D0_D0_ROBOT_MANAGER_HPP_
-#define INCLUDE_FORDYCA_ROS_SUPPORT_D0_D0_ROBOT_MANAGER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -64,14 +63,17 @@ struct functor_maps_initializer;
  *
  * - Metric collection from robots
  */
-class d0_robot_manager : public frsupport::robot_manager,
-                          public rer::client<d0_robot_manager> {
+class d0_robot_manager : public rer::client<d0_robot_manager>,
+                         public frsupport::robot_manager {
  public:
-  d0_robot_manager(fcontroller::foraging_controller* c) RCPPSW_COLD;
+  d0_robot_manager(const cros::topic& robot_ns,
+                   const cros::config::sierra_config* config,
+                   fcontroller::foraging_controller* c) RCPPSW_COLD;
   ~d0_robot_manager(void) override RCPPSW_COLD;
 
   /* swarm manager overrides */
   void init(ticpp::Element& node) override RCPPSW_COLD;
+  void pre_step(void) override;
   void post_step(void) override;
   void reset(void) override RCPPSW_COLD;
   void destroy(void) override RCPPSW_COLD;
@@ -122,7 +124,16 @@ private:
    */
   void robot_post_step(void);
 
+  /**
+   * \brief Process a single robot on a timestep, before running its controller.
+   *
+   * - Update its position/sensing.
+   */
+  void robot_pre_step(void);
+
   /* clang-format off */
+  const cros::topic                                        mc_robot_ns;
+
   fcontroller::foraging_controller*                        m_controller;
   std::unique_ptr<frmetrics::d0::d0_robot_metrics_manager> m_metrics_manager;
   std::unique_ptr<interactor_map_type>                     m_interactor_map;
@@ -132,4 +143,3 @@ private:
 
 NS_END(d0, support, ros, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ROS_SUPPORT_D0_D0_ROBOT_MANAGER_HPP_ */

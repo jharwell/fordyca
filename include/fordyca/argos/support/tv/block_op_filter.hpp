@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_BLOCK_OP_FILTER_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_BLOCK_OP_FILTER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -209,4 +208,3 @@ class block_op_filter : public rer::client<block_op_filter> {
 };
 NS_END(tv, support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_BLOCK_OP_FILTER_HPP_ */

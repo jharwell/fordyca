@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_CONFIG_BLOCK_SEL_BLOCK_SEL_MATRIX_CONFIG_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_CONFIG_BLOCK_SEL_BLOCK_SEL_MATRIX_CONFIG_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -51,4 +50,3 @@ struct block_sel_matrix_config final : public rconfig::base_config {
 
 NS_END(block_sel, config, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_CONFIG_BLOCK_SEL_BLOCK_SEL_MATRIX_CONFIG_HPP_ */

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_D2_ACQUIRE_CACHE_SITE_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_D2_ACQUIRE_CACHE_SITE_FSM_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -99,4 +98,3 @@ class acquire_cache_site_fsm : public rer::client<acquire_cache_site_fsm>,
 
 NS_END(d2, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_D2_ACQUIRE_CACHE_SITE_FSM_HPP_ */

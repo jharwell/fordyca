@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_BLOCK_OP_PENALTY_ID_CALCULATOR_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_BLOCK_OP_PENALTY_ID_CALCULATOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -78,4 +77,3 @@ class block_op_penalty_id_calculator : public rer::client<block_op_penalty_id_ca
 
 NS_END(tv, support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_BLOCK_OP_PENALTY_ID_CALCULATOR_HPP_ */

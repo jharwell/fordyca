@@ -20,8 +20,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_CONFIG_ARGOS_SWARM_MANAGER_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_CONFIG_ARGOS_SWARM_MANAGER_REPOSITORY_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -52,4 +51,3 @@ class argos_swarm_manager_repository : public cpargos::config::xml::swarm_manage
 
 NS_END(config, support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_CONFIG_ARGOS_SWARM_MANAGER_REPOSITORY_HPP_ */

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_FORAGING_SIGNAL_HPP_
-#define INCLUDE_FORDYCA_FSM_FORAGING_SIGNAL_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -93,4 +92,3 @@ class foraging_signal : public csfsm::util_signal {
 
 NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_FORAGING_SIGNAL_HPP_ */

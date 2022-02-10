@@ -44,6 +44,7 @@
 #include "fordyca/metrics/tv/env_dynamics_metrics_csv_sink.hpp"
 #include "fordyca/argos/support/argos_swarm_manager.hpp"
 #include "fordyca/argos/support/tv/tv_manager.hpp"
+#include "fordyca/metrics/specs.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -74,8 +75,8 @@ base_fs_output_manager::base_fs_output_manager(
   /* register collectors common to all of FORDYCA */
   rmetrics::creatable_collector_set creatable_set = {
     { typeid(fmetrics::blocks::manipulation_metrics_collector),
-      cmspecs::blocks::kManipulation.xml,
-      cmspecs::blocks::kManipulation.scoped,
+      fmspecs::blocks::kManipulation.xml,
+      fmspecs::blocks::kManipulation.scoped,
       rmetrics::output_mode::ekAPPEND },
     { typeid(fmetrics::tv::env_dynamics_metrics_collector),
       cmspecs::tv::kEnvironment.xml,

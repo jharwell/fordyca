@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_CONFIG_ENV_DYNAMICS_CONFIG_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_CONFIG_ENV_DYNAMICS_CONFIG_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -48,4 +47,3 @@ struct env_dynamics_config final : public ctv::config::base_env_dynamics_config 
 
 NS_END(tv, config, support, fordyca, argos);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_CONFIG_ENV_DYNAMICS_CONFIG_HPP_ */

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_CACHE_SEL_EXCEPTION_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_CACHE_SEL_EXCEPTION_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -53,4 +52,3 @@ struct cache_sel_exception {
 
 NS_END(cognitive, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_CACHE_SEL_EXCEPTION_HPP_ */

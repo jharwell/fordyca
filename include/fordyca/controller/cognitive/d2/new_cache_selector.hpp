@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_NEW_CACHE_SELECTOR_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_NEW_CACHE_SELECTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -84,4 +83,3 @@ class new_cache_selector: public rer::client<new_cache_selector> {
 
 NS_END(cognitive, d2, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_NEW_CACHE_SELECTOR_HPP_ */

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DS_DP_CACHE_MAP_HPP_
-#define INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DS_DP_CACHE_MAP_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -68,4 +67,3 @@ class dp_cache_map : public dpo_map<rmath::vector2z,
 
 NS_END(ds, perception, subsystem, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DS_DP_CACHE_MAP_HPP_ */

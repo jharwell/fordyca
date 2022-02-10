@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_CREATE_RO_PARAMS_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_CREATE_RO_PARAMS_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -65,4 +64,3 @@ struct create_ro_params {
 
 NS_END(caches, support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_CREATE_RO_PARAMS_HPP_ */

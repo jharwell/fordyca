@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_REACTIVE_EVENTS_FWD_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_REACTIVE_EVENTS_FWD_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -42,4 +41,3 @@ class nest_block_drop;
 
 NS_END(events, controller, reactive);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_REACTIVE_EVENTS_FWD_HPP_ */

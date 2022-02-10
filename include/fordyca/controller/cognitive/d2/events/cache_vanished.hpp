@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_EVENTS_CACHE_VANISHED_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_EVENTS_CACHE_VANISHED_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -83,4 +82,3 @@ using cache_vanished_visitor = rpvisitor::filtered_visitor<cache_vanished>;
 
 NS_END(events, d2, cognitive, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_EVENTS_CACHE_VANISHED_HPP_ */

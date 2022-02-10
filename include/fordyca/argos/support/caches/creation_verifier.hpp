@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_CREATION_VERIFIER_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_CREATION_VERIFIER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -121,4 +120,3 @@ class creation_verifier : public rer::client<creation_verifier> {
 };
 NS_END(caches, support, argos, fordyca);
 
-#endif // INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_CREATION_VERIFIER_HPP_

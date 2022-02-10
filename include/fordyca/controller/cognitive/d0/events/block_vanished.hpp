@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D0_EVENTS_BLOCK_VANISHED_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D0_EVENTS_BLOCK_VANISHED_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -100,4 +99,3 @@ using block_vanished_visitor = rpvisitor::filtered_visitor<block_vanished>;
 
 NS_END(events, d0, cognitive, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D0_EVENTS_BLOCK_VANISHED_HPP_ */

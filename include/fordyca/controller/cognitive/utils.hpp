@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_UTILS_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_UTILS_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -50,4 +49,3 @@ void controller_visit(TController& controller) {
 
 NS_END(cognitive, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_UTILS_HPP_ */

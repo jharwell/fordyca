@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_D2_DYNAMIC_CACHE_MANAGER_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_D2_DYNAMIC_CACHE_MANAGER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -126,4 +125,3 @@ class dynamic_cache_manager final : public fascaches::base_manager,
 
 NS_END(d2, support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_D2_DYNAMIC_CACHE_MANAGER_HPP_ */

@@ -1,0 +1,57 @@
+<?xml version="1.0" ?>
+
+<launch>
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/turtlebot3_house.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="false"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+  
+  <group ns="tb3_0">
+    <param name="tf_prefix" value="tb3_0"/>
+    <param name="id" value="0"/>
+    <param
+        name="robot_description"
+        command="$(find xacro)/xacro $(find turtlebot3_description)/urdf/turtlebot3_burger.urdf.xacro"/>
+    <node
+        name="spawn_urdf"
+        pkg="gazebo_ros"
+        type="spawn_model"
+        args="-urdf -model turtlebot3_burger_tb3_0 -x 4 -y 4 -z 0 -param robot_description"/>
+    <node
+        name="fordyca_rosbridge_crw_node"
+        pkg="fordyca_rosbridge"
+        type="fordyca_rosbridge_crw_node"
+        output="screen"
+        />
+    <node
+        name="fordyca_rosbridge_d0_master_node"
+        pkg="fordyca_rosbridge"
+        type="fordyca_rosbridge_d0_master_node"
+        output="screen"
+        />
+  </group>
+
+  <group ns="sierra">
+    <node
+        name="sierra_timekeeper"
+        pkg="sierra_rosbridge"
+        type="sierra_timekeeper.py"
+        required="true"/>
+    <param
+        name="experiment/param_file"
+        value="/home/jharwell/git/fordyca/exp/demo.params"/>
+    <param
+        name="experiment/length"
+        value="10000"/>
+    <param
+        name="experiment/n_robots"
+        value="1"/>
+    <param
+        name="controller/rate"
+        value="5"/>
+  </group>
+</launch>

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_OP_FILTER_RESULT_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_OP_FILTER_RESULT_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -45,4 +44,3 @@ struct op_filter_result {
 
 NS_END(tv, argos support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_TV_OP_FILTER_RESULT_HPP_ */

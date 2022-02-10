@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_COLLECTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -61,8 +60,8 @@ class manipulation_metrics_collector final : public rmetrics::base_collector {
   void reset_after_interval(void) override;
   const rmetrics::base_data* data(void) const override { return &m_data; }
 
-#if !defined(RCPPSW_AL_MT_SAFE_TYPES)
-  void data(const manipulation_metrics_data& data) { m_data = data; }
+#if defined(COSM_PAL_TARGET_ROS)
+  void collect(const manipulation_metrics_data& data) { m_data += data; }
 #endif
 
  private:
@@ -72,5 +71,3 @@ class manipulation_metrics_collector final : public rmetrics::base_collector {
 };
 
 NS_END(blocks, metrics, fordyca);
-
-#endif /* INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_COLLECTOR_HPP_ */

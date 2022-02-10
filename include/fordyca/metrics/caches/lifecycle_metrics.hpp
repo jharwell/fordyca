@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_CACHES_LIFECYCLE_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_CACHES_LIFECYCLE_METRICS_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -79,4 +78,3 @@ class lifecycle_metrics : public rmetrics::base_metrics {
 
 NS_END(caches, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_CACHES_LIFECYCLE_METRICS_HPP_ */

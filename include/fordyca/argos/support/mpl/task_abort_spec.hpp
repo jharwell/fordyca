@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_MPL_TASK_ABORT_SPEC_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_MPL_TASK_ABORT_SPEC_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -74,4 +73,3 @@ using task_abort_spec = typename boost::mpl::fold<
 
 NS_END(mpl, support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_MPL_TASK_ABORT_SPEC_HPP_ */

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DS_DP_BLOCK_MAP_HPP_
-#define INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DS_DP_BLOCK_MAP_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -66,4 +65,3 @@ class dp_block_map : public dpo_map<rtypes::type_uuid,
 
 NS_END(ds, perception, subsystem, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DS_DP_BLOCK_MAP_HPP_ */

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_FORAGING_TRANSPORT_GOAL_HPP_
-#define INCLUDE_FORDYCA_FSM_FORAGING_TRANSPORT_GOAL_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -71,4 +70,3 @@ enum class foraging_transport_goal {
 
 NS_END(fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_FORAGING_TRANSPORT_GOAL_HPP_ */

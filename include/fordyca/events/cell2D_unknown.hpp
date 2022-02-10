@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_CELL2D_UNKNOWN_HPP_
-#define INCLUDE_FORDYCA_EVENTS_CELL2D_UNKNOWN_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -86,4 +85,3 @@ using cell2D_unknown_visitor =
 
 NS_END(events, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EVENTS_CELL2D_UNKNOWN_HPP_ */

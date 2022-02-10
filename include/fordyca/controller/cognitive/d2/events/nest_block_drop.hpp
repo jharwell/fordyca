@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_EVENTS_NEST_BLOCK_DROP_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_EVENTS_NEST_BLOCK_DROP_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -109,4 +108,3 @@ class nest_block_drop_visitor : public detail::nest_block_drop_visitor_impl {
 
 NS_END(events, d2, cognitive, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_EVENTS_NEST_BLOCK_DROP_HPP_ */

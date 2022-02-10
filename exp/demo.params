@@ -9,7 +9,7 @@
     <sensing_subsystemQ3D>
       <!-- -5pi/6 : 5pi/6 -->
       <proximity_sensor fov="-2.61:2.61"
-                        delta="0.1" />
+                        delta="0.06" />
 
       <env_sensor>
         <!-- NEST: The nest is a relatively light gray. -->
@@ -22,23 +22,22 @@
     </sensing_subsystemQ3D>
     <nest dims="1.0, 4.0" center="2, 3" />
     <strategy>
-          <nest_acq
-              strategy="wander"
-              />
-          </strategy>
+      <nest_acq
+          strategy="wander"
+          />
+    </strategy>
     <actuation_subsystem2D>
       <force_calculator>
         <avoidance_force lookahead="0.5"
                          max="0.08"/>
         <wander_force circle_distance="4.0"
                       circle_radius="100.0"
-                      max="0.9"
+                      max="0.09"
                       interval="1">
           <!-- 5 degrees max delta. -->
           <bias_angle src="uniform"
                       max_delta="0.0872"/>
         </wander_force>
-        <phototaxis_force max="0.08"/>
         <phototaxis_force max="0.08"/>
       </force_calculator>
 
@@ -55,17 +54,28 @@
       <metrics
           metrics_path="metrics">
         <sinks>
-          <csv>
+          <network>
+            <stream
+                output_interval="100"
+                block_acq_counts="blocks/acq-counts"
+                spatial_interference_counts="spatial/interference/counts"
+                block_transporter="blocks/transporter"
+                block_transportee="blocks/transportee"
+                block_clusters="blocks/clusters"
+                spatial_movement='spatial/movement'
+                block_manipulation="blocks/manipulation"/>
+          </network>
+          <file>
             <append
-                output_interval="1000"
-                block_acq_counts="block-acq-counts"
+                output_interval="100"
+                block_acq_counts="blocks-acq-counts"
                 spatial_interference_counts="spatial-interference-counts"
-                block_transporter="block-transporter"
-                block_transportee="block-transportee"
-                block_clusters="block-clusters"
+                block_transporter="blocks-transporter"
+                block_transportee="blocks-transportee"
+                block_clusters="blocks-clusters"
                 spatial_movement='spatial-movement'
-                block_manipulation="block-manipulation"/>
-          </csv>
+                block_manipulation="blocks-manipulation"/>
+          </file>
         </sinks>
       </metrics>
     </output>

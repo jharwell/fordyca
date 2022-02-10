@@ -229,9 +229,6 @@ void d1_loop_functions::private_init(void) {
       output_root(),
       arena_map()->block_distributor()->block_clustersro().size());
 
-  /* this starts at 0, and ARGoS starts at 1, so sync up */
-  m_metrics_manager->timestep_inc();
-
   /*
    * Initialize convergence calculations to include task distribution (if
    * enabled in XML file).
@@ -451,18 +448,17 @@ void d1_loop_functions::post_step(void) {
   /* Collect metrics from loop functions */
   m_metrics_manager->collect_from_sm(this);
 
-  m_metrics_manager->flush(rmetrics::output_mode::ekTRUNCATE);
-  m_metrics_manager->flush(rmetrics::output_mode::ekCREATE);
+  m_metrics_manager->flush(rmetrics::output_mode::ekTRUNCATE, timestep());
+  m_metrics_manager->flush(rmetrics::output_mode::ekCREATE, timestep());
 
   /* Not a clean way to do this in the metrics collectors... */
-  if (m_metrics_manager->flush(rmetrics::output_mode::ekAPPEND)) {
+  if (m_metrics_manager->flush(rmetrics::output_mode::ekAPPEND, timestep())) {
     if (nullptr != conv_calculator()) {
       conv_calculator()->reset_metrics();
     }
     tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>()->reset_metrics();
   }
-  m_metrics_manager->interval_reset();
-  m_metrics_manager->timestep_inc();
+  m_metrics_manager->interval_reset(timestep());
 
   ndc_uuid_pop();
 } /* post_step() */
@@ -604,9 +600,9 @@ void d1_loop_functions::static_cache_monitor(void) {
     floor()->SetChanged();
     return;
   }
-  ER_INFO("Could not create static caches: n_harvesters=%u,n_collectors=%u",
-          m_cache_counts.n_harvesters.load(),
-          m_cache_counts.n_collectors.load());
+  ER_INFO("Could not create static caches: n_harvesters=%zu,n_collectors=%zu",
+          ral::mt_load(m_cache_counts.n_harvesters),
+          ral::mt_load(m_cache_counts.n_collectors));
 } /* static_cache_monitor() */
 
 bool d1_loop_functions::caches_depleted(void) const {

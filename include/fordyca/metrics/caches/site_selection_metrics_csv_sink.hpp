@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_CACHES_SITE_SELECTION_METRICS_CSV_SINK_HPP_
-#define INCLUDE_FORDYCA_METRICS_CACHES_SITE_SELECTION_METRICS_CSV_SINK_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -68,4 +67,3 @@ class site_selection_metrics_csv_sink final : public rmetrics::csv_sink {
 
 NS_END(caches, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_CACHES_SITE_SELECTION_METRICS_CSV_SINK_HPP_ */

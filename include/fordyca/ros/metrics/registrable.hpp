@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ROS_METRICS_REGISTRABLE_HPP_
-#define INCLUDE_FORDYCA_ROS_METRICS_REGISTRABLE_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -38,4 +37,3 @@ extern rmetrics::creatable_collector_set kStandard;
 
 NS_END(registrable, metrics, ros, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ROS_METRICS_REGISTRABLE_HPP_ */

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_BASE_CREATOR_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_BASE_CREATOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -113,4 +112,3 @@ class base_creator : public rer::client<base_creator> {
 };
 NS_END(caches, support, argos, fordyca);
 
-#endif // INCLUDE_FORDYCA_ARGOS_SUPPORT_CACHES_BASE_CREATOR_HPP_

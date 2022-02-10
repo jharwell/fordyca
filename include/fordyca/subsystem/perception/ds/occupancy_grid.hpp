@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DS_OCCUPANCY_GRID_HPP_
-#define INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DS_OCCUPANCY_GRID_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -121,4 +120,3 @@ class occupancy_grid : public rer::client<occupancy_grid>,
 
 NS_END(ds, perception, subsystem, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DS~_OCCUPANCY_GRID_HPP_ */

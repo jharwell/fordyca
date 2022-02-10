@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_METRICS_BASE_FS_OUTPUT_MANAGER_HPP_
-#define INCLUDE_FORDYCA_ARGOS_METRICS_BASE_FS_OUTPUT_MANAGER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -69,4 +68,3 @@ class base_fs_output_manager : public rer::client<base_fs_output_manager>,
 
 NS_END(metrics, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_METRICS_BASE_FS_OUTPUT_MANAGER_HPP_ */

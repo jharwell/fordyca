@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARGOS_SUPPORT_MPL_NEST_BLOCK_DROP_SPEC_HPP_
-#define INCLUDE_FORDYCA_ARGOS_SUPPORT_MPL_NEST_BLOCK_DROP_SPEC_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -78,4 +77,3 @@ using nest_block_drop_spec = typename boost::mpl::fold<
   >::type;
 NS_END(mpl, support, argos, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ARGOS_SUPPORT_MPL_NEST_BLOCK_DROP_SPEC_HPP_ */

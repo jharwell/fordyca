@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DPO_PERCEPTION_SUBSYSTEM_HPP_
-#define INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DPO_PERCEPTION_SUBSYSTEM_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -100,4 +99,3 @@ class dpo_perception_subsystem final
 
 NS_END(cognitive, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUBSYSTEM_PERCEPTION_DPO_PERCEPTION_SUBSYSTEM_HPP_ */

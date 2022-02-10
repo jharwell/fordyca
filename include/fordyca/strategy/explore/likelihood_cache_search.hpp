@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_STRATEGY_EXPLORE_LIKELIHOOD_CACHE_SEARCH_HPP_
-#define INCLUDE_FORDYCA_STRATEGY_EXPLORE_LIKELIHOOD_CACHE_SEARCH_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -82,4 +81,3 @@ class likelihood_cache_search : public localized_search {
 
 NS_END(explore, strategy, fordyca);
 
-#endif /* INCLUDE_FORDYCA_STRATEGY_EXPLORE_LIKELIHOOD_CACHE_SEARCH_HPP_ */
