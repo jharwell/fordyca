@@ -23,6 +23,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/controller/cognitive/d1/events/free_block_drop.hpp"
 
 /*******************************************************************************
@@ -52,9 +54,8 @@ class free_block_drop : public rer::client<free_block_drop>,
     using inherited = cdops::cell2D_op::visit_typelist;
     using controllers = controller::d2::typelist;
 
-    using others = rmpl::typelist<fsm::block_to_goal_fsm,
-                                  tasks::d2::cache_starter,
-                                  tasks::d2::cache_finisher>;
+    using others = rmpl::typelist<ffsm::block_to_goal_fsm,
+                                  ffsm::d0::free_block_to_nest_fsm>;
 
     using value = boost::mpl::joint_view<
         boost::mpl::joint_view<controllers::type, others::type>,
@@ -71,14 +72,14 @@ class free_block_drop : public rer::client<free_block_drop>,
 
 
   /* controllers */
-  void visit(fccd2::birtd_dpo_controller&);
-  void visit(fccd2::birtd_mdpo_controller&);
-  void visit(fccd2::birtd_odpo_controller&);
-  void visit(fccd2::birtd_omdpo_controller&);
+  void visit(fccd2::birtd_dpo_controller& controller);
+  void visit(fccd2::birtd_mdpo_controller& controller);
+  void visit(fccd2::birtd_odpo_controller& controller);
+  void visit(fccd2::birtd_omdpo_controller& controller);
 
-  /* tasks */
-  void visit(ftasks::d2::cache_starter&);
-  void visit(ftasks::d2::cache_finisher&);
+  /* FSMs */
+  void visit(ffsm::d0::free_block_to_nest_fsm& fsm);
+  void visit(fsm::block_to_goal_fsm& fsm);
 
  protected:
   /**
@@ -90,8 +91,8 @@ class free_block_drop : public rer::client<free_block_drop>,
                         const rmath::vector2z& coord,
                         const rtypes::discretize_ratio& resolution);
 
+
  private:
-  void visit(fsm::block_to_goal_fsm& fsm);
 
   bool dispatch_free_block_interactor(
       tasks::base_foraging_task* task,
@@ -118,4 +119,3 @@ class free_block_drop_visitor
 };
 
 NS_END(events, d2, cognitive, controller, fordyca);
-

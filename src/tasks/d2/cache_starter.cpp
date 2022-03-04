@@ -89,6 +89,30 @@ void cache_starter::active_interface_update(int) {
 } /* active_interface_update() */
 
 /*******************************************************************************
+ * Event Handling
+ ******************************************************************************/
+void cache_starter::accept(fccd2::events::free_block_drop& visitor) {
+  auto& fsm = *static_cast<ffsm::block_to_goal_fsm*>(mechanism());
+  visitor.visit(fsm);
+}
+void cache_starter::accept(fccd2::events::free_block_pickup& visitor) {
+auto& fsm = *static_cast<ffsm::block_to_goal_fsm*>(mechanism());
+  visitor.visit(fsm);
+}
+void cache_starter::accept(fccd2::events::block_vanished& visitor) {
+  auto& fsm = *static_cast<ffsm::block_to_goal_fsm*>(mechanism());
+  visitor.visit(fsm);
+}
+void cache_starter::accept(fccd2::events::block_proximity& visitor) {
+  auto& fsm = *static_cast<ffsm::block_to_goal_fsm*>(mechanism());
+  visitor.visit(fsm);
+}
+void cache_starter::accept(fccd2::events::cache_proximity& visitor) {
+  auto& fsm = *static_cast<ffsm::block_to_goal_fsm*>(mechanism());
+  visitor.visit(fsm);
+}
+
+/*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
 RCPPSW_WRAP_DEF_OVERRIDE(
@@ -161,24 +185,5 @@ RCPPSW_WRAP_DEF_OVERRIDE(
     entity_acquired_id,
     *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
     const);
-
-/*******************************************************************************
- * Event Handling
- ******************************************************************************/
-void cache_starter::accept(fccd2::events::free_block_drop& visitor) {
-  visitor.visit(*this);
-}
-void cache_starter::accept(fccd2::events::free_block_pickup& visitor) {
-  visitor.visit(*this);
-}
-void cache_starter::accept(fccd2::events::block_vanished& visitor) {
-  visitor.visit(*this);
-}
-void cache_starter::accept(fccd2::events::block_proximity& visitor) {
-  visitor.visit(*this);
-}
-void cache_starter::accept(fccd2::events::cache_proximity& visitor) {
-  visitor.visit(*this);
-}
 
 NS_END(d2, tasks, fordyca);

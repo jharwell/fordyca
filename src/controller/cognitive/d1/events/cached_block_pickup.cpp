@@ -107,13 +107,6 @@ void cached_block_pickup::visit(fccd1::bitd_omdpo_controller& controller) {
 } /* visit() */
 
 /*******************************************************************************
- * Tasks
- ******************************************************************************/
-void cached_block_pickup::visit(tasks::d1::collector& task) {
-  visit(*static_cast<fsm::d1::cached_block_to_nest_fsm*>(task.mechanism()));
-} /* visit() */
-
-/*******************************************************************************
  * FSMs
  ******************************************************************************/
 void cached_block_pickup::visit(fsm::block_to_goal_fsm& fsm) {

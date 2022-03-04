@@ -64,9 +64,9 @@ class cache_transferer final : public foraging_task,
    * I wish you didn't have to stub out the d1 events.
    */
   /* existing cache interaction events */
-  void accept(fccd1::events::cached_block_pickup&) override {}
-  void accept(fccd1::events::cache_vanished&) override {}
-  void accept(fccd1::events::cache_block_drop&) override {}
+  RCPPSW_VISITOR_ACCEPT_STUB(fccd1::events::cached_block_pickup);
+  RCPPSW_VISITOR_ACCEPT_STUB(fccd1::events::cache_vanished);
+  RCPPSW_VISITOR_ACCEPT_STUB(fccd1::events::cache_block_drop);
 
   void accept(fccd2::events::cached_block_pickup& visitor) override;
   void accept(fccd2::events::cache_vanished& visitor) override;

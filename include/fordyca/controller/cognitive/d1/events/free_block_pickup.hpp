@@ -34,6 +34,7 @@
 #include "fordyca/tasks/tasks_fwd.hpp"
 #include "fordyca/subsystem/perception/perception_fwd.hpp"
 #include "fordyca/controller/cognitive/d0/events/free_block_pickup.hpp"
+#include "fordyca/events/free_block_interactor_processor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,14 +53,14 @@ NS_START(fordyca, controller, cognitive, d1, events);
  * that is not part of a cache).
  */
 class free_block_pickup : public rer::client<free_block_pickup>,
-                          public fccd0::events::free_block_pickup {
+                          public fccd0::events::free_block_pickup,
+                          public fevents::free_block_interactor_processor {
  private:
   struct visit_typelist_impl {
     using controllers = controller::d1::typelist;
-    using tasks = rmpl::typelist<tasks::d1::harvester>;
-    using fsms = rmpl::typelist<fsm::block_to_goal_fsm>;
-    using value1 = boost::mpl::joint_view<controllers::type, tasks::type>;
-    using value = boost::mpl::joint_view<value1, fsms::type>;
+    using fsms = rmpl::typelist<ffsm::block_to_goal_fsm,
+                                ffsm::d0::free_block_to_nest_fsm>;
+    using value = boost::mpl::joint_view<controllers::type, fsms::type>;
   };
 
  public:
@@ -76,26 +77,21 @@ class free_block_pickup : public rer::client<free_block_pickup>,
   void visit(fccognitive::d1::bitd_odpo_controller& controller);
   void visit(fccognitive::d1::bitd_omdpo_controller& controller);
 
-  /* tasks */
-  void visit(tasks::d1::harvester& task);
-
   /* FSMs */
-  void visit(fsm::block_to_goal_fsm& fsm);
+  void visit(ffsm::block_to_goal_fsm& fsm);
 
  protected:
   free_block_pickup(crepr::sim_block3D* block,
                     const rtypes::type_uuid& id,
                     const rtypes::timestep& t);
 
+ private:
   template<typename TController, typename TPerceptionModel>
-  void controller_visit_impl(TController& controller, TPerceptionModel& model) {
+  void controller_process(TController& controller, TPerceptionModel& model) {
     fccd0::events::free_block_pickup::visit(model);
     ccops::base_block_pickup::visit(static_cast<ccontroller::block_carrying_controller&>(controller));
-    dispatch_free_block_interactor(controller.current_task());
+    task_dispatch(controller.current_task(), *this);
   }
-
- private:
-  void dispatch_free_block_interactor(tasks::base_foraging_task* task);
 };
 
 /**
@@ -107,4 +103,3 @@ class free_block_pickup : public rer::client<free_block_pickup>,
 using free_block_pickup_visitor = rpvisitor::filtered_visitor<free_block_pickup>;
 
 NS_END(events, d1, cognitive, controller, fordyca);
-

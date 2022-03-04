@@ -70,26 +70,26 @@ class harvester final : public foraging_task,
    */
 
   /* free block interaction events */
-  void accept(fccd0::events::free_block_pickup&) override {}
-  void accept(fccd0::events::free_block_drop&) override {}
-  void accept(fccd0::events::block_vanished&) override {}
+  RCPPSW_VISITOR_ACCEPT_STUB(fccd0::events::free_block_drop);
+  RCPPSW_VISITOR_ACCEPT_STUB(fccd0::events::free_block_pickup);
+  RCPPSW_VISITOR_ACCEPT_STUB(fccd0::events::block_vanished);
 
   void accept(fccd1::events::free_block_pickup& visitor) override;
   void accept(fccd1::events::free_block_drop&) override {}
   void accept(fccd1::events::block_vanished& visitor) override;
 
-  void accept(fccd2::events::free_block_pickup&) override {}
+  void accept(fccd2::events::free_block_pickup& visitor) override;
   void accept(fccd2::events::free_block_drop&) override {}
-  void accept(fccd2::events::block_vanished&) override {}
+  void accept(fccd2::events::block_vanished& visitor) override;
 
   /* cache interaction events */
   void accept(fccd1::events::cache_block_drop& visitor) override;
-  void accept(fccd1::events::cached_block_pickup&) override {}
+  RCPPSW_VISITOR_ACCEPT_STUB(fccd1::events::cached_block_pickup);
   void accept(fccd1::events::cache_vanished& visitor) override;
 
-  void accept(fccd2::events::cache_block_drop&) override {}
-  void accept(fccd2::events::cached_block_pickup&) override {}
-  void accept(fccd2::events::cache_vanished&) override {}
+  void accept(fccd2::events::cache_block_drop& visitor) override;
+  RCPPSW_VISITOR_ACCEPT_STUB(fccd2::events::cached_block_pickup);
+  void accept(fccd2::events::cache_vanished& visitor) override;
 
   /* goal acquisition metrics */
   RCPPSW_WRAP_DECL_OVERRIDE(bool, goal_acquired, const);

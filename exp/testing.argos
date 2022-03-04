@@ -17,11 +17,11 @@
   <!-- *************** -->
   <controllers>
 
-    <dpo_controller id="fbc"
-                          library="libfordyca">
+    <birtd_dpo_controller id="fbc"
+                          library="libfordyca-argos-footbot">
       <actuators>
         <differential_steering implementation="default" />
-        <!-- <leds implementation="default" medium="leds" /> -->
+        <leds implementation="default" medium="leds" />
         <!-- <range_and_bearing implementation="default" /> -->
       </actuators>
       <sensors>
@@ -92,7 +92,7 @@
               tab_init_policy="max_depth">
             <task_partition
                 always_partition="false"
-                never_partition="true">
+                never_partition="false">
               <src_sigmoid_sel
                   input_src="exec">
                 <sigmoid_sel
@@ -197,26 +197,26 @@
           </force_calculator>
 
           <!-- 25 degrees soft_turn_max. -->
-          <diff_drive soft_turn_max="0.436"
+          <diff_drive soft_turn_max="1.04"
                       max_speed="0.1" />
         </actuation_subsystem2D>
       </params>
-    </dpo_controller>
+    </birtd_dpo_controller>
 
   </controllers>
 
   <!-- ****************** -->
   <!-- * Loop functions * -->
   <!-- ****************** -->
-  <loop_functions library="libfordyca"
-                  label="d0_loop_functions">
+  <loop_functions library="libfordyca-argos-footbot"
+                  label="d2_loop_functions">
     <output
         output_parent="output"
         output_leaf="__current_date__">
       <metrics
           metrics_path="metrics">
         <sinks>
-          <csv>
+          <file>
             <append
                 output_interval="1000"
                 block_acq_counts="block-acq-counts"
@@ -261,7 +261,7 @@
                       cache_acq_vector_locs2D="cache-acq-vector-locs"
                       cache_locations="cache-locations"
                       spatial_dist_pos2D="spatial-dist-pos2D"/>
-          </csv>
+          </file>
         </sinks>
       </metrics>
     </output>
@@ -413,7 +413,7 @@
       <position method="uniform" min="1,1,0" max="10,10,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
 
-      <entity quantity="1" max_trials="1000">
+      <entity quantity="11" max_trials="1000">
         <foot-bot id="fb" omnidirectional_camera_aperture="89">
           <controller config="fbc" />
           <!-- <battery model= "time_motion"/> -->
@@ -475,7 +475,7 @@
        <!--                 headless_grabbing="true" -->
        <!--                 headless_frame_size="1600x1200" -->
        <!--                 /> -->
-      <user_functions label="d0_qt_user_functions" />
+      <user_functions label="d2_qt_user_functions" />
     </qt-opengl>
   </visualization>
 

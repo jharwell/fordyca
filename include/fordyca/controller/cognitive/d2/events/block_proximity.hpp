@@ -57,8 +57,7 @@ class block_proximity : public rer::client<block_proximity> {
  private:
   struct visit_typelist_impl {
     using controllers = controller::d2::typelist;
-    using others = rmpl::typelist<ffsm::block_to_goal_fsm,
-                                  ftasks::d2::cache_starter>;
+    using others = rmpl::typelist<ffsm::block_to_goal_fsm>;
     using value = boost::mpl::joint_view<controllers, others::type>;
   };
 
@@ -77,14 +76,10 @@ class block_proximity : public rer::client<block_proximity> {
   void visit(fccd2::birtd_odpo_controller& c);
   void visit(fccd2::birtd_omdpo_controller& c);
 
-  /* tasks */
-  void visit(tasks::d2::cache_starter& task);
-
- private:
-
   /* FSMs */
   void visit(fsm::block_to_goal_fsm& fsm);
 
+ private:
   void dispatch_cache_starter(ftasks::base_foraging_task* task);
 
   /* clang-format off */
@@ -101,4 +96,3 @@ class block_proximity : public rer::client<block_proximity> {
 using block_proximity_visitor = rpvisitor::filtered_visitor<block_proximity>;
 
 NS_END(events, d2, cognitive, controller, fordyca);
-

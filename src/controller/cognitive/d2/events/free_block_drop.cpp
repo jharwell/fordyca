@@ -30,15 +30,17 @@
 #include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
+#include "fordyca/fsm/d0/free_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
-#include "fordyca/tasks/d2/cache_finisher.hpp"
-#include "fordyca/tasks/d2/cache_starter.hpp"
 #include "fordyca/tasks/d2/foraging_task.hpp"
+#include "fordyca/events/free_block_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller, cognitive, d2, events);
+
+using base_drop = fccd1::events::free_block_drop;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -48,7 +50,7 @@ free_block_drop::free_block_drop(
     const rmath::vector2z& coord,
     const rtypes::discretize_ratio& resolution)
     : ER_CLIENT_INIT("fordyca.controller.cognitive.d2.events.free_block_drop"),
-      fccd1::events::free_block_drop(std::move(block), coord, resolution) {}
+      base_drop(std::move(block), coord, resolution) {}
 
 
 /*******************************************************************************
@@ -99,23 +101,18 @@ void free_block_drop::visit(fccd2::birtd_odpo_controller& controller) {
 } /* visit() */
 
 /*******************************************************************************
- * Tasks
- ******************************************************************************/
-void free_block_drop::visit(tasks::d2::cache_starter& task) {
-  visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
-} /* visit() */
-
-void free_block_drop::visit(tasks::d2::cache_finisher& task) {
-  visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
-} /* visit() */
-
-/*******************************************************************************
  * FSMs
  ******************************************************************************/
 void free_block_drop::visit(fsm::block_to_goal_fsm& fsm) {
   fsm.inject_event(fsm::foraging_signal::ekBLOCK_DROP,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
+
+void free_block_drop::visit(ffsm::d0::free_block_to_nest_fsm& fsm) {
+  fsm.inject_event(ffsm::foraging_signal::ekBLOCK_DROP,
+                   rpfsm::event_type::ekNORMAL);
+} /* visit() */
+
 
 /*******************************************************************************
  * Member Functions

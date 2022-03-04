@@ -73,16 +73,16 @@ class collector : public foraging_task,
   /* cache interaction events */
   void accept(fccd1::events::cached_block_pickup& visitor) override;
   void accept(fccd1::events::cache_vanished& visitor) override;
-  void accept(fccd1::events::cache_block_drop&) override {}
+  RCPPSW_VISITOR_ACCEPT_STUB(fccd1::events::cache_block_drop);
 
-  void accept(fccd2::events::cached_block_pickup&) override {}
-  void accept(fccd2::events::cache_vanished&) override {}
-  void accept(fccd2::events::cache_block_drop&) override {}
+  void accept(fccd2::events::cached_block_pickup& visitor) override;
+  void accept(fccd2::events::cache_vanished&) override;
+  RCPPSW_VISITOR_ACCEPT_STUB(fccd2::events::cache_block_drop);
 
   /* nest interaction events */
-  void accept(fccd0::events::nest_block_drop&) override {}
+  RCPPSW_VISITOR_ACCEPT_STUB(fccd0::events::nest_block_drop);
   void accept(fccd1::events::nest_block_drop& visitor) override;
-  void accept(fccd2::events::nest_block_drop&) override {}
+  void accept(fccd2::events::nest_block_drop& visitor) override;
 
   /* goal acquisition metrics */
   RCPPSW_WRAP_DECL_OVERRIDE(bool, goal_acquired, const);
@@ -114,4 +114,3 @@ class collector : public foraging_task,
 };
 
 NS_END(d1, tasks, fordyca);
-

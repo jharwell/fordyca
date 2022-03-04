@@ -48,10 +48,7 @@ class cache_block_drop : public rer::client<cache_block_drop>,
  private:
   struct visit_typelist_impl {
     using controllers = controller::d2::typelist;
-
-    using others = rmpl::typelist<tasks::d2::cache_transferer>;
-
-    using value = boost::mpl::joint_view<others::type, controllers::type>;
+    using value = controllers::type;
   };
 
  public:
@@ -67,9 +64,6 @@ class cache_block_drop : public rer::client<cache_block_drop>,
   void visit(fccd2::birtd_mdpo_controller& controller);
   void visit(fccd2::birtd_odpo_controller& controller);
   void visit(fccd2::birtd_omdpo_controller& controller);
-
-  /* tasks */
-  void visit(ftasks::d2::cache_transferer& task);
 
  protected:
   /**
@@ -108,4 +102,3 @@ class cache_block_drop_visitor
 };
 
 NS_END(events, d2, cognitive, controller, fordyca);
-

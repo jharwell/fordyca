@@ -82,6 +82,9 @@ class free_block_pickup : public rer::client<free_block_pickup>,
   /* tasks */
   void visit(ftasks::d0::generalist& task);
 
+  /* FSMs */
+  void visit(ffsm::d0::free_block_to_nest_fsm& fsm);
+
   free_block_pickup(crepr::sim_block3D* block,
                     const rtypes::type_uuid& id,
                     const rtypes::timestep& t);
@@ -92,10 +95,10 @@ class free_block_pickup : public rer::client<free_block_pickup>,
 
   crepr::sim_block3D* block(void);
 
+
  private:
   /* FSMs */
   void visit(ffsm::d0::dpo_fsm& fsm);
-  void visit(ffsm::d0::free_block_to_nest_fsm& fsm);
 };
 
 /**
@@ -107,4 +110,3 @@ class free_block_pickup : public rer::client<free_block_pickup>,
 using free_block_pickup_visitor = rpvisitor::filtered_visitor<free_block_pickup>;
 
 NS_END(events, d0, cognitive, controller, fordyca);
-

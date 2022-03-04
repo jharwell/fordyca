@@ -7,12 +7,12 @@ export GINIROOT=/home/gini
 export SWARMROOT=$GINIROOT/shared/swarm
 
 # Load modules
-module load cmake/3.16.2
+module load cmake/3.21.3
 module load qt/5.9.1
 module load boost/1.72.0/gnu-9.2.0
 module load gcc/9.2.0
 module load llvm/5.0.0
-module load python/3.6.3
+module load python3/3.9.3_anaconda2021.11_mamba
 module load parallel
 module unload gcc/6.1.0
 

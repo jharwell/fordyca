@@ -55,11 +55,11 @@ git checkout devel
 cd ..
 
 # Next, ARGoS epuck
-if [ -d argos3-eepuck3D ]; then rm -rf argos3-eepuck3D; fi
-git clone https://github.com/swarm-robotics/argos3-eepuck3D.git
-cd argos3-eepuck3D
-git checkout devel
-cd ..
+# if [ -d argos3-eepuck3D ]; then rm -rf argos3-eepuck3D; fi
+# git clone https://github.com/swarm-robotics/argos3-eepuck3D.git
+# cd argos3-eepuck3D
+# git checkout devel
+# cd ..
 
 # Made it!
 echo -e "********************************************************************************"

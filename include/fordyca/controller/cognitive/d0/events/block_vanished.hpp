@@ -74,15 +74,16 @@ class block_vanished : public rer::client<block_vanished> {
   void visit(fccd0::odpo_controller& controller);
   void visit(fccd0::omdpo_controller& controller);
 
-  /* tasks */
-  void visit(ftasks::d0::generalist& task);
+  /* FSMs */
+  void visit(ffsm::d0::free_block_to_nest_fsm& fsm);
+
+ protected:
+  const rtypes::type_uuid& block_id(void) const { return mc_block_id; }
 
  private:
   /* FSMs */
   void visit(ffsm::d0::crw_fsm& fsm);
   void visit(ffsm::d0::dpo_fsm& fsm);
-  void visit(ffsm::d0::free_block_to_nest_fsm& fsm);
-
 
   /* clang-format off */
   const rtypes::type_uuid mc_block_id;
@@ -98,4 +99,3 @@ class block_vanished : public rer::client<block_vanished> {
 using block_vanished_visitor = rpvisitor::filtered_visitor<block_vanished>;
 
 NS_END(events, d0, cognitive, controller, fordyca);
-

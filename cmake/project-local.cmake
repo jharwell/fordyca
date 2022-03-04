@@ -172,6 +172,7 @@ if ("${COSM_BUILD_FOR}" MATCHES "ARGOS")
   if ("${COSM_BUILD_ENV}" MATCHES "MSI")
     # For nlopt
     target_link_directories(${fordyca_LIBRARY_NAME}
+      PUBLIC
       ${LIBRA_DEPS_PREFIX}/lib64
       )
   endif()
@@ -216,7 +217,7 @@ endif()
 ################################################################################
 # Installation                                                                 #
 ################################################################################
-configure_exports_as(${fordyca_LIBRARY_NAME})
+configure_exports_as(${fordyca_LIBRARY_NAME} ${CMAKE_INSTALL_PREFIX})
 
 # Install fordyca
 register_target_for_install(${fordyca_LIBRARY_NAME} ${CMAKE_INSTALL_PREFIX})

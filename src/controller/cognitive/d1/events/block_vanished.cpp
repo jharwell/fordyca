@@ -28,8 +28,9 @@
 #include "fordyca/controller/cognitive/d1/bitd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d1/bitd_omdpo_controller.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
-#include "fordyca/tasks/d1/harvester.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
+#include "fordyca/events/free_block_interactor.hpp"
+#include "fordyca/tasks/d1/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,7 +42,7 @@ NS_START(fordyca, controller, cognitive, d1, events);
  ******************************************************************************/
 block_vanished::block_vanished(const rtypes::type_uuid& block_id)
     : ER_CLIENT_INIT("fordyca.controller.cognitive.d1.events.block_vanished"),
-      mc_block_id(block_id) {}
+      fccd0::events::block_vanished(block_id) {}
 
 /*******************************************************************************
  * Controllers
@@ -79,13 +80,6 @@ void block_vanished::visit(fccd1::bitd_omdpo_controller& controller) {
 } /* visit() */
 
 /*******************************************************************************
- * Tasks
- ******************************************************************************/
-void block_vanished::visit(ftasks::d1::harvester& task) {
-  this->visit(*static_cast<ffsm::block_to_goal_fsm*>(task.mechanism()));
-} /* visit() */
-
-/*******************************************************************************
  * FSMs
  ******************************************************************************/
 void block_vanished::visit(ffsm::block_to_goal_fsm& fsm) {
@@ -100,7 +94,7 @@ void block_vanished::dispatch_free_block_interactor(
     tasks::base_foraging_task* const task) {
   ER_INFO("Abort pickup while executing task %s: block%d vanished",
           dynamic_cast<cta::logical_task*>(task)->name().c_str(),
-          mc_block_id.v());
+          block_id().v());
   auto* interactor = dynamic_cast<fevents::free_block_interactor*>(task);
   ER_ASSERT(nullptr != interactor,
             "Non-free block interactor task %s triggered block vanished event",

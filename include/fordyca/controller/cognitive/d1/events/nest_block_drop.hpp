@@ -23,17 +23,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <memory>
 
-#include "rcppsw/er/client.hpp"
-#include "rcppsw/patterns/visitor/visitor.hpp"
-#include "rcppsw/types/timestep.hpp"
-
-#include "cosm/repr/base_block3D.hpp"
-
-#include "fordyca/controller/controller_fwd.hpp"
-#include "fordyca/fsm/fsm_fwd.hpp"
-#include "fordyca/tasks/tasks_fwd.hpp"
+#include "fordyca/controller/cognitive/d0/events/nest_block_drop.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,17 +40,16 @@ NS_START(fordyca, controller, cognitive, d1, events);
  *
  * \brief Fired whenever a robot drops a block in the nest.
  */
-class nest_block_drop : public rer::client<nest_block_drop> {
+class nest_block_drop : public rer::client<nest_block_drop>,
+                        public fccd0::events::nest_block_drop {
  private:
   struct visit_typelist_impl {
     using controllers = controller::d1::typelist;
 
-    using fsms = rmpl::typelist<fsm::d1::cached_block_to_nest_fsm>;
-    using tasks = rmpl::typelist<tasks::d1::collector>;
+    using fsms = rmpl::typelist<ffsm::d1::cached_block_to_nest_fsm,
+                                ffsm::d0::free_block_to_nest_fsm>;
 
-    using value = boost::mpl::joint_view<
-        boost::mpl::joint_view<controllers::type, tasks::type>,
-        fsms::type>;
+    using value = boost::mpl::joint_view<controllers::type, fsms::type>;
   };
 
  public:
@@ -86,22 +76,11 @@ class nest_block_drop : public rer::client<nest_block_drop> {
   void visit(controller::cognitive::d1::bitd_odpo_controller& controller);
   void visit(controller::cognitive::d1::bitd_omdpo_controller& controller);
 
-  /* tasks */
-  void visit(tasks::d1::collector& task);
+  /* FSMs */
+  void visit(ffsm::d1::cached_block_to_nest_fsm& fsm);
 
  protected:
   void dispatch_nest_interactor(tasks::base_foraging_task* task);
-  const crepr::base_block3D* block(void) const { return m_block; }
-
- private:
-  /* FSMs */
-  void visit(fsm::d1::cached_block_to_nest_fsm& fsm);
-
-  /* clang-format off */
-  const rtypes::timestep mc_timestep;
-
-  crepr::base_block3D*   m_block;
-  /* clang-format on */
 };
 
 /**
@@ -126,4 +105,3 @@ class nest_block_drop_visitor
 };
 
 NS_END(events, d1, cognitive, controller, fordyca);
-

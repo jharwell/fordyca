@@ -51,13 +51,9 @@ class cache_vanished : public rer::client<cache_vanished> {
  private:
   struct visit_typelist_impl {
     using controllers = fcontroller::d1::cognitive_typelist;
-    using tasks = rmpl::typelist<tasks::d1::collector,
-                                 tasks::d1::harvester>;
     using fsms = rmpl::typelist<ffsm::block_to_goal_fsm,
                                 ffsm::d1::cached_block_to_nest_fsm>;
-    using value =
-        boost::mpl::joint_view<boost::mpl::joint_view<tasks::type, fsms::type>,
-                               controllers::type>;
+    using value = boost::mpl::joint_view<controllers::type, fsms::type>;
   };
 
  public:
@@ -74,19 +70,15 @@ class cache_vanished : public rer::client<cache_vanished> {
   void visit(fccd1::bitd_odpo_controller& controller);
   void visit(fccd1::bitd_omdpo_controller& controller);
 
-  /* tasks */
-  void visit(ftasks::d1::collector& task);
-  void visit(ftasks::d1::harvester& task);
+  /* FSMs */
+  void visit(ffsm::d1::cached_block_to_nest_fsm& fsm);
+  void visit(ffsm::block_to_goal_fsm& fsm);
 
  protected:
-  void visit(ffsm::block_to_goal_fsm& fsm);
   const rtypes::type_uuid& cache_id(void) const { return mc_cache_id; }
   void dispatch_cache_interactor(ftasks::base_foraging_task* task);
 
  private:
-  /* FSMs */
-  void visit(ffsm::d1::cached_block_to_nest_fsm& fsm);
-
   /* clang-format off */
     const rtypes::type_uuid mc_cache_id;
   /* clang-format on */
@@ -102,4 +94,3 @@ class cache_vanished : public rer::client<cache_vanished> {
 using cache_vanished_visitor = rpvisitor::filtered_visitor<cache_vanished>;
 
 NS_END(events, d1, cognitive, controller, fordyca);
-

@@ -94,13 +94,6 @@ void block_proximity::visit(fccd2::birtd_omdpo_controller& c) {
 } /* visit() */
 
 /*******************************************************************************
- * Tasks
- ******************************************************************************/
-void block_proximity::visit(ftasks::d2::cache_starter& task) {
-  visit(*static_cast<ffsm::block_to_goal_fsm*>(task.mechanism()));
-} /* visit() */
-
-/*******************************************************************************
  * FSMs
  ******************************************************************************/
 void block_proximity::visit(ffsm::block_to_goal_fsm& fsm) {

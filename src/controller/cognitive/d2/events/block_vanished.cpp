@@ -29,8 +29,8 @@
 #include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
-#include "fordyca/tasks/d2/cache_finisher.hpp"
-#include "fordyca/tasks/d2/cache_starter.hpp"
+#include "fordyca/events/free_block_interactor.hpp"
+#include "fordyca/tasks/d2/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -77,24 +77,6 @@ void block_vanished::visit(fccd2::birtd_odpo_controller& controller) {
   dispatch_free_block_interactor(controller.current_task());
 
   controller.ndc_uuid_pop();
-} /* visit() */
-
-/*******************************************************************************
- * Tasks
- ******************************************************************************/
-void block_vanished::visit(ftasks::d2::cache_starter& task) {
-  visit(*static_cast<ffsm::block_to_goal_fsm*>(task.mechanism()));
-} /* visit() */
-
-void block_vanished::visit(ftasks::d2::cache_finisher& task) {
-  visit(*static_cast<ffsm::block_to_goal_fsm*>(task.mechanism()));
-} /* visit() */
-
-/*******************************************************************************
- * FSMs
- ******************************************************************************/
-void block_vanished::visit(ffsm::block_to_goal_fsm& fsm) {
-  fccd1::events::block_vanished::visit(fsm);
 } /* visit() */
 
 /*******************************************************************************

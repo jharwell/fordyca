@@ -61,7 +61,7 @@ NS_START(fordyca, controller, cognitive, d1, events);
  * - A robot aborts its task, and is carrying a block.
  */
 class free_block_drop : public rer::client<free_block_drop>,
-                              public cdops::cell2D_op {
+                        public cdops::cell2D_op {
  private:
   struct visit_typelist_impl {
     using inherited = cdops::cell2D_op::visit_typelist;

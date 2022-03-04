@@ -38,9 +38,8 @@
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
 #include "fordyca/tasks/d2/foraging_task.hpp"
-#include "fordyca/tasks/d2/cache_collector.hpp"
-#include "fordyca/tasks/d2/cache_transferer.hpp"
 #include "fordyca/fsm/d1/cached_block_to_nest_fsm.hpp"
+#include "fordyca/events/existing_cache_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -117,16 +116,6 @@ void cached_block_pickup::visit(fccd2::birtd_omdpo_controller& controller) {
     controller.csel_exception_added(true);
   }
   controller.ndc_uuid_pop();
-} /* visit() */
-
-/*******************************************************************************
- * Tasks
- ******************************************************************************/
-void cached_block_pickup::visit(tasks::d2::cache_transferer& task) {
-  base_pickup::visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
-} /* visit() */
-void cached_block_pickup::visit(tasks::d2::cache_collector& task) {
-  base_pickup::visit(*static_cast<ffsm::d1::cached_block_to_nest_fsm*>(task.mechanism()));
 } /* visit() */
 
 /*******************************************************************************

@@ -30,8 +30,8 @@
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/d1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
-#include "fordyca/tasks/d1/collector.hpp"
-#include "fordyca/tasks/d1/harvester.hpp"
+#include "fordyca/events/existing_cache_interactor.hpp"
+#include "fordyca/tasks/d1/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -78,17 +78,6 @@ void cache_vanished::visit(fccd1::bitd_omdpo_controller& controller) {
   dispatch_cache_interactor(controller.current_task());
 
   controller.ndc_uuid_pop();
-} /* visit() */
-
-/*******************************************************************************
- * Tasks
- ******************************************************************************/
-void cache_vanished::visit(tasks::d1::collector& task) {
-  visit(*static_cast<fsm::d1::cached_block_to_nest_fsm*>(task.mechanism()));
-} /* visit() */
-
-void cache_vanished::visit(tasks::d1::harvester& task) {
-  visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 
 /*******************************************************************************

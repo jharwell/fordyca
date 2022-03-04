@@ -84,13 +84,6 @@ void block_vanished::visit(fccd0::omdpo_controller& controller) {
 } /* visit() */
 
 /*******************************************************************************
- * Tasks
- ******************************************************************************/
-void block_vanished::visit(ftasks::d0::generalist& task) {
-  this->visit(*static_cast<fsm::d0::free_block_to_nest_fsm*>(task.mechanism()));
-} /* visit() */
-
-/*******************************************************************************
  * FSMs
  ******************************************************************************/
 void block_vanished::visit(ffsm::d0::dpo_fsm& fsm) {

@@ -48,7 +48,8 @@ NS_START(fordyca, tasks, d0);
  * because it does not have any, but it IS still abortable if its current
  * execution time takes too long (as configured by parameters).
  */
-class generalist final : public foraging_task {
+class generalist final : public rer::client<generalist>,
+                         public foraging_task {
  public:
   generalist(const cta::config::task_alloc_config* config,
              std::unique_ptr<cta::taskable> mechanism);
@@ -66,21 +67,21 @@ class generalist final : public foraging_task {
 
   /* free block interaction events */
   void accept(fccd0::events::free_block_pickup& visitor) override;
-  void accept(fccd0::events::free_block_drop&) override {}
+  void accept(fccd0::events::free_block_drop& ) override {}
   void accept(fccd0::events::block_vanished& visitor) override;
 
-  void accept(fccd1::events::free_block_pickup&) override {}
-  void accept(fccd1::events::free_block_drop&) override {}
-  void accept(fccd1::events::block_vanished&) override {}
+  void accept(fccd1::events::free_block_pickup& visitor) override;
+  void accept(fccd1::events::free_block_drop& ) override {}
+  void accept(fccd1::events::block_vanished& visitor) override;
 
-  void accept(fccd2::events::free_block_pickup&) override {}
-  void accept(fccd2::events::free_block_drop&) override {}
-  void accept(fccd2::events::block_vanished&) override {}
+  void accept(fccd2::events::free_block_pickup& visitor) override;
+  void accept(fccd2::events::free_block_drop& ) override {}
+  void accept(fccd2::events::block_vanished& visitor) override;
 
   /* nest interaction events */
   void accept(fccd0::events::nest_block_drop& visitor) override;
-  void accept(fccd1::events::nest_block_drop&) override {}
-  void accept(fccd2::events::nest_block_drop&) override {}
+  void accept(fccd1::events::nest_block_drop& visitor) override;
+  void accept(fccd2::events::nest_block_drop& visitor) override;
 
   /* goal acquisition metrics */
   RCPPSW_WRAP_DECL_OVERRIDE(bool, goal_acquired, const);

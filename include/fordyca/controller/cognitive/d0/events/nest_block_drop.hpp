@@ -87,15 +87,14 @@ class nest_block_drop : public rer::client<nest_block_drop> {
 
   /* tasks */
   void visit(ftasks::d0::generalist& task);
+  void visit(ffsm::d0::free_block_to_nest_fsm& fsm);
 
  protected:
   crepr::base_block3D* block(void) const { return m_block; }
 
  private:
   /* FSMs */
-  void visit(ffsm::d0::free_block_to_nest_fsm& fsm);
   void visit(ffsm::d0::dpo_fsm& fsm);
-
 
   /* clang-format off */
   const rtypes::timestep mc_timestep;
@@ -124,4 +123,3 @@ class nest_block_drop_visitor : public detail::nest_block_drop_visitor_impl {
 };
 
 NS_END(events, d0, cognitive, controller, fordyca);
-

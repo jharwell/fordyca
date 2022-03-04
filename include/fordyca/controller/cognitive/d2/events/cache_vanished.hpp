@@ -46,15 +46,14 @@ class cache_vanished : public rer::client<cache_vanished>,
  private:
   struct visit_typelist_impl {
     using controllers = fcontroller::d2::cognitive_typelist;
-    using tasks = rmpl::typelist<tasks::d2::cache_transferer>;
     using fsms = rmpl::typelist<fsm::block_to_goal_fsm>;
-    using value =
-        boost::mpl::joint_view<boost::mpl::joint_view<tasks::type, fsms::type>,
-                               controllers::type>;
+    using value = boost::mpl::joint_view<fsms::type, controllers::type>;
   };
 
  public:
   using visit_typelist = visit_typelist_impl::value;
+  using fccd1::events::cache_vanished::visit;
+
   explicit cache_vanished(const rtypes::type_uuid& cache_id);
   ~cache_vanished(void) override = default;
 
@@ -66,11 +65,7 @@ class cache_vanished : public rer::client<cache_vanished>,
   void visit(fccd2::birtd_mdpo_controller& controller);
   void visit(fccd2::birtd_odpo_controller& controller);
   void visit(fccd2::birtd_omdpo_controller& controller);
-
-  /* tasks */
-  void visit(ftasks::d2::cache_transferer& task);
 };
-
 
 /**
  * \brief We use the precise visitor in order to force compile errors if a call to
@@ -81,4 +76,3 @@ class cache_vanished : public rer::client<cache_vanished>,
 using cache_vanished_visitor = rpvisitor::filtered_visitor<cache_vanished>;
 
 NS_END(events, d2, cognitive, controller, fordyca);
-

@@ -28,7 +28,6 @@
 #include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
-#include "fordyca/tasks/d2/cache_transferer.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 
 /*******************************************************************************
@@ -82,13 +81,6 @@ void cache_vanished::visit(fccd2::birtd_omdpo_controller& controller) {
   dispatch_cache_interactor(controller.current_task());
 
   controller.ndc_uuid_pop();
-} /* visit() */
-
-/*******************************************************************************
- * Tasks
- ******************************************************************************/
-void cache_vanished::visit(tasks::d2::cache_transferer& task) {
-  base_vanished::visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 
 NS_END(events, d2, cognitive, controller, fordyca);

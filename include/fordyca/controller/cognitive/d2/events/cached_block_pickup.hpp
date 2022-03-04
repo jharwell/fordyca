@@ -47,10 +47,7 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
  private:
   struct visit_typelist_impl {
     using controllers = fcontroller::d2::cognitive_typelist;
-    using others = rmpl::typelist<ftasks::d2::cache_transferer,
-                                  ftasks::d2::cache_collector>;
-
-    using value = boost::mpl::joint_view<controllers, others::type>;
+    using value = controllers::type;
   };
 
  public:
@@ -71,10 +68,6 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
   void visit(fccd2::birtd_mdpo_controller& controller);
   void visit(fccd2::birtd_odpo_controller& controller);
   void visit(fccd2::birtd_omdpo_controller& controller);
-
-  /* tasks */
-  void visit(ftasks::d2::cache_transferer& task);
-  void visit(ftasks::d2::cache_collector& task);
 
  private:
   bool dispatch_cache_interactor(
@@ -102,4 +95,3 @@ class cached_block_pickup_visitor
 };
 
 NS_END(events, d2, cognitive, controller, fordyca);
-

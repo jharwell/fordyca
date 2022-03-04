@@ -54,9 +54,7 @@ NS_START(fordyca, controller, cognitive, d2, events);
 class cache_proximity : public rer::client<cache_proximity> {
  private:
   struct visit_typelist_impl {
-    using others = rmpl::typelist<ftasks::d2::cache_finisher,
-                                  ftasks::d2::cache_starter,
-                                  ffsm::block_to_goal_fsm>;
+    using others = rmpl::typelist<ffsm::block_to_goal_fsm>;
     using value = boost::mpl::joint_view<fcontroller::d2::typelist::type,
                                          others::type>;
   };
@@ -76,14 +74,10 @@ class cache_proximity : public rer::client<cache_proximity> {
   void visit(fccd2::birtd_mdpo_controller& c);
   void visit(fccd2::birtd_omdpo_controller& c);
 
-  /* tasks */
-  void visit(tasks::d2::cache_finisher& task);
-  void visit(tasks::d2::cache_starter& task);
-
- private:
   /* FSMs */
   void visit(fsm::block_to_goal_fsm& fsm);
 
+ private:
   void dispatch_cache_interactor(tasks::base_foraging_task* task);
 
   /* clang-format off */
@@ -100,4 +94,3 @@ class cache_proximity : public rer::client<cache_proximity> {
 using cache_proximity_visitor = rpvisitor::filtered_visitor<cache_proximity>;
 
 NS_END(events, d2, cognitive, controller, fordyca);
-

@@ -76,7 +76,6 @@ boost::optional<std::string>
 manipulation_metrics_csv_sink::csv_line_build(
     const rmetrics::base_data* data,
     const rtypes::timestep& t) {
-  ER_DEBUG("Current timestep: %zu, ready? %d", t.v(), ready_to_flush(t));
   if (!ready_to_flush(t)) {
     return boost::none;
   }

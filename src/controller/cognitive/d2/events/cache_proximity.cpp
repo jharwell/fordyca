@@ -36,8 +36,8 @@
 #include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
-#include "fordyca/tasks/d2/cache_finisher.hpp"
-#include "fordyca/tasks/d2/cache_starter.hpp"
+#include "fordyca/events/existing_cache_interactor.hpp"
+#include "fordyca/tasks/d2/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -104,17 +104,6 @@ void cache_proximity::visit(fccd2::birtd_omdpo_controller& c) {
   dispatch_cache_interactor(c.current_task());
 
   c.ndc_uuid_pop();
-} /* visit() */
-
-/*******************************************************************************
- * Tasks
- ******************************************************************************/
-void cache_proximity::visit(tasks::d2::cache_finisher& task) {
-  visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
-} /* visit() */
-
-void cache_proximity::visit(tasks::d2::cache_starter& task) {
-  visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 
 /*******************************************************************************

@@ -92,9 +92,6 @@ class cache_block_drop : public rer::client<cache_block_drop>,
   void visit(controller::cognitive::d1::bitd_odpo_controller& controller);
   void visit(controller::cognitive::d1::bitd_omdpo_controller& controller);
 
-  /* tasks */
-  void visit(tasks::d1::harvester& task);
-
   /* FSMs */
   void visit(cfsm::cell2D_fsm& fsm);
   void visit(fsm::block_to_goal_fsm& fsm);

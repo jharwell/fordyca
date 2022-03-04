@@ -100,15 +100,18 @@ void cache_transferer::active_interface_update(int) {
  * Event Handling
  ******************************************************************************/
 void cache_transferer::accept(fccd2::events::cache_block_drop& visitor) {
-  visitor.visit(*this);
+  auto& fsm = *static_cast<ffsm::block_to_goal_fsm*>(mechanism());
+  static_cast<fccd1::events::cache_block_drop&>(visitor).visit(fsm);
 }
 
 void cache_transferer::accept(fccd2::events::cached_block_pickup& visitor) {
-  visitor.visit(*this);
+  auto& fsm = *static_cast<ffsm::block_to_goal_fsm*>(mechanism());
+  static_cast<fccd1::events::cached_block_pickup&>(visitor).visit(fsm);
 }
 
 void cache_transferer::accept(fccd2::events::cache_vanished& visitor) {
-  visitor.visit(*this);
+  auto& fsm = *static_cast<ffsm::block_to_goal_fsm*>(mechanism());
+  static_cast<fccd1::events::cache_vanished&>(visitor).visit(fsm);
 }
 
 /*******************************************************************************

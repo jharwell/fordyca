@@ -53,17 +53,14 @@ class block_vanished : public rer::client<block_vanished>,
  private:
   struct visit_typelist_impl {
     using controllers = fcontroller::d2::typelist;
-    using tasks = rmpl::typelist<ftasks::d2::cache_starter,
-                                 ftasks::d2::cache_finisher>;
     using fsms = rmpl::typelist<ffsm::block_to_goal_fsm>;
 
-    using value = boost::mpl::joint_view<
-        boost::mpl::joint_view<controllers::type, tasks::type>,
-        fsms::type>;
+    using value = boost::mpl::joint_view<controllers::type, fsms::type>;
   };
 
  public:
   using visit_typelist = visit_typelist_impl::value;
+  using fccd1::events::block_vanished::visit;
 
   explicit block_vanished(const rtypes::type_uuid& block_id);
   ~block_vanished(void) override = default;
@@ -77,15 +74,8 @@ class block_vanished : public rer::client<block_vanished>,
   void visit(fccd2::birtd_odpo_controller& controller);
   void visit(fccd2::birtd_omdpo_controller& controller);
 
-  /* tasks */
-  void visit(ftasks::d2::cache_starter& task);
-  void visit(ftasks::d2::cache_finisher& task);
 
  private:
-
-  /* FSMs*/
-  void visit(ffsm::block_to_goal_fsm& fsm);
-
   void dispatch_free_block_interactor(ftasks::base_foraging_task* task);
 };
 

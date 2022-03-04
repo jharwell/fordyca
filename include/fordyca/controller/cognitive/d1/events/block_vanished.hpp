@@ -23,13 +23,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/er/client.hpp"
-#include "rcppsw/patterns/visitor/visitor.hpp"
-#include "rcppsw/types/type_uuid.hpp"
-
-#include "fordyca/controller/controller_fwd.hpp"
-#include "fordyca/fsm/fsm_fwd.hpp"
-#include "fordyca/tasks/tasks_fwd.hpp"
+#include "fordyca/controller/cognitive/d0/events/block_vanished.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,17 +41,16 @@ NS_START(fordyca, controller, cognitive, d1, events);
  * serving the penalty the block it is waiting for vanishes due to another
  * robot picking it up.
  */
-class block_vanished : public rer::client<block_vanished> {
+class block_vanished : public rer::client<block_vanished>,
+                       public fccd0::events::block_vanished {
  private:
   struct visit_typelist_impl {
     using controllers = fcontroller::d1::cognitive_typelist;
-    using tasks = rmpl::typelist<ftasks::d1::harvester>;
 
-    using fsms = rmpl::typelist<ffsm::block_to_goal_fsm>;
+    using fsms = rmpl::typelist<ffsm::block_to_goal_fsm,
+                                ffsm::d0::free_block_to_nest_fsm>;
 
-    using value = boost::mpl::joint_view<
-        boost::mpl::joint_view<controllers::type, tasks::type>,
-        fsms::type>;
+    using value = boost::mpl::joint_view<controllers::type, fsms::type>;
   };
 
  public:
@@ -75,20 +68,11 @@ class block_vanished : public rer::client<block_vanished> {
   void visit(fccognitive::d1::bitd_odpo_controller& controller);
   void visit(fccognitive::d1::bitd_omdpo_controller& controller);
 
-  /* tasks */
-  void visit(ftasks::d1::harvester& task);
-
- protected:
-  void dispatch_free_block_interactor(ftasks::base_foraging_task* const task);
-  const rtypes::type_uuid& block_id(void) const { return mc_block_id; }
-
   /* FSMs */
   void visit(ffsm::block_to_goal_fsm& fsm);
 
- private:
-   /* clang-format off */
-  const rtypes::type_uuid mc_block_id;
-  /* clang-format on */
+ protected:
+  void dispatch_free_block_interactor(ftasks::base_foraging_task* const task);
 };
 
 /**
@@ -100,4 +84,3 @@ class block_vanished : public rer::client<block_vanished> {
 using block_vanished_visitor = rpvisitor::filtered_visitor<block_vanished>;
 
 NS_END(events, d1, reactive, controller, fordyca);
-

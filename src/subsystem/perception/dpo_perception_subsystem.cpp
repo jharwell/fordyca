@@ -173,22 +173,32 @@ void dpo_perception_subsystem::los_tracking_sync(
   auto it = range.begin();
 
   while (it != range.end()) {
-    ER_TRACE("Check tracked DPO cache%d@%s/%s xspan=%s,yspan=%s w/LOS "
-             "xspan=%s,yspan=%s",
+    ER_TRACE("Check tracked DPO cache%d@%s/%s "
+             "xrspan=%s,yrspan=%s,xdspan=%s,ydspan=%s"
+             "w/LOS xrspan=%s,yrspan=%s,xdspan=%s,ydspan=%s",
              (*it)->id().v(),
              rcppsw::to_string((*it)->rcenter2D()).c_str(),
              rcppsw::to_string((*it)->dcenter2D()).c_str(),
              rcppsw::to_string((*it)->xrspan()).c_str(),
              rcppsw::to_string((*it)->yrspan()).c_str(),
+             rcppsw::to_string((*it)->xdspan()).c_str(),
+             rcppsw::to_string((*it)->ydspan()).c_str(),
+             rcppsw::to_string(c_los->xrspan()).c_str(),
+             rcppsw::to_string(c_los->yrspan()).c_str(),
              rcppsw::to_string(c_los->xdspan()).c_str(),
              rcppsw::to_string(c_los->ydspan()).c_str());
 
     /*
      * We can't just check if the cache host cell is in our LOS, because for
      * bigger arenas, it almost never is.
+     *
+     * Note that we compare discrete rather than real coordinate overlap here,
+     * to avoid potential floating point errors as the robot moves away from an
+     * existing cache which should definitely stay in its DPO store as it moves
+     * away.
      */
-    bool should_be_in_los = (*it)->yrspan().overlaps_with(c_los->yrspan()) ||
-                            (*it)->xrspan().overlaps_with(c_los->xrspan());
+    bool should_be_in_los = (*it)->ydspan().overlaps_with(c_los->ydspan()) &&
+                            (*it)->xdspan().overlaps_with(c_los->xdspan());
 
     bool in_los =
         los_caches.end() !=
@@ -197,15 +207,20 @@ void dpo_perception_subsystem::los_tracking_sync(
         });
 
     if (should_be_in_los && !in_los) {
-      ER_INFO("Remove tracked DPO cache%d@%s/%s xspan=%s,yspan=%s: not in LOS "
-              "xspan=%s,yspan=%s",
-              (*it)->id().v(),
-              rcppsw::to_string((*it)->rcenter2D()).c_str(),
-              rcppsw::to_string((*it)->dcenter2D()).c_str(),
-              rcppsw::to_string((*it)->xrspan()).c_str(),
-              rcppsw::to_string((*it)->yrspan()).c_str(),
-              rcppsw::to_string(c_los->xdspan()).c_str(),
-              rcppsw::to_string(c_los->ydspan()).c_str());
+      ER_TRACE("Remove tracked DPO cache%d@%s/%s "
+               "xrspan=%s,yrspan=%s,xdspan=%s,ydspan=%s:"
+               " not in LOS xrspan=%s,yrspan=%s,xdspan=%s,ydspan=%s",
+               (*it)->id().v(),
+               rcppsw::to_string((*it)->rcenter2D()).c_str(),
+               rcppsw::to_string((*it)->dcenter2D()).c_str(),
+               rcppsw::to_string((*it)->xrspan()).c_str(),
+               rcppsw::to_string((*it)->yrspan()).c_str(),
+               rcppsw::to_string((*it)->xdspan()).c_str(),
+               rcppsw::to_string((*it)->ydspan()).c_str(),
+               rcppsw::to_string(c_los->xrspan()).c_str(),
+               rcppsw::to_string(c_los->yrspan()).c_str(),
+               rcppsw::to_string(c_los->xdspan()).c_str(),
+               rcppsw::to_string(c_los->ydspan()).c_str());
 
       /*
        * Copy iterator object + iterator increment MUST be before removal to

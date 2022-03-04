@@ -57,11 +57,8 @@ class nest_block_drop : public rer::client<nest_block_drop>,
     using controllers = controller::d2::typelist;
 
     using fsms = rmpl::typelist<ffsm::d1::cached_block_to_nest_fsm>;
-    using tasks = rmpl::typelist<ftasks::d2::cache_collector>;
 
-    using value = boost::mpl::joint_view<
-        boost::mpl::joint_view<controllers::type, tasks::type>,
-        fsms::type>;
+    using value = boost::mpl::joint_view<controllers::type, fsms::type>;
   };
 
  public:
@@ -107,4 +104,3 @@ class nest_block_drop_visitor : public detail::nest_block_drop_visitor_impl {
 };
 
 NS_END(events, d2, cognitive, controller, fordyca);
-

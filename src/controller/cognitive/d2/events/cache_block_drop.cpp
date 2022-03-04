@@ -34,7 +34,8 @@
 #include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
-#include "fordyca/tasks/d2/cache_transferer.hpp"
+#include "fordyca/events/existing_cache_interactor.hpp"
+#include "fordyca/tasks/d2/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -119,10 +120,6 @@ void cache_block_drop::visit(fccd2::birtd_omdpo_controller& controller) {
       dynamic_cast<cta::logical_task*>(controller.current_task())->name().c_str());
 
   controller.ndc_uuid_pop();
-} /* visit() */
-
-void cache_block_drop::visit(tasks::d2::cache_transferer& task) {
-  base_drop::visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 
 /*******************************************************************************

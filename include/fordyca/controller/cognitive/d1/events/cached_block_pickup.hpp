@@ -72,10 +72,8 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
  private:
   struct visit_typelist_impl {
     using controllers = controller::d1::cognitive_typelist;
-    using others = rmpl::typelist<
-        fsm::block_to_goal_fsm,
-        fsm::d1::cached_block_to_nest_fsm,
-      tasks::d1::collector>;
+    using others = rmpl::typelist<fsm::block_to_goal_fsm,
+                                  fsm::d1::cached_block_to_nest_fsm>;
 
     using value = boost::mpl::joint_view<controllers, others::type>;
   };
@@ -99,15 +97,12 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
   void visit(controller::cognitive::d1::bitd_odpo_controller& controller);
   void visit(controller::cognitive::d1::bitd_omdpo_controller& controller);
 
-  /* tasks */
-  void visit(tasks::d1::collector& task);
+  /* FSMs */
+  void visit(fsm::d1::cached_block_to_nest_fsm& fsm);
+  void visit(fsm::block_to_goal_fsm& fsm);
 
  protected:
   using ccops::base_block_pickup::visit;
-
-  /* FSMs */
-  void visit(fsm::block_to_goal_fsm& fsm);
-  void visit(fsm::d1::cached_block_to_nest_fsm& fsm);
 
   /* data structures */
   void visit(fspds::dpo_semantic_map& map);
@@ -118,7 +113,6 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
   crepr::sim_block3D* block(void);
 
  private:
-
   /* FSMs */
   void visit(cfsm::cell2D_fsm& fsm);
 

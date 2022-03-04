@@ -36,7 +36,8 @@
 #include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
-#include "fordyca/tasks/d1/harvester.hpp"
+#include "fordyca/tasks/d1/foraging_task.hpp"
+#include "fordyca/events/existing_cache_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -119,13 +120,6 @@ void cache_block_drop::visit(
       dynamic_cast<cta::logical_task*>(controller.current_task())->name().c_str());
 
   controller.ndc_uuid_pop();
-} /* visit() */
-
-/*******************************************************************************
- * Tasks
- ******************************************************************************/
-void cache_block_drop::visit(tasks::d1::harvester& task) {
-  visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 
 /*******************************************************************************
