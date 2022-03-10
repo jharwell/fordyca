@@ -179,13 +179,13 @@ task_executive_builder::tasking_map task_executive_builder::d2_tasks_create(
   graph->install_tab(
       tasks::d1::foraging_task::kCollectorName, std::move(children2), rng);
   return tasking_map{
-    { "cache_starter",
+    { ftd2::foraging_task::kCacheStarterName,
       graph->find_vertex(tasks::d2::foraging_task::kCacheStarterName) },
-    { "cache_finisher",
+    { ftd2::foraging_task::kCacheFinisherName,
       graph->find_vertex(tasks::d2::foraging_task::kCacheFinisherName) },
-    { "cache_transferer",
+    { ftd2::foraging_task::kCacheTransfererName,
       graph->find_vertex(tasks::d2::foraging_task::kCacheTransfererName) },
-    { "cache_collector",
+    { ftd2::foraging_task::kCacheCollectorName,
       graph->find_vertex(tasks::d2::foraging_task::kCacheCollectorName) }
   };
 } /* d2_tasks_create() */
@@ -198,10 +198,10 @@ void task_executive_builder::d2_exec_est_init(
   const auto* task_config =
       config_repo.config_get<cta::config::task_alloc_config>();
 
-  auto* cache_starter = map.find("cache_starter")->second;
-  auto* cache_finisher = map.find("cache_finisher")->second;
-  auto* cache_transferer = map.find("cache_transferer")->second;
-  auto* cache_collector = map.find("cache_collector")->second;
+  auto* cache_starter = map.find(ftd2::foraging_task::kCacheStarterName)->second;
+  auto* cache_finisher = map.find(ftd2::foraging_task::kCacheFinisherName)->second;
+  auto* cache_transferer = map.find(ftd2::foraging_task::kCacheTransfererName)->second;
+  auto* cache_collector = map.find(ftd2::foraging_task::kCacheCollectorName)->second;
   if (!task_config->exec_est.seed_enabled) {
     return;
   }
@@ -222,13 +222,13 @@ void task_executive_builder::d2_exec_est_init(
         ->last_subtask(cache_collector);
   }
   rmath::rangez cs_bounds =
-      task_config->exec_est.ranges.find("cache_starter")->second;
+      task_config->exec_est.ranges.find(ftd2::foraging_task::kCacheStarterName)->second;
   rmath::rangez cf_bounds =
-      task_config->exec_est.ranges.find("cache_finisher")->second;
+      task_config->exec_est.ranges.find(ftd2::foraging_task::kCacheFinisherName)->second;
   rmath::rangez ct_bounds =
-      task_config->exec_est.ranges.find("cache_transferer")->second;
+      task_config->exec_est.ranges.find(ftd2::foraging_task::kCacheTransfererName)->second;
   rmath::rangez cc_bounds =
-      task_config->exec_est.ranges.find("cache_collector")->second;
+      task_config->exec_est.ranges.find(ftd2::foraging_task::kCacheCollectorName)->second;
 
   ER_INFO("Seeding exec estimate for tasks: '%s'=%s, '%s'=%s",
           cache_starter->name().c_str(),
@@ -250,10 +250,10 @@ void task_executive_builder::d2_exec_est_init(
 void task_executive_builder::d2_subtasks_init(const tasking_map& map,
                                               cta::ds::bi_tdgraph* graph,
                                               rmath::rng* rng) {
-  auto* cache_starter = map.find("cache_starter")->second;
-  auto* cache_finisher = map.find("cache_finisher")->second;
-  auto* cache_transferer = map.find("cache_transferer")->second;
-  auto* cache_collector = map.find("cache_collector")->second;
+  auto* cache_starter = map.find(ftd2::foraging_task::kCacheStarterName)->second;
+  auto* cache_finisher = map.find(ftd2::foraging_task::kCacheFinisherName)->second;
+  auto* cache_transferer = map.find(ftd2::foraging_task::kCacheTransfererName)->second;
+  auto* cache_collector = map.find(ftd2::foraging_task::kCacheCollectorName)->second;
 
   /*
    * As part of seeding exec estimates, we set the last executed subtask for a
@@ -278,9 +278,9 @@ std::unique_ptr<cta::bi_tdgraph_executive> task_executive_builder::operator()(
     rmath::rng* rng) {
   const auto* task_config =
       config_repo.config_get<cta::config::task_alloc_config>();
-  auto variant =
-      std::make_unique<cta::ds::ds_variant>(cta::ds::bi_tdgraph(task_config));
-  auto* graph = &std::get<cta::ds::bi_tdgraph>(*variant.get());
+  cta::ds::ds_variant variant = std::make_unique<cta::ds::bi_tdgraph>(task_config);
+  auto* graph = std::get<std::unique_ptr<cta::ds::bi_tdgraph>>(variant).get();
+
   const auto* execp =
       config_repo.config_get<cta::config::task_executive_config>();
   const auto* allocp = config_repo.config_get<cta::config::task_alloc_config>();

@@ -40,10 +40,9 @@ NS_START(fordyca, controller, config, d0);
  * \brief Collection of all parameter parsers and parse results needed by
  * \ref mdpo_controller.
  */
-class mdpo_controller_repository: public dpo_controller_repository {
+class mdpo_controller_repository: public virtual dpo_controller_repository {
  public:
   mdpo_controller_repository(void) = default;
 };
 
 NS_END(d0, config, controller, fordyca);
-

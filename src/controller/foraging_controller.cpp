@@ -23,7 +23,6 @@
  ******************************************************************************/
 #include "fordyca//controller/foraging_controller.hpp"
 
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <filesystem>
 #include <fstream>
 
@@ -37,9 +36,11 @@
 #include "cosm/subsystem/config/actuation_subsystem2D_config.hpp"
 #include "cosm/hal/subsystem/config/sensing_subsystemQ3D_config.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 #include "cosm/tv/robot_dynamics_applicator.hpp"
 #include "cosm/spatial/interference_tracker.hpp"
 #include "cosm/spatial/nest_zone_tracker.hpp"
+#include "cosm/subsystem/actuation_subsystem2D.hpp"
 
 #include "fordyca/controller/config/foraging_controller_repository.hpp"
 
@@ -61,7 +62,7 @@ static sensing_init(foraging_controller* c,
   auto light_handle = c->GetSensor<chargos::sensors::light_sensor::impl_type>(
       saa_names::light_sensor);
   auto env_handle = c->GetSensor<chal::sensors::env_sensor::impl_type>(
-      saa_names::ground_sensor);
+      saa_names:: ground_sensor);
   auto position_handle = c->GetSensor<chargos::sensors::position_sensor::impl_type>(
       saa_names::position_sensor);
   auto steering_handle = c->GetSensor<chargos::sensors::diff_drive_sensor::impl_type>(
@@ -127,6 +128,7 @@ static sensing_init(foraging_controller* c,
              const chal::subsystem::config::sensing_subsystemQ3D_config* sensing) {
   auto robot_ns = cros::to_ns(c->entity_id());
   auto light = chros::sensors::light_sensor(robot_ns);
+  auto sonar = chros::sensors::sonar_sensor(robot_ns);
   auto lidar = chros::sensors::lidar_sensor(robot_ns);
   auto proximity = chsensors::proximity_sensor(robot_ns,
                                                &sensing->proximity);
@@ -136,6 +138,7 @@ static sensing_init(foraging_controller* c,
   using subsystem = csubsystem::sensing_subsystemQ3D;
   subsystem::sensor_map sensors;
   sensors.emplace(subsystem::map_entry_create(std::move(light)));
+  sensors.emplace(subsystem::map_entry_create(std::move(sonar)));
   sensors.emplace(subsystem::map_entry_create(std::move(lidar)));
   sensors.emplace(subsystem::map_entry_create(std::move(proximity)));
   sensors.emplace(subsystem::map_entry_create(std::move(odometry)));
@@ -216,9 +219,9 @@ foraging_controller::~foraging_controller(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool foraging_controller::block_detected(void) const {
+bool foraging_controller::block_detect(void) const {
   return saa()->sensing()->env()->detect("block");
-} /* block_detected() */
+} /* block_detect() */
 
 void foraging_controller::init(ticpp::Element& node) {
   /* verify environment variables set up for logging */

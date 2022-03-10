@@ -44,7 +44,7 @@ NS_START(fordyca, strategy, explore);
  * CRW at that location, with the idea being that the likelihood of another
  * block being nearby is higher, given that you've found one there before.
  */
-class likelihood_block_search : public localized_search {
+class likelihood_block_search final : public localized_search {
  public:
   likelihood_block_search(const fstrategy::strategy_params* const c_params,
                           rmath::rng* rng);

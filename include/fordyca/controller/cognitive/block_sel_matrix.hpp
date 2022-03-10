@@ -23,7 +23,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <boost/variant.hpp>
+#include <variant>
 #include <map>
 #include <string>
 #include <vector>
@@ -45,7 +45,7 @@ NS_START(fordyca, controller, cognitive);
  * matrix can have the same type.
  */
 using block_sel_variant =
-    boost::variant<double,
+    std::variant<double,
                    rmath::vector2d,
                    std::vector<rtypes::type_uuid>,
                    config::block_sel::block_pickup_policy_config>;

@@ -25,18 +25,17 @@
  ******************************************************************************/
 #include "cosm/tv/tv_manager.hpp"
 
-#include "fordyca/argos/support/tv/env_dynamics.hpp"
-#include "fordyca/argos/support/tv/fordyca_pd_adaptor.hpp"
-
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, argos, support, tv);
+
+class env_dynamics;
+class fordyca_pd_adaptor;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 using tv_manager = ctv::tv_manager<env_dynamics, fordyca_pd_adaptor>;
 
-NS_END(tv, argos support, argos, fordyca);
-
+NS_END(tv, support, argos, fordyca);

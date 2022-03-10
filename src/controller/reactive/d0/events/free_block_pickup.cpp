@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/controller/reactive/d0/events/free_block_pickup.hpp"
 
+#include "cosm/repr/base_block3D.hpp"
+
 #include "fordyca/controller/reactive/d0/crw_controller.hpp"
 #include "fordyca/fsm/d0/crw_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
@@ -49,6 +51,7 @@ void free_block_pickup::visit(fcreactive::d0::crw_controller& controller) {
 
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   visit(*controller.fsm());
+  ER_INFO("Picked up block%d@", block()->id().v());
 
   controller.ndc_uuid_pop();
 } /* visit() */

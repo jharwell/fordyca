@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include <vector>
 #include <memory>
+#include <mutex>
 
 #include "cosm/controller/operations/task_id_extract.hpp"
 

@@ -12,15 +12,15 @@
   </appender>
 
   <root>
-        <priority value="debug" />
+        <priority value="info" />
         <appender-ref ref="__console__"/>
   </root>
 
   <!-- Specify the level for some specific categories -->
   <category name="fordyca.events" >
-    <priority value ="all" />
+    <priority value ="info" />
   </category>
-    <category name="fordyca.controller.reactive" >
+  <category name="fordyca.controller.reactive" >
     <priority value ="debug" />
   </category>
 
@@ -31,16 +31,16 @@
     <priority value ="fatal" />
   </category>
   <category name="cosm.hal.argos.actuators.diff_drive" >
-    <priority value ="debug" />
+    <priority value ="info" />
   </category>
   <category name="cosm.steer2D.force_calculator" >
-    <priority value ="debug" />
+    <priority value ="info" />
   </category>
   <category name="cosm.steer2D.arrival_force" >
-    <priority value ="debug" />
+    <priority value ="info" />
   </category>
   <category name="cosm.subsystem" >
-    <priority value ="debug" />
+    <priority value ="info" />
   </category>
   <category name="cosm.tv.population_dynamics" >
     <priority value ="info" />
@@ -64,7 +64,7 @@
     <priority value ="info" />
   </category>
   <category name="fordyca.fsm.acquire_goal_fsm" >
-    <priority value ="debug" />
+    <priority value ="info" />
   </category>
   <category name="fordyca.support.block_dist" >
     <priority value ="info" />
@@ -100,7 +100,7 @@
   </category>
 
   <category name="fordyca.subsystem.perception" >
-    <priority value ="debug" />
+    <priority value ="info" />
   </category>
   <category name="fordyca.controller.metrics.collector_registerer" >
     <priority value ="info" />

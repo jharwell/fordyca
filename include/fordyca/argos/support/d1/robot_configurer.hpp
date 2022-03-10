@@ -51,16 +51,22 @@ NS_START(fordyca, argos, support, d1);
  * - Enabling tasking metric aggregation via task executive hooks
  */
 template <class TController, class TMetricsManager>
-class robot_configurer {
+class robot_configurer
+    : public rer::client<robot_configurer<TController, TMetricsManager>> {
  public:
   using controller_type = TController;
 
   robot_configurer(const cavis::config::visualization_config* const config,
                    cforacle::foraging_oracle* const oracle,
                    TMetricsManager* const metrics_manager)
-      : mc_config(config),
+      : ER_CLIENT_INIT("fordyca.argos.support.d1.robot_configurer"),
+        mc_config(config),
         m_oracle(oracle),
         m_metrics_manager(metrics_manager) {}
+
+  robot_configurer(const robot_configurer&) = default;
+  robot_configurer& operator=(const robot_configurer&) = delete;
+
 
   template<typename U = TController,
            RCPPSW_SFINAE_TYPELIST_REJECT(controller::d1::oracular_typelist,
@@ -109,6 +115,8 @@ class robot_configurer {
   } /* controller_config_vis() */
 
   void controller_config_oracle(controller_type *const c) const {
+    ER_ASSERT(nullptr != m_oracle,
+              "Oracle must be defined in XML to use oracular controllers");
     if (nullptr != m_oracle->tasking()) {
       m_oracle->tasking()->listener_add(c->executive());
     }
@@ -128,4 +136,3 @@ class robot_configurer {
 };
 
 NS_END(d1, support, argos, fordyca);
-

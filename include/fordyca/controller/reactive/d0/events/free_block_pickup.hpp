@@ -85,4 +85,3 @@ class free_block_pickup : public rer::client<free_block_pickup>,
 using free_block_pickup_visitor = rpvisitor::filtered_visitor<free_block_pickup>;
 
 NS_END(events, d0, reactive, controller, fordyca);
-

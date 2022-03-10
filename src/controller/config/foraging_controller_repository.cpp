@@ -24,11 +24,9 @@
 #include "fordyca/controller/config/foraging_controller_repository.hpp"
 
 #include "cosm/repr/config/xml/nest_parser.hpp"
-#include "cosm/subsystem/config/xml/actuation_subsystem2D_parser.hpp"
-#include "cosm/hal/subsystem/config/xml/sensing_subsystemQ3D_parser.hpp"
-#include "cosm/pal/config/xml/output_parser.hpp"
 
 #include "fordyca/strategy/config/strategy_parser.hpp"
+#include "cosm/hal/subsystem/config/xml/sensing_subsystemQ3D_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,15 +37,6 @@ NS_START(fordyca, controller, config);
  * Constructors/Destructor
  ******************************************************************************/
 foraging_controller_repository::foraging_controller_repository(void) {
-  parser_register<csconfig::xml::actuation_subsystem2D_parser,
-                  csconfig::actuation_subsystem2D_config>(
-                      csconfig::xml::actuation_subsystem2D_parser::kXMLRoot);
-  parser_register<chsubsystem::config::xml::sensing_subsystemQ3D_parser,
-                  chsubsystem::config::sensing_subsystemQ3D_config>(
-                      chsubsystem::config::xml::sensing_subsystemQ3D_parser::kXMLRoot);
-  parser_register<cpcxml::output_parser, cpconfig::output_config>(
-      cpcxml::output_parser::kXMLRoot);
-
   parser_register<fsconfig::strategy_parser, fsconfig::strategy_config>(
       fsconfig::strategy_parser::kXMLRoot);
   parser_register<crepr::config::xml::nest_parser, crepr::config::nest_config>(

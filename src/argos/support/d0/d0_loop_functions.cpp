@@ -49,6 +49,9 @@
 #include "fordyca/argos/support/d0/robot_configurer_applicator.hpp"
 #include "fordyca/argos/support/d0/robot_los_update_applicator.hpp"
 #include "fordyca/argos/support/tv/tv_manager.hpp"
+#include "fordyca/argos/support/tv/fordyca_pd_adaptor.hpp"
+#include "fordyca/argos/support/tv/env_dynamics.hpp"
+
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/

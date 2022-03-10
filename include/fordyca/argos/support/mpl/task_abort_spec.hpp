@@ -72,4 +72,3 @@ using task_abort_spec = typename boost::mpl::fold<
   >::type;
 
 NS_END(mpl, support, argos, fordyca);
-

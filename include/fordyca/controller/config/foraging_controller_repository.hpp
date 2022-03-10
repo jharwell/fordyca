@@ -23,7 +23,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/config/xml/xml_config_repository.hpp"
+#include "cosm/controller/config/xml/base_controller_repository.hpp"
 
 #include "fordyca/fordyca.hpp"
 
@@ -43,10 +43,9 @@ NS_START(fordyca, controller, config);
  * all foraging controllers.
  */
 class foraging_controller_repository
-    : public rconfig::xml::xml_config_repository {
+    : public virtual ccontroller::config::xml::base_controller_repository {
  public:
   foraging_controller_repository(void) RCPPSW_COLD;
 };
 
 NS_END(config, controller, fordyca);
-

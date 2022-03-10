@@ -60,7 +60,7 @@ bool block_acq_validator::operator()(const rmath::vector2d& loc,
             loc.to_str().c_str());
     return false;
   }
-  const auto& config = boost::get<fcconfig::block_sel::block_pickup_policy_config>(
+  const auto& config = std::get<fcconfig::block_sel::block_pickup_policy_config>(
       mc_matrix->find(bselm::kPickupPolicy)->second);
 
   /*

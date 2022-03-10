@@ -22,9 +22,11 @@ set(fordyca_CHECK_LANGUAGE "CXX")
 # COSM
 if("${COSM_BUILD_FOR}" MATCHES "ARGOS_FOOTBOT")
   find_package(cosm-argos-footbot)
-elseif("${COSM_BUILD_FOR}" MATCHES "ROS_TURTLEBOT3")
-  find_package(cosm-ros-turtlebot3
+elseif("${COSM_BUILD_FOR}" MATCHES "ROS_ETURTLEBOT3")
+  find_package(cosm-ros-eturtlebot3
     HINTS ${CMAKE_INSTALL_PREFIX})
+else()
+  message(FATAL_ERROR "FORDYCA only supports [ARGOS_FOOTBOT,ROS_TURTLEBOT3]")
 endif()
 
 ################################################################################
@@ -124,22 +126,30 @@ foreach(component ${fordyca_FIND_COMPONENTS})
 endforeach()
 
 # Define the FORDYCA library
-set(fordyca_LIBRARY_NAME fordyca-${COSM_HAL_TARGET})
+set(fordyca_LIBRARY fordyca-${COSM_HAL_TARGET})
 
 add_library(
-  ${fordyca_LIBRARY_NAME}
+  ${fordyca_LIBRARY}
   SHARED
   ${fordyca_components_SRC}
   )
 
 # alias so we plug into the LIBRA framework properly
-add_library(fordyca ALIAS ${fordyca_LIBRARY_NAME})
+add_library(fordyca ALIAS ${fordyca_LIBRARY})
+
+execute_process(COMMAND git rev-list --count HEAD
+  OUTPUT_VARIABLE FORDYCA_VERSION
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+set(fordyca_LIBRARY_NAME fordyca-${COSM_HAL_TARGET}-v${FORDYCA_VERSION})
+set_target_properties(${fordyca_LIBRARY}
+  PROPERTIES OUTPUT_NAME
+  ${fordyca_LIBRARY_NAME})
 
 ########################################
 # Include directories
 ########################################
 target_include_directories(
-  ${fordyca_LIBRARY_NAME}
+  ${fordyca_LIBRARY}
   PUBLIC
   $<BUILD_INTERFACE:${fordyca_DIR}/include>
   $<BUILD_INTERFACE:${cosm_INCLUDE_DIRS}>
@@ -149,13 +159,13 @@ target_include_directories(
 ########################################
 # Link Libraries
 ########################################
-target_link_libraries(${fordyca_LIBRARY_NAME}
+target_link_libraries(${fordyca_LIBRARY}
   cosm-${COSM_HAL_TARGET}::cosm-${COSM_HAL_TARGET}
   rt
   )
 
 if ("${COSM_BUILD_FOR}" MATCHES "ARGOS")
-  target_link_libraries(${fordyca_LIBRARY_NAME}
+  target_link_libraries(${fordyca_LIBRARY}
     argos3core_simulator
     argos3plugin_simulator_footbot
     argos3plugin_simulator_epuck
@@ -165,13 +175,13 @@ if ("${COSM_BUILD_FOR}" MATCHES "ARGOS")
     argos3plugin_simulator_qtopengl
     argos3plugin_simulator_media
     )
-  target_link_libraries(${fordyca_LIBRARY_NAME}
+  target_link_libraries(${fordyca_LIBRARY}
     nlopt
     )
 
   if ("${COSM_BUILD_ENV}" MATCHES "MSI")
     # For nlopt
-    target_link_directories(${fordyca_LIBRARY_NAME}
+    target_link_directories(${fordyca_LIBRARY}
       PUBLIC
       ${LIBRA_DEPS_PREFIX}/lib64
       )
@@ -186,30 +196,30 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
 ########################################
 if ("${COSM_BUILD_FOR}" MATCHES "ARGOS")
   if (FORDYCA_WITH_ROBOT_RAB)
-    target_compile_definitions(${fordyca_LIBRARY_NAME}
+    target_compile_definitions(${fordyca_LIBRARY}
       PUBLIC
       FORDYCA_WITH_ROBOT_RAB)
   endif()
   if (FORDYCA_WITH_ROBOT_BATTERY)
-    target_compile_definitions(${fordyca_LIBRARY_NAME}
+    target_compile_definitions(${fordyca_LIBRARY}
       PUBLIC
       FORDYCA_WITH_ROBOT_BATTERY)
   endif()
   if (FORDYCA_WITH_ROBOT_CAMERA)
-    target_compile_definitions(${fordyca_LIBRARY_NAME}
+    target_compile_definitions(${fordyca_LIBRARY}
       PUBLIC
       FORDYCA_WITH_ROBOT_CAMERA)
   endif()
 endif()
 
 if (FORDYCA_WITH_ROBOT_LEDS)
-  target_compile_definitions(${fordyca_LIBRARY_NAME}
+  target_compile_definitions(${fordyca_LIBRARY}
     PUBLIC
     FORDYCA_WITH_ROBOT_LEDS)
 endif()
 
 if ("${COSM_BUILD_FOR}" MATCHES "MSI")
-  target_compile_options(${fordyca_LIBRARY_NAME} PUBLIC
+  target_compile_options(${fordyca_LIBRARY} PUBLIC
     -Wno-missing-include-dirs
     -fno-new-inheriting-ctors)
 endif()
@@ -217,10 +227,10 @@ endif()
 ################################################################################
 # Installation                                                                 #
 ################################################################################
-configure_exports_as(${fordyca_LIBRARY_NAME} ${CMAKE_INSTALL_PREFIX})
+configure_exports_as(${fordyca_LIBRARY} ${CMAKE_INSTALL_PREFIX})
 
 # Install fordyca
-register_target_for_install(${fordyca_LIBRARY_NAME} ${CMAKE_INSTALL_PREFIX})
+register_target_for_install(${fordyca_LIBRARY} ${CMAKE_INSTALL_PREFIX})
 register_headers_for_install(include/fordyca ${CMAKE_INSTALL_PREFIX})
 
 ################################################################################

@@ -81,4 +81,3 @@ class dpo_parser : public rer::client<dpo_parser>,
 };
 
 NS_END(config, perception, subsystem, fordyca);
-

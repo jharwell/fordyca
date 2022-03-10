@@ -102,7 +102,7 @@ void d2_metrics_manager::task_start_cb(
 
 void d2_metrics_manager::task_finish_or_abort_cb(
     const cta::polled_task* const task) {
-  collect("tasks::execution::" + task->name(),
+  collect("tasks/execution/" + task->name(),
           dynamic_cast<const ctametrics::execution_metrics&>(*task));
 } /* task_finish_or_abort_cb() */
 
@@ -123,20 +123,20 @@ void d2_metrics_manager::register_standard(
       fmspecs::tasks::tab::kCollector.scoped,
       rmetrics::output_mode::ekAPPEND },
     { typeid(ctametrics::execution_metrics_collector),
-      "task_execution_cache_starter",
-      "tasks::execution::" + std::string(task2::kCacheStarterName),
+      fmspecs::tasks::exec::kCacheStarter.xml,
+      fmspecs::tasks::exec::kCacheStarter.scoped,
       rmetrics::output_mode::ekAPPEND },
     { typeid(ctametrics::execution_metrics_collector),
-      "task_execution_cache_finisher",
-      "tasks::execution::" + std::string(task2::kCacheFinisherName),
+      fmspecs::tasks::exec::kCacheFinisher.xml,
+      fmspecs::tasks::exec::kCacheFinisher.scoped,
       rmetrics::output_mode::ekAPPEND },
     { typeid(ctametrics::execution_metrics_collector),
-      "task_execution_cache_transferer",
-      "tasks::execution::" + std::string(task2::kCacheTransfererName),
+      fmspecs::tasks::exec::kCacheTransferer.xml,
+      fmspecs::tasks::exec::kCacheTransferer.scoped,
       rmetrics::output_mode::ekAPPEND },
     { typeid(ctametrics::execution_metrics_collector),
-      "task_execution_cache_collector",
-      "tasks::execution::" + std::string(task2::kCacheCollectorName),
+      fmspecs::tasks::exec::kCacheCollector.xml,
+      fmspecs::tasks::exec::kCacheCollector.scoped,
       rmetrics::output_mode::ekAPPEND },
     { typeid(fmetrics::caches::site_selection_metrics_collector),
       fmspecs::caches::kSiteSelection.xml,

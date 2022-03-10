@@ -35,6 +35,7 @@
 #include "rcppsw/utils/color.hpp"
 
 #include "cosm/pal/argos/swarm_manager_adaptor.hpp"
+#include "cosm/pal/controller/controller2D.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/argos/support/tv/tv_manager.hpp"

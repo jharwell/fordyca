@@ -23,10 +23,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <boost/variant.hpp>
 #include <map>
 #include <string>
 #include <vector>
+#include <variant>
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/range.hpp"
@@ -48,7 +48,7 @@ NS_START(fordyca, controller, cognitive);
  * matrix can have the same type.
  */
 using cache_sel_variant =
-    boost::variant<rtypes::spatial_dist,
+    std::variant<rtypes::spatial_dist,
                    rmath::vector2d,
                    rmath::rangez,
                    std::vector<rtypes::type_uuid>,

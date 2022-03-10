@@ -61,10 +61,10 @@ class foraging_task
                 std::unique_ptr<cta::taskable> mechanism);
   ~foraging_task(void) override = default;
 
-  static inline const std::string kCacheStarterName = "Cache Starter";
-  static inline const std::string kCacheFinisherName = "Cache Finisher";
-  static inline const std::string kCacheTransfererName = "Cache Transferer";
-  static inline const std::string kCacheCollectorName = "Cache Collector";
+  static inline const std::string kCacheStarterName = "cache_starter";
+  static inline const std::string kCacheFinisherName = "cache_finisher";
+  static inline const std::string kCacheTransfererName = "cache_transferer";
+  static inline const std::string kCacheCollectorName = "cache_collector";
 
   static bool task_in_d2(const polled_task* task) RCPPSW_PURE;
 
@@ -73,4 +73,3 @@ class foraging_task
 };
 
 NS_END(d2, tasks, fordyca);
-

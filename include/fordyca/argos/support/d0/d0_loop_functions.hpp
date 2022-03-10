@@ -27,6 +27,7 @@
 
 #include "rcppsw/ds/type_map.hpp"
 #include "rcppsw/ds/grid2D_overlay.hpp"
+#include "rcppsw/mpl/typelist.hpp"
 
 #include "cosm/controller/operations/grid_los_update.hpp"
 #include "cosm/controller/operations/metrics_extract.hpp"
@@ -34,6 +35,7 @@
 
 #include "fordyca/repr/forager_los.hpp"
 #include "fordyca/argos/support/argos_swarm_manager.hpp"
+#include "fordyca/controller/controller_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -91,7 +93,7 @@ class d0_loop_functions : public fasupport::argos_swarm_manager,
 
 private:
   using interactor_map_type = rds::type_map<
-    rmpl::typelist_wrap_apply<controller::d0::typelist,
+    rmpl::typelist_wrap_apply<fcontroller::d0::typelist,
                               robot_arena_interactor,
                               carena::caching_arena_map>::type
     >;
@@ -153,4 +155,3 @@ private:
 };
 
 NS_END(d0, support, argos, fordyca);
-

@@ -110,7 +110,7 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
 
   const carepr::arena_cache* cache(void) const { return mc_cache; }
 
-  crepr::sim_block3D* block(void);
+  crepr::sim_block3D* block(void) RCPPSW_PURE;
 
  private:
   /* FSMs */

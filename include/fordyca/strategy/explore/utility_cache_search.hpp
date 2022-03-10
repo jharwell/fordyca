@@ -44,7 +44,7 @@ NS_START(fordyca, strategy, explore);
  * compute where a cache would ideally be located, and vector to it, begining
  * performing CRW at that location.
  */
-class utility_cache_search : public localized_search {
+class utility_cache_search final : public localized_search {
  public:
   utility_cache_search(const fstrategy::strategy_params* const c_params,
                        rmath::rng* rng);

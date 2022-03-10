@@ -40,6 +40,7 @@
 #include "fordyca/argos/metrics/base_fs_output_manager.hpp"
 #include "fordyca/argos/support/tv/env_dynamics.hpp"
 #include "fordyca/argos/support/tv/fordyca_pd_adaptor.hpp"
+#include "fordyca/argos/support/tv/tv_manager.hpp"
 
 /*******************************************************************************
  * Namespaces

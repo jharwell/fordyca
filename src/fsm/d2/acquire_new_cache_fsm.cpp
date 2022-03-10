@@ -25,6 +25,7 @@
 
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/controller/cognitive/d2/new_cache_selector.hpp"
@@ -76,7 +77,7 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
                   std::bind([](void) noexcept { return false; })),
               RCPPSW_STRUCT_DOT_INITIALIZER(goal_valid_cb,
                                             [](const rmath::vector2d&,
-                                               const rtypes::type_uuid&) {
+                                               const rtypes::type_uuid&) noexcept {
                                               return true;
                                             }) }),
       mc_matrix(c_ro->csel_matrix),
@@ -103,7 +104,7 @@ acquire_new_cache_fsm::cache_select(void) {
             rcppsw::to_string(best->ranchor2D()).c_str(),
             rcppsw::to_string(best->danchor2D()).c_str());
 
-    auto tol = boost::get<rtypes::spatial_dist>(
+    auto tol = std::get<rtypes::spatial_dist>(
         mc_matrix->find(cselm::kNewCacheDropTolerance)->second);
     return boost::make_optional(
         acquire_goal_fsm::candidate_type(best->rcenter2D(), tol.v(), best->id()));

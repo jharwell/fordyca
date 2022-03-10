@@ -51,6 +51,8 @@
 #include "fordyca/argos/support/d1/static_cache_locs_calculator.hpp"
 #include "fordyca/argos/support/d1/static_cache_manager.hpp"
 #include "fordyca/argos/support/tv/tv_manager.hpp"
+#include "fordyca/argos/support/tv/fordyca_pd_adaptor.hpp"
+#include "fordyca/argos/support/tv/env_dynamics.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

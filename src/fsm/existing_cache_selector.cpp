@@ -68,7 +68,7 @@ existing_cache_selector::operator()(const fspds::dp_cache_map& existing_caches,
     }
     math::existing_cache_utility u(
         c.ent()->rcenter2D(),
-        boost::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second));
+        std::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second));
 
     double utility = u.calc(position, c.density(), c.ent()->n_blocks());
     ER_ASSERT(utility > 0.0, "Bad utility calculation");
@@ -120,10 +120,10 @@ bool existing_cache_selector::cache_is_excluded(
 
   std::vector<rtypes::type_uuid> exceptions;
   if (mc_is_pickup) {
-    exceptions = boost::get<std::vector<rtypes::type_uuid>>(
+    exceptions = std::get<std::vector<rtypes::type_uuid>>(
         mc_matrix->find(cselm::kPickupExceptions)->second);
   } else {
-    exceptions = boost::get<std::vector<rtypes::type_uuid>>(
+    exceptions = std::get<std::vector<rtypes::type_uuid>>(
         mc_matrix->find(cselm::kDropExceptions)->second);
   }
 

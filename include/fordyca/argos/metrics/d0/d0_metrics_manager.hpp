@@ -72,4 +72,3 @@ class d0_metrics_manager : public fametrics::base_fs_output_manager,
 };
 
 NS_END(d0, metrics, argos, fordyca);
-

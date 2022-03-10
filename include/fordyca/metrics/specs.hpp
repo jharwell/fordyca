@@ -59,7 +59,20 @@ extern cmspecs::name_spec kLifecycle;
 
 NS_END(caches);
 
-NS_START(tasks, tab);
+NS_START(tasks, exec);
+
+
+extern cmspecs::name_spec kGeneralist;
+extern cmspecs::name_spec kHarvester;
+extern cmspecs::name_spec kCollector;
+extern cmspecs::name_spec kCacheStarter;
+extern cmspecs::name_spec kCacheFinisher;
+extern cmspecs::name_spec kCacheTransferer;
+extern cmspecs::name_spec kCacheCollector;
+
+NS_END(exec);
+
+NS_START(tab);
 
 extern cmspecs::name_spec kGeneralist;
 extern cmspecs::name_spec kHarvester;
@@ -68,4 +81,3 @@ extern cmspecs::name_spec kCollector;
 NS_END(tab, tasks);
 
 NS_END(specs, metrics, fordyca);
-

@@ -81,7 +81,7 @@ cache_site_selector::operator()(const cads::bcache_vectorno& known_caches,
 
   bool site_ok = verify_site(site, known_caches);
   bool strict =
-      boost::get<bool>(mc_matrix->find(cselm::kStrictConstraints)->second);
+      std::get<bool>(mc_matrix->find(cselm::kStrictConstraints)->second);
 
   if (site_ok || (!site_ok && !strict)) {
     return boost::make_optional(site);
@@ -126,7 +126,7 @@ void cache_site_selector::opt_initialize(const opt_init_conditions* cond,
                                          std::vector<double>* initial_guess,
                                          rmath::rng* rng) {
   rmath::vector2d nest_loc =
-      boost::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second);
+      std::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second);
 
   ER_INFO("Known caches: [%s]", rcppsw::to_string(cond->known_caches).c_str());
 
@@ -140,9 +140,9 @@ void cache_site_selector::opt_initialize(const opt_init_conditions* cond,
           std::get<1>(m_constraints).size());
 
   auto xrange =
-      boost::get<rmath::rangez>(mc_matrix->find(cselm::kSiteXRange)->second);
+      std::get<rmath::rangez>(mc_matrix->find(cselm::kSiteXRange)->second);
   auto yrange =
-      boost::get<rmath::rangez>(mc_matrix->find(cselm::kSiteYRange)->second);
+      std::get<rmath::rangez>(mc_matrix->find(cselm::kSiteYRange)->second);
   *utility_data = { cond->position, nest_loc };
   m_alg.set_max_objective(&__site_utility_func, utility_data);
   m_alg.set_ftol_rel(kUTILITY_TOL);
@@ -174,14 +174,14 @@ void cache_site_selector::constraints_create(const cads::bcache_vectorno& known_
     std::get<0>(m_constraints)
         .push_back({ c,
                      this,
-                     boost::get<rtypes::spatial_dist>(
+                     std::get<rtypes::spatial_dist>(
                          mc_matrix->find(cselm::kCacheProxDist)->second) });
   } /* for(&c..) */
 
   std::get<1>(m_constraints)
       .push_back({ nest_loc,
                    this,
-                   boost::get<rtypes::spatial_dist>(
+                   std::get<rtypes::spatial_dist>(
                        mc_matrix->find(cselm::kNestProxDist)->second) });
 
   for (auto& c : std::get<0>(m_constraints)) {

@@ -62,10 +62,10 @@ block_selector::operator()(const fspds::dp_block_map& blocks,
      */
     double priority =
         (crepr::block_type::ekCUBE == b.ent()->md()->type())
-            ? boost::get<double>(mc_matrix->find(bselm::kCubePriority)->second)
-            : boost::get<double>(mc_matrix->find(bselm::kRampPriority)->second);
+            ? std::get<double>(mc_matrix->find(bselm::kCubePriority)->second)
+            : std::get<double>(mc_matrix->find(bselm::kRampPriority)->second);
     rmath::vector2d nest_loc =
-        boost::get<rmath::vector2d>(mc_matrix->find(bselm::kNestLoc)->second);
+        std::get<rmath::vector2d>(mc_matrix->find(bselm::kNestLoc)->second);
 
     double utility = math::block_utility(b.ent()->ranchor2D(), nest_loc)(
         position, b.density(), priority);
@@ -110,7 +110,7 @@ bool block_selector::block_is_excluded(
              block_dim);
     return true;
   }
-  auto exceptions = boost::get<std::vector<rtypes::type_uuid>>(
+  auto exceptions = std::get<std::vector<rtypes::type_uuid>>(
       mc_matrix->find(bselm::kSelExceptions)->second);
   if (std::any_of(exceptions.begin(), exceptions.end(), [&](auto& id) {
         return id == block->id();

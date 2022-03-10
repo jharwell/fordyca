@@ -23,6 +23,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "cosm/ta/config/xml/repository.hpp"
+
 #include "fordyca/controller/config/d0/mdpo_controller_repository.hpp"
 
 /*******************************************************************************
@@ -40,10 +42,10 @@ NS_START(fordyca, controller, config, d1);
  * \brief Collection of all parameter parsers and parse results needed
  * by d1 controllers.
  */
-class controller_repository: public d0::mdpo_controller_repository {
+class controller_repository: public d0::mdpo_controller_repository,
+                             public cta::config::xml::repository {
  public:
   controller_repository(void) RCPPSW_COLD;
 };
 
 NS_END(d1, config, controller, fordyca);
-

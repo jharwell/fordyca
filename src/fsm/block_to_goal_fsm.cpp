@@ -25,6 +25,8 @@
 
 #include "cosm/spatial/fsm/acquire_goal_fsm.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
+#include "cosm/subsystem/actuation_subsystem2D.hpp"
+#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"

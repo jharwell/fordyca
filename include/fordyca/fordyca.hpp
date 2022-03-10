@@ -258,6 +258,9 @@ namespace fsexplore = fstrategy::explore;
 namespace fsconfig = fstrategy::config;
 
 namespace ftasks = fordyca::tasks;
+namespace ftd0 = ftasks::d0;
+namespace ftd1 = ftasks::d1;
+namespace ftd2 = ftasks::d2;
 
 namespace fevents = fordyca::events;
 

@@ -23,6 +23,10 @@
  ******************************************************************************/
 #include "fordyca/metrics/specs.hpp"
 
+#include "fordyca/tasks/d0/foraging_task.hpp"
+#include "fordyca/tasks/d1/foraging_task.hpp"
+#include "fordyca/tasks/d2/foraging_task.hpp"
+
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
@@ -89,7 +93,40 @@ cmspecs::name_spec kLifecycle = {
 
 NS_END(caches);
 
-NS_START(tasks, tab);
+NS_START(tasks, exec);
+
+
+cmspecs::name_spec kGeneralist = {
+  "task_execution_generalist",
+  "tasks/execution/" + ftd0::foraging_task::kGeneralistName
+};
+cmspecs::name_spec kHarvester = {
+  "task_execution_harvester",
+  "tasks/execution/" + ftd1::foraging_task::kHarvesterName
+};
+cmspecs::name_spec kCollector = {
+  "task_execution_collector",
+  "tasks/execution/" + ftd1::foraging_task::kCollectorName
+};
+cmspecs::name_spec kCacheStarter = {
+  "task_execution_cache_starter",
+  "tasks/execution/" + ftd2::foraging_task::kCacheStarterName
+};
+cmspecs::name_spec kCacheFinisher = {
+  "task_execution_cache_finisher",
+  "tasks/execution/" + ftd2::foraging_task::kCacheFinisherName
+};
+cmspecs::name_spec kCacheTransferer = {
+  "task_execution_cache_transferer",
+  "tasks/execution/" + ftd2::foraging_task::kCacheTransfererName
+};
+cmspecs::name_spec kCacheCollector = {
+  "task_execution_cache_collector",
+  "tasks/execution/" + ftd2::foraging_task::kCacheCollectorName
+};
+
+NS_END(exec);
+NS_START(tab);
 
 cmspecs::name_spec kGeneralist = {
   "task_tab_generalist",
@@ -104,6 +141,8 @@ cmspecs::name_spec kCollector = {
   "tasks/tab/collector"
 };
 
-NS_END(tab, tasks);
+NS_END(tab);
+
+NS_END(tasks);
 
 NS_END(specs, metrics, fordyca);

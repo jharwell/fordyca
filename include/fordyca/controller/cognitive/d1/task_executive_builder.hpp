@@ -142,9 +142,7 @@ class task_executive_builder : public rer::client<task_executive_builder> {
   cspatial::nest_zone_tracker* const                   m_nz_tracker;
   csubsystem::saa_subsystemQ3D* const                  m_saa;
   fsperception::foraging_perception_subsystem* const   m_perception;
-
   /* clang-format on */
 };
 
 NS_END(cognitive, d1, controller, fordyca);
-

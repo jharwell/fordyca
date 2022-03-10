@@ -45,6 +45,8 @@
 #include "fordyca/argos/support/argos_swarm_manager.hpp"
 #include "fordyca/argos/support/tv/tv_manager.hpp"
 #include "fordyca/metrics/specs.hpp"
+#include "fordyca/argos/support/tv/fordyca_pd_adaptor.hpp"
+#include "fordyca/argos/support/tv/env_dynamics.hpp"
 
 /*******************************************************************************
  * Namespaces

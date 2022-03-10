@@ -125,7 +125,7 @@ void d1_metrics_manager::task_finish_or_abort_cb(
   if (!(task1::task_in_d1(task) || task0::task_in_d0(task))) {
     return;
   }
-  collect("tasks::execution::" + task->name(),
+  collect("tasks/execution/" + task->name(),
           dynamic_cast<const ctametrics::execution_metrics&>(*task));
 } /* task_finish_or_abort_cb() */
 
@@ -160,20 +160,20 @@ void d1_metrics_manager::register_standard(
       fmspecs::caches::kAcqCounts.scoped,
       rmetrics::output_mode::ekAPPEND },
     { typeid(ctametrics::execution_metrics_collector),
-      "task_execution_collector",
-      "tasks::execution::" + task1::kCollectorName,
+      fmspecs::tasks::exec::kCollector.xml,
+      fmspecs::tasks::exec::kCollector.scoped,
       rmetrics::output_mode::ekAPPEND },
     { typeid(ctametrics::execution_metrics_collector),
-      "task_execution_harvester",
-      "tasks::execution::" + task1::kHarvesterName,
+      fmspecs::tasks::exec::kHarvester.xml,
+      fmspecs::tasks::exec::kHarvester.scoped,
       rmetrics::output_mode::ekAPPEND },
     { typeid(ctametrics::execution_metrics_collector),
-      "task_execution_generalist",
-      "tasks::execution::" + task0::kGeneralistName,
+      fmspecs::tasks::exec::kGeneralist.xml,
+      fmspecs::tasks::exec::kGeneralist.scoped,
       rmetrics::output_mode::ekAPPEND },
     { typeid(ctametrics::bi_tab_metrics_collector),
-      "task_tab_generalist",
-      "tasks::tab::generalist",
+      fmspecs::tasks::tab::kGeneralist.xml,
+      fmspecs::tasks::tab::kGeneralist.scoped,
       rmetrics::output_mode::ekAPPEND },
     { typeid(cametrics::caches::utilization_metrics_collector),
       fmspecs::caches::kUtilization.xml,

@@ -48,7 +48,7 @@ NS_START(strategy, explore);
  * CRW at that location, with the idea being that the likelihood of another
  * cache being nearby is higher, given that you've found one there before.
  */
-class likelihood_cache_search : public localized_search {
+class likelihood_cache_search final : public localized_search {
  public:
   likelihood_cache_search(const fstrategy::strategy_params* const c_params,
                           rmath::rng* rng);
@@ -80,4 +80,3 @@ class likelihood_cache_search : public localized_search {
 };
 
 NS_END(explore, strategy, fordyca);
-

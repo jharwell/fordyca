@@ -25,6 +25,8 @@
 
 #include "cosm/arena/repr/light_type_index.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
+#include "cosm/subsystem/actuation_subsystem2D.hpp"
 
 /*******************************************************************************
  * Namespaces

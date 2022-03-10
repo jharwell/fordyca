@@ -65,7 +65,7 @@ new_cache_selector::operator()(const fspds::dp_block_map& new_caches,
      */
     math::new_cache_utility u(
         c.ent()->rcenter2D(),
-        boost::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second));
+        std::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second));
 
     double utility = u.calc(position, c.density());
     ER_ASSERT(utility > 0.0, "Bad utility calculation");
@@ -98,9 +98,9 @@ bool new_cache_selector::new_cache_is_excluded(
     const fspds::dp_cache_map& existing_caches,
     const fspds::dp_block_map& blocks,
     const crepr::base_block3D* const new_cache) const {
-  auto cache_prox = boost::get<rtypes::spatial_dist>(
+  auto cache_prox = std::get<rtypes::spatial_dist>(
       mc_matrix->find(cselm::kCacheProxDist)->second);
-  auto cluster_prox = boost::get<rtypes::spatial_dist>(
+  auto cluster_prox = std::get<rtypes::spatial_dist>(
       mc_matrix->find(cselm::kClusterProxDist)->second);
 
   /*

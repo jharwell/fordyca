@@ -31,9 +31,11 @@
 #include "cosm/repr/config/nest_config.hpp"
 #include "cosm/hal/subsystem/config/sensing_subsystemQ3D_config.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
+#include "cosm/subsystem/actuation_subsystem2D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
 #include "cosm/ds/cell2D.hpp"
+#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 
 #include "fordyca/controller/config/block_sel/block_sel_matrix_config.hpp"
 #include "fordyca/controller/config/cache_sel/cache_sel_matrix_config.hpp"

@@ -40,10 +40,9 @@ NS_START(fordyca, controller, config, d0);
  * \brief Collection of all parameter parsers and parse results needed by
  * \ref dpo_controller.
  */
-class dpo_controller_repository: public cognitive_controller_repository {
+class dpo_controller_repository: public virtual cognitive_controller_repository {
  public:
   dpo_controller_repository(void) RCPPSW_COLD;
 };
 
 NS_END(d0, config, controller, fordyca);
-

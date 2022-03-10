@@ -116,7 +116,7 @@ class foraging_controller
   void irv_init(const ctv::robot_dynamics_applicator* rda) override final;
 
   /* block carrying controller overrides */
-  bool block_detected(void) const override;
+  bool block_detect(void) const override;
 
   /* movement metrics */
   rtypes::spatial_dist

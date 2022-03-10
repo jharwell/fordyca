@@ -71,7 +71,7 @@ free_block_to_nest_fsm::free_block_to_nest_fsm(
                                              &entry_transport_to_nest,
                                              &exit_transport_to_nest),
           RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&finished)),
-      mc_nest_loc(boost::get<rmath::vector2d>(
+      mc_nest_loc(std::get<rmath::vector2d>(
           c_ro->bsel_matrix->find(bsel_matrix::kNestLoc)->second)),
       m_block_fsm(c_ro, c_no, std::move(explore), rng) {}
 

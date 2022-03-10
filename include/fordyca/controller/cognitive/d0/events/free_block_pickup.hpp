@@ -93,7 +93,7 @@ class free_block_pickup : public rer::client<free_block_pickup>,
   void visit(fspds::dpo_store& store);
   void visit(fspds::dpo_semantic_map& map);
 
-  crepr::sim_block3D* block(void);
+  crepr::sim_block3D* block(void) RCPPSW_PURE;
 
 
  private:

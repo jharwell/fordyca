@@ -166,7 +166,7 @@
           <proximity_sensor fov="-2.61:2.61"
                             delta="0.1" />
 
-          <ground_sensor>
+          <env_sensor>
             <!-- NEST: The nest is a relatively light gray. -->
             <nest range="0.6:0.8"
                   consensus="3"/>
@@ -176,7 +176,7 @@
             <!-- CACHE: Caches are dark gray. -->
             <cache range="0.3:0.5"
                    consensus="3"/>
-          </ground_sensor>
+          </env_sensor>
         </sensing_subsystemQ3D>
         <actuation_subsystem2D>
           <force_calculator>

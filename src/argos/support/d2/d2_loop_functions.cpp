@@ -50,6 +50,8 @@
 #include "fordyca/argos/support/d2/robot_arena_interactor.hpp"
 #include "fordyca/argos/support/d2/robot_configurer.hpp"
 #include "fordyca/argos/support/tv/tv_manager.hpp"
+#include "fordyca/argos/support/tv/fordyca_pd_adaptor.hpp"
+#include "fordyca/argos/support/tv/env_dynamics.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

@@ -63,7 +63,7 @@ class foraging_task
  public:
   using variant_type = boost::variant<generalist*>;
 
-  static inline const std::string kGeneralistName = "Generalist";
+  static inline const std::string kGeneralistName = "generalist";
 
   foraging_task(const std::string& name,
                 const cta::config::task_alloc_config* config,
@@ -75,4 +75,3 @@ class foraging_task
 };
 
 NS_END(d0, tasks, fordyca);
-

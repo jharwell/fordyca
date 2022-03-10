@@ -83,8 +83,8 @@ d0_metrics_manager::d0_metrics_manager(
       fmspecs::perception::kMDPO.scoped,
       rmetrics::output_mode::ekAPPEND },
     { typeid(fmetrics::perception::dpo_metrics_collector),
-      fmspecs::perception::kMDPO.xml,
-      fmspecs::perception::kMDPO.scoped,
+      fmspecs::perception::kDPO.xml,
+      fmspecs::perception::kDPO.scoped,
       rmetrics::output_mode::ekAPPEND }
   };
 

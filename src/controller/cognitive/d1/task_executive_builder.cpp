@@ -165,9 +165,12 @@ csfsm::fsm_params fsm_params {
   graph->install_tab(
       tasks::d0::foraging_task::kGeneralistName, std::move(children), rng);
   return tasking_map{
-    { "generalist", graph->find_vertex(tasks::d0::foraging_task::kGeneralistName) },
-    { "collector", graph->find_vertex(tasks::d1::foraging_task::kCollectorName) },
-    { "harvester", graph->find_vertex(tasks::d1::foraging_task::kHarvesterName) }
+    { tasks::d0::foraging_task::kGeneralistName,
+          graph->find_vertex(tasks::d0::foraging_task::kGeneralistName) },
+    { tasks::d1::foraging_task::kCollectorName,
+          graph->find_vertex(tasks::d1::foraging_task::kCollectorName) },
+    { tasks::d1::foraging_task::kHarvesterName,
+          graph->find_vertex(tasks::d1::foraging_task::kHarvesterName) }
   };
 } /* d1_tasks_create() */
 
@@ -185,9 +188,9 @@ void task_executive_builder::d1_exec_est_init(
    * Generalist is not partitionable in depth 0 initialization, so this has
    * not been done.
    */
-  auto* harvester = map.find("harvester")->second;
-  auto* collector = map.find("collector")->second;
-  auto* generalist = map.find("generalist")->second;
+  auto* harvester = map.find(ftd1::foraging_task::kHarvesterName)->second;
+  auto* collector = map.find(ftd1::foraging_task::kCollectorName)->second;
+  auto* generalist = map.find(ftd0::foraging_task::kGeneralistName)->second;
 
   if (0 == rng->uniform(0, 1)) {
     graph->root_tab()->last_subtask(harvester);
@@ -196,7 +199,7 @@ void task_executive_builder::d1_exec_est_init(
   }
 
   rmath::rangez g_bounds =
-      task_config->exec_est.ranges.find("generalist")->second;
+      task_config->exec_est.ranges.find(ftd0::foraging_task::kGeneralistName)->second;
 
   auto h_bounds = task_config->exec_est.ranges.find("harvester")->second;
   auto c_bounds = task_config->exec_est.ranges.find("collector")->second;
@@ -219,8 +222,8 @@ void task_executive_builder::d1_subtasks_init(const tasking_map& map,
    * Generalist is not partitionable in depth 0 initialization, so this has
    * not been done.
    */
-  auto* harvester = map.find("harvester")->second;
-  auto* collector = map.find("collector")->second;
+  auto* harvester = map.find(ftd1::foraging_task::kHarvesterName)->second;
+  auto* collector = map.find(ftd1::foraging_task::kCollectorName)->second;
 
   if (0 == rng->uniform(0, 1)) {
     graph->root_tab()->last_subtask(harvester);
@@ -234,9 +237,9 @@ std::unique_ptr<cta::bi_tdgraph_executive> task_executive_builder::operator()(
     rmath::rng* rng) {
   const auto* task_config =
       config_repo.config_get<cta::config::task_alloc_config>();
-  auto variant =
-      std::make_unique<cta::ds::ds_variant>(cta::ds::bi_tdgraph(task_config));
-  auto* graph = &std::get<cta::ds::bi_tdgraph>(*variant.get());
+  cta::ds::ds_variant variant = std::make_unique<cta::ds::bi_tdgraph>(task_config);
+
+  auto* graph = std::get<std::unique_ptr<cta::ds::bi_tdgraph>>(variant).get();
   auto map = d1_tasks_create(config_repo, graph, rng);
   const auto* execp =
       config_repo.config_get<cta::config::task_executive_config>();

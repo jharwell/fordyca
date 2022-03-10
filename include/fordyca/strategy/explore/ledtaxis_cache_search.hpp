@@ -44,7 +44,7 @@ NS_START(fordyca, strategy, explore);
  * CRW at that location, with the idea being that the ledtaxis of another
  * cache being nearby is higher, given that you've found one there before.
  */
-class ledtaxis_cache_search : public foraging_strategy,
+class ledtaxis_cache_search final : public foraging_strategy,
                               public rer::client<ledtaxis_cache_search> {
  public:
   ledtaxis_cache_search(const fstrategy::strategy_params* params,
