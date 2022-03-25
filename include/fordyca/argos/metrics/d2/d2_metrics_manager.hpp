@@ -73,7 +73,7 @@ class d2_metrics_manager final : public d1::d1_metrics_manager,
     /* only Cache Starter implements these metrics */
     if (nullptr != task &&
         tasks::d2::foraging_task::kCacheStarterName == task->name()) {
-      collect(fmspecs::caches::kSiteSelection.scoped, *task);
+      collect(fmspecs::caches::kSiteSelection.scoped(), *task);
     }
   }
  private:
@@ -81,4 +81,3 @@ class d2_metrics_manager final : public d1::d1_metrics_manager,
 };
 
 NS_END(d2, metrics, argos, fordyca);
-

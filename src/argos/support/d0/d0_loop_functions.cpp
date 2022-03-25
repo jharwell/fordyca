@@ -220,7 +220,7 @@ void d0_loop_functions::post_step(void) {
 
   const auto* collector =
       m_metrics_manager->get<cfmetrics::block_transportee_metrics_collector>(
-          cmspecs::blocks::kTransportee.scoped);
+          cmspecs::blocks::kTransportee.scoped());
 
   /* update arena map */
   arena_map()->post_step_update(

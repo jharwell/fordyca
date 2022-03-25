@@ -106,13 +106,13 @@ void d1_metrics_manager::collect_from_cache(
       dynamic_cast<const cametrics::caches::utilization_metrics*>(cache);
   const auto* loc_m =
       dynamic_cast<const cametrics::caches::location_metrics*>(cache);
-  collect(fmspecs::caches::kUtilization.scoped, *util_m);
-  collect(fmspecs::caches::kLocations.scoped, *loc_m);
+  collect(fmspecs::caches::kUtilization.scoped(), *util_m);
+  collect(fmspecs::caches::kLocations.scoped(), *loc_m);
 } /* collect_from_cache() */
 
 void d1_metrics_manager::collect_from_cache_manager(
     const fascaches::base_manager* const manager) {
-  collect(fmspecs::caches::kLifecycle.scoped, *manager);
+  collect(fmspecs::caches::kLifecycle.scoped(), *manager);
 } /* collect_from_cache() */
 
 void d1_metrics_manager::task_finish_or_abort_cb(
@@ -143,7 +143,7 @@ void d1_metrics_manager::task_start_cb(const cta::polled_task* const,
   if (!(tab->root()->name() == task0::kGeneralistName)) {
     return;
   }
-  collect(fmspecs::tasks::tab::kGeneralist.scoped, *tab);
+  collect(fmspecs::tasks::tab::kGeneralist.scoped(), *tab);
 } /* task_start_cb() */
 
 void d1_metrics_manager::register_standard(
@@ -155,34 +155,48 @@ void d1_metrics_manager::register_standard(
       rmpl::identity<cametrics::caches::utilization_metrics_csv_sink>,
       rmpl::identity<fmetrics::caches::lifecycle_metrics_csv_sink> >;
   rmetrics::creatable_collector_set creatable_set = {
-    { typeid(csmetrics::goal_acq_metrics_collector),
-      fmspecs::caches::kAcqCounts.xml,
-      fmspecs::caches::kAcqCounts.scoped,
-      rmetrics::output_mode::ekAPPEND },
-    { typeid(ctametrics::execution_metrics_collector),
-      fmspecs::tasks::exec::kCollector.xml,
-      fmspecs::tasks::exec::kCollector.scoped,
-      rmetrics::output_mode::ekAPPEND },
-    { typeid(ctametrics::execution_metrics_collector),
-      fmspecs::tasks::exec::kHarvester.xml,
-      fmspecs::tasks::exec::kHarvester.scoped,
-      rmetrics::output_mode::ekAPPEND },
-    { typeid(ctametrics::execution_metrics_collector),
-      fmspecs::tasks::exec::kGeneralist.xml,
-      fmspecs::tasks::exec::kGeneralist.scoped,
-      rmetrics::output_mode::ekAPPEND },
-    { typeid(ctametrics::bi_tab_metrics_collector),
-      fmspecs::tasks::tab::kGeneralist.xml,
-      fmspecs::tasks::tab::kGeneralist.scoped,
-      rmetrics::output_mode::ekAPPEND },
-    { typeid(cametrics::caches::utilization_metrics_collector),
-      fmspecs::caches::kUtilization.xml,
-      fmspecs::caches::kUtilization.scoped,
-      rmetrics::output_mode::ekAPPEND },
-    { typeid(fmetrics::caches::lifecycle_metrics_collector),
-      fmspecs::caches::kLifecycle.xml,
-      fmspecs::caches::kLifecycle.scoped,
-      rmetrics::output_mode::ekAPPEND }
+    {
+      typeid(csmetrics::goal_acq_metrics_collector),
+      fmspecs::caches::kAcqCounts.xml(),
+      fmspecs::caches::kAcqCounts.scoped(),
+      rmetrics::output_mode::ekAPPEND
+    },
+    {
+      typeid(ctametrics::execution_metrics_collector),
+      fmspecs::tasks::exec::kCollector.xml(),
+      fmspecs::tasks::exec::kCollector.scoped(),
+      rmetrics::output_mode::ekAPPEND
+    },
+    {
+      typeid(ctametrics::execution_metrics_collector),
+      fmspecs::tasks::exec::kHarvester.xml(),
+      fmspecs::tasks::exec::kHarvester.scoped(),
+      rmetrics::output_mode::ekAPPEND
+    },
+    {
+      typeid(ctametrics::execution_metrics_collector),
+      fmspecs::tasks::exec::kGeneralist.xml(),
+      fmspecs::tasks::exec::kGeneralist.scoped(),
+      rmetrics::output_mode::ekAPPEND
+    },
+    {
+      typeid(ctametrics::bi_tab_metrics_collector),
+      fmspecs::tasks::tab::kGeneralist.xml(),
+      fmspecs::tasks::tab::kGeneralist.scoped(),
+      rmetrics::output_mode::ekAPPEND
+    },
+    {
+      typeid(cametrics::caches::utilization_metrics_collector),
+      fmspecs::caches::kUtilization.xml(),
+      fmspecs::caches::kUtilization.scoped(),
+      rmetrics::output_mode::ekAPPEND
+    },
+    {
+      typeid(fmetrics::caches::lifecycle_metrics_collector),
+      fmspecs::caches::kLifecycle.xml(),
+      fmspecs::caches::kLifecycle.scoped(),
+      rmetrics::output_mode::ekAPPEND
+    }
   };
 
     rmetrics::register_with_sink<d1_metrics_manager,
@@ -201,10 +215,12 @@ void d1_metrics_manager::register_with_decomp_depth(
   using sink_list =
       rmpl::typelist<rmpl::identity<ctametrics::bi_tdgraph_metrics_csv_sink> >;
   rmetrics::creatable_collector_set creatable_set = {
-    { typeid(ctametrics::bi_tdgraph_metrics_collector),
-      cmspecs::tasks::kDistribution.xml,
-      cmspecs::tasks::kDistribution.scoped,
-      rmetrics::output_mode::ekAPPEND }
+    {
+      typeid(ctametrics::bi_tdgraph_metrics_collector),
+      cmspecs::tasks::kDistribution.xml(),
+      cmspecs::tasks::kDistribution.scoped(),
+      rmetrics::output_mode::ekAPPEND
+    }
   };
   auto extra_args = std::make_tuple(depth);
 
@@ -230,22 +246,30 @@ void d1_metrics_manager::register_with_arena_dims2D(
       rmpl::identity<cametrics::caches::location_metrics_csv_sink> >;
 
   rmetrics::creatable_collector_set creatable_set = {
-    { typeid(csmetrics::goal_acq_locs2D_metrics_collector),
-      fmspecs::caches::kAcqLocs2D.xml,
-      fmspecs::caches::kAcqLocs2D.scoped,
-      rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE },
-    { typeid(csmetrics::explore_locs2D_metrics_collector),
-      fmspecs::caches::kAcqExploreLocs2D.xml,
-      fmspecs::caches::kAcqExploreLocs2D.scoped,
-      rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE },
-    { typeid(csmetrics::vector_locs2D_metrics_collector),
-      fmspecs::caches::kAcqVectorLocs2D.xml,
-      fmspecs::caches::kAcqVectorLocs2D.scoped,
-      rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE },
-    { typeid(cametrics::caches::location_metrics_collector),
-      fmspecs::caches::kLocations.xml,
-      fmspecs::caches::kLocations.scoped,
-      rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE }
+    {
+      typeid(csmetrics::goal_acq_locs2D_metrics_collector),
+      fmspecs::caches::kAcqLocs2D.xml(),
+      fmspecs::caches::kAcqLocs2D.scoped(),
+      rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE
+    },
+    {
+      typeid(csmetrics::explore_locs2D_metrics_collector),
+      fmspecs::caches::kAcqExploreLocs2D.xml(),
+      fmspecs::caches::kAcqExploreLocs2D.scoped(),
+      rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE
+    },
+    {
+      typeid(csmetrics::vector_locs2D_metrics_collector),
+      fmspecs::caches::kAcqVectorLocs2D.xml(),
+      fmspecs::caches::kAcqVectorLocs2D.scoped(),
+      rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE
+    },
+    {
+      typeid(cametrics::caches::location_metrics_collector),
+      fmspecs::caches::kLocations.xml(),
+      fmspecs::caches::kLocations.scoped(),
+      rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE
+    }
   };
 
   auto extra_args = std::make_tuple(dims);

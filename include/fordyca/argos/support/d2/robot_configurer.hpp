@@ -76,4 +76,3 @@ class robot_configurer : public d1::robot_configurer<TController,
   } /* operator() */
 };
 NS_END(d2, support, argos, fordyca);
-

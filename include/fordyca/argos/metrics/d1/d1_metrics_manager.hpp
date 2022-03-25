@@ -113,7 +113,7 @@ class d1_metrics_manager : public d0::d0_metrics_manager,
       const auto *mdpo = dynamic_cast<const fmetrics::perception::mdpo_metrics*>(
           controller->perception());
       if (nullptr != mdpo) {
-        collect(fmspecs::perception::kMDPO.scoped, *mdpo);
+        collect(fmspecs::perception::kMDPO.scoped(), *mdpo);
       }
       /*
        * Only controllers with DPO perception provide these.
@@ -121,7 +121,7 @@ class d1_metrics_manager : public d0::d0_metrics_manager,
       const auto *dpo = dynamic_cast<const fmetrics::perception::dpo_metrics*>(
           controller->perception());
       if (nullptr != dpo) {
-        collect(fmspecs::perception::kDPO.scoped, *dpo);
+        collect(fmspecs::perception::kDPO.scoped(), *dpo);
       }
     }
 
@@ -150,16 +150,16 @@ class d1_metrics_manager : public d0::d0_metrics_manager,
  private:
   template<typename Controller>
   void collect_controller_common(const Controller* const controller) {
-    collect(cmspecs::spatial::kNestZone.scoped, *controller->nz_tracker());
-    collect(fmspecs::blocks::kManipulation.scoped, *controller->block_manip_recorder());
+    collect(cmspecs::spatial::kNestZone.scoped(), *controller->nz_tracker());
+    collect(fmspecs::blocks::kManipulation.scoped(), *controller->block_manip_recorder());
 
     const auto *task = dynamic_cast<const cta::polled_task*>(controller->current_task());
     if (nullptr == task) {
       return;
     }
-    collect(cmspecs::blocks::kTransporter.scoped, *task->mechanism());
+    collect(cmspecs::blocks::kTransporter.scoped(), *task->mechanism());
     collect_if(
-        cmspecs::blocks::kAcqCounts.scoped,
+        cmspecs::blocks::kAcqCounts.scoped(),
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
@@ -167,7 +167,7 @@ class d1_metrics_manager : public d0::d0_metrics_manager,
           return fsm::foraging_acq_goal::ekBLOCK == m.acquisition_goal();
         });
     collect_if(
-        cmspecs::blocks::kAcqLocs2D.scoped,
+        cmspecs::blocks::kAcqLocs2D.scoped(),
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
@@ -181,7 +181,7 @@ class d1_metrics_manager : public d0::d0_metrics_manager,
      * robots explore.
      */
     collect_if(
-        cmspecs::blocks::kAcqExploreLocs2D.scoped,
+        cmspecs::blocks::kAcqExploreLocs2D.scoped(),
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
@@ -190,7 +190,7 @@ class d1_metrics_manager : public d0::d0_metrics_manager,
               m.is_exploring_for_goal().is_exploring;
         });
     collect_if(
-        cmspecs::blocks::kAcqVectorLocs2D.scoped,
+        cmspecs::blocks::kAcqVectorLocs2D.scoped(),
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
@@ -200,7 +200,7 @@ class d1_metrics_manager : public d0::d0_metrics_manager,
         });
 
     collect_if(
-        fmspecs::caches::kAcqCounts.scoped,
+        fmspecs::caches::kAcqCounts.scoped(),
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
@@ -208,7 +208,7 @@ class d1_metrics_manager : public d0::d0_metrics_manager,
           return fsm::foraging_acq_goal::ekEXISTING_CACHE == m.acquisition_goal();
         });
     collect_if(
-        fmspecs::caches::kAcqLocs2D.scoped,
+        fmspecs::caches::kAcqLocs2D.scoped(),
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
@@ -222,7 +222,7 @@ class d1_metrics_manager : public d0::d0_metrics_manager,
      * robots explore.
      */
     collect_if(
-        fmspecs::caches::kAcqExploreLocs2D.scoped,
+        fmspecs::caches::kAcqExploreLocs2D.scoped(),
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
@@ -231,7 +231,7 @@ class d1_metrics_manager : public d0::d0_metrics_manager,
               m.is_exploring_for_goal().is_exploring;
         });
     collect_if(
-        fmspecs::caches::kAcqVectorLocs2D.scoped,
+        fmspecs::caches::kAcqVectorLocs2D.scoped(),
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           const auto & m = dynamic_cast<const csmetrics::goal_acq_metrics&>(
@@ -239,7 +239,7 @@ class d1_metrics_manager : public d0::d0_metrics_manager,
           return fsm::foraging_acq_goal::ekEXISTING_CACHE == m.acquisition_goal() &&
               m.is_vectoring_to_goal();
         });
-    collect(cmspecs::tasks::kDistribution.scoped, *controller);
+    collect(cmspecs::tasks::kDistribution.scoped(), *controller);
   } /* collect_controller_common() */
 
   void register_standard(const rmconfig::metrics_config* mconfig);
@@ -249,4 +249,3 @@ class d1_metrics_manager : public d0::d0_metrics_manager,
 };
 
 NS_END(d1, metrics, argos, fordyca);
-

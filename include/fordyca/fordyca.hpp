@@ -168,6 +168,8 @@
 
 namespace fordyca {
 
+namespace repr {}
+
 namespace strategy {
 namespace explore {}
 namespace config {}
@@ -290,6 +292,8 @@ namespace fasmpl = fasupport::mpl;
 namespace fasd0 = fasupport::d0;
 namespace fasd1 = fasupport::d1;
 namespace fasd2 = fasupport::d2;
+
+namespace frepr = fordyca::repr;
 
 namespace fros = fordyca::ros;
 namespace frmetrics = fros::metrics;

@@ -298,7 +298,7 @@ void d2_loop_functions::post_step(void) {
   /* update arena map */
   const auto* collector =
       m_metrics_manager->get<cfmetrics::block_transportee_metrics_collector>(
-          cmspecs::blocks::kTransportee.scoped);
+          cmspecs::blocks::kTransportee.scoped());
   /*
    * Update arena map. Free block pickups and nest block drops are covered
    * internally by the arena map in terms of updating block clusters, but task

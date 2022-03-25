@@ -26,11 +26,11 @@ elseif("${COSM_BUILD_FOR}" MATCHES "ROS_ETURTLEBOT3")
   find_package(cosm-ros-eturtlebot3
     HINTS ${CMAKE_INSTALL_PREFIX})
 else()
-  message(FATAL_ERROR "FORDYCA only supports [ARGOS_FOOTBOT,ROS_TURTLEBOT3]")
+  message(FATAL_ERROR "FORDYCA only supports [ARGOS_FOOTBOT,ROS_ETURTLEBOT3]")
 endif()
 
 ################################################################################
-# Components                                                                      #
+# Components
 ################################################################################
 string(CONCAT common_regex
   "src/math|"
@@ -253,5 +253,4 @@ if(${COSM_BUILD_FOR} MATCHES "ARGOS")
   message(STATUS "With robot battery....................: FORDYCA_WITH_ROBOT_BATTERY=${FORDYCA_WITH_ROBOT_BATTERY}")
   message(STATUS "With robot LEDs.......................: FORDYCA_WITH_ROBOT_LEDS=${FORDYCA_WITH_ROBOT_LEDS}")
   message(STATUS "With robot CAMERA.....................: FORDYCA_WITH_ROBOT_CAMERA=${FORDYCA_WITH_ROBOT_CAMERA}")
-elseif(${COSM_BUILD_FOR} MATCHES "ROS")
 endif()

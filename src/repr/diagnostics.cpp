@@ -1,7 +1,7 @@
 /**
- * \file dpo_metrics_collector.hpp
+ * \file diagnostics.cpp
  *
- * \copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2022 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,52 +18,48 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#pragma once
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <memory>
-
-#include "rcppsw/metrics/base_collector.hpp"
-
-#include "fordyca/metrics/perception/dpo_metrics_data.hpp"
+#include "fordyca/repr/diagnostics.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, metrics, perception);
+NS_START(fordyca, repr, diagnostics);
 
 /*******************************************************************************
- * Class Definitions
+ * Global Variables
  ******************************************************************************/
-/**
- * \class dpo_metrics_collector
- * \ingroup metrics blocks
- *
- * \brief Collector for \ref dpo_metrics.
- *
- * Metrics CAN be collected in parallel from robots; concurrent updates to the
- * gathered stats are supported.
- */
-class dpo_metrics_collector final
-    : public rmetrics::base_collector {
- public:
-  /**
-   * \param sink The metrics sink to use.
-   */
-  explicit dpo_metrics_collector(
-      std::unique_ptr<rmetrics::base_sink> sink);
-
-  /* base_collector overrides */
-  void collect(const rmetrics::base_metrics& metrics) override;
-  void reset_after_interval(void) override;
-  const rmetrics::base_data* data(void) const override { return &m_data; }
-
- private:
-  /* clang-format off */
-  dpo_metrics_data m_data{};
-  /* clang-format on */
+chactuators::diagnostic_actuator::map_type kColorMap = {
+  {
+    chactuators::diagnostics::ekEXPLORE,
+    rutils::color::kMAGENTA
+  },
+  {
+    chactuators::diagnostics::ekSUCCESS,
+    rutils::color::kGREEN
+  },
+  {
+    chactuators::diagnostics::ekTAXIS,
+    rutils::color::kYELLOW
+  },
+  {
+    chactuators::diagnostics::ekLEAVING_NEST,
+    rutils::color::kGRAY50
+  },
+  {
+    chactuators::diagnostics::ekWAIT_FOR_SIGNAL,
+    rutils::color::kWHITE
+  },
+  {
+    chactuators::diagnostics::ekVECTOR_TO_GOAL,
+    rutils::color::kBLUE
+  },
+  {
+    chactuators::diagnostics::ekEXP_INTERFERENCE,
+    rutils::color::kRED
+  }
 };
 
-NS_END(perception, metrics, fordyca);
+NS_END(diagnostics, repr, fordyca);

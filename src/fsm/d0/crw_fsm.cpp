@@ -178,6 +178,14 @@ rtypes::type_uuid crw_fsm::entity_acquired_id(void) const {
   return rtypes::constants::kNoUUID;
 } /* entity_acquired_id() */
 
+csmetrics::goal_acq_metrics::goal_type crw_fsm::acquisition_goal(void) const {
+  if (ekST_ACQUIRE_BLOCK == current_state() ||
+      ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
+    return fsm::to_goal_type(foraging_acq_goal::ekBLOCK);
+  }
+  return fsm::to_goal_type(foraging_acq_goal::ekNONE);
+} /* block_transport_goal() */
+
 /*******************************************************************************
  * Block Transport Metrics
  ******************************************************************************/
@@ -189,6 +197,14 @@ bool crw_fsm::is_phototaxiing_to_goal(bool include_ca) const {
            !exp_interference();
   }
 } /* is_phototaxiing_to_goal() */
+
+foraging_transport_goal crw_fsm::block_transport_goal(void) const {
+  if (ekST_TRANSPORT_TO_NEST == current_state() ||
+      ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
+    return foraging_transport_goal::ekNEST;
+  }
+  return foraging_transport_goal::ekNONE;
+} /* block_transport_goal() */
 
 /*******************************************************************************
  * General Member Functions
@@ -212,22 +228,6 @@ void crw_fsm::run(void) {
 bool crw_fsm::block_detected(void) const {
   return saa()->sensing()->env()->detect("block");
 } /* block_detected() */
-
-foraging_transport_goal crw_fsm::block_transport_goal(void) const {
-  if (ekST_TRANSPORT_TO_NEST == current_state() ||
-      ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return foraging_transport_goal::ekNEST;
-  }
-  return foraging_transport_goal::ekNONE;
-} /* block_transport_goal() */
-
-csmetrics::goal_acq_metrics::goal_type crw_fsm::acquisition_goal(void) const {
-  if (ekST_ACQUIRE_BLOCK == current_state() ||
-      ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
-    return fsm::to_goal_type(foraging_acq_goal::ekBLOCK);
-  }
-  return fsm::to_goal_type(foraging_acq_goal::ekNONE);
-} /* block_transport_goal() */
 
 /*******************************************************************************
  * Taskable Interface

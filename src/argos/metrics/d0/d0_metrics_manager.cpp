@@ -78,14 +78,18 @@ d0_metrics_manager::d0_metrics_manager(
     : base_fs_output_manager(mconfig, gconfig, output_root, n_block_clusters),
       ER_CLIENT_INIT("fordyca.argos.metrics.d0.d0_manager") {
   rmetrics::creatable_collector_set creatable_set = {
-    { typeid(fmetrics::perception::mdpo_metrics_collector),
-      fmspecs::perception::kMDPO.xml,
-      fmspecs::perception::kMDPO.scoped,
-      rmetrics::output_mode::ekAPPEND },
-    { typeid(fmetrics::perception::dpo_metrics_collector),
-      fmspecs::perception::kDPO.xml,
-      fmspecs::perception::kDPO.scoped,
-      rmetrics::output_mode::ekAPPEND }
+    {
+      typeid(fmetrics::perception::mdpo_metrics_collector),
+      fmspecs::perception::kMDPO.xml(),
+      fmspecs::perception::kMDPO.scoped(),
+      rmetrics::output_mode::ekAPPEND
+    },
+    {
+      typeid(fmetrics::perception::dpo_metrics_collector),
+      fmspecs::perception::kDPO.xml(),
+      fmspecs::perception::kDPO.scoped(),
+      rmetrics::output_mode::ekAPPEND
+    }
   };
 
   rmetrics::register_with_sink<fametrics::d0::d0_metrics_manager,
@@ -112,13 +116,13 @@ void d0_metrics_manager::collect_from_controller(const TController* const contro
   /*
    * All d0 controllers provide these.
    */
-  collect(cmspecs::spatial::kNestZone.scoped, *controller->nz_tracker());
-  collect(cmspecs::strategy::kNestAcq.scoped, *controller->fsm());
-  collect(cmspecs::blocks::kAcqCounts.scoped, *controller);
-  collect(cmspecs::blocks::kTransporter.scoped, *controller);
-  collect(fmspecs::blocks::kManipulation.scoped, *controller->block_manip_recorder());
+  collect(cmspecs::spatial::kNestZone.scoped(), *controller->nz_tracker());
+  collect(cmspecs::strategy::kNestAcq.scoped(), *controller->fsm());
+  collect(cmspecs::blocks::kAcqCounts.scoped(), *controller);
+  collect(cmspecs::blocks::kTransporter.scoped(), *controller);
+  collect(fmspecs::blocks::kManipulation.scoped(), *controller->block_manip_recorder());
 
-  collect_if(cmspecs::blocks::kAcqLocs2D.scoped,
+  collect_if(cmspecs::blocks::kAcqLocs2D.scoped(),
              *controller,
              [&](const rmetrics::base_metrics& metrics) {
                const auto& m =
@@ -131,14 +135,14 @@ void d0_metrics_manager::collect_from_controller(const TController* const contro
    * We count "false" explorations as part of gathering metrics on where robots
    * explore.
    */
-  collect_if(cmspecs::blocks::kAcqExploreLocs2D.scoped,
+  collect_if(cmspecs::blocks::kAcqExploreLocs2D.scoped(),
              *controller,
              [&](const rmetrics::base_metrics& metrics) {
                const auto& m =
                    dynamic_cast<const csmetrics::goal_acq_metrics&>(metrics);
                return m.is_exploring_for_goal().is_exploring;
              });
-  collect_if(cmspecs::blocks::kAcqVectorLocs2D.scoped,
+  collect_if(cmspecs::blocks::kAcqVectorLocs2D.scoped(),
              *controller,
              [&](const rmetrics::base_metrics& metrics) {
                const auto& m =
@@ -153,8 +157,8 @@ template<class TController,
          RCPPSW_SFINAE_DEF(std::is_base_of<fccognitive::cognitive_controller,
                            U>::value)>
 void d0_metrics_manager::collect_from_cognitive_controller(const TController* controller)  {
-  collect(fmspecs::perception::kDPO.scoped, *controller->perception());
-  collect(fmspecs::perception::kMDPO.scoped, *controller->perception());
+  collect(fmspecs::perception::kDPO.scoped(), *controller->perception());
+  collect(fmspecs::perception::kMDPO.scoped(), *controller->perception());
 } /* collect_from_cognitive_controller() */
 
 /*******************************************************************************

@@ -43,6 +43,7 @@
 #include "cosm/subsystem/actuation_subsystem2D.hpp"
 
 #include "fordyca/controller/config/foraging_controller_repository.hpp"
+#include "fordyca/repr/diagnostics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -164,7 +165,8 @@ static actuation_init(foraging_controller* c,
 #else
   auto diag_handle = nullptr;
 #endif /* FORDYCA_WITH_ROBOT_LEDS */
-  auto diag = chactuators::diagnostic_actuator(diag_handle);
+  auto diag = chactuators::diagnostic_actuator(diag_handle,
+                                               frepr::diagnostics::kColorMap);
 
 #if defined(FORDYCA_WITH_ROBOT_RAB)
   auto rab_handle = c->GetActuator<chactuators::wifi_actuator::impl_type>(saa_names::rab_saa);

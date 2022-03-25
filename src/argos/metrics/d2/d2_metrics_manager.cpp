@@ -72,7 +72,7 @@ d2_metrics_manager::d2_metrics_manager(
   register_standard(mconfig);
 
   /* Overwrite d1; we have a deeper decomposition now */
-  collector_unregister(cmspecs::tasks::kDistribution.scoped);
+  collector_unregister(cmspecs::tasks::kDistribution.scoped());
   register_with_decomp_depth(mconfig, 2);
 
   /* setup metric collection for all collector groups in all sink groups */
@@ -90,11 +90,11 @@ void d2_metrics_manager::task_start_cb(
     return;
   }
   if (task0::kGeneralistName == tab->root()->name()) {
-    collect(fmspecs::tasks::tab::kGeneralist.scoped, *tab);
+    collect(fmspecs::tasks::tab::kGeneralist.scoped(), *tab);
   } else if (task1::kHarvesterName == tab->root()->name()) {
-    collect(fmspecs::tasks::tab::kHarvester.scoped, *tab);
+    collect(fmspecs::tasks::tab::kHarvester.scoped(), *tab);
   } else if (task1::kCollectorName == tab->root()->name()) {
-    collect(fmspecs::tasks::tab::kCollector.scoped, *tab);
+    collect(fmspecs::tasks::tab::kCollector.scoped(), *tab);
   } else {
     ER_FATAL_SENTINEL("Bad task name '%s'", task->name().c_str());
   }
@@ -114,34 +114,48 @@ void d2_metrics_manager::register_standard(
       rmpl::identity<fmetrics::caches::site_selection_metrics_csv_sink>
     >;
   rmetrics::creatable_collector_set creatable_set = {
-    { typeid(ctametrics::bi_tab_metrics_collector),
-      fmspecs::tasks::tab::kHarvester.xml,
-      fmspecs::tasks::tab::kHarvester.scoped,
-      rmetrics::output_mode::ekAPPEND },
-    { typeid(ctametrics::bi_tab_metrics_collector),
-      fmspecs::tasks::tab::kCollector.xml,
-      fmspecs::tasks::tab::kCollector.scoped,
-      rmetrics::output_mode::ekAPPEND },
-    { typeid(ctametrics::execution_metrics_collector),
-      fmspecs::tasks::exec::kCacheStarter.xml,
-      fmspecs::tasks::exec::kCacheStarter.scoped,
-      rmetrics::output_mode::ekAPPEND },
-    { typeid(ctametrics::execution_metrics_collector),
-      fmspecs::tasks::exec::kCacheFinisher.xml,
-      fmspecs::tasks::exec::kCacheFinisher.scoped,
-      rmetrics::output_mode::ekAPPEND },
-    { typeid(ctametrics::execution_metrics_collector),
-      fmspecs::tasks::exec::kCacheTransferer.xml,
-      fmspecs::tasks::exec::kCacheTransferer.scoped,
-      rmetrics::output_mode::ekAPPEND },
-    { typeid(ctametrics::execution_metrics_collector),
-      fmspecs::tasks::exec::kCacheCollector.xml,
-      fmspecs::tasks::exec::kCacheCollector.scoped,
-      rmetrics::output_mode::ekAPPEND },
-    { typeid(fmetrics::caches::site_selection_metrics_collector),
-      fmspecs::caches::kSiteSelection.xml,
-      fmspecs::caches::kSiteSelection.scoped,
-      rmetrics::output_mode::ekAPPEND }
+    {
+      typeid(ctametrics::bi_tab_metrics_collector),
+      fmspecs::tasks::tab::kHarvester.xml(),
+      fmspecs::tasks::tab::kHarvester.scoped(),
+      rmetrics::output_mode::ekAPPEND
+    },
+    {
+      typeid(ctametrics::bi_tab_metrics_collector),
+      fmspecs::tasks::tab::kCollector.xml(),
+      fmspecs::tasks::tab::kCollector.scoped(),
+      rmetrics::output_mode::ekAPPEND
+    },
+    {
+      typeid(ctametrics::execution_metrics_collector),
+      fmspecs::tasks::exec::kCacheStarter.xml(),
+      fmspecs::tasks::exec::kCacheStarter.scoped(),
+      rmetrics::output_mode::ekAPPEND
+    },
+    {
+      typeid(ctametrics::execution_metrics_collector),
+      fmspecs::tasks::exec::kCacheFinisher.xml(),
+      fmspecs::tasks::exec::kCacheFinisher.scoped(),
+      rmetrics::output_mode::ekAPPEND
+    },
+    {
+      typeid(ctametrics::execution_metrics_collector),
+      fmspecs::tasks::exec::kCacheTransferer.xml(),
+      fmspecs::tasks::exec::kCacheTransferer.scoped(),
+      rmetrics::output_mode::ekAPPEND
+    },
+    {
+      typeid(ctametrics::execution_metrics_collector),
+      fmspecs::tasks::exec::kCacheCollector.xml(),
+      fmspecs::tasks::exec::kCacheCollector.scoped(),
+      rmetrics::output_mode::ekAPPEND
+    },
+    {
+      typeid(fmetrics::caches::site_selection_metrics_collector),
+      fmspecs::caches::kSiteSelection.xml(),
+      fmspecs::caches::kSiteSelection.scoped(),
+      rmetrics::output_mode::ekAPPEND
+    }
   };
   rmetrics::register_with_sink<d2_metrics_manager,
                                rmetrics::file_sink_registerer> csv(this,

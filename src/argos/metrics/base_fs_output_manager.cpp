@@ -76,14 +76,18 @@ base_fs_output_manager::base_fs_output_manager(
 
   /* register collectors common to all of FORDYCA */
   rmetrics::creatable_collector_set creatable_set = {
-    { typeid(fmetrics::blocks::manipulation_metrics_collector),
-      fmspecs::blocks::kManipulation.xml,
-      fmspecs::blocks::kManipulation.scoped,
-      rmetrics::output_mode::ekAPPEND },
-    { typeid(fmetrics::tv::env_dynamics_metrics_collector),
-      cmspecs::tv::kEnvironment.xml,
-      cmspecs::tv::kEnvironment.scoped,
-      rmetrics::output_mode::ekAPPEND },
+    {
+      typeid(fmetrics::blocks::manipulation_metrics_collector),
+      fmspecs::blocks::kManipulation.xml(),
+      fmspecs::blocks::kManipulation.scoped(),
+      rmetrics::output_mode::ekAPPEND
+    },
+    {
+      typeid(fmetrics::tv::env_dynamics_metrics_collector),
+      cmspecs::tv::kEnvironment.xml(),
+      cmspecs::tv::kEnvironment.scoped(),
+      rmetrics::output_mode::ekAPPEND
+    },
   };
 
       rmetrics::register_with_sink<base_fs_output_manager,
@@ -105,15 +109,15 @@ base_fs_output_manager::base_fs_output_manager(
 void base_fs_output_manager::collect_from_sm(
     const fasupport::argos_swarm_manager* const sm) {
   if (nullptr != sm->conv_calculator()) {
-    collect(cmspecs::kConvergence.scoped, sm->conv_calculator()->decoratee());
+    collect(cmspecs::kConvergence.scoped(), sm->conv_calculator()->decoratee());
   }
 
-  collect(cmspecs::tv::kEnvironment.scoped,
+  collect(cmspecs::tv::kEnvironment.scoped(),
           *sm->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>());
 
   if (nullptr !=
       sm->tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>()) {
-    collect(cmspecs::tv::kPopulation.scoped,
+    collect(cmspecs::tv::kPopulation.scoped(),
             *sm->tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>());
   }
   collect_from_arena(sm->arena_map());
