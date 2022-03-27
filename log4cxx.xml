@@ -6,7 +6,6 @@
   class="log4cxx.ConsoleAppender">
     <param name="Target" value="System.out"/>
     <layout class="log4cxx.PatternLayout">
-      <!-- <param name="ConversionPattern" value="%X{time} %x %Y[%-5p]%y %c - %m%n"/> -->
       <param name="ConversionPattern" value="%X{time} %x [%-5p] %c - %m%n"/>
     </layout>
   </appender>

@@ -269,25 +269,23 @@ void foraging_controller::reset(void) { block_carrying_controller::reset(); }
 fs::path foraging_controller::output_init(const cpconfig::output_config* outputp) {
   auto path =  base_controller2D::output_init(outputp);
 
-#if (LIBRA_ER == LIBRA_ER_ALL)
-  /*
-   * Each file appender is attached to a root category in the COSM
-   * namespace. If you give different file appenders the same file, then the
-   * lines within it are not always ordered, which is not overly helpful for
-   * debugging.
-   */
-  ER_LOGFILE_SET(log4cxx::Logger::getLogger("cosm.ta"), path / "ta.log");
+/* #if (LIBRA_ER == LIBRA_ER_ALL) */
+/*   /\* */
+/*    * Each file appender is attached to a root category in the COSM */
+/*    * namespace. If you give different file appenders the same file, then the */
+/*    * lines within it are not always ordered, which is not overly helpful for */
+/*    * debugging. */
+/*    *\/ */
+  /* ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.tasks"), */
+  /*                path / "controller.log"); */
 
-  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.controller"),
-                 path / "controller.log");
-  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.ds"), path / "ds.log");
-  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.fsm"), path / "fsm.log");
-  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.controller.saa"),
-                 path / "saa.log");
-  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.controller.explore_"
-                                            "behavior"),
-                 path / "saa.log");
-#endif
+  /* ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.math"), */
+  /*                path / "controller.log"); */
+  /* ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.fsm"), */
+  /*                path / "controller.log"); */
+  /* ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.strategy"), */
+  /*                path / "controller.log"); */
+/* #endif */
 
   return path;
 } /* output_init() */

@@ -146,18 +146,16 @@ void argos_swarm_manager::tv_init(const fastv::config::tv_manager_config* tvp) {
 void argos_swarm_manager::output_init(const cpconfig::output_config* output) {
   swarm_manager_adaptor::output_init(output);
 
-#if (LIBRA_ER == LIBRA_ER_ALL)
-  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.events"),
-                 output_root() / "events.log");
-  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.support"),
-                 output_root() = "support.log");
-  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.loop"),
-                 output_root() / "sim.log");
-  ER_LOGFILE_SET(log4cxx::Logger::getLogger("cosm.foraging.ds.arena_map"),
-                 output_root() / "sim.log");
-  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.metrics"),
-                 output_root() / "metrics.log");
-#endif
+/* #if (LIBRA_ER == LIBRA_ER_ALL) */
+/*   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.ros"), */
+/*                  output_root() / "manager.log"); */
+/*   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.argos"), */
+/*                  output_root() / "manager.log"); */
+/*   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.events"), */
+/*                  output_root() / "manager.log"); */
+/*   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.metrics"), */
+/*                  output_root() / "manager.log"); */
+/* #endif */
 } /* output_init() */
 
 void argos_swarm_manager::oracle_init(

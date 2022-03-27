@@ -44,8 +44,8 @@ NS_START(fordyca, argos, support, d2);
  * - Enabling tasking metric aggregation via task executive hooks
  */
 template<class TController, class TAggregator>
-class robot_configurer : public d1::robot_configurer<TController,
-                                                         TAggregator> {
+class robot_configurer final : public d1::robot_configurer<TController,
+                                                           TAggregator> {
  public:
   using controller_type = typename d1::robot_configurer<TController,
                                                             TAggregator>::controller_type;
