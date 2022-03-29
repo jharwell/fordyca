@@ -66,7 +66,7 @@ void free_block_pickup::visit(fccd2::birtd_dpo_controller& c) {
 void free_block_pickup::visit(fccd2::birtd_mdpo_controller& c) {
   c.ndc_uuid_push();
 
-  controller_process(c, *c.perception()->template model<fspds::dpo_store>());
+  controller_process(c, *c.perception()->template model<fspds::dpo_semantic_map>());
   ER_INFO("Picked up block%d", block()->id().v());
 
   c.ndc_uuid_pop();
@@ -75,7 +75,7 @@ void free_block_pickup::visit(fccd2::birtd_mdpo_controller& c) {
 void free_block_pickup::visit(fccd2::birtd_odpo_controller& c) {
   c.ndc_uuid_push();
 
-  controller_process(c, *c.perception()->template model<fspds::dpo_semantic_map>());
+  controller_process(c, *c.perception()->template model<fspds::dpo_store>());
   ER_INFO("Picked up block%d", block()->id().v());
 
   c.ndc_uuid_pop();

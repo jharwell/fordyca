@@ -35,6 +35,7 @@ endif()
 string(CONCAT common_regex
   "src/math|"
   "src/metrics/blocks|"
+  "src/init|"
   "src/metrics/specs"
   )
 component_register_as_src(
@@ -125,6 +126,17 @@ foreach(component ${fordyca_FIND_COMPONENTS})
   endif()
 endforeach()
 
+# Configure version
+execute_process(COMMAND git rev-list --count HEAD
+  OUTPUT_VARIABLE FORDYCA_VERSION
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/version.cpp.in
+  ${CMAKE_CURRENT_BINARY_DIR}/src/version.cpp
+  @ONLY
+  )
+list(APPEND fordyca_components_SRC "${CMAKE_CURRENT_BINARY_DIR}/src/version.cpp")
+
 # Define the FORDYCA library
 set(fordyca_LIBRARY fordyca-${COSM_HAL_TARGET})
 
@@ -137,10 +149,8 @@ add_library(
 # alias so we plug into the LIBRA framework properly
 add_library(fordyca ALIAS ${fordyca_LIBRARY})
 
-execute_process(COMMAND git rev-list --count HEAD
-  OUTPUT_VARIABLE FORDYCA_VERSION
-  OUTPUT_STRIP_TRAILING_WHITESPACE)
-set(fordyca_LIBRARY_NAME fordyca-${COSM_HAL_TARGET}-v${FORDYCA_VERSION})
+
+set(fordyca_LIBRARY_NAME fordyca-${COSM_HAL_TARGET})
 set_target_properties(${fordyca_LIBRARY}
   PROPERTIES OUTPUT_NAME
   ${fordyca_LIBRARY_NAME})
