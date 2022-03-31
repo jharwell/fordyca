@@ -26,6 +26,12 @@
   <category name="cosm.hal.sensors.proximity" >
     <priority value ="debug" />
   </category>
+  <category name="cosm.hal.ros" >
+    <priority value ="debug" />
+  </category>
+  <category name="cosm.ros" >
+    <priority value ="debug" />
+  </category>
   <category name="cosm.hal.argos.actuators.led" >
     <priority value ="fatal" />
   </category>
@@ -56,6 +62,8 @@
   <category name="cosm.foraging.block_motion_handler" >
     <priority value ="debug" />
   </category>
+
+
   <category name="fordyca.controller" >
     <priority value ="info" />
   </category>
@@ -65,32 +73,34 @@
   <category name="fordyca.fsm.acquire_goal_fsm" >
     <priority value ="info" />
   </category>
-  <category name="fordyca.support.block_dist" >
+  <category name="fordyca.argos.support.block_dist" >
     <priority value ="info" />
   </category>
-  <category name="fordyca.support.d2.dynamic_cache_creator" >
+  <category name="fordyca.argos.support.d2.dynamic_cache_creator" >
     <priority value ="debug" />
   </category>
-  <category name="fordyca.support.d1.static_cache_creator" >
+  <category name="fordyca.argos.support.d1.static_cache_creator" >
     <priority value ="debug" />
   </category>
-  <category name="fordyca.support.d1.static_cache_manager" >
+  <category name="fordyca.argos.support.d1.static_cache_manager" >
     <priority value ="debug" />
   </category>
     <category name="fordyca.tasks.d2.cache_starter" >
     <priority value ="info" />
   </category>
-  <category name="fordyca.support.d2.cache_center_calculator" >
+  <category name="fordyca.argos.support.d2.cache_center_calculator" >
+    <priority value ="debug" />
+  </category>
+  <category name="fordyca.argos.support.cache_creation_verifier" >
+    <priority value ="debug" />
+  </category>
+  <category name="fordyca.argos.support.tasking_oracle" >
+    <priority value ="info" />
+  </category>
+  <category name="fordyca.argos.support.base_cache_creator" >
     <priority value ="debug" />
   </category>
 
-  <category name="fordyca.support.cache_creation_verifier" >
-    <priority value ="debug" />
-  </category>
-
-  <category name="fordyca.support.base_cache_creator" >
-    <priority value ="debug" />
-  </category>
   <category name="fordyca.fsm.d0.free_block_to_nest" >
     <priority value ="info" />
   </category>
@@ -107,8 +117,9 @@
   <category name="fordyca.controller.oracular_info_receptor" >
     <priority value ="info" />
   </category>
-  <category name="fordyca.support.tasking_oracle" >
-    <priority value ="info" />
+
+  <category name="fordyca.ros" >
+    <priority value ="debug" />
   </category>
 
   <category name="rcppsw.metrics" >

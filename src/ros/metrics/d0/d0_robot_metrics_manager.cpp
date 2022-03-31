@@ -87,7 +87,7 @@ void d0_robot_metrics_manager::collect_from_controller(
   /*
    * All d0 controllers provide these.
    */
-  collect(fmspecs::blocks::kManipulation.scoped, *c->block_manip_recorder());
+  collect(fmspecs::blocks::kManipulation.scoped(), *c->block_manip_recorder());
 } /* collect_from_controller() */
 
 NS_END(d0, metrics, ros, fordyca);

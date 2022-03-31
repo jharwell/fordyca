@@ -96,13 +96,13 @@ void d0_swarm_metrics_manager::register_standard(
   boost::mpl::for_each<sink_list>(registerer);
 
   /* initialize counting map to track received metrics */
-  msg_tracking()->init(fmspecs::blocks::kManipulation.scoped);
+  msg_tracking()->init(fmspecs::blocks::kManipulation.scoped());
 
   /* set ROS callbacks for metric collection */
   ::ros::NodeHandle n;
   auto cb = [&](cros::topic robot_ns) {
               m_subs.push_back(n.subscribe<frmblocks::manipulation_metrics_msg>(
-                  robot_ns / fmspecs::blocks::kManipulation.scoped,
+                  robot_ns / fmspecs::blocks::kManipulation.scoped(),
                   kQueueBufferSize,
                   &d0_swarm_metrics_manager::collect,
                   this));
@@ -116,8 +116,8 @@ void d0_swarm_metrics_manager::register_standard(
 void d0_swarm_metrics_manager::collect(
     const boost::shared_ptr<const frmblocks::manipulation_metrics_msg>& msg) {
   auto* collector = get<fmetrics::blocks::manipulation_metrics_collector>(
-      fmspecs::blocks::kManipulation.scoped);
-  msg_tracking()->update_on_receive(fmspecs::blocks::kManipulation.scoped,
+      fmspecs::blocks::kManipulation.scoped());
+  msg_tracking()->update_on_receive(fmspecs::blocks::kManipulation.scoped(),
                                     msg->header.seq);
   collector->collect(msg->data);
 } /* collect() */

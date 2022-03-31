@@ -36,6 +36,7 @@ string(CONCAT common_regex
   "src/math|"
   "src/metrics/blocks|"
   "src/init|"
+  "src/repr/diagnostics|"
   "src/metrics/specs"
   )
 component_register_as_src(
@@ -52,8 +53,8 @@ if ("${COSM_BUILD_FOR}" MATCHES "ARGOS")
       "src/events|"
       "src/support|"
       "src/subsystem|"
-      "src/repr|"
       "src/strategy|"
+      "src/repr|"
       "src/metrics|"
       "src/tasks|"
       "src/metrics|"
@@ -199,7 +200,7 @@ if ("${COSM_BUILD_FOR}" MATCHES "ARGOS")
 endif()
 
 # Force failures at build time rather than runtime
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
+target_link_options(${fordyca_LIBRARY} PRIVATE -Wl,--no-undefined)
 
 ########################################
 # Compile Options/Definitions

@@ -39,8 +39,8 @@ NS_START(fordyca, ros, metrics, registrable);
  ******************************************************************************/
 rmetrics::creatable_collector_set kStandard = {
     { typeid(fmetrics::blocks::manipulation_metrics_collector),
-      fmspecs::blocks::kManipulation.xml,
-      fmspecs::blocks::kManipulation.scoped,
+      fmspecs::blocks::kManipulation.xml(),
+      fmspecs::blocks::kManipulation.scoped(),
       rmetrics::output_mode::ekSTREAM | rmetrics::output_mode::ekAPPEND }
   };
 

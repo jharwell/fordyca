@@ -197,9 +197,11 @@ static actuation_init(foraging_controller* c,
       chactuators::diff_drive_actuator(cros::to_ns(c->entity_id())));
 
 #if defined(FORDYCA_WITH_ROBOT_LEDS)
-  auto diag = chactuators::diagnostic_actuator(true);
+  auto diag = chactuators::diagnostic_actuator(true,
+                                               frepr::diagnostics::kColorMap);
 #else
-  auto diag = chactuators::diagnostic_actuator(false);
+  auto diag = chactuators::diagnostic_actuator(false,
+                                               frepr::diagnostics::kColorMap);
 #endif
 
   using subsystem = csubsystem::actuation_subsystem2D;
