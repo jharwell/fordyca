@@ -27,6 +27,7 @@
 
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/arena/repr/light_type_index.hpp"
+#include "cosm/ds/cell2D.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/spatial/strategy/nest_acq/factory.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
@@ -35,22 +36,22 @@
 #include "cosm/ta/config/task_alloc_config.hpp"
 #include "cosm/ta/config/task_executive_config.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
-#include "cosm/ds/cell2D.hpp"
+#include "cosm/spatial/strategy/blocks/drop/base_drop.hpp"
 
 #include "fordyca/controller/config/d1/controller_repository.hpp"
-#include "fordyca/strategy/config/strategy_config.hpp"
-#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
-#include "fordyca/subsystem/perception/foraging_perception_subsystem.hpp"
-#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/fsm/d0/dpo_fsm.hpp"
 #include "fordyca/fsm/d1/block_to_existing_cache_fsm.hpp"
 #include "fordyca/fsm/d1/cached_block_to_nest_fsm.hpp"
+#include "fordyca/strategy/config/strategy_config.hpp"
 #include "fordyca/strategy/explore/block_factory.hpp"
 #include "fordyca/strategy/explore/cache_factory.hpp"
+#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
+#include "fordyca/subsystem/perception/foraging_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/tasks/d0/generalist.hpp"
 #include "fordyca/tasks/d1/collector.hpp"
 #include "fordyca/tasks/d1/harvester.hpp"
-#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -86,27 +87,28 @@ task_executive_builder::tasking_map task_executive_builder::d1_tasks_create(
     rmath::rng* rng) {
   const auto* task_config =
       config_repo.config_get<cta::config::task_alloc_config>();
-  const auto* strat_config =
-      config_repo.config_get<fsconfig::strategy_config>();
+  const auto* strat_config = config_repo.config_get<fsconfig::strategy_config>();
   auto cache_color = carepr::light_type_index()[carepr::light_type_index::kCache];
-csfsm::fsm_params fsm_params {
-      saa(),
-      inta_tracker(),
-      nz_tracker(),
-    };
-  auto strategy_cachep = fstrategy::strategy_params{
-    &fsm_params,
-    nullptr,
-    mc_csel_matrix,
-    m_perception->known_objects(),
-    cache_color
+  csfsm::fsm_params fsm_params{
+    saa(),
+    inta_tracker(),
+    nz_tracker(),
   };
-  auto strategy_blockp = fstrategy::strategy_params{
-    &fsm_params,
-    nullptr,
-    mc_csel_matrix,
-    m_perception->known_objects(),
-    rutils::color()
+  auto strategy_cachep = fstrategy::strategy_params {
+    .fsm =&fsm_params,
+    .explore = &strat_config->caches.explore,
+    .bsel_matrix = nullptr,
+    .csel_matrix = mc_csel_matrix,
+    .accessor = m_perception->known_objects(),
+    .ledtaxis_target = cache_color
+  };
+  auto strategy_blockp = fstrategy::strategy_params {
+    .fsm =&fsm_params,
+    .explore = &strat_config->blocks.explore,
+    .bsel_matrix = nullptr,
+    .csel_matrix = mc_csel_matrix,
+    .accessor = m_perception->known_objects(),
+    .ledtaxis_target = rutils::color()
   };
 
   ER_ASSERT(nullptr != mc_bsel_matrix, "NULL block selection matrix");
@@ -116,20 +118,20 @@ csfsm::fsm_params fsm_params {
   fsexplore::cache_factory cache_factory;
   csstrategy::nest_acq::factory nest_acq_factory;
 
-  fsm::fsm_ro_params ro_params = {
-    .bsel_matrix = block_sel_matrix(),
-    .csel_matrix = mc_csel_matrix,
-    .store = perception()->model<fspds::dpo_store>(),
-    .accessor = m_perception->known_objects(),
-    .strategy_config = *strat_config
-  };
+  fsm::fsm_ro_params ro_params = { .bsel_matrix = block_sel_matrix(),
+                                   .csel_matrix = mc_csel_matrix,
+                                   .store =
+                                   perception()->model<fspds::dpo_store>(),
+                                   .accessor = m_perception->known_objects(),
+                                   .strategy = *strat_config };
 
   auto generalist_fsm = std::make_unique<fsm::d0::free_block_to_nest_fsm>(
       &ro_params,
       &fsm_params,
       block_factory.create(
-          strat_config->explore.block_strategy, &strategy_blockp, rng),
+          strat_config->blocks.explore.strategy, &strategy_blockp, rng),
       nest_acq_factory.create(strat_config->nest_acq.strategy,
+                              &strat_config->nest_acq,
                               &fsm_params,
                               rng),
       rng);
@@ -137,16 +139,15 @@ csfsm::fsm_params fsm_params {
       &ro_params,
       &fsm_params,
       cache_factory.create(
-          strat_config->explore.cache_strategy, &strategy_cachep, rng),
+          strat_config->caches.explore.strategy, &strategy_cachep, rng),
       nest_acq_factory.create(strat_config->nest_acq.strategy,
+                              &strat_config->nest_acq,
                               &fsm_params,
                               rng),
       rng);
 
   auto harvester_fsm = std::make_unique<fsm::d1::block_to_existing_cache_fsm>(
-      &ro_params,
-      &fsm_params,
-      rng);
+      &ro_params, &fsm_params, rng);
 
   auto collector = std::make_unique<tasks::d1::collector>(
       task_config, std::move(collector_fsm));
@@ -166,11 +167,11 @@ csfsm::fsm_params fsm_params {
       tasks::d0::foraging_task::kGeneralistName, std::move(children), rng);
   return tasking_map{
     { tasks::d0::foraging_task::kGeneralistName,
-          graph->find_vertex(tasks::d0::foraging_task::kGeneralistName) },
+      graph->find_vertex(tasks::d0::foraging_task::kGeneralistName) },
     { tasks::d1::foraging_task::kCollectorName,
-          graph->find_vertex(tasks::d1::foraging_task::kCollectorName) },
+      graph->find_vertex(tasks::d1::foraging_task::kCollectorName) },
     { tasks::d1::foraging_task::kHarvesterName,
-          graph->find_vertex(tasks::d1::foraging_task::kHarvesterName) }
+      graph->find_vertex(tasks::d1::foraging_task::kHarvesterName) }
   };
 } /* d1_tasks_create() */
 
@@ -199,7 +200,8 @@ void task_executive_builder::d1_exec_est_init(
   }
 
   rmath::rangez g_bounds =
-      task_config->exec_est.ranges.find(ftd0::foraging_task::kGeneralistName)->second;
+      task_config->exec_est.ranges.find(ftd0::foraging_task::kGeneralistName)
+          ->second;
 
   auto h_bounds = task_config->exec_est.ranges.find("harvester")->second;
   auto c_bounds = task_config->exec_est.ranges.find("collector")->second;
@@ -237,7 +239,8 @@ std::unique_ptr<cta::bi_tdgraph_executive> task_executive_builder::operator()(
     rmath::rng* rng) {
   const auto* task_config =
       config_repo.config_get<cta::config::task_alloc_config>();
-  cta::ds::ds_variant variant = std::make_unique<cta::ds::bi_tdgraph>(task_config);
+  cta::ds::ds_variant variant =
+      std::make_unique<cta::ds::bi_tdgraph>(task_config);
 
   auto* graph = std::get<std::unique_ptr<cta::ds::bi_tdgraph>>(variant).get();
   auto map = d1_tasks_create(config_repo, graph, rng);

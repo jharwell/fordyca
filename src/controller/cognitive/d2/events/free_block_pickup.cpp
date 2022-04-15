@@ -27,20 +27,19 @@
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
-#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
-#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
-#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
+#include "fordyca/events/free_block_interactor.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/d0/free_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
+#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/tasks/d2/foraging_task.hpp"
-#include "fordyca/events/free_block_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller, cognitive, d2, events);
-
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -66,7 +65,8 @@ void free_block_pickup::visit(fccd2::birtd_dpo_controller& c) {
 void free_block_pickup::visit(fccd2::birtd_mdpo_controller& c) {
   c.ndc_uuid_push();
 
-  controller_process(c, *c.perception()->template model<fspds::dpo_semantic_map>());
+  controller_process(c,
+                     *c.perception()->template model<fspds::dpo_semantic_map>());
   ER_INFO("Picked up block%d", block()->id().v());
 
   c.ndc_uuid_pop();
@@ -84,7 +84,8 @@ void free_block_pickup::visit(fccd2::birtd_odpo_controller& c) {
 void free_block_pickup::visit(fccd2::birtd_omdpo_controller& c) {
   c.ndc_uuid_push();
 
-  controller_process(c, *c.perception()->template model<fspds::dpo_semantic_map>());
+  controller_process(c,
+                     *c.perception()->template model<fspds::dpo_semantic_map>());
   ER_INFO("Picked up block%d", block()->id().v());
 
   c.ndc_uuid_pop();

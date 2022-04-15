@@ -69,4 +69,3 @@ enum class foraging_transport_goal {
 };
 
 NS_END(fsm, fordyca);
-

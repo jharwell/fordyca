@@ -26,24 +26,24 @@
 #include <fstream>
 
 #include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/ds/cell2D.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
+#include "cosm/hal/subsystem/config/sensing_subsystemQ3D_config.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/repr/config/nest_config.hpp"
-#include "cosm/hal/subsystem/config/sensing_subsystemQ3D_config.hpp"
-#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/subsystem/actuation_subsystem2D.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
-#include "cosm/ds/cell2D.hpp"
-#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 
+#include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
+#include "fordyca/controller/cognitive/d1/task_executive_builder.hpp"
 #include "fordyca/controller/config/block_sel/block_sel_matrix_config.hpp"
 #include "fordyca/controller/config/cache_sel/cache_sel_matrix_config.hpp"
 #include "fordyca/controller/config/d1/controller_repository.hpp"
-#include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
-#include "fordyca/controller/cognitive/d1/task_executive_builder.hpp"
-#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
+#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
 
 /*******************************************************************************
@@ -66,7 +66,7 @@ bitd_dpo_controller::~bitd_dpo_controller(void) = default;
  ******************************************************************************/
 void bitd_dpo_controller::control_step(void) {
   mdc_ts_update();
-ndc_uuid_push();
+  ndc_uuid_push();
   ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
@@ -88,6 +88,9 @@ ndc_uuid_push();
    * state.
    */
   supervisor()->run();
+
+  /* Update block detection status for use in the loop functions */
+  block_detect_status_update();
 
   ndc_uuid_pop();
 } /* control_step() */
@@ -131,7 +134,8 @@ void bitd_dpo_controller::shared_init(
    * have an XML repository with the correct configuration in it.
    */
   auto sensing =
-      config_repo.config_get<chal::subsystem::config::sensing_subsystemQ3D_config>();
+      config_repo
+          .config_get<chal::subsystem::config::sensing_subsystemQ3D_config>();
 
   saa()->sensing()->env()->config_update(&sensing->env);
 } /* shared_init() */

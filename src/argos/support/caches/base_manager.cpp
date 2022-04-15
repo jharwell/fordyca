@@ -50,20 +50,20 @@ base_manager::creation_blocks_alloc(
   std::copy_if(all_blocks.begin(),
                all_blocks.end(),
                std::back_inserter(allocated.usable),
-               [&](const auto*b) { return usable_filter(b,
-                                                        existing_caches,
-                                                        clusters); });
+               [&](const auto* b) {
+                 return usable_filter(b, existing_caches, clusters);
+               });
 
   auto absorbable_transform = [&](auto* b) { return std::make_pair(b->id(), b); };
 
-  ralg::transform_if(all_blocks.begin(),
-                     all_blocks.end(),
-                     std::inserter(allocated.absorbable,
-                                   allocated.absorbable.begin()),
-                     [&](const auto*b) { return absorbable_filter(b,
-                                                                  existing_caches,
-                                                                  clusters); },
-                     absorbable_transform);
+  ralg::transform_if(
+      all_blocks.begin(),
+      all_blocks.end(),
+      std::inserter(allocated.absorbable, allocated.absorbable.begin()),
+      [&](const auto* b) {
+        return absorbable_filter(b, existing_caches, clusters);
+      },
+      absorbable_transform);
 
   if (creation_blocks_alloc_check(allocated, existing_caches)) {
     return boost::make_optional(allocated);

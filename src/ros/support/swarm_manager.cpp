@@ -77,8 +77,8 @@ void swarm_manager::pre_step(void) {
 } /* pre_step() */
 
 bool swarm_manager::experiment_finished(void) const {
-  return timestep() >= mc_sierra.experiment.length.v() *
-      mc_sierra.experiment.ticks_per_sec.v();
+  return timestep() >=
+         mc_sierra.experiment.length.v() * mc_sierra.experiment.ticks_per_sec.v();
 } /* experiment_finished() */
 
 NS_END(support, ros, fordyca);

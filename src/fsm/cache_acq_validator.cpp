@@ -25,8 +25,8 @@
 
 #include "cosm/arena/repr/base_cache.hpp"
 
-#include "fordyca/controller/config/cache_sel/cache_pickup_policy_config.hpp"
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
+#include "fordyca/controller/config/cache_sel/cache_pickup_policy_config.hpp"
 #include "fordyca/subsystem/perception/ds/dp_cache_map.hpp"
 
 /*******************************************************************************
@@ -45,7 +45,8 @@ cache_acq_validator::cache_acq_validator(
     : ER_CLIENT_INIT("fordyca.fsm.cache_acq_validator"),
       mc_for_pickup(for_pickup),
       mc_csel_matrix(csel_matrix),
-      mc_caches(fspds::dp_cache_map::raw_values_extract<cads::bcache_vectorno>(*dpo_map)) {}
+      mc_caches(fspds::dp_cache_map::raw_values_extract<cads::bcache_vectorno>(
+          *dpo_map)) {}
 
 cache_acq_validator::cache_acq_validator(
     const cads::bcache_vectorno& caches,

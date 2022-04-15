@@ -32,23 +32,20 @@ NS_START(fordyca, strategy, config);
  * Member Functions
  ******************************************************************************/
 void strategy_parser::parse(const ticpp::Element& node) {
-  ER_DEBUG("Parent node=%s: child=%s",
-           node.Value().c_str(),
-           kXMLRoot.c_str());
+  ER_DEBUG("Parent node=%s: child=%s", node.Value().c_str(), kXMLRoot.c_str());
 
   ticpp::Element snode = node_get(node, kXMLRoot);
   m_config = std::make_unique<config_type>();
 
-  m_explore.parse(snode);
   m_nest_acq.parse(snode);
+  m_blocks.parse(snode);
 
-  if (m_explore.is_parsed()) {
-    m_config->explore = *m_explore.config_get<explore_parser::config_type>();
+  if (m_blocks.is_parsed()) {
+    m_config->blocks = *m_blocks.config_get<blocks_parser::config_type>();
   }
   if (m_nest_acq.is_parsed()) {
     m_config->nest_acq =
-        *m_nest_acq
-             .config_get<csstrategy::config::xml::nest_acq_parser::config_type>();
+        *m_nest_acq.config_get<cssnest_acq::config::xml::nest_acq_parser::config_type>();
   }
 } /* parse() */
 

@@ -27,11 +27,11 @@
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/ds/cell2D.hpp"
 
-#include "fordyca/subsystem/perception/los_proc_verify.hpp"
-#include "fordyca/subsystem/perception/oracular_info_receptor.hpp"
 #include "fordyca/subsystem/perception/ds/dpo_store.hpp"
 #include "fordyca/subsystem/perception/events/block_found.hpp"
 #include "fordyca/subsystem/perception/events/cache_found.hpp"
+#include "fordyca/subsystem/perception/los_proc_verify.hpp"
+#include "fordyca/subsystem/perception/oracular_info_receptor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,8 +44,9 @@ NS_START(fordyca, subsystem, perception);
 dpo_perception_subsystem::dpo_perception_subsystem(
     const config::perception_config* const config)
     : ER_CLIENT_INIT("fordyca.subsystem.perception.dpo"),
-      foraging_perception_subsystem(&config->dpo.rlos,
-                                    std::make_unique<ds::dpo_store>(&config->dpo.pheromone)) {}
+      foraging_perception_subsystem(
+          &config->dpo.rlos,
+          std::make_unique<ds::dpo_store>(&config->dpo.pheromone)) {}
 
 dpo_perception_subsystem::~dpo_perception_subsystem(void) = default;
 
@@ -147,15 +148,15 @@ void dpo_perception_subsystem::process_los_blocks(
               rcppsw::to_string(block->danchor2D()).c_str());
 
     ER_CONDI(!store()->contains(block),
-              "Discovered block%d@%s/%s",
-              block->id().v(),
-              rcppsw::to_string(block->ranchor2D()).c_str(),
-              rcppsw::to_string(block->danchor2D()).c_str());
+             "Discovered block%d@%s/%s",
+             block->id().v(),
+             rcppsw::to_string(block->ranchor2D()).c_str(),
+             rcppsw::to_string(block->danchor2D()).c_str());
     ER_CONDD(store()->contains(block),
-              "Block%d@%s/%s already known",
-              block->id().v(),
-              rcppsw::to_string(block->ranchor2D()).c_str(),
-              rcppsw::to_string(block->danchor2D()).c_str());
+             "Block%d@%s/%s already known",
+             block->id().v(),
+             rcppsw::to_string(block->ranchor2D()).c_str(),
+             rcppsw::to_string(block->danchor2D()).c_str());
     events::block_found_visitor op(block);
     op.visit(*store());
   } /* for(block..) */
@@ -200,11 +201,10 @@ void dpo_perception_subsystem::los_tracking_sync(
     bool should_be_in_los = (*it)->ydspan().overlaps_with(c_los->ydspan()) &&
                             (*it)->xdspan().overlaps_with(c_los->xdspan());
 
-    bool in_los =
-        los_caches.end() !=
-        std::find_if(los_caches.begin(), los_caches.end(), [&](const auto& c) {
-          return c->dloccmp(**it);
-        });
+    bool in_los = los_caches.end() !=
+                  std::find_if(los_caches.begin(),
+                               los_caches.end(),
+                               [&](const auto& c) { return c->dloccmp(**it); });
 
     if (should_be_in_los && !in_los) {
       ER_TRACE("Remove tracked DPO cache%d@%s/%s "
@@ -326,25 +326,26 @@ crepr::pheromone_density dpo_perception_subsystem::avg_cache_density(void) const
 
   if (!store()->tracked_caches().empty()) {
     ret = std::accumulate(range.begin(),
-                         range.end(),
+                          range.end(),
                           crepr::pheromone_density(),
                           [&](const auto& accum, const auto& cache) {
-                           return accum + cache.density();
+                            return accum + cache.density();
                           }) /
           store()->tracked_caches().size();
   }
   return ret;
 } /* avg_cache_density() */
 
-const known_objects_accessor* dpo_perception_subsystem::known_objects(void) const {
+const known_objects_accessor*
+dpo_perception_subsystem::known_objects(void) const {
   return store()->known_objects();
 }
 
-const ds::dpo_store* dpo_perception_subsystem::store(void) const  {
+const ds::dpo_store* dpo_perception_subsystem::store(void) const {
   return model<const ds::dpo_store>();
 }
 
-ds::dpo_store* dpo_perception_subsystem::store(void)  {
+ds::dpo_store* dpo_perception_subsystem::store(void) {
   return model<ds::dpo_store>();
 }
 

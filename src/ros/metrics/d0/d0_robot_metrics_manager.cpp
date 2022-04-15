@@ -25,20 +25,20 @@
 
 #include <boost/mpl/for_each.hpp>
 
+#include "rcppsw/metrics/network_sink_registerer.hpp"
+#include "rcppsw/metrics/register_using_config.hpp"
+#include "rcppsw/metrics/register_with_sink.hpp"
+#include "rcppsw/mpl/identity.hpp"
 #include "rcppsw/mpl/typelist.hpp"
 #include "rcppsw/utils/maskable_enum.hpp"
-#include "rcppsw/metrics/register_with_sink.hpp"
-#include "rcppsw/metrics/register_using_config.hpp"
-#include "rcppsw/metrics/network_sink_registerer.hpp"
-#include "rcppsw/mpl/identity.hpp"
 
-#include "cosm/repr/base_block3D.hpp"
 #include "cosm/metrics/specs.hpp"
+#include "cosm/repr/base_block3D.hpp"
 #include "cosm/ros/metrics/topic_sink.hpp"
 
 #include "fordyca/controller/reactive/d0/crw_controller.hpp"
-#include "fordyca/metrics/specs.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
+#include "fordyca/metrics/specs.hpp"
 #include "fordyca/ros/metrics/blocks/manipulation_metrics_topic_sink.hpp"
 #include "fordyca/ros/metrics/registrable.hpp"
 
@@ -55,20 +55,16 @@ d0_robot_metrics_manager::d0_robot_metrics_manager(
     const rmconfig::metrics_config* const mconfig)
     : crmetrics::robot_metrics_manager(robot_ns, mconfig),
       ER_CLIENT_INIT("fordyca.ros.metrics.d0.d0_robot_metrics_manager") {
-
   using sink_list = rmpl::typelist<
-    rmpl::identity<frmetrics::blocks::manipulation_metrics_topic_sink>
-    >;
+      rmpl::identity<frmetrics::blocks::manipulation_metrics_topic_sink> >;
 
   ER_INFO("Registering collectors");
 
   rmetrics::register_with_sink<frmetrics::d0::d0_robot_metrics_manager,
-                               rmetrics::network_sink_registerer> topic(this,
-                                                                        frmetrics::registrable::kStandard);
-  rmetrics::register_using_config<decltype(topic),
-                                  rmconfig::network_sink_config> registerer(
-                                      std::move(topic),
-                                      &mconfig->network);
+                               rmetrics::network_sink_registerer>
+      topic(this, frmetrics::registrable::kStandard);
+  rmetrics::register_using_config<decltype(topic), rmconfig::network_sink_config>
+      registerer(std::move(topic), &mconfig->network);
 
   boost::mpl::for_each<sink_list>(registerer);
 

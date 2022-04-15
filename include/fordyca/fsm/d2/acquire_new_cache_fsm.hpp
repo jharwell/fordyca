@@ -58,7 +58,7 @@ class acquire_new_cache_fsm final : public rer::client<acquire_new_cache_fsm>,
  public:
   acquire_new_cache_fsm(const fsm_ro_params* c_ro,
                         const csfsm::fsm_params* c_no,
-                        std::unique_ptr<csstrategy::base_strategy> exp_behavior,
+                        std::unique_ptr<cssexplore::base_explore> explore,
                         rmath::rng* rng);
   ~acquire_new_cache_fsm(void) override = default;
 
@@ -81,4 +81,3 @@ class acquire_new_cache_fsm final : public rer::client<acquire_new_cache_fsm>,
 };
 
 NS_END(d2, fsm, fordyca);
-

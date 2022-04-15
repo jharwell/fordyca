@@ -51,14 +51,19 @@ void free_block_pickup::visit(fcreactive::d0::crw_controller& controller) {
 
   visit(static_cast<ccontroller::block_carrying_controller&>(controller));
   visit(*controller.fsm());
-  ER_INFO("Picked up block%d@", block()->id().v());
+  ER_INFO("Picked up block%d", block()->id().v());
 
   controller.ndc_uuid_pop();
 } /* visit() */
 
 void free_block_pickup::visit(ffsm::d0::crw_fsm& fsm) {
+  auto old = fsm.current_state();
+  ER_DEBUG("Visiting FSM: state=%d", old);
   fsm.inject_event(ffsm::foraging_signal::ekBLOCK_PICKUP,
                    rpfsm::event_type::ekNORMAL);
+  auto _new = fsm.current_state();
+  ER_DEBUG("Visited FSM: state=%d", _new);
+  ER_ASSERT(old != _new, "FSM did not change state after pickup");
 } /* visit() */
 
 NS_END(events, d0, reactive, controller, fordyca);

@@ -27,9 +27,9 @@
 #include "fordyca/controller/cognitive/d1/bitd_mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d1/bitd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d1/bitd_omdpo_controller.hpp"
-#include "fordyca/fsm/foraging_signal.hpp"
-#include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/events/free_block_interactor.hpp"
+#include "fordyca/fsm/block_to_goal_fsm.hpp"
+#include "fordyca/fsm/foraging_signal.hpp"
 #include "fordyca/tasks/d1/foraging_task.hpp"
 
 /*******************************************************************************

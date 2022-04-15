@@ -62,4 +62,3 @@ enum class task_status {
 };
 
 NS_END(tasks, fordyca);
-

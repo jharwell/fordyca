@@ -24,11 +24,11 @@
 #include "fordyca/argos/support/caches/creation_verifier.hpp"
 
 #include "cosm/arena/caching_arena_map.hpp"
-#include "cosm/arena/repr/arena_cache.hpp"
-#include "cosm/repr/sim_block3D.hpp"
-#include "cosm/repr/nest.hpp"
 #include "cosm/arena/free_blocks_calculator.hpp"
+#include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/foraging/repr/block_cluster.hpp"
+#include "cosm/repr/nest.hpp"
+#include "cosm/repr/sim_block3D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,8 +39,8 @@ NS_START(fordyca, argos, support, caches);
  * Constructors/Destructor
  ******************************************************************************/
 creation_verifier::creation_verifier(carena::caching_arena_map* const map,
-                                                 const rtypes::spatial_dist& cache_dim,
-                                                 bool strict_constraints)
+                                     const rtypes::spatial_dist& cache_dim,
+                                     bool strict_constraints)
     : ER_CLIENT_INIT("fordyca.support.creation_verifier"),
       mc_cache_dim(cache_dim),
       mc_strict_constraints(strict_constraints),
@@ -58,10 +58,8 @@ bool creation_verifier::verify_single(
   auto free_blocks =
       carena::free_blocks_calculator(false)(c_all_blocks, c_caches);
 
-  bool sanity_ok = sanity_checks(c_caches,
-                                 free_blocks,
-                                 c_clusters,
-                                 m_map->nests());
+  bool sanity_ok =
+      sanity_checks(c_caches, free_blocks, c_clusters, m_map->nests());
   if (!sanity_ok) {
     if (mc_strict_constraints) {
       ER_WARN("Bad cache%d@%s/%s creation--discard (strict constraints)",

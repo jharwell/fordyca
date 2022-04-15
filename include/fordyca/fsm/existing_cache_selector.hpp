@@ -98,4 +98,3 @@ class existing_cache_selector : public rer::client<existing_cache_selector> {
 };
 
 NS_END(fsm, fordyca);
-

@@ -71,4 +71,3 @@ class block_acq_validator : public rer::client<block_acq_validator> {
 };
 
 NS_END(fsm, fordyca);
-

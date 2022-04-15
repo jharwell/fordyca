@@ -25,8 +25,6 @@
 
 #include "rcppsw/math/math.hpp"
 
-#include "rcppsw/math/math.hpp"
-
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -41,9 +39,7 @@ void caches_parser::parse(const ticpp::Element& node) {
     return;
   }
 
-  ER_DEBUG("Parent node=%s: child=%s",
-           node.Value().c_str(),
-           kXMLRoot.c_str());
+  ER_DEBUG("Parent node=%s: child=%s", node.Value().c_str(), kXMLRoot.c_str());
 
   ticpp::Element cnode = node_get(node, kXMLRoot);
   m_config = std::make_unique<config_type>();

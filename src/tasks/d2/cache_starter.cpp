@@ -23,8 +23,8 @@
  ******************************************************************************/
 #include "fordyca/tasks/d2/cache_starter.hpp"
 
-#include "fordyca/controller/cognitive/d2/events/block_vanished.hpp"
 #include "fordyca/controller/cognitive/d2/events/block_proximity.hpp"
+#include "fordyca/controller/cognitive/d2/events/block_vanished.hpp"
 #include "fordyca/controller/cognitive/d2/events/cache_proximity.hpp"
 #include "fordyca/controller/cognitive/d2/events/free_block_drop.hpp"
 #include "fordyca/controller/cognitive/d2/events/free_block_pickup.hpp"
@@ -96,7 +96,7 @@ void cache_starter::accept(fccd2::events::free_block_drop& visitor) {
   visitor.visit(fsm);
 }
 void cache_starter::accept(fccd2::events::free_block_pickup& visitor) {
-auto& fsm = *static_cast<ffsm::block_to_goal_fsm*>(mechanism());
+  auto& fsm = *static_cast<ffsm::block_to_goal_fsm*>(mechanism());
   visitor.visit(fsm);
 }
 void cache_starter::accept(fccd2::events::block_vanished& visitor) {

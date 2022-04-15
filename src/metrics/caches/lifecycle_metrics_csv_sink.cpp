@@ -42,8 +42,8 @@ lifecycle_metrics_csv_sink::lifecycle_metrics_csv_sink(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<std::string> lifecycle_metrics_csv_sink::csv_header_cols(
-    const rmetrics::base_data*) const {
+std::list<std::string>
+lifecycle_metrics_csv_sink::csv_header_cols(const rmetrics::base_data*) const {
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
     /* clang-format off */
@@ -66,9 +66,9 @@ std::list<std::string> lifecycle_metrics_csv_sink::csv_header_cols(
   return merged;
 } /* csv_header_cols() */
 
-boost::optional<std::string> lifecycle_metrics_csv_sink::csv_line_build(
-    const rmetrics::base_data* data,
-    const rtypes::timestep& t) {
+boost::optional<std::string>
+lifecycle_metrics_csv_sink::csv_line_build(const rmetrics::base_data* data,
+                                           const rtypes::timestep& t) {
   if (!ready_to_flush(t)) {
     return boost::none;
   }
@@ -91,9 +91,7 @@ boost::optional<std::string> lifecycle_metrics_csv_sink::csv_line_build(
   line += csv_entry_tsavg(d->cum.depleted, t);
   line += csv_entry_tsavg(d->cum.discarded, t);
 
-  line += csv_entry_domavg(d->cum.depletion_sum.v(),
-                       d->cum.depleted,
-                       true);
+  line += csv_entry_domavg(d->cum.depletion_sum.v(), d->cum.depleted, true);
   return boost::make_optional(line);
 } /* csv_line_build() */
 

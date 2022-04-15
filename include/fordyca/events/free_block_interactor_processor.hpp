@@ -25,9 +25,9 @@
  ******************************************************************************/
 #include "cosm/ta/polled_task.hpp"
 
+#include "fordyca/events/free_block_interactor.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
-#include "fordyca/events/free_block_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -43,20 +43,22 @@ NS_START(fordyca, events);
  *
  * \brief
  */
-class free_block_interactor_processor : public rer::client<free_block_interactor_processor> {
+class free_block_interactor_processor
+    : public rer::client<free_block_interactor_processor> {
  public:
-  free_block_interactor_processor(void) :
-      ER_CLIENT_INIT("fordyca.events.free_block_interactor_processor") {}
+  free_block_interactor_processor(void)
+      : ER_CLIENT_INIT("fordyca.events.free_block_interactor_processor") {}
 
   /* Not move/copy constructable/assignable by default */
   free_block_interactor_processor(const free_block_interactor_processor&) = delete;
-  free_block_interactor_processor& operator=(const free_block_interactor_processor&) = delete;
+  free_block_interactor_processor&
+  operator=(const free_block_interactor_processor&) = delete;
   free_block_interactor_processor(free_block_interactor_processor&&) = delete;
-  free_block_interactor_processor& operator=(free_block_interactor_processor&&) = delete;
+  free_block_interactor_processor&
+  operator=(free_block_interactor_processor&&) = delete;
 
-  template<typename TVisitor>
-  void task_dispatch(tasks::base_foraging_task* const task,
-                     TVisitor& visitor) {
+  template <typename TVisitor>
+  void task_dispatch(tasks::base_foraging_task* const task, TVisitor& visitor) {
     auto* polled RCPPSW_UNUSED = dynamic_cast<cta::polled_task*>(task);
     auto* interactor = dynamic_cast<fevents::free_block_interactor*>(task);
     ER_ASSERT(nullptr != interactor,

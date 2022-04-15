@@ -41,7 +41,6 @@ forager_los::forager_los(const rtypes::type_uuid& c_id,
     : grid2D_los(c_id, c_view, c_resolution),
       ER_CLIENT_INIT("fordyca.repr.forager_los") {}
 
-
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/

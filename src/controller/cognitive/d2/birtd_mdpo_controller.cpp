@@ -24,13 +24,13 @@
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/ds/cell2D.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
-#include "cosm/ds/cell2D.hpp"
 
 #include "fordyca/controller/config/d2/controller_repository.hpp"
-#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/subsystem/perception/perception_subsystem_factory.hpp"
 
 /*******************************************************************************

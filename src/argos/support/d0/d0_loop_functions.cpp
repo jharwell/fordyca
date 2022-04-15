@@ -26,31 +26,31 @@
 #include <boost/mpl/for_each.hpp>
 
 #include "cosm/arena/config/arena_map_config.hpp"
+#include "cosm/argos/convergence_calculator.hpp"
 #include "cosm/controller/operations/applicator.hpp"
 #include "cosm/foraging/block_dist/base_distributor.hpp"
 #include "cosm/foraging/metrics/block_transportee_metrics_collector.hpp"
 #include "cosm/foraging/oracle/foraging_oracle.hpp"
 #include "cosm/interactors/applicator.hpp"
-#include "cosm/argos/convergence_calculator.hpp"
+#include "cosm/metrics/specs.hpp"
 #include "cosm/pal/argos/swarm_iterator.hpp"
 #include "cosm/pal/pal.hpp"
-#include "cosm/metrics/specs.hpp"
 
-#include "fordyca/controller/cognitive/d0/dpo_controller.hpp"
-#include "fordyca/controller/cognitive/d0/mdpo_controller.hpp"
-#include "fordyca/controller/cognitive/d0/odpo_controller.hpp"
-#include "fordyca/controller/cognitive/d0/omdpo_controller.hpp"
-#include "fordyca/subsystem/perception/foraging_perception_subsystem.hpp"
-#include "fordyca/controller/reactive/d0/crw_controller.hpp"
-#include "fordyca/repr/forager_los.hpp"
 #include "fordyca/argos/metrics/d0/d0_metrics_manager.hpp"
 #include "fordyca/argos/support/d0/robot_arena_interactor.hpp"
 #include "fordyca/argos/support/d0/robot_configurer.hpp"
 #include "fordyca/argos/support/d0/robot_configurer_applicator.hpp"
 #include "fordyca/argos/support/d0/robot_los_update_applicator.hpp"
-#include "fordyca/argos/support/tv/tv_manager.hpp"
-#include "fordyca/argos/support/tv/fordyca_pd_adaptor.hpp"
 #include "fordyca/argos/support/tv/env_dynamics.hpp"
+#include "fordyca/argos/support/tv/fordyca_pd_adaptor.hpp"
+#include "fordyca/argos/support/tv/tv_manager.hpp"
+#include "fordyca/controller/cognitive/d0/dpo_controller.hpp"
+#include "fordyca/controller/cognitive/d0/mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/d0/odpo_controller.hpp"
+#include "fordyca/controller/cognitive/d0/omdpo_controller.hpp"
+#include "fordyca/controller/reactive/d0/crw_controller.hpp"
+#include "fordyca/repr/forager_los.hpp"
+#include "fordyca/subsystem/perception/foraging_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -84,10 +84,10 @@ struct functor_maps_initializer {
             lf->m_metrics_manager.get(),
             lf->floor(),
             lf->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>()));
-    lf->m_metrics_map->emplace(typeid(controller),
-                               ccops::metrics_extract<T,
-                               fametrics::d0::d0_metrics_manager>(
-                                   lf->m_metrics_manager.get()));
+    lf->m_metrics_map->emplace(
+        typeid(controller),
+        ccops::metrics_extract<T, fametrics::d0::d0_metrics_manager>(
+            lf->m_metrics_manager.get()));
     config_map->emplace(
         typeid(controller),
         robot_configurer<T>(
@@ -96,9 +96,11 @@ struct functor_maps_initializer {
     lf->m_los_update_map->emplace(
         typeid(controller),
         ccops::grid_los_update<T,
-        rds::grid2D_overlay<cds::cell2D>,
-        repr::forager_los>(
-            lf->arena_map()->decoratee().template layer<cads::arena_grid::kCell>()));
+                               rds::grid2D_overlay<cds::cell2D>,
+                               repr::forager_los>(
+            lf->arena_map()
+                ->decoratee()
+                .template layer<cads::arena_grid::kCell>()));
   }
 
   /* clang-format off */
@@ -181,7 +183,7 @@ void d0_loop_functions::private_init(void) {
    * only happens once, so it doesn't really matter if it is slow.
    */
   cpargos::swarm_iterator::controllers<controller::foraging_controller,
-                                          cpal::iteration_order::ekSTATIC>(
+                                       cpal::iteration_order::ekSTATIC>(
       this, cb, cpal::kRobotType);
 } /* private_init() */
 
@@ -247,7 +249,7 @@ void d0_loop_functions::post_step(void) {
 } /* post_step() */
 
 void d0_loop_functions::destroy(void) {
- if (nullptr != m_metrics_manager) {
+  if (nullptr != m_metrics_manager) {
     m_metrics_manager->finalize();
   }
 } /* destroy() */
@@ -271,8 +273,7 @@ void d0_loop_functions::robot_pre_step(chal::robot& robot) {
    * control step because we need access to information only available in the
    * loop functions.
    */
-  controller->sensing_update(timestep(),
-                             arena_map()->grid_resolution());
+  controller->sensing_update(timestep(), arena_map()->grid_resolution());
 
   /* Send robot its new LOS */
   auto it = m_los_update_map->find(controller->type_index());
@@ -298,11 +299,10 @@ void d0_loop_functions::robot_post_step(chal::robot& robot) {
             controller->GetId().c_str(),
             controller->type_index().name());
 
-  auto iapplicator = cinteractors::applicator<controller::foraging_controller,
-                                              d0::robot_arena_interactor,
-                                              carena::caching_arena_map>(
-                                                  controller,
-                                                  timestep());
+  auto iapplicator =
+      cinteractors::applicator<controller::foraging_controller,
+                               d0::robot_arena_interactor,
+                               carena::caching_arena_map>(controller, timestep());
   auto status = boost::apply_visitor(
       iapplicator, m_interactor_map->at(controller->type_index()));
 
@@ -325,9 +325,10 @@ void d0_loop_functions::robot_post_step(chal::robot& robot) {
    * Collect metrics from robot, now that it has finished interacting with the
    * environment and no more changes to its state will occur this timestep.
    */
-  auto mapplicator = ccops::applicator<controller::foraging_controller,
-                                       ccops::metrics_extract,
-                                       fametrics::d0::d0_metrics_manager>(controller);
+  auto mapplicator =
+      ccops::applicator<controller::foraging_controller,
+                        ccops::metrics_extract,
+                        fametrics::d0::d0_metrics_manager>(controller);
   boost::apply_visitor(mapplicator, m_metrics_map->at(controller->type_index()));
 
   controller->block_manip_recorder()->reset();

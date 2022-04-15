@@ -25,23 +25,23 @@
 
 #include <boost/mpl/for_each.hpp>
 
+#include "rcppsw/metrics/file_sink_registerer.hpp"
+#include "rcppsw/metrics/register_using_config.hpp"
+#include "rcppsw/metrics/register_with_sink.hpp"
+#include "rcppsw/mpl/identity.hpp"
 #include "rcppsw/mpl/typelist.hpp"
 #include "rcppsw/utils/maskable_enum.hpp"
-#include "rcppsw/metrics/register_with_sink.hpp"
-#include "rcppsw/metrics/register_using_config.hpp"
-#include "rcppsw/metrics/file_sink_registerer.hpp"
-#include "rcppsw/mpl/identity.hpp"
 
-#include "cosm/ros/metrics/topic_sink.hpp"
-#include "cosm/pal/ros/swarm_iterator.hpp"
 #include "cosm/metrics/specs.hpp"
+#include "cosm/pal/ros/swarm_iterator.hpp"
+#include "cosm/ros/metrics/topic_sink.hpp"
 
 #include "fordyca/controller/reactive/d0/crw_controller.hpp"
-#include "fordyca/metrics/specs.hpp"
-#include "fordyca/metrics/blocks/manipulation_metrics_csv_sink.hpp"
-#include "fordyca/ros/metrics/registrable.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
+#include "fordyca/metrics/blocks/manipulation_metrics_csv_sink.hpp"
+#include "fordyca/metrics/specs.hpp"
 #include "fordyca/ros/metrics/blocks/manipulation_metrics_glue.hpp"
+#include "fordyca/ros/metrics/registrable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -57,18 +57,15 @@ d0_swarm_metrics_manager::d0_swarm_metrics_manager(
     size_t n_robots)
     : crmetrics::swarm_metrics_manager(mconfig, root, n_robots),
       ER_CLIENT_INIT("fordyca.ros.metrics.d0.d0_swarm_metrics_manager") {
-
   /*
    * Register all standard metrics which don't require additional parameters
    * and can be done by default.
    */
   register_standard(mconfig, n_robots);
 
-  std::all_of(std::begin(m_subs),
-              std::end(m_subs),
-              [&](auto& sub) {
-                return wait_for_connection(sub);
-              });
+  std::all_of(std::begin(m_subs), std::end(m_subs), [&](auto& sub) {
+    return wait_for_connection(sub);
+  });
 
   /* setup metric collection for all collector groups in all sink groups */
   initialize();
@@ -81,17 +78,14 @@ void d0_swarm_metrics_manager::register_standard(
     const rmconfig::metrics_config* const mconfig,
     size_t n_robots) {
   using sink_list = rmpl::typelist<
-    rmpl::identity<fmetrics::blocks::manipulation_metrics_csv_sink>
-    >;
+      rmpl::identity<fmetrics::blocks::manipulation_metrics_csv_sink> >;
 
   /* register collectors common to all of FORDYCA */
   rmetrics::register_with_sink<frmetrics::d0::d0_swarm_metrics_manager,
-                               rmetrics::file_sink_registerer> topic(this,
-                                                                     registrable::kStandard);
-  rmetrics::register_using_config<decltype(topic),
-                                  rmconfig::file_sink_config> registerer(
-                                      std::move(topic),
-                                      &mconfig->csv);
+                               rmetrics::file_sink_registerer>
+      topic(this, registrable::kStandard);
+  rmetrics::register_using_config<decltype(topic), rmconfig::file_sink_config>
+      registerer(std::move(topic), &mconfig->csv);
 
   boost::mpl::for_each<sink_list>(registerer);
 
@@ -101,12 +95,12 @@ void d0_swarm_metrics_manager::register_standard(
   /* set ROS callbacks for metric collection */
   ::ros::NodeHandle n;
   auto cb = [&](cros::topic robot_ns) {
-              m_subs.push_back(n.subscribe<frmblocks::manipulation_metrics_msg>(
-                  robot_ns / fmspecs::blocks::kManipulation.scoped(),
-                  kQueueBufferSize,
-                  &d0_swarm_metrics_manager::collect,
-                  this));
-            };
+    m_subs.push_back(n.subscribe<frmblocks::manipulation_metrics_msg>(
+        robot_ns / fmspecs::blocks::kManipulation.scoped(),
+        kQueueBufferSize,
+        &d0_swarm_metrics_manager::collect,
+        this));
+  };
   cpros::swarm_iterator::robots(n_robots, cb);
 } /* register_standard() */
 

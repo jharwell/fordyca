@@ -42,8 +42,7 @@ dpo_metrics_collector::dpo_metrics_collector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void dpo_metrics_collector::collect(
-    const rmetrics::base_metrics& metrics) {
+void dpo_metrics_collector::collect(const rmetrics::base_metrics& metrics) {
   const auto* m = dynamic_cast<const dpo_metrics*>(&metrics);
 
   /*
@@ -66,14 +65,10 @@ void dpo_metrics_collector::collect(
   m_data.cum.known_blocks += m->n_known_blocks();
   m_data.cum.known_caches += m->n_known_caches();
 
-  ral::mt_accum(m_data.interval.block_density_sum,
-               m->avg_block_density().v());
-  ral::mt_accum(m_data.cum.block_density_sum,
-               m->avg_block_density().v());
-  ral::mt_accum(m_data.interval.cache_density_sum,
-               m->avg_cache_density().v());
-  ral::mt_accum(m_data.cum.block_density_sum,
-               m->avg_cache_density().v());
+  ral::mt_accum(m_data.interval.block_density_sum, m->avg_block_density().v());
+  ral::mt_accum(m_data.cum.block_density_sum, m->avg_block_density().v());
+  ral::mt_accum(m_data.interval.cache_density_sum, m->avg_cache_density().v());
+  ral::mt_accum(m_data.cum.block_density_sum, m->avg_cache_density().v());
 } /* collect() */
 
 void dpo_metrics_collector::reset_after_interval(void) {

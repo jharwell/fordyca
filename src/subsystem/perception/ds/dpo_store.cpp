@@ -45,8 +45,7 @@ dpo_store::dpo_store(const cspconfig::pheromone_config* const config)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-model_update_result
-dpo_store::cache_update(tracked_cache_type&& cache) {
+model_update_result dpo_store::cache_update(tracked_cache_type&& cache) {
   model_update_result res;
 
   ER_TRACE("Updating cache%d@%s",
@@ -86,8 +85,7 @@ bool dpo_store::cache_remove(carepr::base_cache* const victim) {
   return false;
 } /* cache_remove() */
 
-model_update_result
-dpo_store::block_update(tracked_block_type&& block_in) {
+model_update_result dpo_store::block_update(tracked_block_type&& block_in) {
   auto range = tracked_blocks().values_range();
 
   auto it1 = std::find_if(range.begin(),

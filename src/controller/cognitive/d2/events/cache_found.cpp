@@ -28,9 +28,9 @@
 #include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
 #include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
-#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
 #include "fordyca/subsystem/perception/events/cache_found.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces

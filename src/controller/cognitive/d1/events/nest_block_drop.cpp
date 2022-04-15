@@ -29,10 +29,10 @@
 #include "fordyca/controller/cognitive/d1/bitd_mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d1/bitd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d1/bitd_omdpo_controller.hpp"
+#include "fordyca/events/nest_interactor.hpp"
 #include "fordyca/fsm/d1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
 #include "fordyca/tasks/d1/foraging_task.hpp"
-#include "fordyca/events/nest_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -87,11 +87,8 @@ static_cache_creator::create_all(const fascaches::create_ro_params& c_params,
             rcppsw::to_string(dcenter).c_str(),
             rcppsw::to_string(alloc_i.second).c_str(),
             alloc_i.second.size());
-    auto cache =
-        create_single_cache(rcenter,
-                            std::move(alloc_i.second),
-                            c_params.t,
-                            pre_dist);
+    auto cache = create_single_cache(
+        rcenter, std::move(alloc_i.second), c_params.t, pre_dist);
     res.created.push_back(std::move(cache));
   } /* for(&alloc_i..) */
 

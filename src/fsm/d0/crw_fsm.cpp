@@ -27,6 +27,9 @@
 #include "cosm/subsystem/actuation_subsystem2D.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/subsystem/sensing_subsystemQ3D.hpp"
+#include "cosm/spatial/strategy/nest_acq/base_nest_acq.hpp"
+#include "cosm/spatial/strategy/blocks/drop/base_drop.hpp"
+
 
 #include "fordyca/fsm/foraging_signal.hpp"
 
@@ -39,17 +42,24 @@ NS_START(fordyca, fsm, d0);
  * Constructors/Destructors
  ******************************************************************************/
 crw_fsm::crw_fsm(const csfsm::fsm_params* params,
-                 std::unique_ptr<csstrategy::base_strategy> explore,
+                 std::unique_ptr<cssexplore::base_explore> explore,
                  std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
+                 std::unique_ptr<cssblocks::drop::base_drop> block_drop,
                  const rmath::vector2d& nest_loc,
                  rmath::rng* rng)
-    : foraging_util_hfsm(params, std::move(nest_acq), rng, ekST_MAX_STATES),
+    : foraging_util_hfsm(params,
+                         std::move(nest_acq),
+                         std::move(block_drop),
+                         rng,
+                         ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.d0.crw"),
       RCPPSW_HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
+      RCPPSW_HFSM_CONSTRUCT_STATE(drop_carried_block, &start),
       RCPPSW_HFSM_CONSTRUCT_STATE(leaving_nest, &start),
       RCPPSW_HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       RCPPSW_HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
       RCPPSW_HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
+      entry_drop_carried_block(),
       RCPPSW_HFSM_CONSTRUCT_STATE(wait_for_block_drop, hfsm::top_state()),
       RCPPSW_HFSM_DEFINE_STATE_MAP(
           mc_state_map,
@@ -70,7 +80,11 @@ crw_fsm::crw_fsm(const csfsm::fsm_params* params,
           RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_drop,
                                              nullptr,
                                              &entry_wait_for_signal,
-                                             nullptr)),
+                                             nullptr),
+          RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&drop_carried_block,
+                                             nullptr,
+                                             &entry_drop_carried_block,
+                                             &exit_drop_carried_block)),
       mc_nest_loc(nest_loc),
       m_explore_fsm(params,
                     std::move(explore),
@@ -93,6 +107,16 @@ RCPPSW_HFSM_STATE_DEFINE(crw_fsm, start, rpfsm::event_data* data) {
       return fsm::foraging_signal::ekHANDLED;
     } else if (fsm::foraging_signal::ekENTERED_NEST == data->signal()) {
       internal_event(ekST_WAIT_FOR_BLOCK_DROP);
+      return fsm::foraging_signal::ekHANDLED;
+    } else if (fsm::foraging_signal::ekDROPPED_BLOCK == data->signal()) {
+      /*
+       * We can't just switch states--ekST_LEAVING_NEST checks if we are still
+       * in a child signal context, so we need to explicitly say that we have
+       * handled the signal and things are back to normal.
+       */
+      data->signal(fsm::foraging_signal::ekRUN);
+      data->type(rpfsm::event_type::ekNORMAL);
+      internal_event(ekST_LEAVING_NEST);
       return fsm::foraging_signal::ekHANDLED;
     }
   }
@@ -117,6 +141,8 @@ RCPPSW_HFSM_STATE_DEFINE_ND(crw_fsm, acquire_block) {
 RCPPSW_HFSM_STATE_DEFINE(crw_fsm,
                          wait_for_block_pickup,
                          rpfsm::event_data* data) {
+  ER_DEBUG("Waiting for block pickup: signal=%d", data->signal());
+
   if (fsm::foraging_signal::ekBLOCK_PICKUP == data->signal()) {
     m_explore_fsm.task_reset();
     ER_INFO("Block pickup signal received");
@@ -132,15 +158,28 @@ RCPPSW_HFSM_STATE_DEFINE(crw_fsm,
   return fsm::foraging_signal::ekHANDLED;
 }
 
-RCPPSW_HFSM_STATE_DEFINE(crw_fsm, wait_for_block_drop, rpfsm::event_data* data) {
-  if (fsm::foraging_signal::ekBLOCK_DROP == data->signal()) {
+RCPPSW_HFSM_STATE_DEFINE(crw_fsm,
+                         wait_for_block_drop,
+                         rpfsm::event_data* data) {
+  ER_DEBUG("Wait for block drop signal: signal=%d", data->signal());
+
+  if (ffsm::foraging_signal::ekBLOCK_DROP == data->signal()) {
     m_explore_fsm.task_reset();
-    m_task_finished = true;
     ER_INFO("Block drop signal received");
-    internal_event(ekST_LEAVING_NEST);
+    internal_event(ekST_DROP_CARRIED_BLOCK);
   }
   return fsm::foraging_signal::ekHANDLED;
 }
+
+RCPPSW_HFSM_ENTRY_DEFINE_ND(crw_fsm, entry_drop_carried_block) {
+  ER_DEBUG("Begin dropping block");
+}
+
+RCPPSW_HFSM_EXIT_DEFINE(crw_fsm, exit_drop_carried_block) {
+  ER_DEBUG("Finished dropping block");
+  m_task_finished = true;
+}
+
 
 /*******************************************************************************
  * Goal Acquisition Metrics
@@ -225,7 +264,7 @@ void crw_fsm::run(void) {
   }
 } /* run() */
 
-bool crw_fsm::block_detected(void) const {
+bool crw_fsm::block_detected(void) {
   return saa()->sensing()->env()->detect("block");
 } /* block_detected() */
 

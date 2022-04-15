@@ -31,14 +31,12 @@ NS_START(fordyca, controller, cognitive, d1, events);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-free_block_drop::free_block_drop(
-    std::unique_ptr<crepr::base_block3D> block,
-    const rmath::vector2z& coord,
-    const rtypes::discretize_ratio& resolution)
+free_block_drop::free_block_drop(std::unique_ptr<crepr::base_block3D> block,
+                                 const rmath::vector2z& coord,
+                                 const rtypes::discretize_ratio& resolution)
     : ER_CLIENT_INIT("fordyca.controller.cognitive.d1.events.free_block_drop"),
-        cell2D_op(coord),
-        mc_resolution(resolution),
-        m_block(std::move(block)) {}
-
+      cell2D_op(coord),
+      mc_resolution(resolution),
+      m_block(std::move(block)) {}
 
 NS_END(events, d1, cognitive, controller, fordyca);

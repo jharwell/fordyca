@@ -176,4 +176,3 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
 };
 
 NS_END(fsm, fordyca);
-

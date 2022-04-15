@@ -30,9 +30,9 @@
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 
-#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/d2/cache_site_selector.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -45,8 +45,7 @@ NS_START(fordyca, strategy, explore);
 utility_cache_search::utility_cache_search(
     const fstrategy::strategy_params* params,
     rmath::rng* rng)
-    : localized_search(params, rng),
-      mc_matrix(params->csel_matrix) {}
+    : localized_search(params, rng), mc_matrix(params->csel_matrix) {}
 
 /*******************************************************************************
  * Member Functions

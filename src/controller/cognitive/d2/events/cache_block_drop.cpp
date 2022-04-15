@@ -30,11 +30,11 @@
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
-#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
-#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
+#include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
-#include "fordyca/events/existing_cache_interactor.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/tasks/d2/foraging_task.hpp"
 
 /*******************************************************************************
@@ -46,10 +46,9 @@ using base_drop = fccd1::events::cache_block_drop;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_block_drop::cache_block_drop(
-    std::unique_ptr<crepr::base_block3D> block,
-    carepr::arena_cache* cache,
-    const rtypes::discretize_ratio& resolution)
+cache_block_drop::cache_block_drop(std::unique_ptr<crepr::base_block3D> block,
+                                   carepr::arena_cache* cache,
+                                   const rtypes::discretize_ratio& resolution)
     : ER_CLIENT_INIT("fordyca.controller.cognitive.events.d2.cache_block_drop"),
       base_drop(std::move(block), cache, resolution) {}
 
@@ -60,7 +59,7 @@ void cache_block_drop::visit(fccd2::birtd_dpo_controller& controller) {
   controller.ndc_uuid_push();
 
   if (dispatch_cache_interactor(controller.current_task(),
-                                   controller.cache_sel_matrix())) {
+                                controller.cache_sel_matrix())) {
     controller.csel_exception_added(true);
   }
   ER_INFO(
@@ -93,7 +92,7 @@ void cache_block_drop::visit(fccd2::birtd_odpo_controller& controller) {
   controller.ndc_uuid_push();
 
   if (dispatch_cache_interactor(controller.current_task(),
-                                   controller.cache_sel_matrix())) {
+                                controller.cache_sel_matrix())) {
     controller.csel_exception_added(true);
   }
   ER_INFO(
@@ -109,7 +108,7 @@ void cache_block_drop::visit(fccd2::birtd_omdpo_controller& controller) {
   controller.ndc_uuid_push();
 
   if (dispatch_cache_interactor(controller.current_task(),
-                                   controller.cache_sel_matrix())) {
+                                controller.cache_sel_matrix())) {
     controller.csel_exception_added(true);
   }
   base_drop::visit(*controller.perception()->model<fspds::dpo_semantic_map>());

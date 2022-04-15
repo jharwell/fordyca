@@ -25,28 +25,28 @@
 
 #include <boost/mpl/for_each.hpp>
 
+#include "rcppsw/metrics/file_sink_registerer.hpp"
+#include "rcppsw/metrics/register_using_config.hpp"
+#include "rcppsw/metrics/register_with_sink.hpp"
+#include "rcppsw/mpl/identity.hpp"
 #include "rcppsw/mpl/typelist.hpp"
 #include "rcppsw/utils/maskable_enum.hpp"
-#include "rcppsw/metrics/file_sink_registerer.hpp"
-#include "rcppsw/metrics/register_with_sink.hpp"
-#include "rcppsw/metrics/register_using_config.hpp"
-#include "rcppsw/mpl/identity.hpp"
 
 #include "cosm/arena/caching_arena_map.hpp"
-#include "cosm/foraging/block_dist/base_distributor.hpp"
 #include "cosm/argos/convergence_calculator.hpp"
+#include "cosm/foraging/block_dist/base_distributor.hpp"
 #include "cosm/metrics/specs.hpp"
 
+#include "fordyca/argos/support/argos_swarm_manager.hpp"
+#include "fordyca/argos/support/tv/env_dynamics.hpp"
+#include "fordyca/argos/support/tv/fordyca_pd_adaptor.hpp"
+#include "fordyca/argos/support/tv/tv_manager.hpp"
 #include "fordyca/controller/foraging_controller.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_csv_sink.hpp"
+#include "fordyca/metrics/specs.hpp"
 #include "fordyca/metrics/tv/env_dynamics_metrics_collector.hpp"
 #include "fordyca/metrics/tv/env_dynamics_metrics_csv_sink.hpp"
-#include "fordyca/argos/support/argos_swarm_manager.hpp"
-#include "fordyca/argos/support/tv/tv_manager.hpp"
-#include "fordyca/metrics/specs.hpp"
-#include "fordyca/argos/support/tv/fordyca_pd_adaptor.hpp"
-#include "fordyca/argos/support/tv/env_dynamics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -76,27 +76,22 @@ base_fs_output_manager::base_fs_output_manager(
 
   /* register collectors common to all of FORDYCA */
   rmetrics::creatable_collector_set creatable_set = {
-    {
-      typeid(fmetrics::blocks::manipulation_metrics_collector),
+    { typeid(fmetrics::blocks::manipulation_metrics_collector),
       fmspecs::blocks::kManipulation.xml(),
       fmspecs::blocks::kManipulation.scoped(),
-      rmetrics::output_mode::ekAPPEND
-    },
-    {
-      typeid(fmetrics::tv::env_dynamics_metrics_collector),
+      rmetrics::output_mode::ekAPPEND },
+    { typeid(fmetrics::tv::env_dynamics_metrics_collector),
       cmspecs::tv::kEnvironment.xml(),
       cmspecs::tv::kEnvironment.scoped(),
-      rmetrics::output_mode::ekAPPEND
-    },
+      rmetrics::output_mode::ekAPPEND },
   };
 
-      rmetrics::register_with_sink<base_fs_output_manager,
-                                   rmetrics::file_sink_registerer> csv(this,
-                                                                       creatable_set);
+  rmetrics::register_with_sink<base_fs_output_manager,
+                               rmetrics::file_sink_registerer>
+      csv(this, creatable_set);
   rmetrics::register_using_config<decltype(csv),
-                                  rmetrics::config::file_sink_config> registerer(
-                                      std::move(csv),
-                                      &mconfig->csv);
+                                  rmetrics::config::file_sink_config>
+      registerer(std::move(csv), &mconfig->csv);
   boost::mpl::for_each<detail::sink_list>(registerer);
 
   /* setup metric collection for all collector groups in all sink groups */
@@ -115,8 +110,7 @@ void base_fs_output_manager::collect_from_sm(
   collect(cmspecs::tv::kEnvironment.scoped(),
           *sm->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>());
 
-  if (nullptr !=
-      sm->tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>()) {
+  if (nullptr != sm->tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>()) {
     collect(cmspecs::tv::kPopulation.scoped(),
             *sm->tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>());
   }

@@ -24,15 +24,14 @@
 #include "fordyca/controller/cognitive/d0/odpo_controller.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/ds/cell2D.hpp"
+#include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
-#include "cosm/ds/cell2D.hpp"
-#include "cosm/subsystem/saa_subsystemQ3D.hpp"
-#include "cosm/fsm/supervisor_fsm.hpp"
 
+#include "fordyca/fsm/d0/dpo_fsm.hpp"
 #include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
 #include "fordyca/subsystem/perception/oracular_info_receptor.hpp"
-#include "fordyca/fsm/d0/dpo_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,7 +42,8 @@ NS_START(fordyca, controller, cognitive, d0);
  * Constructors/Destructor
  ******************************************************************************/
 odpo_controller::odpo_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.cognitive.d0.odpo"), m_receptor(nullptr) {}
+    : ER_CLIENT_INIT("fordyca.controller.cognitive.d0.odpo"),
+      m_receptor(nullptr) {}
 
 odpo_controller::~odpo_controller(void) = default;
 
@@ -59,7 +59,6 @@ void odpo_controller::control_step(void) {
             block()->id().v(),
             block()->md()->robot_id().v());
 
-
   perception()->update(m_receptor.get());
 
   /*
@@ -74,6 +73,9 @@ void odpo_controller::control_step(void) {
    * abnormal operation state.
    */
   supervisor()->run();
+
+  /* Update block detection status for use in the loop functions */
+  block_detect_status_update();
 
   ndc_uuid_pop();
 } /* control_step() */

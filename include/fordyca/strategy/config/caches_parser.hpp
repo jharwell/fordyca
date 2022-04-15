@@ -1,7 +1,7 @@
 /**
- * \file block_priorities_parser.hpp
+ * \file caches_parser.hpp
  *
- * \copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -23,55 +23,58 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
 #include <memory>
+#include <string>
 
 #include "rcppsw/config/xml/xml_config_parser.hpp"
 
-#include "fordyca/controller/config/block_sel/block_priority_config.hpp"
+#include "cosm/spatial/strategy/explore/config/xml/explore_parser.hpp"
+
+#include "fordyca/strategy/config/caches_config.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller, config, block_sel);
+NS_START(fordyca, strategy, config);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class block_priorities_parser
- * \ingroup controller config block_sel
+ * \class caches_parser
+ * \ingroup strategy config
  *
- * \brief Parses XML parameters related to block priorties into \ref
- * block_priority_config.
+ * \brief Parses XML configuration for how robots can do things to/with caches
+ * into \ref caches_config.
  */
-class block_priorities_parser final : public rer::client<block_priorities_parser>,
-                                      public rconfig::xml::xml_config_parser {
+class caches_parser final : public rer::client<caches_parser>,
+                             public rconfig::xml::xml_config_parser {
  public:
-  using config_type = block_priority_config;
+  using config_type = caches_config;
 
-  block_priorities_parser(void)
-      : ER_CLIENT_INIT("fordyca.controller.config.block_sel.block_priorities_parser") {}
+  caches_parser(void)
+      : ER_CLIENT_INIT("fordyca.strategy.caches.config.caches_parser") {}
 
   /**
-   * \brief The root tag that all block parameters should lie under in the
-   * XML tree.
+   * \brief The root tag that all XML configuration for caches should lie
+   * under in the XML tree.
    */
-  static inline const std::string kXMLRoot = "block_priorities";
+  static inline const std::string kXMLRoot = "caches";
 
-  void parse(const ticpp::Element& node) override RCPPSW_COLD;
+  void parse(const ticpp::Element& node) override;
   bool validate(void) const override RCPPSW_ATTR(pure, cold);
 
   RCPPSW_COLD std::string xml_root(void) const override { return kXMLRoot; }
 
  private:
-  RCPPSW_COLD const rconfig::base_config* config_get_impl(void) const override {
+  const rconfig::base_config* config_get_impl(void) const override {
     return m_config.get();
   }
 
   /* clang-format off */
-  std::unique_ptr<config_type> m_config{nullptr};
+  std::unique_ptr<config_type>            m_config{nullptr};
+  cssexplore::config::xml::explore_parser m_explore{};
   /* clang-format on */
 };
 
-NS_END(block_sel, config, controller, fordyca);
+NS_END(config, strategy, fordyca);

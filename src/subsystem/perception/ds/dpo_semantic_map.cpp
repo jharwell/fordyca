@@ -83,7 +83,8 @@ model_update_result dpo_semantic_map::block_update(tracked_block_type&& block) {
     e.visit(access<occupancy_grid::kCell>(found->ent()->danchor2D()));
 
     /* copy density from DPO store to new cell  */
-    access<occupancy_grid::kPheromone>(found->ent()->danchor2D()) = found->density();
+    access<occupancy_grid::kPheromone>(found->ent()->danchor2D()) =
+        found->density();
   }
   return res;
 } /* block_update() */
@@ -99,7 +100,8 @@ model_update_result dpo_semantic_map::cache_update(tracked_cache_type&& cache) {
     e.visit(access<occupancy_grid::kCell>(found->ent()->dcenter2D()));
 
     /* copy density from DPO store to new cell  */
-    access<occupancy_grid::kPheromone>(found->ent()->dcenter2D()) = found->density();
+    access<occupancy_grid::kPheromone>(found->ent()->dcenter2D()) =
+        found->density();
   }
   return res;
 } /* cache_update() */

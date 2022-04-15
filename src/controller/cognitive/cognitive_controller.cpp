@@ -37,8 +37,7 @@ NS_START(fordyca, controller, cognitive);
  * Constructors/Destructor
  ******************************************************************************/
 cognitive_controller::cognitive_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.cognitive"),
-      m_perception() {}
+    : ER_CLIENT_INIT("fordyca.controller.cognitive"), m_perception() {}
 
 cognitive_controller::~cognitive_controller(void) = default;
 

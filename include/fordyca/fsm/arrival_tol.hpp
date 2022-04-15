@@ -57,4 +57,3 @@ static constexpr double kNEW_CACHE_ARRIVAL_TOL = 0.8;
 static constexpr double kCACHE_SITE_ARRIVAL_TOL = 0.8;
 
 NS_END(fordyca, fsm);
-

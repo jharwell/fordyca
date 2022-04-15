@@ -32,18 +32,17 @@ RCPPSW_WARNING_DISABLE_POP()
  */
 #undef emit
 
-#include "cosm/subsystem/saa_subsystemQ3D.hpp"
-
 #include <argos3/core/simulator/entity/controllable_entity.h>
 
 #include "cosm/argos/vis/block_carry_visualizer.hpp"
 #include "cosm/argos/vis/polygon2D_visualizer.hpp"
 #include "cosm/argos/vis/steer2D_visualizer.hpp"
 #include "cosm/repr/sim_block3D.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
 #include "fordyca/controller/cognitive/d0/mdpo_controller.hpp"
-#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -79,7 +78,9 @@ void d0_qt_user_functions::Draw(chal::robot& c_entity) {
   }
   if (nullptr != mdpo && mdpo->display_los()) {
     const auto* los = mdpo->perception()->los();
-    auto res = mdpo->perception()->template model<fspds::dpo_semantic_map>()->resolution();
+    auto res = mdpo->perception()
+                   ->template model<fspds::dpo_semantic_map>()
+                   ->resolution();
     std::vector<rmath::vector2d> points = {
       rmath::zvec2dvec(los->abs_ll(), res.v()) - mdpo->rpos2D(),
       rmath::zvec2dvec(los->abs_ul(), res.v()) - mdpo->rpos2D(),

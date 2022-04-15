@@ -80,4 +80,3 @@ class dpo_entity {
 };
 
 NS_END(repr, fordyca);
-

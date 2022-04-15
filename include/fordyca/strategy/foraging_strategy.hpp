@@ -23,7 +23,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "cosm/spatial/strategy/base_strategy.hpp"
+#include "cosm/spatial/strategy/explore/base_explore.hpp"
 
 #include "fordyca/strategy/strategy_params.hpp"
 
@@ -42,10 +42,10 @@ NS_START(fordyca, strategy);
  * \brief Base class for different behaviors that controllers can
  * exhibit when looking for stuff, avoiding collision, etc.
  */
-class foraging_strategy : public csstrategy::base_strategy {
+class foraging_strategy : public cssexplore::base_explore {
  public:
-  foraging_strategy(const fstrategy::strategy_params * params, rmath::rng* rng)
-      : base_strategy(params->fsm, rng),
+  foraging_strategy(const fstrategy::strategy_params* params, rmath::rng* rng)
+      : base_explore(params->fsm, params->explore, rng),
         mc_accessor(params->accessor) {}
 
   foraging_strategy(const foraging_strategy&) = delete;
@@ -62,4 +62,3 @@ class foraging_strategy : public csstrategy::base_strategy {
 };
 
 NS_END(strategy, fordyca);
-

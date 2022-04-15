@@ -70,7 +70,8 @@ class nest_block_drop_interactor final
   operator=(const nest_block_drop_interactor&) = delete;
 
   bool robot_goal_acquired(const TController& controller) const override {
-    return controller.goal_acquired() && fsm::foraging_transport_goal::ekNEST ==
+    return controller.goal_acquired() &&
+        fsm::foraging_transport_goal::ekNEST ==
         controller.block_transport_goal();
   }
 
@@ -90,4 +91,3 @@ class nest_block_drop_interactor final
 };
 
 NS_END(support, ros, fordyca);
-

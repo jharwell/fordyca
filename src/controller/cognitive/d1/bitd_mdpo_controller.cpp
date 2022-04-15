@@ -24,14 +24,14 @@
 #include "fordyca/controller/cognitive/d1/bitd_mdpo_controller.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/ds/cell2D.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
-#include "cosm/ds/cell2D.hpp"
 
-#include "fordyca/controller/config/d1/controller_repository.hpp"
 #include "fordyca/controller/cognitive/d1/task_executive_builder.hpp"
+#include "fordyca/controller/config/d1/controller_repository.hpp"
 #include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/subsystem/perception/perception_subsystem_factory.hpp"
 
@@ -92,6 +92,9 @@ void bitd_mdpo_controller::control_step(void) {
    * state.
    */
   supervisor()->run();
+
+  /* Update block detection status for use in the loop functions */
+  block_detect_status_update();
 
   ndc_uuid_pop();
 } /* control_step() */

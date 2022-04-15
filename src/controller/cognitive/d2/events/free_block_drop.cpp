@@ -29,11 +29,11 @@
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
+#include "fordyca/events/free_block_interactor.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/d0/free_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
 #include "fordyca/tasks/d2/foraging_task.hpp"
-#include "fordyca/events/free_block_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,13 +45,11 @@ using base_drop = fccd1::events::free_block_drop;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-free_block_drop::free_block_drop(
-    std::unique_ptr<crepr::base_block3D> block,
-    const rmath::vector2z& coord,
-    const rtypes::discretize_ratio& resolution)
+free_block_drop::free_block_drop(std::unique_ptr<crepr::base_block3D> block,
+                                 const rmath::vector2z& coord,
+                                 const rtypes::discretize_ratio& resolution)
     : ER_CLIENT_INIT("fordyca.controller.cognitive.d2.events.free_block_drop"),
       base_drop(std::move(block), coord, resolution) {}
-
 
 /*******************************************************************************
  * Controllers
@@ -112,7 +110,6 @@ void free_block_drop::visit(ffsm::d0::free_block_to_nest_fsm& fsm) {
   fsm.inject_event(ffsm::foraging_signal::ekBLOCK_DROP,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
-
 
 /*******************************************************************************
  * Member Functions

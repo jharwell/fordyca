@@ -43,8 +43,7 @@ env_dynamics_metrics_csv_sink::env_dynamics_metrics_csv_sink(
  * Member Functions
  ******************************************************************************/
 std::list<std::string>
-env_dynamics_metrics_csv_sink::csv_header_cols(
-    const rmetrics::base_data*) const {
+env_dynamics_metrics_csv_sink::csv_header_cols(const rmetrics::base_data*) const {
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
     /* clang-format off */
@@ -58,9 +57,8 @@ env_dynamics_metrics_csv_sink::csv_header_cols(
 } /* csv_header_cols() */
 
 boost::optional<std::string>
-env_dynamics_metrics_csv_sink::csv_line_build(
-    const rmetrics::base_data* data,
-    const rtypes::timestep& t) {
+env_dynamics_metrics_csv_sink::csv_line_build(const rmetrics::base_data* data,
+                                              const rtypes::timestep& t) {
   if (!ready_to_flush(t)) {
     return boost::none;
   }

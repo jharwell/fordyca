@@ -59,10 +59,8 @@ class cell2D_empty : public cdops::cell2D_empty,
  private:
   struct visit_typelist_impl {
     using inherited = cell2D_empty::visit_typelist;
-    using others =
-        rmpl::typelist<ds::arena_map,
-                       fspds::occupancy_grid,
-                       fspds::dpo_semantic_map>;
+    using others = rmpl::
+        typelist<ds::arena_map, fspds::occupancy_grid, fspds::dpo_semantic_map>;
     using value = boost::mpl::joint_view<inherited::type, others::type>;
   };
 
@@ -92,4 +90,3 @@ NS_END(detail);
 using cell2D_empty_visitor = rpvisitor::filtered_visitor<detail::cell2D_empty>;
 
 NS_END(events, fordyca);
-

@@ -41,4 +41,3 @@ class cached_block_to_nest_fsm;
 } // namespace d1
 
 NS_END(fsm, fordyca);
-

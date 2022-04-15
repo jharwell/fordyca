@@ -23,10 +23,10 @@
  ******************************************************************************/
 #include "fordyca/controller/config/foraging_controller_repository.hpp"
 
+#include "cosm/hal/subsystem/config/xml/sensing_subsystemQ3D_parser.hpp"
 #include "cosm/repr/config/xml/nest_parser.hpp"
 
 #include "fordyca/strategy/config/strategy_parser.hpp"
-#include "cosm/hal/subsystem/config/xml/sensing_subsystemQ3D_parser.hpp"
 
 /*******************************************************************************
  * Namespaces

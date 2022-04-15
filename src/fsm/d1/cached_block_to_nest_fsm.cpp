@@ -24,6 +24,8 @@
 #include "fordyca/fsm/d1/cached_block_to_nest_fsm.hpp"
 
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
+#include "cosm/spatial/strategy/nest_acq/base_nest_acq.hpp"
+#include "cosm/spatial/strategy/blocks/drop/base_drop.hpp"
 
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
@@ -43,10 +45,14 @@ using csel_matrix = controller::cognitive::cache_sel_matrix;
 cached_block_to_nest_fsm::cached_block_to_nest_fsm(
     const fsm_ro_params* c_ro,
     const csfsm::fsm_params* c_no,
-    std::unique_ptr<csstrategy::base_strategy> explore,
+    std::unique_ptr<cssexplore::base_explore> explore,
     std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
     rmath::rng* rng)
-    : foraging_util_hfsm(c_no, std::move(nest_acq), rng, ekST_MAX_STATES),
+    : foraging_util_hfsm(c_no,
+                         std::move(nest_acq),
+                         nullptr,
+                         rng,
+                         ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.d1.cached_block_to_nest"),
       RCPPSW_HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       RCPPSW_HFSM_CONSTRUCT_STATE(leaving_nest, &start),

@@ -59,4 +59,3 @@ class base_foraging_task
 };
 
 NS_END(tasks, fordyca);
-

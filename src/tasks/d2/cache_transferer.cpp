@@ -24,8 +24,8 @@
 #include "fordyca/tasks/d2/cache_transferer.hpp"
 
 #include "fordyca/controller/cognitive/d2/events/block_found.hpp"
-#include "fordyca/controller/cognitive/d2/events/cache_vanished.hpp"
 #include "fordyca/controller/cognitive/d2/events/cache_block_drop.hpp"
+#include "fordyca/controller/cognitive/d2/events/cache_vanished.hpp"
 #include "fordyca/controller/cognitive/d2/events/cached_block_pickup.hpp"
 #include "fordyca/fsm/d2/cache_transferer_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"

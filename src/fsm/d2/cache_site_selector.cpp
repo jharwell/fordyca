@@ -27,8 +27,8 @@
 
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/math/cache_site_utility.hpp"
-#include "fordyca/subsystem/perception/ds/dp_cache_map.hpp"
 #include "fordyca/subsystem/perception/ds/dp_block_map.hpp"
+#include "fordyca/subsystem/perception/ds/dp_cache_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -92,8 +92,9 @@ cache_site_selector::operator()(const cads::bcache_vectorno& known_caches,
   }
 } /* operator()() */
 
-bool cache_site_selector::verify_site(const rmath::vector2d& site,
-                                      const cads::bcache_vectorno& known_caches) const {
+bool cache_site_selector::verify_site(
+    const rmath::vector2d& site,
+    const cads::bcache_vectorno& known_caches) const {
   const nest_constraint_data* ndata = &std::get<1>(m_constraints)[0];
 
   /* check distances to known caches */
@@ -168,8 +169,9 @@ void cache_site_selector::opt_initialize(const opt_init_conditions* cond,
           yrange.to_str().c_str());
 } /* opt_initialize() */
 
-void cache_site_selector::constraints_create(const cads::bcache_vectorno& known_caches,
-                                             const rmath::vector2d& nest_loc) {
+void cache_site_selector::constraints_create(
+    const cads::bcache_vectorno& known_caches,
+    const rmath::vector2d& nest_loc) {
   for (const auto& c : known_caches) {
     std::get<0>(m_constraints)
         .push_back({ c,

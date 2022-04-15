@@ -25,8 +25,9 @@
  ******************************************************************************/
 #include <map>
 
-#include "fordyca/fordyca.hpp"
 #include "cosm/hal/actuators/diagnostic_actuator.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

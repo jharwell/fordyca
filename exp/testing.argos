@@ -17,7 +17,7 @@
   <!-- *************** -->
   <controllers>
 
-    <birtd_dpo_controller id="fbc"
+    <crw_controller id="fbc"
                           library="libfordyca-argos-footbot">
       <actuators>
         <differential_steering implementation="default" />
@@ -154,9 +154,20 @@
               cache_size="3"/>
         </cache_sel_matrix>
         <strategy>
-          <explore
-              block_strategy="CRW"
-              cache_strategy="utility_search"/>
+          <blocks>
+            <explore
+                strategy="CRW"
+                min_duration="50"/>
+            <drop
+                strategy="backup"
+                duration="50"
+                />
+          </blocks>
+          <caches>
+            <explore
+                strategy="utility_search"
+                min_duration="50"/>
+            </caches>
           <nest_acq
               strategy="random_thresh"
               />
@@ -201,7 +212,7 @@
                       max_speed="0.1" />
         </actuation_subsystem2D>
       </params>
-    </birtd_dpo_controller>
+    </crw_controller>
 
   </controllers>
 
@@ -209,7 +220,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca-argos-footbot"
-                  label="d2_loop_functions">
+                  label="d0_loop_functions">
     <output
         output_parent="output"
         output_leaf="__current_date__">
@@ -475,7 +486,7 @@
        <!--                 headless_grabbing="true" -->
        <!--                 headless_frame_size="1600x1200" -->
        <!--                 /> -->
-      <user_functions label="d2_qt_user_functions" />
+      <user_functions label="d0_qt_user_functions" />
     </qt-opengl>
   </visualization>
 

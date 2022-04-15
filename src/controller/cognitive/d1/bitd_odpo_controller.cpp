@@ -24,11 +24,11 @@
 #include "fordyca/controller/cognitive/d1/bitd_odpo_controller.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/ds/cell2D.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
-#include "cosm/ds/cell2D.hpp"
 
 #include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
 #include "fordyca/subsystem/perception/oracular_info_receptor.hpp"
@@ -42,7 +42,8 @@ NS_START(fordyca, controller, cognitive, d1);
  * Constructors/Destructor
  ******************************************************************************/
 bitd_odpo_controller::bitd_odpo_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.cognitive.d1.bitd_odpo"), m_receptor(nullptr) {}
+    : ER_CLIENT_INIT("fordyca.controller.cognitive.d1.bitd_odpo"),
+      m_receptor(nullptr) {}
 
 bitd_odpo_controller::~bitd_odpo_controller(void) = default;
 
@@ -51,7 +52,7 @@ bitd_odpo_controller::~bitd_odpo_controller(void) = default;
  ******************************************************************************/
 void bitd_odpo_controller::control_step(void) {
   mdc_ts_update();
-ndc_uuid_push();
+  ndc_uuid_push();
   ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
@@ -72,6 +73,9 @@ ndc_uuid_push();
    * state.
    */
   supervisor()->run();
+
+  /* Update block detection status for use in the loop functions */
+  block_detect_status_update();
 
   ndc_uuid_pop();
 } /* control_step() */

@@ -91,7 +91,7 @@ class localized_search : public foraging_strategy,
   void task_execute(void) override final;
 
   /* prototype overrides */
-  std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
+  std::unique_ptr<cssexplore::base_explore> clone(void) const override {
     csfsm::fsm_params fsm_params {
       saa(),
       inta_tracker(),
@@ -99,6 +99,7 @@ class localized_search : public foraging_strategy,
     };
     fstrategy::strategy_params params {
       &fsm_params,
+      config(),
       nullptr,
       nullptr,
       accessor(),
@@ -115,4 +116,3 @@ class localized_search : public foraging_strategy,
 };
 
 NS_END(explore, strategy, fordyca);
-

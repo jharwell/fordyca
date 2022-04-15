@@ -29,9 +29,9 @@
 #include "cosm/repr/sim_block3D.hpp"
 #include "cosm/spatial/conflict_checker.hpp"
 
-#include "fordyca/events/cell2D_empty.hpp"
-#include "fordyca/argos/support/d2/cache_center_calculator.hpp"
 #include "fordyca/argos/support/caches/creation_verifier.hpp"
+#include "fordyca/argos/support/d2/cache_center_calculator.hpp"
+#include "fordyca/events/cell2D_empty.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -96,9 +96,8 @@ dynamic_cache_creator::create_all(const fascaches::create_ro_params& c_params,
                      [&](const auto& c) { return c.get(); });
       sanity_caches.push_back(cache_i.cache.get());
 
-      auto verifier = fascaches::creation_verifier(m_map,
-                                                   cache_dim(),
-                                              mc_strict_constraints);
+      auto verifier =
+          fascaches::creation_verifier(m_map, cache_dim(), mc_strict_constraints);
       if (!verifier.verify_single(cache_i.cache.get(),
                                   sanity_caches,
                                   all_blocks,
@@ -143,10 +142,8 @@ dynamic_cache_creator::cache_i_result dynamic_cache_creator::cache_i_create(
    * blocks within the extent of the cache-to-be, and add them into the block
    * list for the new cache (absorption).
    */
-  auto absorb_blocks = cache_i_alloc_from_absorbable(c_absorbable_blocks,
-                                                     c_alloc_blocks,
-                                                     *center,
-                                                     cache_dim());
+  auto absorb_blocks = cache_i_alloc_from_absorbable(
+      c_absorbable_blocks, c_alloc_blocks, *center, cache_dim());
   ER_DEBUG("Absorb blocks=[%s]", rcppsw::to_string(absorb_blocks).c_str());
 
   /* blocks for cache i = allocated blocks + absorb blocks */
@@ -159,10 +156,8 @@ dynamic_cache_creator::cache_i_result dynamic_cache_creator::cache_i_create(
 
   ER_DEBUG("Cache blocks=[%s]", rcppsw::to_string(cache_i_blocks).c_str());
 
-  auto cache = create_single_cache(*center,
-                                   std::move(cache_i_blocks),
-                                   c_params.t,
-                                   false);
+  auto cache =
+      create_single_cache(*center, std::move(cache_i_blocks), c_params.t, false);
   return { true, std::move(cache), cache_i_blocks };
 } /* cache_i_create() */
 
@@ -215,7 +210,6 @@ cds::block3D_vectorno dynamic_cache_creator::cache_i_blocks_alloc(
   } /* while() */
   return cache_i_blocks;
 } /* cache_i_blocks_alloc() */
-
 
 cds::block3D_htno dynamic_cache_creator::cache_i_alloc_from_absorbable(
     const cds::block3D_htno& c_absorbable_blocks,

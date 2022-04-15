@@ -32,12 +32,12 @@
 #include "fordyca/controller/cognitive/d1/bitd_mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d1/bitd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d1/bitd_omdpo_controller.hpp"
-#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
-#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
+#include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/tasks/d1/foraging_task.hpp"
-#include "fordyca/events/existing_cache_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,10 +47,9 @@ NS_START(fordyca, controller, cognitive, d1, events);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_block_drop::cache_block_drop(
-    std::unique_ptr<crepr::base_block3D> block,
-    carepr::arena_cache* cache,
-    const rtypes::discretize_ratio& resolution)
+cache_block_drop::cache_block_drop(std::unique_ptr<crepr::base_block3D> block,
+                                   carepr::arena_cache* cache,
+                                   const rtypes::discretize_ratio& resolution)
     : ER_CLIENT_INIT("fordyca.controller.cognitive.events.d1.cache_block_drop"),
       cell2D_op(cache->dcenter2D()),
       mc_resolution(resolution),
@@ -130,7 +129,6 @@ void cache_block_drop::visit(cfsm::cell2D_fsm& fsm) {
   fsm.event_block_drop();
 } /* visit() */
 
-
 void cache_block_drop::visit(fsm::block_to_goal_fsm& fsm) {
   fsm.inject_event(fsm::foraging_signal::ekBLOCK_DROP,
                    rpfsm::event_type::ekNORMAL);
@@ -166,6 +164,5 @@ void cache_block_drop::dispatch_cache_interactor(
             dynamic_cast<cta::logical_task*>(task)->name().c_str());
   interactor->accept(*this);
 } /* dispatch_cache_interactor() */
-
 
 NS_END(events, d1, cognitive, controller, fordyca);

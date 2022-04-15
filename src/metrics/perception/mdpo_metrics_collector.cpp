@@ -42,9 +42,7 @@ mdpo_metrics_collector::mdpo_metrics_collector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void mdpo_metrics_collector::collect(
-    const rmetrics::base_metrics& metrics) {
-
+void mdpo_metrics_collector::collect(const rmetrics::base_metrics& metrics) {
   const auto* m = dynamic_cast<const mdpo_metrics*>(&metrics);
 
   /*

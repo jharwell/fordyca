@@ -55,16 +55,19 @@ class crw_adaptor final : public foraging_strategy,
   crw_adaptor(const crw_adaptor&) = delete;
   crw_adaptor& operator=(const crw_adaptor&) = delete;
 
+  RCPPSW_WRAP_DECLDEF_OVERRIDE(min_duration_met, decoratee(), const);
+
   /* taskable overrides */
   RCPPSW_WRAP_DECLDEF_OVERRIDE(task_reset, decoratee());
   RCPPSW_WRAP_DECLDEF_OVERRIDE(task_running, decoratee(), const);
   RCPPSW_WRAP_DECLDEF_OVERRIDE(task_finished, decoratee(), const);
   RCPPSW_WRAP_DECLDEF_OVERRIDE(task_execute, decoratee());
-  void task_start(cta::taskable_argument* arg) override { decoratee().task_start(arg); }
+  void task_start(cta::taskable_argument* arg) override {
+    decoratee().task_start(arg);
+  }
 
   /* prototype overrides */
   RCPPSW_WRAP_DECLDEF_OVERRIDE(clone, decoratee(), const);
 };
 
 NS_END(explore, strategy, fordyca);
-

@@ -49,7 +49,7 @@ NS_START(fordyca, support);
  * functions needed across multiple derived classes.
  */
 class base_swarm_manager : public cpal::swarm_manager,
-                            public rer::client<base_swarm_manager> {
+                           public rer::client<base_swarm_manager> {
  public:
   base_swarm_manager(void) RCPPSW_COLD;
   ~base_swarm_manager(void) override RCPPSW_COLD;
@@ -75,4 +75,3 @@ class base_swarm_manager : public cpal::swarm_manager,
 };
 
 NS_END(support, fordyca);
-

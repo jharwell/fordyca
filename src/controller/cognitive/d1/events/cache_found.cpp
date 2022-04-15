@@ -29,10 +29,10 @@
 #include "fordyca/controller/cognitive/d1/bitd_mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d1/bitd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d1/bitd_omdpo_controller.hpp"
-#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
-#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
-#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cell2D_empty.hpp"
+#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -207,9 +207,8 @@ void cache_found::visit(fspds::dpo_semantic_map& map) {
   auto blocks = map.known_blocks();
   for (auto&& b : blocks) {
     if (m_cache->contains_point(b->rcenter2D())) {
-      ER_TRACE("Remove block%d hidden behind cache%d",
-               b->id().v(),
-               m_cache->id().v());
+      ER_TRACE(
+          "Remove block%d hidden behind cache%d", b->id().v(), m_cache->id().v());
       rms.push_back(b);
     }
   } /* for(&&b..) */
@@ -244,7 +243,7 @@ void cache_found::visit(fspds::dpo_semantic_map& map) {
    *
    * Cloning is definitely necessary here.
    */
-  map.cache_update({m_cache->clone(), density});
+  map.cache_update({ m_cache->clone(), density });
 } /* visit() */
 
 NS_END(events, d1, cognitive, controller, fordyca);

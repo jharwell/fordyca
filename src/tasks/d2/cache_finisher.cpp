@@ -163,5 +163,4 @@ RCPPSW_WRAP_DEF_OVERRIDE(
     *static_cast<fsm::d2::block_to_new_cache_fsm*>(polled_task::mechanism()),
     const);
 
-
 NS_END(d2, tasks, fordyca);

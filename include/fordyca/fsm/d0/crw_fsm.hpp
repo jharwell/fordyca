@@ -63,8 +63,9 @@ class crw_fsm final : public cffsm::foraging_util_hfsm,
                       public cta::taskable {
  public:
   crw_fsm(const csfsm::fsm_params* params,
-          std::unique_ptr<csstrategy::base_strategy> explore,
+          std::unique_ptr<cssexplore::base_explore> explore,
           std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
+          std::unique_ptr<cssblocks::drop::base_drop> block_drop,
           const rmath::vector2d& nest_loc,
           rmath::rng* rng);
 
@@ -103,7 +104,7 @@ class crw_fsm final : public cffsm::foraging_util_hfsm,
   void run(void);
 
  private:
-  bool block_detected(void) const;
+  bool block_detected(void);
 
   enum fsm_states {
     ekST_START, /* Initial state */
@@ -112,6 +113,7 @@ class crw_fsm final : public cffsm::foraging_util_hfsm,
     ekST_LEAVING_NEST,          /* Block dropped in nest--time to go */
     ekST_WAIT_FOR_BLOCK_PICKUP,
     ekST_WAIT_FOR_BLOCK_DROP,
+    ekST_DROP_CARRIED_BLOCK,
     ekST_MAX_STATES
   };
 
@@ -119,6 +121,9 @@ class crw_fsm final : public cffsm::foraging_util_hfsm,
   RCPPSW_HFSM_STATE_INHERIT(cffsm::foraging_util_hfsm,
                      transport_to_nest,
                      nest_transport_data);
+  RCPPSW_HFSM_STATE_INHERIT(cffsm::foraging_util_hfsm,
+                            drop_carried_block,
+                            rpfsm::event_data);
   RCPPSW_HFSM_STATE_INHERIT(cffsm::foraging_util_hfsm, leaving_nest,
                      rpfsm::event_data);
 
@@ -134,8 +139,10 @@ class crw_fsm final : public cffsm::foraging_util_hfsm,
   RCPPSW_HFSM_STATE_DECLARE_ND(crw_fsm, acquire_block);
   RCPPSW_HFSM_STATE_DECLARE(crw_fsm, wait_for_block_pickup,
                      rpfsm::event_data);
+  RCPPSW_HFSM_ENTRY_DECLARE_ND(crw_fsm, entry_drop_carried_block);
+  RCPPSW_HFSM_EXIT_DECLARE(crw_fsm, exit_drop_carried_block);
   RCPPSW_HFSM_STATE_DECLARE(crw_fsm, wait_for_block_drop,
-                     rpfsm::event_data);
+                            rpfsm::event_data);
 
   /**
    * \brief Defines the state map for the FSM.

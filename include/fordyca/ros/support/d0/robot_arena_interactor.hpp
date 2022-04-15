@@ -100,4 +100,3 @@ class robot_arena_interactor final : public rer::client<
 };
 
 NS_END(d0, support, ros, fordyca);
-

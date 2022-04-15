@@ -28,13 +28,14 @@
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/spatial/strategy/nest_acq/factory.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
+#include "cosm/spatial/strategy/blocks/drop/base_drop.hpp"
 
 #include "fordyca/controller/config/d0/mdpo_controller_repository.hpp"
-#include "fordyca/strategy/config/strategy_config.hpp"
-#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/fsm/d0/dpo_fsm.hpp"
+#include "fordyca/strategy/config/strategy_config.hpp"
 #include "fordyca/strategy/explore/block_factory.hpp"
 #include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/subsystem/perception/perception_subsystem_factory.hpp"
 
 /*******************************************************************************
@@ -75,6 +76,9 @@ void mdpo_controller::control_step(void) {
    * abnormal operation state.
    */
   supervisor()->run();
+
+  /* Update block detection status for use in the loop functions */
+  block_detect_status_update();
 
   ndc_uuid_pop();
 } /* control_step() */
@@ -121,36 +125,41 @@ void mdpo_controller::shared_init(
 
 void mdpo_controller::private_init(
     const config::d0::mdpo_controller_repository& config_repo) {
-  const auto* strat_config =
-      config_repo.config_get<fsconfig::strategy_config>();
+  const auto* strat_config = config_repo.config_get<fsconfig::strategy_config>();
 
-  csfsm::fsm_params fsm_params {
+  csfsm::fsm_params fsm_params{
     saa(),
     inta_tracker(),
     nz_tracker(),
   };
   auto strategy_params = fstrategy::strategy_params{
-    &fsm_params,
-    nullptr,
-    nullptr,
-    perception()->known_objects(),
-    rutils::color()
+    .fsm = &fsm_params,
+    .explore = &strat_config->blocks.explore,
+    .bsel_matrix = nullptr,
+    .csel_matrix = nullptr,
+    .accessor = nullptr,
+    .ledtaxis_target = rutils::color()
   };
   fsm::fsm_ro_params fsm_ro_params = {
     .bsel_matrix = block_sel_matrix(),
     .csel_matrix = nullptr,
     .store = perception()->model<fspds::dpo_semantic_map>()->store(),
     .accessor = perception()->known_objects(),
-    .strategy_config = *strat_config };
+    .strategy = *strat_config
+  };
+
+  auto block = fsexplore::block_factory().create(strat_config->blocks.explore.strategy,
+                                                 &strategy_params, rng());
+
+  auto nest_acq = csstrategy::nest_acq::factory().create(strat_config->nest_acq.strategy,
+                                                         &strat_config->nest_acq,
+                                                         &fsm_params,
+                                                         rng());
   dpo_controller::fsm(std::make_unique<fsm::d0::dpo_fsm>(
       &fsm_ro_params,
       &fsm_params,
-      fsexplore::block_factory().create(strat_config->explore.block_strategy,
-                                        &strategy_params,
-                                        rng()),
-      csstrategy::nest_acq::factory().create(strat_config->nest_acq.strategy,
-                                             &fsm_params,
-                                             rng()),
+      std::move(block),
+      std::move(nest_acq),
       rng()));
 
   /* Set MDPO FSM supervision */
@@ -158,7 +167,6 @@ void mdpo_controller::private_init(
 } /* private_init() */
 
 NS_END(cognitive, d0, controller, fordyca);
-
 
 using namespace fccd0; // NOLINT
 

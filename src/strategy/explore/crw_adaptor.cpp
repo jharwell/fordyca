@@ -36,6 +36,6 @@ NS_START(fordyca, strategy, explore);
 crw_adaptor::crw_adaptor(const fstrategy::strategy_params* params,
                          rmath::rng* rng)
     : foraging_strategy(params, rng),
-      decorator(params->fsm, rng) {}
+      decorator(params->fsm, params->explore, rng) {}
 
 NS_END(explore, strategy, fordyca);

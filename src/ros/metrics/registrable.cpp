@@ -25,9 +25,8 @@
 
 #include "rcppsw/utils/maskable_enum.hpp"
 
-#include "fordyca/metrics/specs.hpp"
-
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
+#include "fordyca/metrics/specs.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -38,10 +37,10 @@ NS_START(fordyca, ros, metrics, registrable);
  * Global Variables
  ******************************************************************************/
 rmetrics::creatable_collector_set kStandard = {
-    { typeid(fmetrics::blocks::manipulation_metrics_collector),
-      fmspecs::blocks::kManipulation.xml(),
-      fmspecs::blocks::kManipulation.scoped(),
-      rmetrics::output_mode::ekSTREAM | rmetrics::output_mode::ekAPPEND }
-  };
+  { typeid(fmetrics::blocks::manipulation_metrics_collector),
+    fmspecs::blocks::kManipulation.xml(),
+    fmspecs::blocks::kManipulation.scoped(),
+    rmetrics::output_mode::ekSTREAM | rmetrics::output_mode::ekAPPEND }
+};
 
 NS_END(registrable, metrics, ros, fordyca);

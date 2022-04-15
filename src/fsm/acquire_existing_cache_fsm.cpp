@@ -27,13 +27,13 @@
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 
-#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/cache_acq_point_selector.hpp"
 #include "fordyca/fsm/cache_acq_validator.hpp"
 #include "fordyca/fsm/existing_cache_selector.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/fsm/foraging_transport_goal.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,13 +46,13 @@ NS_START(fordyca, fsm);
 acquire_existing_cache_fsm::acquire_existing_cache_fsm(
     const fsm_ro_params* c_ro,
     const csfsm::fsm_params* c_no,
-    std::unique_ptr<csstrategy::base_strategy> exp_behavior,
+    std::unique_ptr<cssexplore::base_explore> explore,
     rmath::rng* rng,
     bool for_pickup)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_existing_cache"),
       acquire_goal_fsm(
           c_no,
-          std::move(exp_behavior),
+          std::move(explore),
           rng,
           acquire_goal_fsm::hook_list{
               RCPPSW_STRUCT_DOT_INITIALIZER(
@@ -107,9 +107,8 @@ acquire_existing_cache_fsm::acq_goal_internal(void) {
  ******************************************************************************/
 boost::optional<acquire_existing_cache_fsm::acq_loc_type>
 acquire_existing_cache_fsm::calc_acq_location(void) {
-  existing_cache_selector selector(mc_for_pickup,
-                                   mc_matrix,
-                                   &mc_store->tracked_caches());
+  existing_cache_selector selector(
+      mc_for_pickup, mc_matrix, &mc_store->tracked_caches());
 
   if (const auto* best = selector(mc_store->tracked_caches(),
                                   saa()->sensing()->rpos2D(),
@@ -145,7 +144,7 @@ bool acquire_existing_cache_fsm::candidates_exist(void) const {
   return !mc_store->known_caches().empty();
 } /* candidates() */
 
-bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) const {
+bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) {
   if (explore_result) {
     ER_FATAL_SENTINEL("Robot acquired cache via exploration");
     return false;

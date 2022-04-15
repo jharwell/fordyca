@@ -45,4 +45,3 @@ class cache_collector;
 } // namespace d2
 
 NS_END(fordyca, tasks);
-

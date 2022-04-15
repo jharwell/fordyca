@@ -29,29 +29,29 @@
 #include "rcppsw/utils/maskable_enum.hpp"
 
 #include "cosm/arena/config/arena_map_config.hpp"
+#include "cosm/argos/convergence_calculator.hpp"
 #include "cosm/controller/operations/applicator.hpp"
 #include "cosm/foraging/block_dist/base_distributor.hpp"
 #include "cosm/foraging/metrics/block_transportee_metrics_collector.hpp"
 #include "cosm/foraging/oracle/foraging_oracle.hpp"
 #include "cosm/hal/argos/subsystem/config/xml/saa_names.hpp"
 #include "cosm/interactors/applicator.hpp"
-#include "cosm/argos/convergence_calculator.hpp"
 #include "cosm/pal/argos/swarm_iterator.hpp"
+#include "cosm/spatial/nest_zone_tracker.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
-#include "cosm/spatial/nest_zone_tracker.hpp"
 
-#include "fordyca/controller/cognitive/d2/birtd_dpo_controller.hpp"
-#include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
-#include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
-#include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
 #include "fordyca/argos/metrics/d2/d2_metrics_manager.hpp"
 #include "fordyca/argos/support/d2/dynamic_cache_manager.hpp"
 #include "fordyca/argos/support/d2/robot_arena_interactor.hpp"
 #include "fordyca/argos/support/d2/robot_configurer.hpp"
-#include "fordyca/argos/support/tv/tv_manager.hpp"
-#include "fordyca/argos/support/tv/fordyca_pd_adaptor.hpp"
 #include "fordyca/argos/support/tv/env_dynamics.hpp"
+#include "fordyca/argos/support/tv/fordyca_pd_adaptor.hpp"
+#include "fordyca/argos/support/tv/tv_manager.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_dpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
+#include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -63,10 +63,10 @@ NS_START(fordyca, argos, support, d2);
  ******************************************************************************/
 NS_START(detail);
 
-using configurer_map_type =
-    rds::type_map<rmpl::typelist_wrap_apply<controller::d2::typelist,
-                                            robot_configurer,
-                                            fametrics::d2::d2_metrics_manager>::type>;
+using configurer_map_type = rds::type_map<
+    rmpl::typelist_wrap_apply<controller::d2::typelist,
+                              robot_configurer,
+                              fametrics::d2::d2_metrics_manager>::type>;
 
 /**
  * \struct functor_maps_initializer
@@ -109,9 +109,11 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
     lf->m_los_update_map->emplace(
         typeid(controller),
         ccops::grid_los_update<T,
-        rds::grid2D_overlay<cds::cell2D>,
-        repr::forager_los>(
-            lf->arena_map()->decoratee().template layer<cads::arena_grid::kCell>()));
+                               rds::grid2D_overlay<cds::cell2D>,
+                               repr::forager_los>(
+            lf->arena_map()
+                ->decoratee()
+                .template layer<cads::arena_grid::kCell>()));
   }
 
   /* clang-format off */
@@ -201,9 +203,10 @@ void d2_loop_functions::private_init(void) {
               controller->GetId().c_str(),
               controller->type_index().name());
 
-    auto applicator = ccops::applicator<controller::foraging_controller,
-                                        robot_configurer,
-                                        fametrics::d2::d2_metrics_manager>(controller);
+    auto applicator =
+        ccops::applicator<controller::foraging_controller,
+                          robot_configurer,
+                          fametrics::d2::d2_metrics_manager>(controller);
     boost::apply_visitor(applicator, config_map.at(controller->type_index()));
   };
 
@@ -213,7 +216,7 @@ void d2_loop_functions::private_init(void) {
    * only happens once, so it doesn't really matter if it is slow.
    */
   cpargos::swarm_iterator::controllers<controller::foraging_controller,
-                                          cpal::iteration_order::ekSTATIC>(
+                                       cpal::iteration_order::ekSTATIC>(
       this, cb, cpal::kRobotType);
 } /* private_init() */
 
@@ -246,7 +249,7 @@ std::vector<int> d2_loop_functions::robot_tasks_extract(uint) const {
         applicator, m_task_extractor_map->at(controller->type_index())));
   };
   cpargos::swarm_iterator::controllers<controller::foraging_controller,
-                                          cpal::iteration_order::ekSTATIC>(
+                                       cpal::iteration_order::ekSTATIC>(
       this, cb, cpal::kRobotType);
   return v;
 } /* robot_tasks_extract() */
@@ -374,8 +377,7 @@ void d2_loop_functions::robot_pre_step(chal::robot& robot) {
    * control step because we need access to information only available in the
    * loop functions.
    */
-  controller->sensing_update(timestep(),
-                             arena_map()->grid_resolution());
+  controller->sensing_update(timestep(), arena_map()->grid_resolution());
 
   /* Send robot its new LOS */
   auto it = m_los_update_map->find(controller->type_index());
@@ -409,11 +411,10 @@ void d2_loop_functions::robot_post_step(chal::robot& robot) {
             controller->GetId().c_str(),
             controller->type_index().name());
 
-  auto iapplicator = cinteractors::applicator<controller::foraging_controller,
-                                              robot_arena_interactor,
-                                              carena::caching_arena_map>(
-                                                  controller,
-                                                  timestep());
+  auto iapplicator =
+      cinteractors::applicator<controller::foraging_controller,
+                               robot_arena_interactor,
+                               carena::caching_arena_map>(controller, timestep());
   auto status = boost::apply_visitor(
       iapplicator, m_interactor_map->at(controller->type_index()));
   if (fsupport::interactor_status::ekNO_EVENT != status) {
@@ -443,9 +444,10 @@ void d2_loop_functions::robot_post_step(chal::robot& robot) {
   }
 
   /* get stats from this robot before its state changes */
-  auto mapplicator = ccops::applicator<controller::foraging_controller,
-                                       ccops::metrics_extract,
-                                       fametrics::d2::d2_metrics_manager>(controller);
+  auto mapplicator =
+      ccops::applicator<controller::foraging_controller,
+                        ccops::metrics_extract,
+                        fametrics::d2::d2_metrics_manager>(controller);
 
   auto it2 = m_metric_extractor_map->find(controller->type_index());
   ER_ASSERT(m_metric_extractor_map->end() != it2,

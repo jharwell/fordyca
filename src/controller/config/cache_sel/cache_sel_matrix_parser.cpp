@@ -37,9 +37,7 @@ void cache_sel_matrix_parser::parse(const ticpp::Element& node) {
     return;
   }
 
-  ER_DEBUG("Parent node=%s: child=%s",
-           node.Value().c_str(),
-           kXMLRoot.c_str());
+  ER_DEBUG("Parent node=%s: child=%s", node.Value().c_str(), kXMLRoot.c_str());
 
   m_config = std::make_unique<config_type>();
   ticpp::Element cnode = node_get(node, kXMLRoot);
@@ -66,8 +64,7 @@ bool cache_sel_matrix_parser::validate(void) const {
            "Cache proximity distance must be > 0");
   ER_CHECK(m_config->block_prox_dist > 0.0,
            "Block proximity distance must be > 0");
-  ER_CHECK(m_config->nest_prox_dist > 0.0,
-           "Nest proximity distance must be > 0");
+  ER_CHECK(m_config->nest_prox_dist > 0.0, "Nest proximity distance must be > 0");
   ER_CHECK(m_config->new_cache_tol > 0.0,
            "New cache proximity distance must be > 0");
   return true;

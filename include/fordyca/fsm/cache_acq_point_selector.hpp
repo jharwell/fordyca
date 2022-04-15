@@ -76,4 +76,3 @@ class cache_acq_point_selector : public rer::client<cache_acq_point_selector> {
 };
 
 NS_END(fsm, fordyca);
-

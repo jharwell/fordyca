@@ -50,8 +50,8 @@ void env_dynamics_metrics_collector::collect(
 
 void env_dynamics_metrics_collector::reset_after_interval(void) {
   m_data.interval.avg_motion_throttle = 0;
-  m_data.interval.block_manip_penalty = rtypes::timestep{0};
-  m_data.interval.cache_usage_penalty = rtypes::timestep{0};
+  m_data.interval.block_manip_penalty = rtypes::timestep{ 0 };
+  m_data.interval.cache_usage_penalty = rtypes::timestep{ 0 };
 } /* reset_after_interval() */
 
 NS_END(tv, metrics, fordyca);

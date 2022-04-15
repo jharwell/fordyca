@@ -53,4 +53,3 @@ using block_pickup_base_visit_typelist = rmpl::typelist<cfds::arena_map,
                                                         fspds::dpo_store,
                                                         crepr::base_block3D>;
 NS_END(detail, events, fordyca);
-

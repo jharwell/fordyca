@@ -177,16 +177,6 @@ target_link_libraries(${fordyca_LIBRARY}
 
 if ("${COSM_BUILD_FOR}" MATCHES "ARGOS")
   target_link_libraries(${fordyca_LIBRARY}
-    argos3core_simulator
-    argos3plugin_simulator_footbot
-    argos3plugin_simulator_epuck
-    argos3plugin_simulator_entities
-    argos3plugin_simulator_dynamics2d
-    argos3plugin_simulator_genericrobot
-    argos3plugin_simulator_qtopengl
-    argos3plugin_simulator_media
-    )
-  target_link_libraries(${fordyca_LIBRARY}
     nlopt
     )
 

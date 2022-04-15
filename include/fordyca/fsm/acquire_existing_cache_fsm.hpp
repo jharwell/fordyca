@@ -70,7 +70,7 @@ class acquire_existing_cache_fsm : public rer::client<acquire_existing_cache_fsm
   acquire_existing_cache_fsm(
       const fsm_ro_params* c_ro,
       const csfsm::fsm_params* c_no,
-      std::unique_ptr<csstrategy::base_strategy> exp_behavior,
+      std::unique_ptr<cssexplore::base_explore> explore,
       rmath::rng* rng,
       bool for_pickup);
 
@@ -98,7 +98,7 @@ class acquire_existing_cache_fsm : public rer::client<acquire_existing_cache_fsm
   boost::optional<acq_loc_type> calc_acq_location(void);
   bool cache_acq_valid(const rmath::vector2d& loc, const rtypes::type_uuid& id);
 
-  bool cache_acquired_cb(bool explore_result) const;
+  bool cache_acquired_cb(bool explore_result);
 
   /* clang-format off */
   /**
@@ -116,4 +116,3 @@ class acquire_existing_cache_fsm : public rer::client<acquire_existing_cache_fsm
 };
 
 NS_END(fsm, fordyca);
-

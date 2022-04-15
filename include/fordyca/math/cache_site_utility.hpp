@@ -73,4 +73,3 @@ class cache_site_utility : public rmath::sigmoid,
 };
 
 NS_END(math, fordyca);
-

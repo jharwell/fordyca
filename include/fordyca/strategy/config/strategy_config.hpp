@@ -27,9 +27,10 @@
 
 #include "rcppsw/config/base_config.hpp"
 
-#include "cosm/spatial/strategy/config/nest_acq_config.hpp"
+#include "cosm/spatial/strategy/nest_acq/config/nest_acq_config.hpp"
 
-#include "fordyca/strategy/config/explore_config.hpp"
+#include "fordyca/strategy/config/blocks_config.hpp"
+#include "fordyca/strategy/config/caches_config.hpp"
 
 /*******************************************************************************
   * Namespaces
@@ -41,15 +42,17 @@ NS_START(fordyca, strategy, config);
 ******************************************************************************/
 /**
   * \struct strategy_config
-  * \ingroup strategy config 
+  * \ingroup strategy config
   *
   * \brief Configuration for different strategies that can be employed by
   * robots for doing things like exploring, collision avoidance, etc.
   */
 struct strategy_config final : public rconfig::base_config {
-  csstrategy::config::nest_acq_config nest_acq{};
-  explore_config explore{};
+  /* clang-format off */
+  cssnest_acq::config::nest_acq_config nest_acq{};
+  blocks_config                        blocks{};
+  caches_config                        caches{};
+  /* clang-format on */
 };
 
 NS_END(config, strategy, fordyca);
-

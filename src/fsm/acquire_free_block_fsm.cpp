@@ -29,10 +29,10 @@
 #include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 
 #include "fordyca/controller/cognitive/block_selector.hpp"
-#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/block_acq_validator.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,12 +45,12 @@ NS_START(fordyca, fsm);
 acquire_free_block_fsm::acquire_free_block_fsm(
     const fsm_ro_params* c_ro,
     const csfsm::fsm_params* c_no,
-    std::unique_ptr<csstrategy::base_strategy> exp_behavior,
+    std::unique_ptr<cssexplore::base_explore> behavior,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_free_block"),
       acquire_goal_fsm(
-        c_no,
-          std::move(exp_behavior),
+          c_no,
+          std::move(behavior),
           rng,
           acquire_goal_fsm::hook_list{
               RCPPSW_STRUCT_DOT_INITIALIZER(
@@ -84,11 +84,11 @@ acquire_free_block_fsm::acquire_free_block_fsm(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool acquire_free_block_fsm::block_exploration_term_cb(void) const {
+bool acquire_free_block_fsm::block_exploration_term_cb(void) {
   return saa()->sensing()->env()->detect("block");
 } /* block_exploration_term_cb() */
 
-bool acquire_free_block_fsm::block_acquired_cb(bool explore_result) const {
+bool acquire_free_block_fsm::block_acquired_cb(bool explore_result) {
   if (explore_result) {
     ER_ASSERT(block_exploration_term_cb(),
               "No block detected after successful exploration?");

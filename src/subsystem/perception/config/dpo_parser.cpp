@@ -36,16 +36,15 @@ void dpo_parser::parse(const ticpp::Element& node) {
   if (nullptr == node.FirstChild(kXMLRoot, false)) {
     return;
   }
-  ER_DEBUG("Parent node=%s: child=%s",
-           node.Value().c_str(),
-           kXMLRoot.c_str());
+  ER_DEBUG("Parent node=%s: child=%s", node.Value().c_str(), kXMLRoot.c_str());
 
   ticpp::Element dnode = node_get(node, kXMLRoot);
   m_config = std::make_unique<config_type>();
 
   m_pheromone.parse(dnode);
   m_rlos.parse(dnode);
-  m_config->pheromone = *m_pheromone.config_get<cspconfig::xml::pheromone_parser::config_type>();
+  m_config->pheromone =
+      *m_pheromone.config_get<cspconfig::xml::pheromone_parser::config_type>();
   m_config->rlos = *m_rlos.config_get<cspconfig::xml::rlos_parser::config_type>();
 } /* parse() */
 

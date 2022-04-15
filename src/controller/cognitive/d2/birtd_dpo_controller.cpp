@@ -26,16 +26,16 @@
 #include <fstream>
 
 #include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/ds/cell2D.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
-#include "cosm/ds/cell2D.hpp"
 
-#include "fordyca/controller/config/d2/controller_repository.hpp"
 #include "fordyca/controller/cognitive/block_sel_matrix.hpp"
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/controller/cognitive/d2/task_executive_builder.hpp"
+#include "fordyca/controller/config/d2/controller_repository.hpp"
 #include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
 #include "fordyca/tasks/d2/foraging_task.hpp"
 
@@ -55,7 +55,7 @@ birtd_dpo_controller::birtd_dpo_controller(void)
  ******************************************************************************/
 void birtd_dpo_controller::control_step(void) {
   mdc_ts_update();
-ndc_uuid_push();
+  ndc_uuid_push();
   ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
@@ -77,6 +77,9 @@ ndc_uuid_push();
    * state.
    */
   supervisor()->run();
+
+  /* Update block detection status for use in the loop functions */
+  block_detect_status_update();
 
   ndc_uuid_pop();
 } /* control_step() */
@@ -111,7 +114,7 @@ void birtd_dpo_controller::private_init(
                                    inta_tracker(),
                                    nz_tracker(),
                                    saa(),
-                                   perception())(config_repo,rng()));
+                                   perception())(config_repo, rng()));
 
   /*
    * Set task alloction callback, rebind task abort callback (original was lost

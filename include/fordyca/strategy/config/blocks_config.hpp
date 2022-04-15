@@ -1,5 +1,5 @@
 /**
- * \file nest_interactor.hpp
+ * \file blocks_config.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,30 +21,33 @@
 #pragma once
 
 /*******************************************************************************
- * Includes
- ******************************************************************************/
-#include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
+  * Includes
+******************************************************************************/
+#include "rcppsw/config/base_config.hpp"
 
-#include "fordyca/controller/cognitive/events_fwd.hpp"
+#include "cosm/spatial/strategy/blocks/config/drop_config.hpp"
+#include "cosm/spatial/strategy/explore/config/explore_config.hpp"
 
-/*******************************************************************************
- * Namespaces
- ******************************************************************************/
-NS_START(fordyca, events);
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
- * Structure Definitions
- ******************************************************************************/
+  * Namespaces
+******************************************************************************/
+NS_START(fordyca, strategy, config);
+
+/*******************************************************************************
+  * Structure Definitions
+******************************************************************************/
 /**
- * \class nest_interactor
- * \ingroup events
- *
- * \brief Interactor specifying the event visit set for all foraging tasks that
- * interact with the nest in FORDYCA.
- */
-class nest_interactor
-    : public rpvisitor::polymorphic_accept_set<fccd0::events::nest_block_drop,
-                                               fccd1::events::nest_block_drop,
-                                               fccd2::events::nest_block_drop> {};
+  * \struct blocks_config
+  * \ingroup strategy config
+  *
+  * \brief Configuration for strategies related to things robots can do with/for
+  * blocks when foraging.
+  */
+struct blocks_config final : public rconfig::base_config {
+  cssexplore::config::explore_config explore{};
+  cssblocks::config::drop_config drop{};
+};
 
-NS_END(tasks, fordyca);
+NS_END(config, strategy, fordyca);

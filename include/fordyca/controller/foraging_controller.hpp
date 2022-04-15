@@ -23,20 +23,21 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <any>
 #include <memory>
 #include <string>
 #include <typeindex>
-#include <any>
 
 #include "cosm/controller/block_carrying_controller.hpp"
 #include "cosm/controller/irv_recipient_controller.hpp"
 #include "cosm/controller/manip_event_recorder.hpp"
 #include "cosm/fsm/block_transporter.hpp"
 #include "cosm/fsm/metrics/block_transporter_metrics.hpp"
+#include "cosm/hal/subsystem/config/sensing_subsystemQ3D_config.hpp"
 #include "cosm/pal/config/output_config.hpp"
 #include "cosm/pal/controller/controller2D.hpp"
-#include "cosm/subsystem/subsystem_fwd.hpp"
 #include "cosm/spatial/metrics/nest_zone_metrics.hpp"
+#include "cosm/subsystem/subsystem_fwd.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/foraging_transport_goal.hpp"
@@ -45,10 +46,6 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::hal::subsystem::config {
-struct sensing_subsystemQ3D_config;
-} /* namespace cosm::hal::subsystem::config */
-
 namespace cosm::subsystem::config {
 struct actuation_subsystem2D_config;
 } // namespace cosm::subsystem::config
@@ -116,7 +113,7 @@ class foraging_controller
   void irv_init(const ctv::robot_dynamics_applicator* rda) override final;
 
   /* block carrying controller overrides */
-  bool block_detect(void) const override;
+  bool block_detect(const ccontroller::block_detect_context& context) override;
 
   /* movement metrics */
   rtypes::spatial_dist
@@ -139,15 +136,16 @@ class foraging_controller
     return m_nz_tracker.get();
   }
 
- const class csubsystem::saa_subsystemQ3D* saa(void) const {
-   return cpal::controller::controller2D::saa();
- }
+  const class csubsystem::saa_subsystemQ3D* saa(void) const {
+    return cpal::controller::controller2D::saa();
+  }
 
-protected:
- class csubsystem::saa_subsystemQ3D* saa(void) {
-   return cpal::controller::controller2D::saa();
- }
+ protected:
+  class csubsystem::saa_subsystemQ3D* saa(void) {
+    return cpal::controller::controller2D::saa();
+  }
   cspatial::nest_zone_tracker* nz_tracker(void) { return m_nz_tracker.get(); }
+  void block_detect_status_update(void);
 
  private:
   void
@@ -156,6 +154,7 @@ protected:
   fs::path output_init(const cpconfig::output_config* outputp) override;
 
   /* clang-format off */
+  bool                                         m_block_detect_status{false};
   block_manip_recorder_type                    m_block_manip{};
   std::unique_ptr<cspatial::nest_zone_tracker> m_nz_tracker{nullptr};
   /* clang-format on */

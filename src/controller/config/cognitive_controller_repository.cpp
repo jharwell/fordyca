@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/config/cognitive_controller_repository.hpp"
+
 #include "fordyca/subsystem/perception/config/perception_parser.hpp"
 
 /*******************************************************************************

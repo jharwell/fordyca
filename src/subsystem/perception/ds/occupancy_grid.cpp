@@ -112,10 +112,7 @@ void occupancy_grid::cell_state_update(size_t i, size_t j) {
    */
   if (density.v() < kEPSILON &&
       density.v() > std::numeric_limits<double>::min()) {
-    ER_TRACE("Relevance of cell(%zu, %zu) is within %f of 0",
-             i,
-             j,
-             kEPSILON);
+    ER_TRACE("Relevance of cell(%zu, %zu) is within %f of 0", i, j, kEPSILON);
     fevents::cell2D_unknown_visitor op(cell.loc());
     op.visit(*this);
     density.reset();

@@ -25,12 +25,13 @@
 
 #include <boost/mpl/for_each.hpp>
 
-#include "rcppsw/utils/maskable_enum.hpp"
-#include "rcppsw/metrics/register_with_sink.hpp"
-#include "rcppsw/metrics/register_using_config.hpp"
 #include "rcppsw/metrics/file_sink_registerer.hpp"
+#include "rcppsw/metrics/register_using_config.hpp"
+#include "rcppsw/metrics/register_with_sink.hpp"
 #include "rcppsw/mpl/identity.hpp"
+#include "rcppsw/utils/maskable_enum.hpp"
 
+#include "cosm/ds/cell2D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tab.hpp"
 #include "cosm/ta/metrics/bi_tab_metrics.hpp"
@@ -41,7 +42,6 @@
 #include "cosm/ta/metrics/execution_metrics.hpp"
 #include "cosm/ta/metrics/execution_metrics_collector.hpp"
 #include "cosm/ta/metrics/execution_metrics_csv_sink.hpp"
-#include "cosm/ds/cell2D.hpp"
 
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
 #include "fordyca/metrics/caches/site_selection_metrics_collector.hpp"
@@ -111,59 +111,42 @@ void d2_metrics_manager::register_standard(
   using sink_list = rmpl::typelist<
       rmpl::identity<ctametrics::bi_tab_metrics_csv_sink>,
       rmpl::identity<ctametrics::execution_metrics_csv_sink>,
-      rmpl::identity<fmetrics::caches::site_selection_metrics_csv_sink>
-    >;
+      rmpl::identity<fmetrics::caches::site_selection_metrics_csv_sink> >;
   rmetrics::creatable_collector_set creatable_set = {
-    {
-      typeid(ctametrics::bi_tab_metrics_collector),
+    { typeid(ctametrics::bi_tab_metrics_collector),
       fmspecs::tasks::tab::kHarvester.xml(),
       fmspecs::tasks::tab::kHarvester.scoped(),
-      rmetrics::output_mode::ekAPPEND
-    },
-    {
-      typeid(ctametrics::bi_tab_metrics_collector),
+      rmetrics::output_mode::ekAPPEND },
+    { typeid(ctametrics::bi_tab_metrics_collector),
       fmspecs::tasks::tab::kCollector.xml(),
       fmspecs::tasks::tab::kCollector.scoped(),
-      rmetrics::output_mode::ekAPPEND
-    },
-    {
-      typeid(ctametrics::execution_metrics_collector),
+      rmetrics::output_mode::ekAPPEND },
+    { typeid(ctametrics::execution_metrics_collector),
       fmspecs::tasks::exec::kCacheStarter.xml(),
       fmspecs::tasks::exec::kCacheStarter.scoped(),
-      rmetrics::output_mode::ekAPPEND
-    },
-    {
-      typeid(ctametrics::execution_metrics_collector),
+      rmetrics::output_mode::ekAPPEND },
+    { typeid(ctametrics::execution_metrics_collector),
       fmspecs::tasks::exec::kCacheFinisher.xml(),
       fmspecs::tasks::exec::kCacheFinisher.scoped(),
-      rmetrics::output_mode::ekAPPEND
-    },
-    {
-      typeid(ctametrics::execution_metrics_collector),
+      rmetrics::output_mode::ekAPPEND },
+    { typeid(ctametrics::execution_metrics_collector),
       fmspecs::tasks::exec::kCacheTransferer.xml(),
       fmspecs::tasks::exec::kCacheTransferer.scoped(),
-      rmetrics::output_mode::ekAPPEND
-    },
-    {
-      typeid(ctametrics::execution_metrics_collector),
+      rmetrics::output_mode::ekAPPEND },
+    { typeid(ctametrics::execution_metrics_collector),
       fmspecs::tasks::exec::kCacheCollector.xml(),
       fmspecs::tasks::exec::kCacheCollector.scoped(),
-      rmetrics::output_mode::ekAPPEND
-    },
-    {
-      typeid(fmetrics::caches::site_selection_metrics_collector),
+      rmetrics::output_mode::ekAPPEND },
+    { typeid(fmetrics::caches::site_selection_metrics_collector),
       fmspecs::caches::kSiteSelection.xml(),
       fmspecs::caches::kSiteSelection.scoped(),
-      rmetrics::output_mode::ekAPPEND
-    }
+      rmetrics::output_mode::ekAPPEND }
   };
-  rmetrics::register_with_sink<d2_metrics_manager,
-                               rmetrics::file_sink_registerer> csv(this,
-                                                                   creatable_set);
+  rmetrics::register_with_sink<d2_metrics_manager, rmetrics::file_sink_registerer>
+      csv(this, creatable_set);
   rmetrics::register_using_config<decltype(csv),
-                                  rmetrics::config::file_sink_config> registerer(
-                                      std::move(csv),
-                                      &mconfig->csv);
+                                  rmetrics::config::file_sink_config>
+      registerer(std::move(csv), &mconfig->csv);
   boost::mpl::for_each<sink_list>(registerer);
 } /* register_standard() */
 

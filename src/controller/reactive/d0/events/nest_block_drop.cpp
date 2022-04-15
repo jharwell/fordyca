@@ -59,5 +59,4 @@ void nest_block_drop::visit(ffsm::d0::crw_fsm& fsm) {
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
-
 NS_END(events, d0, reactive, controller, fordyca);

@@ -24,6 +24,7 @@
 #include "fordyca/argos/support/caches/base_creator.hpp"
 
 #include "cosm/arena/caching_arena_map.hpp"
+#include "cosm/arena/free_blocks_calculator.hpp"
 #include "cosm/arena/operations/cache_extent_set.hpp"
 #include "cosm/arena/operations/free_block_drop.hpp"
 #include "cosm/arena/operations/free_block_pickup.hpp"
@@ -31,7 +32,6 @@
 #include "cosm/ds/operations/cell2D_cache_extent.hpp"
 #include "cosm/foraging/block_dist/base_distributor.hpp"
 #include "cosm/repr/sim_block3D.hpp"
-#include "cosm/arena/free_blocks_calculator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,7 +42,7 @@ NS_START(fordyca, argos, support, caches);
  * Constructors/Destructor
  ******************************************************************************/
 base_creator::base_creator(carena::caching_arena_map* const map,
-                                       const rtypes::spatial_dist& cache_dim)
+                           const rtypes::spatial_dist& cache_dim)
     : ER_CLIENT_INIT("fordyca.argos.support.caches.base_creator"),
       mc_cache_dim(cache_dim),
       m_map(map) {}
@@ -52,9 +52,9 @@ base_creator::base_creator(carena::caching_arena_map* const map,
  ******************************************************************************/
 std::shared_ptr<carepr::arena_cache>
 base_creator::create_single_cache(const rmath::vector2d& center,
-                                        cds::block3D_vectorno&& blocks,
-                                        const rtypes::timestep& t,
-                                        bool pre_dist) {
+                                  cds::block3D_vectorno&& blocks,
+                                  const rtypes::timestep& t,
+                                  bool pre_dist) {
   ER_ASSERT(center.is_pd(),
             "Center@%s is not positive definite",
             center.to_str().c_str());
@@ -121,7 +121,6 @@ base_creator::create_single_cache(const rmath::vector2d& center,
        */
       pickup_op.visit(*m_map);
     } /* for(block..) */
-
   }
   /*
    * Loop through all blocks and deposit them in the cache host cell, which
@@ -129,10 +128,8 @@ base_creator::create_single_cache(const rmath::vector2d& center,
    * cache as its entity.
    */
   for (auto& block : blocks) {
-    caops::free_block_drop_visitor drop_op(block,
-                                           dcenter,
-                                           m_map->grid_resolution(),
-                                           carena::locking::ekALL_HELD);
+    caops::free_block_drop_visitor drop_op(
+        block, dcenter, m_map->grid_resolution(), carena::locking::ekALL_HELD);
 
     drop_op.visit(cell);
     drop_op.visit(*block);
@@ -145,12 +142,11 @@ base_creator::create_single_cache(const rmath::vector2d& center,
   /* create the cache! */
   cds::block3D_vectorno for_cache(blocks.begin(), blocks.end());
   auto ret = std::make_shared<carepr::arena_cache>(
-      carepr::arena_cache::params{
-        mc_cache_dim,
-            m_map->grid_resolution(),
-            center,
-            std::move(for_cache),
-            rtypes::constants::kNoUUID },
+      carepr::arena_cache::params{ mc_cache_dim,
+                                   m_map->grid_resolution(),
+                                   center,
+                                   std::move(for_cache),
+                                   rtypes::constants::kNoUUID },
       carepr::light_type_index()[carepr::light_type_index::kCache]);
   ret->creation_ts(t);
 
@@ -163,10 +159,10 @@ base_creator::create_single_cache(const rmath::vector2d& center,
    */
   ret->blocks_map_enable();
   ER_CONDW(dcenter != ret->dcenter2D(),
-            "Created cache%d has bad center? %s != %s",
-            ret->id().v(),
-            rcppsw::to_string(ret->dcenter2D()).c_str(),
-            rcppsw::to_string(dcenter).c_str());
+           "Created cache%d has bad center? %s != %s",
+           ret->id().v(),
+           rcppsw::to_string(ret->dcenter2D()).c_str(),
+           rcppsw::to_string(dcenter).c_str());
   ER_INFO("Created cache%d@%s/%s,anchor=%s/%s,xspan=%s/%s,yspan=%s/%s with %zu "
           "blocks [%s]",
           ret->id().v(),
@@ -188,8 +184,7 @@ base_creator::create_single_cache(const rmath::vector2d& center,
   return ret;
 } /* create_single_cache() */
 
-void base_creator::cache_extents_configure(
-    const cads::acache_vectoro& caches) {
+void base_creator::cache_extents_configure(const cads::acache_vectoro& caches) {
   for (const auto& cache : caches) {
     caops::cache_extent_set_visitor e(cache.get());
     e.visit(m_map->decoratee());

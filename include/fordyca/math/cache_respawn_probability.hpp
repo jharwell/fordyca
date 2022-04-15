@@ -63,4 +63,3 @@ class cache_respawn_probability : public rmath::expression<double> {
 };
 
 NS_END(math, fordyca);
-

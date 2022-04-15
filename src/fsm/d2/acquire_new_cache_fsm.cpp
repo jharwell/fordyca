@@ -29,10 +29,10 @@
 
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/controller/cognitive/d2/new_cache_selector.hpp"
-#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
-#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,12 +46,12 @@ using cselm = controller::cognitive::cache_sel_matrix;
 acquire_new_cache_fsm::acquire_new_cache_fsm(
     const fsm_ro_params* c_ro,
     const csfsm::fsm_params* c_no,
-    std::unique_ptr<csstrategy::base_strategy> exp_behavior,
+    std::unique_ptr<cssexplore::base_explore> explore,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.d2.acquire_new_cache"),
       acquire_goal_fsm(
           c_no,
-          std::move(exp_behavior),
+          std::move(explore),
           rng,
           acquire_goal_fsm::hook_list{
               RCPPSW_STRUCT_DOT_INITIALIZER(
@@ -75,11 +75,11 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
               RCPPSW_STRUCT_DOT_INITIALIZER(
                   explore_term_cb,
                   std::bind([](void) noexcept { return false; })),
-              RCPPSW_STRUCT_DOT_INITIALIZER(goal_valid_cb,
-                                            [](const rmath::vector2d&,
-                                               const rtypes::type_uuid&) noexcept {
-                                              return true;
-                                            }) }),
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  goal_valid_cb,
+                  [](const rmath::vector2d&, const rtypes::type_uuid&) noexcept {
+                    return true;
+                  }) }),
       mc_matrix(c_ro->csel_matrix),
       mc_store(c_ro->store) {}
 
@@ -95,10 +95,9 @@ acquire_new_cache_fsm::cache_select(void) {
   controller::cognitive::d2::new_cache_selector selector(mc_matrix);
 
   /* A "new" cache is the same as a single block  */
-  if (const auto* best =
-          selector(mc_store->tracked_blocks(),
-                   mc_store->tracked_caches(),
-                   sensing()->rpos2D())) {
+  if (const auto* best = selector(mc_store->tracked_blocks(),
+                                  mc_store->tracked_caches(),
+                                  sensing()->rpos2D())) {
     ER_INFO("Select new cache%d@%s/%s for acquisition",
             best->id().v(),
             rcppsw::to_string(best->ranchor2D()).c_str(),

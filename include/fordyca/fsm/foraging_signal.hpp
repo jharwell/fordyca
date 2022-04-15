@@ -91,4 +91,3 @@ class foraging_signal : public csfsm::util_signal {
 };
 
 NS_END(controller, fordyca);
-

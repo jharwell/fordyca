@@ -25,26 +25,24 @@
 
 #include <boost/mpl/for_each.hpp>
 
+#include "rcppsw/metrics/file_sink_registerer.hpp"
+#include "rcppsw/metrics/register_using_config.hpp"
+#include "rcppsw/metrics/register_with_sink.hpp"
+#include "rcppsw/mpl/identity.hpp"
 #include "rcppsw/mpl/typelist.hpp"
 #include "rcppsw/utils/maskable_enum.hpp"
-#include "rcppsw/metrics/register_with_sink.hpp"
-#include "rcppsw/metrics/register_using_config.hpp"
-#include "rcppsw/metrics/file_sink_registerer.hpp"
-#include "rcppsw/mpl/identity.hpp"
 
+#include "cosm/ds/cell2D.hpp"
+#include "cosm/metrics/specs.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 #include "cosm/spatial/metrics/movement_metrics.hpp"
-#include "cosm/ds/cell2D.hpp"
-#include "cosm/metrics/specs.hpp"
 
 #include "fordyca//controller/foraging_controller.hpp"
 #include "fordyca/controller/cognitive/d0/dpo_controller.hpp"
 #include "fordyca/controller/cognitive/d0/mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d0/odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d0/omdpo_controller.hpp"
-#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
-#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/reactive/d0/crw_controller.hpp"
 #include "fordyca/fsm/d0/crw_fsm.hpp"
 #include "fordyca/fsm/d0/dpo_fsm.hpp"
@@ -55,15 +53,17 @@
 #include "fordyca/metrics/perception/mdpo_metrics_collector.hpp"
 #include "fordyca/metrics/perception/mdpo_metrics_csv_sink.hpp"
 #include "fordyca/metrics/specs.hpp"
+#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, argos, metrics, d0, detail);
 
-using sink_list = rmpl::typelist<
-    rmpl::identity<fmetrics::perception::mdpo_metrics_csv_sink>,
-    rmpl::identity<fmetrics::perception::dpo_metrics_csv_sink> >;
+using sink_list =
+    rmpl::typelist<rmpl::identity<fmetrics::perception::mdpo_metrics_csv_sink>,
+                   rmpl::identity<fmetrics::perception::dpo_metrics_csv_sink> >;
 
 NS_END(detail);
 
@@ -78,27 +78,21 @@ d0_metrics_manager::d0_metrics_manager(
     : base_fs_output_manager(mconfig, gconfig, output_root, n_block_clusters),
       ER_CLIENT_INIT("fordyca.argos.metrics.d0.d0_manager") {
   rmetrics::creatable_collector_set creatable_set = {
-    {
-      typeid(fmetrics::perception::mdpo_metrics_collector),
+    { typeid(fmetrics::perception::mdpo_metrics_collector),
       fmspecs::perception::kMDPO.xml(),
       fmspecs::perception::kMDPO.scoped(),
-      rmetrics::output_mode::ekAPPEND
-    },
-    {
-      typeid(fmetrics::perception::dpo_metrics_collector),
+      rmetrics::output_mode::ekAPPEND },
+    { typeid(fmetrics::perception::dpo_metrics_collector),
       fmspecs::perception::kDPO.xml(),
       fmspecs::perception::kDPO.scoped(),
-      rmetrics::output_mode::ekAPPEND
-    }
+      rmetrics::output_mode::ekAPPEND }
   };
 
   rmetrics::register_with_sink<fametrics::d0::d0_metrics_manager,
-                               rmetrics::file_sink_registerer> csv(this,
-                                                                   creatable_set);
-  rmetrics::register_using_config<decltype(csv),
-                                  rmconfig::file_sink_config> registerer(
-                                      std::move(csv),
-                                      &mconfig->csv);
+                               rmetrics::file_sink_registerer>
+      csv(this, creatable_set);
+  rmetrics::register_using_config<decltype(csv), rmconfig::file_sink_config>
+      registerer(std::move(csv), &mconfig->csv);
 
   boost::mpl::for_each<detail::sink_list>(registerer);
 
@@ -110,7 +104,8 @@ d0_metrics_manager::d0_metrics_manager(
  * Member Functions
  ******************************************************************************/
 template <class TController>
-void d0_metrics_manager::collect_from_controller(const TController* const controller) {
+void d0_metrics_manager::collect_from_controller(
+    const TController* const controller) {
   base_fs_output_manager::collect_from_controller(controller);
 
   /*
@@ -120,7 +115,8 @@ void d0_metrics_manager::collect_from_controller(const TController* const contro
   collect(cmspecs::strategy::kNestAcq.scoped(), *controller->fsm());
   collect(cmspecs::blocks::kAcqCounts.scoped(), *controller);
   collect(cmspecs::blocks::kTransporter.scoped(), *controller);
-  collect(fmspecs::blocks::kManipulation.scoped(), *controller->block_manip_recorder());
+  collect(fmspecs::blocks::kManipulation.scoped(),
+          *controller->block_manip_recorder());
 
   collect_if(cmspecs::blocks::kAcqLocs2D.scoped(),
              *controller,
@@ -128,7 +124,7 @@ void d0_metrics_manager::collect_from_controller(const TController* const contro
                const auto& m =
                    dynamic_cast<const csmetrics::goal_acq_metrics&>(metrics);
                return fsm::foraging_acq_goal::ekBLOCK == m.acquisition_goal() &&
-                   m.goal_acquired();
+                      m.goal_acquired();
              });
 
   /*
@@ -152,11 +148,12 @@ void d0_metrics_manager::collect_from_controller(const TController* const contro
   collect_from_cognitive_controller(controller);
 } /* collect_from_controller() */
 
-template<class TController,
-         typename U,
-         RCPPSW_SFINAE_DEF(std::is_base_of<fccognitive::cognitive_controller,
-                           U>::value)>
-void d0_metrics_manager::collect_from_cognitive_controller(const TController* controller)  {
+template <class TController,
+          typename U,
+          RCPPSW_SFINAE_DEF(
+              std::is_base_of<fccognitive::cognitive_controller, U>::value)>
+void d0_metrics_manager::collect_from_cognitive_controller(
+    const TController* controller) {
   collect(fmspecs::perception::kDPO.scoped(), *controller->perception());
   collect(fmspecs::perception::kMDPO.scoped(), *controller->perception());
 } /* collect_from_cognitive_controller() */

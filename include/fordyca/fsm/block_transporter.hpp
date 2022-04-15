@@ -56,4 +56,3 @@ class block_transporter {
 };
 
 NS_END(fsm, fordyca);
-

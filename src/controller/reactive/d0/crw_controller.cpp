@@ -28,6 +28,7 @@
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/repr/config/nest_config.hpp"
+#include "cosm/spatial/strategy/blocks/drop/factory.hpp"
 #include "cosm/spatial/strategy/nest_acq/factory.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
@@ -63,40 +64,43 @@ void crw_controller::init(ticpp::Element& node) {
     ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);
   }
-  ER_INFO("All parameters parsed successfully");
 
-  csfsm::fsm_params fsm_params {
-    saa(),
-        inta_tracker(),
-        nz_tracker()
-        };
-  auto strategy_params = fstrategy::strategy_params{
-    &fsm_params,
-        nullptr,
-        nullptr,
-        nullptr,
-        rutils::color()
-        };
-
-  ER_DEBUG("Creating strategies");
-  const auto* nest = repo.config_get<crepr::config::nest_config>();
   const auto* strat_config = repo.config_get<fsconfig::strategy_config>();
 
+  csfsm::fsm_params fsm_params{ saa(), inta_tracker(), nz_tracker() };
+  auto strategy_params = fstrategy::strategy_params {
+    .fsm = &fsm_params,
+    .explore = &strat_config->blocks.explore,
+    .bsel_matrix = nullptr,
+    .csel_matrix = nullptr,
+    .accessor = nullptr,
+    .ledtaxis_target = rutils::color()
+  };
+
+  const auto* nest = repo.config_get<crepr::config::nest_config>();
+
   auto block_factory = fsexplore::block_factory();
-  auto block_acq = block_factory.create(fsexplore::block_factory::kCRW,
-                                        &strategy_params,
-                                        rng());
   auto nest_factory = csstrategy::nest_acq::factory();
-  auto nest_acq = nest_factory.create(strat_config->nest_acq.strategy,
-                                         &fsm_params,
-                                      rng());
-  ER_DEBUG("Create FSM");
-  m_fsm = std::make_unique<fsm::d0::crw_fsm>(
-      &fsm_params,
-      std::move(block_acq),
-      std::move(nest_acq),
-      nest->center,
-      rng());
+  auto drop_factory = csstrategy::blocks::drop::factory();
+
+  auto block_acq = block_factory.create(
+      fsexplore::block_factory::kCRW, &strategy_params, rng());
+  auto nest_acq =
+      nest_factory.create(strat_config->nest_acq.strategy,
+                          &strat_config->nest_acq,
+                          &fsm_params,
+                          rng());
+  auto block_drop = drop_factory.create(strat_config->blocks.drop.strategy,
+                                        &fsm_params,
+                                        &strat_config->blocks.drop,
+                                        rng());
+
+  m_fsm = std::make_unique<fsm::d0::crw_fsm>(&fsm_params,
+                                             std::move(block_acq),
+                                             std::move(nest_acq),
+                                             std::move(block_drop),
+                                             nest->center,
+                                             rng());
 
   /* Set CRW FSM supervision */
   supervisor()->supervisee_update(m_fsm.get());
@@ -131,6 +135,9 @@ void crw_controller::control_step(void) {
    * abnormal operation state.
    */
   supervisor()->run();
+
+  /* Update block detection status for use in the loop functions */
+  block_detect_status_update();
 
   ndc_uuid_pop();
 } /* control_step() */

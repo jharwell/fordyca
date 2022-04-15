@@ -25,12 +25,12 @@
 
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/ds/operations/cell2D_empty.hpp"
-#include "cosm/repr/sim_block3D.hpp"
 #include "cosm/repr/pheromone_density.hpp"
+#include "cosm/repr/sim_block3D.hpp"
 
 #include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
-#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -121,8 +121,8 @@ fsperception::model_update_result block_found::visit(fspds::dpo_store& store) {
   auto* raw = m_block->clone().release();
   auto clone = std::unique_ptr<crepr::sim_block3D>();
   clone.reset(static_cast<crepr::sim_block3D*>(raw));
-  return store.block_update(repr::dpo_entity<crepr::sim_block3D>(std::move(clone),
-                                                                 density));
+  return store.block_update(
+      repr::dpo_entity<crepr::sim_block3D>(std::move(clone), density));
 } /* visit() */
 
 void block_found::visit(fspds::dpo_semantic_map& map) {

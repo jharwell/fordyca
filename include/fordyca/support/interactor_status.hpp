@@ -84,4 +84,3 @@ enum class interactor_status {
 };
 
 NS_END(support, fordyca);
-

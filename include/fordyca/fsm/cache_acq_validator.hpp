@@ -92,4 +92,3 @@ class cache_acq_validator : public rer::client<cache_acq_validator> {
 };
 
 NS_END(fsm, fordyca);
-

@@ -26,8 +26,8 @@
 #include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/ds/cell2D.hpp"
 #include "cosm/foraging/repr/block_cluster.hpp"
-#include "cosm/repr/sim_block3D.hpp"
 #include "cosm/repr/nest.hpp"
+#include "cosm/repr/sim_block3D.hpp"
 #include "cosm/spatial/conflict_checker.hpp"
 
 /*******************************************************************************

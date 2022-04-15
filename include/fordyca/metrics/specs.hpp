@@ -61,7 +61,6 @@ NS_END(caches);
 
 NS_START(tasks, exec);
 
-
 extern cmspecs::name_spec kGeneralist;
 extern cmspecs::name_spec kHarvester;
 extern cmspecs::name_spec kCollector;

@@ -28,8 +28,8 @@
 #include "cosm/repr/sim_block3D.hpp"
 #include "cosm/spatial/dimension_checker.hpp"
 
-#include "fordyca/events/cell2D_empty.hpp"
 #include "fordyca/argos/support/d2/dynamic_cache_creator.hpp"
+#include "fordyca/events/cell2D_empty.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,15 +55,16 @@ boost::optional<cads::acache_vectoro>
 dynamic_cache_manager::create(const fascaches::create_ro_params& c_params,
                               const cds::block3D_vectorno& c_all_blocks) {
   auto usable_cb = std::bind(&dynamic_cache_manager::block_alloc_usable_filter,
-                                 this,
-                                 std::placeholders::_1,
-                                 std::placeholders::_2,
-                                 std::placeholders::_3);
-  auto absorbable_cb = std::bind(&dynamic_cache_manager::block_alloc_absorbable_filter,
-                                 this,
-                                 std::placeholders::_1,
-                                 std::placeholders::_2,
-                                 std::placeholders::_3);
+                             this,
+                             std::placeholders::_1,
+                             std::placeholders::_2,
+                             std::placeholders::_3);
+  auto absorbable_cb =
+      std::bind(&dynamic_cache_manager::block_alloc_absorbable_filter,
+                this,
+                std::placeholders::_1,
+                std::placeholders::_2,
+                std::placeholders::_3);
   if (auto for_creation = creation_blocks_alloc(c_all_blocks,
                                                 c_params.current_caches,
                                                 c_params.clusters,
@@ -118,22 +119,18 @@ bool dynamic_cache_manager::block_alloc_usable_filter(
 
       /* blocks cannot be in existing caches */
       std::all_of(existing_caches.begin(),
-                     existing_caches.end(),
-                     [&](const auto& c) { return !c->contains_block(block); }) &&
+                  existing_caches.end(),
+                  [&](const auto& c) { return !c->contains_block(block); }) &&
 
       /* blocks cannot be in clusters */
-      std::all_of(clusters.begin(),
-                  clusters.end(),
-                  [&](const auto& clust) {
-                    /* constructed, so must assign before search */
-                    auto cblocks = clust->blocks();
-                    ER_DEBUG("Cluster%d blocks: [%s]",
-                             clust->id().v(),
-                             rcppsw::to_string(cblocks).c_str());
-                    return cblocks.end() == std::find(cblocks.begin(),
-                                                      cblocks.end(),
-                                                      block);
-                  });
+      std::all_of(clusters.begin(), clusters.end(), [&](const auto& clust) {
+        /* constructed, so must assign before search */
+        auto cblocks = clust->blocks();
+        ER_DEBUG("Cluster%d blocks: [%s]",
+                 clust->id().v(),
+                 rcppsw::to_string(cblocks).c_str());
+        return cblocks.end() == std::find(cblocks.begin(), cblocks.end(), block);
+      });
 } /* block_alloc_usable_filter() */
 
 bool dynamic_cache_manager::block_alloc_absorbable_filter(
@@ -142,10 +139,10 @@ bool dynamic_cache_manager::block_alloc_absorbable_filter(
     const cfds::block3D_cluster_vectorro&) {
   /* blocks cannot be carried by a robot */
   return !block->is_carried_by_robot() &&
-      /* Blocks cannot be in existing caches */
-       std::all_of(existing_caches.begin(),
-                   existing_caches.end(),
-                   [&](const auto& c) { return !c->contains_block(block); });
+         /* Blocks cannot be in existing caches */
+         std::all_of(existing_caches.begin(),
+                     existing_caches.end(),
+                     [&](const auto& c) { return !c->contains_block(block); });
 } /* block_alloc_absorbable_filter() */
 
 NS_END(d2, support, argos, fordyca);

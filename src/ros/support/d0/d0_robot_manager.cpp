@@ -27,8 +27,8 @@
 
 #include "cosm/controller/operations/applicator.hpp"
 #include "cosm/interactors/applicator.hpp"
-#include "cosm/pal/pal.hpp"
 #include "cosm/metrics/specs.hpp"
+#include "cosm/pal/pal.hpp"
 
 #include "fordyca/controller/reactive/d0/crw_controller.hpp"
 #include "fordyca/ros/metrics/d0/d0_robot_metrics_manager.hpp"
@@ -61,10 +61,10 @@ struct functor_maps_initializer {
     lf->m_interactor_map->emplace(
         typeid(controller),
         robot_arena_interactor<T>(lf->m_metrics_manager.get()));
-    lf->m_metrics_map->emplace(typeid(controller),
-                               ccops::metrics_extract<T,
-                               frmetrics::d0::d0_robot_metrics_manager>(
-                                   lf->m_metrics_manager.get()));
+    lf->m_metrics_map->emplace(
+        typeid(controller),
+        ccops::metrics_extract<T, frmetrics::d0::d0_robot_metrics_manager>(
+            lf->m_metrics_manager.get()));
   }
 
   /* clang-format off */
@@ -115,10 +115,10 @@ void d0_robot_manager::private_init(void) {
   m_metrics_manager = std::make_unique<frmetrics::d0::d0_robot_metrics_manager>(
       mc_robot_ns, &output->metrics);
 
-   m_interactor_map = std::make_unique<interactor_map_type>();
-   m_metrics_map = std::make_unique<metric_extraction_map_type>();
+  m_interactor_map = std::make_unique<interactor_map_type>();
+  m_metrics_map = std::make_unique<metric_extraction_map_type>();
 
-   /*
+  /*
    * Intitialize controller interactions with environment via various
    * functors/type maps for all d0 controller types.
    */
@@ -187,19 +187,17 @@ void d0_robot_manager::robot_post_step(void) {
 
   auto iapplicator = cinteractors::applicator<controller::foraging_controller,
                                               d0::robot_arena_interactor>(
-                                                  m_controller,
-                                                  timestep());
+      m_controller, timestep());
   boost::apply_visitor(iapplicator, m_interactor_map->at(id));
 
   /*
    * Collect metrics from robot, now that it has finished interacting with the
    * environment and no more changes to its state will occur this timestep.
    */
-  auto mapplicator = ccops::applicator<
-    controller::foraging_controller,
-    ccops::metrics_extract,
-    frmetrics::d0::d0_robot_metrics_manager
-    >(m_controller);
+  auto mapplicator =
+      ccops::applicator<controller::foraging_controller,
+                        ccops::metrics_extract,
+                        frmetrics::d0::d0_robot_metrics_manager>(m_controller);
 
   boost::apply_visitor(mapplicator, m_metrics_map->at(id));
   m_controller->block_manip_recorder()->reset();
@@ -211,8 +209,7 @@ void d0_robot_manager::robot_pre_step(void) {
    * cheating and just setting the resolution to something reasonable for the
    * purpose of metric collection I think is fine.
    */
-  m_controller->sensing_update(timestep(),
-                               rtypes::discretize_ratio(0.2));
+  m_controller->sensing_update(timestep(), rtypes::discretize_ratio(0.2));
 } /* robot_pre_step() */
 
 NS_END(d0, support, ros, fordyca);

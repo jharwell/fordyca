@@ -1,5 +1,5 @@
 /**
- * \file explore_config.hpp
+ * \file caches_config.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -23,9 +23,9 @@
 /*******************************************************************************
   * Includes
 ******************************************************************************/
-#include <string>
-
 #include "rcppsw/config/base_config.hpp"
+
+#include "cosm/spatial/strategy/explore/config/explore_config.hpp"
 
 #include "fordyca/fordyca.hpp"
 
@@ -38,16 +38,14 @@ NS_START(fordyca, strategy, config);
   * Structure Definitions
 ******************************************************************************/
 /**
-  * \struct explore_config
+  * \struct caches_config
   * \ingroup strategy config
   *
-  * \brief Configuration for explore strategies that can be employed by
-  * robots.
+  * \brief Configuration for strategies related to things robots can do with/for
+  * caches when foraging.
   */
-struct explore_config final : public rconfig::base_config {
-  std::string block_strategy{};
-  std::string cache_strategy{};
+struct caches_config final : public rconfig::base_config {
+  cssexplore::config::explore_config explore{};
 };
 
 NS_END(config, strategy, fordyca);
-

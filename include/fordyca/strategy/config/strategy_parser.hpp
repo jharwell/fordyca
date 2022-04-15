@@ -28,10 +28,11 @@
 
 #include "rcppsw/config/xml/xml_config_parser.hpp"
 
-#include "cosm/spatial/strategy/config/xml/nest_acq_parser.hpp"
+#include "cosm/spatial/strategy/nest_acq/config/xml/nest_acq_parser.hpp"
 
 #include "fordyca/strategy/config/strategy_config.hpp"
-#include "fordyca/strategy/config/explore_parser.hpp"
+#include "fordyca/strategy/config/blocks_parser.hpp"
+#include "fordyca/strategy/config/caches_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,7 +54,8 @@ class strategy_parser final : public rer::client<strategy_parser>,
  public:
   using config_type = strategy_config;
 
-  strategy_parser(void) : ER_CLIENT_INIT("fordyca.strategy.config.strategy_parser") {}
+  strategy_parser(void)
+      : ER_CLIENT_INIT("fordyca.strategy.config.strategy_parser") {}
 
 
   /**
@@ -71,11 +73,11 @@ class strategy_parser final : public rer::client<strategy_parser>,
   }
 
   /* clang-format off */
-  std::unique_ptr<config_type>             m_config{nullptr};
-  csstrategy::config::xml::nest_acq_parser m_nest_acq{};
-  explore_parser                           m_explore{};
+  std::unique_ptr<config_type>              m_config{nullptr};
+  cssnest_acq::config::xml::nest_acq_parser m_nest_acq{};
+  blocks_parser                             m_blocks{};
+  caches_parser                             m_caches{};
   /* clang-format on */
 };
 
 NS_END(config, strategy, fordyca);
-

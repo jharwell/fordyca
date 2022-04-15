@@ -74,4 +74,3 @@ class block_utility : public rmath::expression<double> {
 };
 
 NS_END(math, fordyca);
-

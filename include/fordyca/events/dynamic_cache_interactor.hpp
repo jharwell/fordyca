@@ -42,10 +42,8 @@ NS_START(fordyca, events);
  * \brief Interactor specifying the event visit set for all foraging tasks that
  * interact with dynamic caches in FORDYCA.
  */
-class dynamic_cache_interactor : public rpvisitor::polymorphic_accept_set<
-  fccd2::events::block_proximity,
-  fccd2::events::cache_proximity
-  > {};
+class dynamic_cache_interactor
+    : public rpvisitor::polymorphic_accept_set<fccd2::events::block_proximity,
+                                               fccd2::events::cache_proximity> {};
 
 NS_END(events, fordyca);
-

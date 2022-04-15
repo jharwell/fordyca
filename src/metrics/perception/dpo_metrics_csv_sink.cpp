@@ -33,18 +33,16 @@ NS_START(fordyca, metrics, perception);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-dpo_metrics_csv_sink::dpo_metrics_csv_sink(
-    fs::path fpath_no_ext,
-    const rmetrics::output_mode& mode,
-    const rtypes::timestep& interval)
+dpo_metrics_csv_sink::dpo_metrics_csv_sink(fs::path fpath_no_ext,
+                                           const rmetrics::output_mode& mode,
+                                           const rtypes::timestep& interval)
     : csv_sink(fpath_no_ext, mode, interval) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 std::list<std::string>
-dpo_metrics_csv_sink::csv_header_cols(
-    const rmetrics::base_data*) const {
+dpo_metrics_csv_sink::csv_header_cols(const rmetrics::base_data*) const {
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
     /* clang-format off */
@@ -63,9 +61,8 @@ dpo_metrics_csv_sink::csv_header_cols(
 } /* csv_header_cols() */
 
 boost::optional<std::string>
-dpo_metrics_csv_sink::csv_line_build(
-    const rmetrics::base_data* data,
-    const rtypes::timestep& t) {
+dpo_metrics_csv_sink::csv_line_build(const rmetrics::base_data* data,
+                                     const rtypes::timestep& t) {
   if (!ready_to_flush(t)) {
     return boost::none;
   }
@@ -78,9 +75,11 @@ dpo_metrics_csv_sink::csv_line_build(
   line += csv_entry_domavg(d->interval.known_caches, d->interval.robot_count);
   line += csv_entry_domavg(d->cum.known_caches, d->cum.robot_count);
 
-  line += csv_entry_domavg(d->interval.block_density_sum, d->interval.robot_count);
+  line +=
+      csv_entry_domavg(d->interval.block_density_sum, d->interval.robot_count);
   line += csv_entry_domavg(d->cum.block_density_sum, d->cum.robot_count);
-  line += csv_entry_domavg(d->interval.cache_density_sum, d->interval.robot_count);
+  line +=
+      csv_entry_domavg(d->interval.cache_density_sum, d->interval.robot_count);
   line += csv_entry_domavg(d->cum.cache_density_sum, d->cum.robot_count, true);
 
   return boost::make_optional(line);

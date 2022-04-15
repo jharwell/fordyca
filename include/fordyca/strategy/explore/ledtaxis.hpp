@@ -69,7 +69,7 @@ class ledtaxis : public foraging_strategy,
   void task_execute(void) override final;
 
   /* prototype overrides */
-  std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
+  std::unique_ptr<cssexplore::base_explore> clone(void) const override {
     return nullptr; /* Should not be a top level explore behavior */
   }
 
@@ -89,4 +89,3 @@ class ledtaxis : public foraging_strategy,
 };
 
 NS_END(explore, strategy, fordyca);
-

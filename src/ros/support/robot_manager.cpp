@@ -35,8 +35,7 @@ NS_START(fordyca, ros, support);
  * Constructors/Destructors
  ******************************************************************************/
 robot_manager::robot_manager(const cros::config::sierra_config* config)
-    : ER_CLIENT_INIT("fordyca.ros.support.robot_manager"),
-      mc_sierra(*config) {}
+    : ER_CLIENT_INIT("fordyca.ros.support.robot_manager"), mc_sierra(*config) {}
 
 robot_manager::~robot_manager(void) = default;
 
@@ -77,8 +76,8 @@ void robot_manager::pre_step(void) {
 } /* pre_step() */
 
 bool robot_manager::experiment_finished(void) const {
-  return timestep() >= mc_sierra.experiment.length.v() *
-      mc_sierra.experiment.ticks_per_sec.v();
+  return timestep() >=
+         mc_sierra.experiment.length.v() * mc_sierra.experiment.ticks_per_sec.v();
 } /* experiment_finished() */
 
 NS_END(support, ros, fordyca);

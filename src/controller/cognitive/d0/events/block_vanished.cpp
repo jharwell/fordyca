@@ -91,7 +91,6 @@ void block_vanished::visit(ffsm::d0::dpo_fsm& fsm) {
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
-
 void block_vanished::visit(fsm::d0::free_block_to_nest_fsm& fsm) {
   fsm.inject_event(fsm::foraging_signal::ekBLOCK_VANISHED,
                    rpfsm::event_type::ekNORMAL);

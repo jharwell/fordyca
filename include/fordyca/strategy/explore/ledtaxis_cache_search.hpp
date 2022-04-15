@@ -81,7 +81,7 @@ class ledtaxis_cache_search final : public foraging_strategy,
   void task_execute(void) override final;
 
   /* prototype overrides */
-  std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
+  std::unique_ptr<cssexplore::base_explore> clone(void) const override {
     csfsm::fsm_params fsm_params {
       saa(),
       inta_tracker(),
@@ -89,6 +89,7 @@ class ledtaxis_cache_search final : public foraging_strategy,
     };
     fstrategy::strategy_params params {
       &fsm_params,
+      config(),
       nullptr,
       nullptr,
       accessor(),
@@ -105,4 +106,3 @@ class ledtaxis_cache_search final : public foraging_strategy,
 };
 
 NS_END(explore, strategy, fordyca);
-

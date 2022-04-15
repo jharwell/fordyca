@@ -28,9 +28,9 @@
 #include "cosm/controller/operations/applicator.hpp"
 #include "cosm/foraging/block_dist/base_distributor.hpp"
 #include "cosm/interactors/applicator.hpp"
-#include "cosm/pal/ros/swarm_iterator.hpp"
-#include "cosm/pal/pal.hpp"
 #include "cosm/metrics/specs.hpp"
+#include "cosm/pal/pal.hpp"
+#include "cosm/pal/ros/swarm_iterator.hpp"
 
 #include "fordyca/controller/reactive/d0/crw_controller.hpp"
 #include "fordyca/ros/metrics/d0/d0_swarm_metrics_manager.hpp"
@@ -74,9 +74,7 @@ void d0_swarm_manager::private_init(void) {
   /* initialize output and metrics collection */
   const auto* output = config()->config_get<cpconfig::output_config>();
   m_metrics_manager = std::make_unique<frmetrics::d0::d0_swarm_metrics_manager>(
-      &output->metrics,
-      output_root(),
-      swarm_size());
+      &output->metrics, output_root(), swarm_size());
 } /* private_init() */
 
 /*******************************************************************************

@@ -26,11 +26,17 @@
   <category name="cosm.hal.sensors.proximity" >
     <priority value ="debug" />
   </category>
+  <category name="cosm.hal.sensors.env" >
+    <priority value ="trace" />
+  </category>
   <category name="cosm.hal.ros" >
-    <priority value ="debug" />
+    <priority value ="info" />
   </category>
   <category name="cosm.ros" >
     <priority value ="debug" />
+  </category>
+  <category name="cosm.ros.metrics" >
+    <priority value ="info" />
   </category>
   <category name="cosm.hal.argos.actuators.led" >
     <priority value ="fatal" />
@@ -39,13 +45,19 @@
     <priority value ="info" />
   </category>
   <category name="cosm.steer2D.force_calculator" >
-    <priority value ="info" />
+    <priority value ="debug" />
   </category>
-  <category name="cosm.steer2D.arrival_force" >
-    <priority value ="info" />
+  <category name="cosm.spatial.fsm" >
+    <priority value ="debug" />
+  </category>
+  <category name="cosm.foraging.fsm" >
+    <priority value ="debug" />
+  </category>
+  <category name="cosm.spatial.fsm" >
+    <priority value ="debug" />
   </category>
   <category name="cosm.subsystem" >
-    <priority value ="info" />
+    <priority value ="debug" />
   </category>
   <category name="cosm.tv.population_dynamics" >
     <priority value ="info" />
@@ -67,8 +79,8 @@
   <category name="fordyca.controller" >
     <priority value ="info" />
   </category>
-  <category name="fordyca.fsm.cache_acquisition_validator" >
-    <priority value ="info" />
+  <category name="fordyca.fsm.d0.crw" >
+    <priority value ="debug" />
   </category>
   <category name="fordyca.fsm.acquire_goal_fsm" >
     <priority value ="info" />

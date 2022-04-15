@@ -30,12 +30,12 @@
 #include "cosm/fsm/cell2D_state.hpp"
 #include "cosm/repr/base_block3D.hpp"
 
-#include "fordyca/subsystem/perception/los_proc_verify.hpp"
-#include "fordyca/subsystem/perception/oracular_info_receptor.hpp"
+#include "fordyca/events/cell2D_empty.hpp"
 #include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
 #include "fordyca/subsystem/perception/events/block_found.hpp"
 #include "fordyca/subsystem/perception/events/cache_found.hpp"
-#include "fordyca/events/cell2D_empty.hpp"
+#include "fordyca/subsystem/perception/los_proc_verify.hpp"
+#include "fordyca/subsystem/perception/oracular_info_receptor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,8 +49,9 @@ using ds::occupancy_grid;
 mdpo_perception_subsystem::mdpo_perception_subsystem(
     const config::perception_config* const config)
     : ER_CLIENT_INIT("fordyca.subsystem.perception.mdpo"),
-      foraging_perception_subsystem(&config->mdpo.rlos,
-                                    std::make_unique<ds::dpo_semantic_map>(&config->mdpo)),
+      foraging_perception_subsystem(
+          &config->mdpo.rlos,
+          std::make_unique<ds::dpo_semantic_map>(&config->mdpo)),
       m_cell_stats(cfsm::cell2D_state::ekST_MAX_STATES),
       m_los() {}
 
@@ -266,15 +267,16 @@ void mdpo_perception_subsystem::update_cell_stats(
   } /* for(i..) */
 } /* update_cell_stats() */
 
-const known_objects_accessor* mdpo_perception_subsystem::known_objects(void) const {
+const known_objects_accessor*
+mdpo_perception_subsystem::known_objects(void) const {
   return map()->store()->known_objects();
 }
 
-const ds::dpo_semantic_map* mdpo_perception_subsystem::map(void) const  {
+const ds::dpo_semantic_map* mdpo_perception_subsystem::map(void) const {
   return model<const ds::dpo_semantic_map>();
 }
 
-ds::dpo_semantic_map* mdpo_perception_subsystem::map(void)  {
+ds::dpo_semantic_map* mdpo_perception_subsystem::map(void) {
   return model<ds::dpo_semantic_map>();
 }
 

@@ -24,11 +24,11 @@
 #include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/ds/cell2D.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
-#include "cosm/ds/cell2D.hpp"
 
 #include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/subsystem/perception/oracular_info_receptor.hpp"
@@ -42,7 +42,8 @@ NS_START(fordyca, controller, cognitive, d2);
  * Constructors/Destructor
  ******************************************************************************/
 birtd_omdpo_controller::birtd_omdpo_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.cognitive.d2.birtd_dpo"), m_receptor(nullptr) {}
+    : ER_CLIENT_INIT("fordyca.controller.cognitive.d2.birtd_dpo"),
+      m_receptor(nullptr) {}
 
 birtd_omdpo_controller::~birtd_omdpo_controller(void) = default;
 
@@ -73,6 +74,9 @@ void birtd_omdpo_controller::control_step(void) {
    */
   supervisor()->run();
 
+  /* Update block detection status for use in the loop functions */
+  block_detect_status_update();
+
   ndc_uuid_pop();
 } /* control_step() */
 
@@ -82,8 +86,6 @@ void birtd_omdpo_controller::oracle_init(
 } /* oracle_init() */
 
 NS_END(cognitive, d2, controller, fordyca);
-
-
 
 using namespace fccd2; // NOLINT
 

@@ -23,6 +23,9 @@
  ******************************************************************************/
 #include "fordyca/fsm/d2/block_to_cache_site_fsm.hpp"
 
+#include "cosm/spatial/strategy/nest_acq/base_nest_acq.hpp"
+#include "cosm/spatial/strategy/blocks/drop/base_drop.hpp"
+
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -34,11 +37,11 @@ NS_START(fordyca, fsm, d2);
 block_to_cache_site_fsm::block_to_cache_site_fsm(
     const fsm_ro_params* c_ro,
     const csfsm::fsm_params* c_no,
-    std::unique_ptr<csstrategy::base_strategy> exp_behavior,
+    std::unique_ptr<cssexplore::base_explore> explore,
     rmath::rng* rng)
     : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, c_no, rng),
       m_cache_fsm(c_ro, c_no, rng),
-      m_block_fsm(c_ro, c_no, std::move(exp_behavior), rng) {}
+      m_block_fsm(c_ro, c_no, std::move(explore), rng) {}
 
 /*******************************************************************************
  * FSM Metrics

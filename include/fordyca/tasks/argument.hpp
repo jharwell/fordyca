@@ -58,4 +58,3 @@ class foraging_signal_argument : public cta::taskable_argument {
 };
 
 NS_END(tasks, fordyca);
-

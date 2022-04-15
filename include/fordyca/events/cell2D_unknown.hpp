@@ -84,4 +84,3 @@ using cell2D_unknown_visitor =
     rpvisitor::filtered_visitor<detail::cell2D_unknown>;
 
 NS_END(events, fordyca);
-

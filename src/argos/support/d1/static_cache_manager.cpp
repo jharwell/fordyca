@@ -31,9 +31,9 @@
 #include "cosm/spatial/conflict_checker.hpp"
 #include "cosm/spatial/dimension_checker.hpp"
 
-#include "fordyca/math/cache_respawn_probability.hpp"
-#include "fordyca/argos/support/d1/static_cache_creator.hpp"
 #include "fordyca/argos/support/caches/creation_verifier.hpp"
+#include "fordyca/argos/support/d1/static_cache_creator.hpp"
+#include "fordyca/math/cache_respawn_probability.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -71,32 +71,30 @@ static_cache_manager::create(const fascaches::create_ro_params& c_params,
                              std::placeholders::_1,
                              std::placeholders::_2,
                              std::placeholders::_3);
-  auto absorbable_cb = std::bind(&static_cache_manager::block_alloc_absorbable_filter,
-                                 this,
-                                 std::placeholders::_1,
-                                 std::placeholders::_2,
-                                 std::placeholders::_3);
+  auto absorbable_cb =
+      std::bind(&static_cache_manager::block_alloc_absorbable_filter,
+                this,
+                std::placeholders::_1,
+                std::placeholders::_2,
+                std::placeholders::_3);
   if (auto for_creation = creation_blocks_alloc(c_all_blocks,
                                                 c_params.current_caches,
                                                 c_params.clusters,
                                                 usable_cb,
                                                 absorbable_cb)) {
-    auto allocated = blocks_alloc(for_creation->usable,
-                                  for_creation->absorbable);
+    auto allocated = blocks_alloc(for_creation->usable, for_creation->absorbable);
 
     /* (re)-create the caches */
     using checker = cspatial::dimension_checker;
     auto even_multiple = checker::even_multiple(arena_map()->grid_resolution(),
                                                 config()->dimension);
 
-    auto odd_dsize = checker::odd_dsize(arena_map()->grid_resolution(),
-                                        even_multiple);
+    auto odd_dsize =
+        checker::odd_dsize(arena_map()->grid_resolution(), even_multiple);
 
     static_cache_creator creator(arena_map(), mc_cache_locs, odd_dsize);
 
-    auto res = creator.create_all(c_params,
-                                  std::move(allocated),
-                                  initial);
+    auto res = creator.create_all(c_params, std::move(allocated), initial);
 
     /* Configure cache extents */
     creator.cache_extents_configure(res.created);
@@ -112,14 +110,12 @@ static_cache_manager::create(const fascaches::create_ro_params& c_params,
                    [&](const auto& c) { return c.get(); });
     auto free_blocks =
         carena::free_blocks_calculator(initial)(c_all_blocks, sanity_caches);
-    auto verifier = fascaches::creation_verifier(arena_map(),
-                                                 odd_dsize,
-                                                 config()->strict_constraints);
-    ER_ASSERT(verifier.sanity_checks(sanity_caches,
-                                     free_blocks,
-                                     c_params.clusters,
-                                     arena_map()->nests()),
-              "One or more caches failed verification");
+    auto verifier = fascaches::creation_verifier(
+        arena_map(), odd_dsize, config()->strict_constraints);
+    ER_ASSERT(
+        verifier.sanity_checks(
+            sanity_caches, free_blocks, c_params.clusters, arena_map()->nests()),
+        "One or more caches failed verification");
 
     caches_created(res.created.size());
     caches_discarded(res.n_discarded);
@@ -176,9 +172,8 @@ boost::optional<cds::block3D_vectorno> static_cache_manager::cache_i_blocks_allo
     RCPPSW_UNUSED size_t cache_index,
     size_t required_blocks) const {
   /* initial allocation */
-  auto alloc_blocks = cache_i_alloc_from_usable(c_usable_blocks,
-                                                 c_alloc_map,
-                                                 required_blocks);
+  auto alloc_blocks =
+      cache_i_alloc_from_usable(c_usable_blocks, c_alloc_map, required_blocks);
   ER_DEBUG("Cache%zu initial allocation: %s (%zu)",
            cache_index,
            rcppsw::to_string(alloc_blocks).c_str(),
@@ -188,14 +183,11 @@ boost::optional<cds::block3D_vectorno> static_cache_manager::cache_i_blocks_allo
    * Find all the free blocks within the extent of the cache-to-be, and add them
    * into the block list for the new cache (absorption).
    */
-  auto absorb_blocks = cache_i_alloc_from_absorbable(c_absorbable_blocks,
-                                                     alloc_blocks,
-                                                     c_alloc_map,
-                                                     c_center);
+  auto absorb_blocks = cache_i_alloc_from_absorbable(
+      c_absorbable_blocks, alloc_blocks, c_alloc_map, c_center);
 
   /* blocks for cache i = initially allocated blocks + absorbed blocks */
-  cds::block3D_vectorno cache_i_blocks(alloc_blocks.begin(),
-                                       alloc_blocks.end());
+  cds::block3D_vectorno cache_i_blocks(alloc_blocks.begin(), alloc_blocks.end());
   std::transform(absorb_blocks.begin(),
                  absorb_blocks.end(),
                  std::back_inserter(cache_i_blocks),
@@ -275,16 +267,15 @@ cds::block3D_vectorno static_cache_manager::cache_i_alloc_from_usable(
    * Note that the calculations for membership are ordered from least to most
    * computationally expensive to compute, so don't reorder them willy-nilly.
    */
-  std::copy_if(
-      c_usable_blocks.begin(),
-      c_usable_blocks.end(),
-      std::back_inserter(cache_i_blocks),
-      [&](const auto& b) {
-        return
-            /* don't have enough blocks yet */
-            (cache_i_blocks.size() < required_blocks) &&
+  std::copy_if(c_usable_blocks.begin(),
+               c_usable_blocks.end(),
+               std::back_inserter(cache_i_blocks),
+               [&](const auto& b) {
+                 return
+                     /* don't have enough blocks yet */
+                     (cache_i_blocks.size() < required_blocks) &&
 
-            /*
+                     /*
              * Not already within the extent of ANY cache (including the one we
              * are allocating blocks for). Blocks can be dropped within cache
              * extents in (for example) RN scenarios during block distribution
@@ -295,18 +286,18 @@ cds::block3D_vectorno static_cache_manager::cache_i_alloc_from_usable(
              * calculating the allocation for is done during the absorbtion
              * phase later.
              */
-            std::all_of(mc_cache_locs.begin(),
-                        mc_cache_locs.end(),
-                        [&](const auto& center) {
-                          auto status = checker::placement2D(
-                              center - cache_dim / 2.0, cache_dim, b);
+                     std::all_of(mc_cache_locs.begin(),
+                                 mc_cache_locs.end(),
+                                 [&](const auto& center) {
+                                   auto status = checker::placement2D(
+                                       center - cache_dim / 2.0, cache_dim, b);
 
-                          return !(status.x && status.y);
-                        }) &&
+                                   return !(status.x && status.y);
+                                 }) &&
 
-            /* not already allocated for a different cache */
-            !c_alloc_map.contains(b);
-      });
+                     /* not already allocated for a different cache */
+                     !c_alloc_map.contains(b);
+               });
   return cache_i_blocks;
 } /* cache_i_alloc_from_usable() */
 
@@ -330,18 +321,17 @@ bool static_cache_manager::block_alloc_usable_filter(
                   [&](const auto& c) { return !c->contains_block(block); });
 } /* block_alloc_usable_filter() */
 
-
 bool static_cache_manager::block_alloc_absorbable_filter(
     const crepr::sim_block3D* block,
     const cads::acache_vectorno& existing_caches,
     const cfds::block3D_cluster_vectorro&) {
   /* blocks cannot be carried by a robot */
   return !block->is_carried_by_robot() &&
-      /* Blocks cannot be in existing caches */
-      std::all_of(existing_caches.begin(),
-                  existing_caches.end(),
-                  [&](const auto& c) { return !c->contains_block(block); });
-}/* block_alloc_absorbable_filter() */
+         /* Blocks cannot be in existing caches */
+         std::all_of(existing_caches.begin(),
+                     existing_caches.end(),
+                     [&](const auto& c) { return !c->contains_block(block); });
+} /* block_alloc_absorbable_filter() */
 
 cds::block3D_htno static_cache_manager::cache_i_alloc_from_absorbable(
     const cds::block3D_htno& c_absorbable_blocks,
@@ -356,27 +346,26 @@ cds::block3D_htno static_cache_manager::cache_i_alloc_from_absorbable(
    * Note that the calculations for membership are ordered from least to most
    * computationally expensive to compute, so don't reorder them willy-nilly.
    */
-  std::copy_if(
-      c_absorbable_blocks.begin(),
-      c_absorbable_blocks.end(),
-      std::inserter(absorb_blocks, absorb_blocks.begin()),
-      [&](const auto& pair) {
-        auto* block = pair.second;
-        auto status = checker::placement2D(
-            c_center - cache_dim / 2.0, cache_dim, block);
+  std::copy_if(c_absorbable_blocks.begin(),
+               c_absorbable_blocks.end(),
+               std::inserter(absorb_blocks, absorb_blocks.begin()),
+               [&](const auto& pair) {
+                 auto* block = pair.second;
+                 auto status = checker::placement2D(
+                     c_center - cache_dim / 2.0, cache_dim, block);
 
-        return
-            /* block overlaps with extent of cache-to-be */
-            status.x && status.y &&
-            /* block is not already allocated to cache-to-be */
-            c_cache_i_blocks.end() == std::find(c_cache_i_blocks.begin(),
-                                                c_cache_i_blocks.end(),
-                                                block) &&
+                 return
+                     /* block overlaps with extent of cache-to-be */
+                     status.x && status.y &&
+                     /* block is not already allocated to cache-to-be */
+                     c_cache_i_blocks.end() == std::find(c_cache_i_blocks.begin(),
+                                                         c_cache_i_blocks.end(),
+                                                         block) &&
 
-            /* block is not already allocated to another cache-to-be */
-            !c_alloc_map.contains(block);
-      });
+                     /* block is not already allocated to another cache-to-be */
+                     !c_alloc_map.contains(block);
+               });
   return absorb_blocks;
-}/* cache_i_alloc_from_absorbable() */
+} /* cache_i_alloc_from_absorbable() */
 
 NS_END(d1, support, argos, fordyca);

@@ -44,8 +44,7 @@ manipulation_metrics_csv_sink::manipulation_metrics_csv_sink(
  * Member Functions
  ******************************************************************************/
 std::list<std::string>
-manipulation_metrics_csv_sink::csv_header_cols(
-    const rmetrics::base_data*) const {
+manipulation_metrics_csv_sink::csv_header_cols(const rmetrics::base_data*) const {
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
     /* clang-format off */
@@ -73,9 +72,8 @@ manipulation_metrics_csv_sink::csv_header_cols(
 } /* csv_header_cols() */
 
 boost::optional<std::string>
-manipulation_metrics_csv_sink::csv_line_build(
-    const rmetrics::base_data* data,
-    const rtypes::timestep& t) {
+manipulation_metrics_csv_sink::csv_line_build(const rmetrics::base_data* data,
+                                              const rtypes::timestep& t) {
   if (!ready_to_flush(t)) {
     return boost::none;
   }
@@ -93,14 +91,16 @@ manipulation_metrics_csv_sink::csv_line_build(
   line += csv_entry_domavg(d->interval[block_manip_events::ekFREE_DROP].penalties,
                            d->interval[block_manip_events::ekFREE_DROP].events);
 
-  line += csv_entry_intavg(d->interval[block_manip_events::ekCACHE_PICKUP].events);
+  line +=
+      csv_entry_intavg(d->interval[block_manip_events::ekCACHE_PICKUP].events);
   line += csv_entry_intavg(d->interval[block_manip_events::ekCACHE_DROP].events);
 
   line +=
       csv_entry_domavg(d->interval[block_manip_events::ekCACHE_PICKUP].penalties,
                        d->interval[block_manip_events::ekCACHE_PICKUP].events);
-  line += csv_entry_domavg(d->interval[block_manip_events::ekCACHE_DROP].penalties,
-                           d->interval[block_manip_events::ekCACHE_DROP].events);
+  line +=
+      csv_entry_domavg(d->interval[block_manip_events::ekCACHE_DROP].penalties,
+                       d->interval[block_manip_events::ekCACHE_DROP].events);
 
   /* cumulative averages */
   line += csv_entry_tsavg(d->cum[block_manip_events::ekFREE_PICKUP].events, t);

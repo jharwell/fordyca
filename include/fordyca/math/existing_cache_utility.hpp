@@ -75,4 +75,3 @@ class existing_cache_utility : public rmath::expression<double> {
 };
 
 NS_END(math, fordyca);
-

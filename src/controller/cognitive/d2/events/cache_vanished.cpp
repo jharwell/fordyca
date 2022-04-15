@@ -27,8 +27,8 @@
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
-#include "fordyca/fsm/foraging_signal.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
+#include "fordyca/fsm/foraging_signal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,8 +41,7 @@ using base_vanished = fccd1::events::cache_vanished;
  * Constructors/Destructor
  ******************************************************************************/
 cache_vanished::cache_vanished(const rtypes::type_uuid& cache_id)
-    : ER_CLIENT_INIT("fordyca.events.cache_vanished"),
-      base_vanished(cache_id) {}
+    : ER_CLIENT_INIT("fordyca.events.cache_vanished"), base_vanished(cache_id) {}
 
 /*******************************************************************************
  * Depth2 Foraging

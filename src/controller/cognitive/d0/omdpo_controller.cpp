@@ -24,14 +24,14 @@
 #include "fordyca/controller/cognitive/d0/omdpo_controller.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
-#include "cosm/repr/base_block3D.hpp"
-#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/ds/cell2D.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
+#include "cosm/repr/base_block3D.hpp"
+#include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
+#include "fordyca/fsm/d0/dpo_fsm.hpp"
 #include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/subsystem/perception/oracular_info_receptor.hpp"
-#include "fordyca/fsm/d0/dpo_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,7 +42,8 @@ NS_START(fordyca, controller, cognitive, d0);
  * Constructors/Destructor
  ******************************************************************************/
 omdpo_controller::omdpo_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.cognitive.d0.omdpo"), m_receptor(nullptr) {}
+    : ER_CLIENT_INIT("fordyca.controller.cognitive.d0.omdpo"),
+      m_receptor(nullptr) {}
 
 omdpo_controller::~omdpo_controller(void) = default;
 
@@ -59,18 +60,21 @@ void omdpo_controller::control_step(void) {
 
   perception()->update(m_receptor.get());
 
-    /*
+  /*
    * Reset steering forces tracking so per-timestep visualizations are
    * correct. This can't be done when applying the steering forces because then
    * they are always 0 during loop function visualization.
    */
   saa()->steer_force2D().tracking_reset();
 
-    /*
+  /*
    * Run the FSM and apply steering forces if normal operation, otherwise handle
    * abnormal operation state.
    */
   supervisor()->run();
+
+  /* Update block detection status for use in the loop functions */
+  block_detect_status_update();
 
   ndc_uuid_pop();
 } /* control_step() */
@@ -81,7 +85,6 @@ void omdpo_controller::oracle_init(
 } /* oracle_init() */
 
 NS_END(cognitive, d0, controller, fordyca);
-
 
 using namespace fccd0; // NOLINT
 

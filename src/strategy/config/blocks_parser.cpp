@@ -1,7 +1,7 @@
 /**
- * \file diagnostics.cpp
+ * \file blocks_parser.cpp
  *
- * \copyright 2022 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,24 +21,46 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/repr/diagnostics.hpp"
+#include "fordyca/strategy/config/blocks_parser.hpp"
 
 /*******************************************************************************
- * Namespaces/Decls
+ * Namespaces
  ******************************************************************************/
-NS_START(fordyca, repr, diagnostics);
+NS_START(fordyca, strategy, config);
 
 /*******************************************************************************
- * Global Variables
+ * Member Functions
  ******************************************************************************/
-chactuators::diagnostic_actuator::map_type kColorMap = {
-  { chactuators::diagnostics::ekEXPLORE, rutils::color::kMAGENTA },
-  { chactuators::diagnostics::ekSUCCESS, rutils::color::kGREEN },
-  { chactuators::diagnostics::ekTAXIS, rutils::color::kYELLOW },
-  { chactuators::diagnostics::ekLEAVING_NEST, rutils::color::kGRAY50 },
-  { chactuators::diagnostics::ekWAIT_FOR_SIGNAL, rutils::color::kWHITE },
-  { chactuators::diagnostics::ekVECTOR_TO_GOAL, rutils::color::kBLUE },
-  { chactuators::diagnostics::ekEXP_INTERFERENCE, rutils::color::kRED }
-};
+void blocks_parser::parse(const ticpp::Element& node) {
+  if (nullptr == node.FirstChild(kXMLRoot, false)) {
+    return;
+  }
+  ER_DEBUG("Parent node=%s: child=%s", node.Value().c_str(), kXMLRoot.c_str());
 
-NS_END(diagnostics, repr, fordyca);
+  ticpp::Element vnode = node_get(node, kXMLRoot);
+  m_config = std::make_unique<config_type>();
+
+  m_drop.parse(vnode);
+  m_explore.parse(vnode);
+
+  if (m_drop.is_parsed()) {
+    m_config->drop =
+        *m_drop.config_get<cssblocks::config::xml::drop_parser::config_type>();
+  }
+  if (m_explore.is_parsed()) {
+    m_config->explore =
+        *m_explore.config_get<cssexplore::config::xml::explore_parser::config_type>();
+  }
+} /* parse() */
+
+bool blocks_parser::validate(void) const {
+  ER_CHECK(m_drop.validate(), "Block drop config validation failed");
+  ER_CHECK(m_explore.validate(), "Bloc exploration config validation failed");
+
+  return true;
+
+error:
+  return false;
+} /* validate() */
+
+NS_END(config, strategy, fordyca);

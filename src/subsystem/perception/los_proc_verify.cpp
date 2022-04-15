@@ -26,9 +26,9 @@
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/repr/base_block3D.hpp"
 
+#include "fordyca/repr/forager_los.hpp"
 #include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
 #include "fordyca/subsystem/perception/ds/dpo_store.hpp"
-#include "fordyca/repr/forager_los.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

@@ -25,8 +25,8 @@
 
 #include "cosm/spatial/fsm/point_argument.hpp"
 
-#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

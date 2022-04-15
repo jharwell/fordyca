@@ -24,9 +24,9 @@
 #include "fordyca/strategy/explore/ledtaxis.hpp"
 
 #include "cosm/arena/repr/light_type_index.hpp"
+#include "cosm/subsystem/actuation_subsystem2D.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/subsystem/sensing_subsystemQ3D.hpp"
-#include "cosm/subsystem/actuation_subsystem2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -54,14 +54,16 @@ void ledtaxis::task_execute(void) {
              obs->to_str().c_str(),
              obs->angle().v(),
              obs->length());
-    saa()->actuation()->diagnostics()->emit(chal::actuators::diagnostics::ekEXP_INTERFERENCE);
+    saa()->actuation()->diagnostics()->emit(
+        chal::actuators::diagnostics::ekEXP_INTERFERENCE);
     saa()->steer_force2D().accum(saa()->steer_force2D().avoidance(*obs));
 
   } else {
     inta_tracker()->state_exit();
 
     ER_DEBUG("No threatening obstacle found");
-    saa()->actuation()->diagnostics()->emit(chal::actuators::diagnostics::ekTAXIS);
+    saa()->actuation()->diagnostics()->emit(
+        chal::actuators::diagnostics::ekTAXIS);
     auto force = saa()->steer_force2D().phototaxis(
         saa()->sensing()->blobs()->readings(),
         carepr::light_type_index()[carepr::light_type_index::kCache]);

@@ -33,9 +33,7 @@ NS_START(fordyca, controller, config, block_sel);
  ******************************************************************************/
 void block_priorities_parser::parse(const ticpp::Element& node) {
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
-    ER_DEBUG("Parent node=%s: child=%s",
-             node.Value().c_str(),
-             kXMLRoot.c_str());
+    ER_DEBUG("Parent node=%s: child=%s", node.Value().c_str(), kXMLRoot.c_str());
 
     ticpp::Element bnode = node_get(node, kXMLRoot);
     m_config = std::make_unique<config_type>();

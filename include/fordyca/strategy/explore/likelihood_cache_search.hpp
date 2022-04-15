@@ -61,7 +61,7 @@ class likelihood_cache_search final : public localized_search {
   void task_start(cta::taskable_argument*) override;
 
   /* prototype overrides */
-  std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
+  std::unique_ptr<cssexplore::base_explore> clone(void) const override {
     csfsm::fsm_params fsm_params {
       saa(),
       inta_tracker(),
@@ -69,6 +69,7 @@ class likelihood_cache_search final : public localized_search {
     };
     fstrategy::strategy_params params {
       &fsm_params,
+      config(),
       nullptr,
       nullptr,
       accessor(),

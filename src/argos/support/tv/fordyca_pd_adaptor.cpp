@@ -45,19 +45,18 @@ fordyca_pd_adaptor::fordyca_pd_adaptor(
     carena::caching_arena_map* map,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.argos support.tv.fordyca_pd_adaptor"),
-      pd_adaptor<cpcontroller::controller2D>(
-          config,
-          sm,
-          envd,
-          rmath::vector2d(map->xrsize(), map->yrsize()),
-          rng),
+      pd_adaptor<cpcontroller::controller2D>(config,
+                                             sm,
+                                             envd,
+                                             rmath::vector2d(map->xrsize(),
+                                                             map->yrsize()),
+                                             rng),
       m_map(map) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void fordyca_pd_adaptor::pre_kill_cleanup(
-    cpcontroller::controller2D* controller) {
+void fordyca_pd_adaptor::pre_kill_cleanup(cpcontroller::controller2D* controller) {
   auto* foraging = static_cast<controller::foraging_controller*>(controller);
   /*
    * If the robot is carrying a block, drop/distribute it in the arena to avoid

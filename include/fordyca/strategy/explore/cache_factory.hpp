@@ -44,7 +44,7 @@ NS_START(fordyca, strategy, explore);
  * \brief Factory for creating cache exploration strategies.
  */
 class cache_factory :
-    public rpfactory::releasing_factory<csstrategy::base_strategy,
+    public rpfactory::releasing_factory<fstrategy::foraging_strategy,
                                         std::string, /* key type */
                                         const fstrategy::strategy_params*,
                                         rmath::rng*> {
@@ -58,4 +58,3 @@ class cache_factory :
 };
 
 NS_END(explore, strategy, fordyca);
-

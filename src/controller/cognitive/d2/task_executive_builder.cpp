@@ -25,6 +25,7 @@
 
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/arena/repr/light_type_index.hpp"
+#include "cosm/ds/cell2D.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/spatial/strategy/nest_acq/factory.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
@@ -33,23 +34,23 @@
 #include "cosm/ta/config/task_alloc_config.hpp"
 #include "cosm/ta/config/task_executive_config.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
-#include "cosm/ds/cell2D.hpp"
+#include "cosm/spatial/strategy/blocks/drop/base_drop.hpp"
 
 #include "fordyca/controller/config/d2/controller_repository.hpp"
-#include "fordyca/strategy/config/strategy_config.hpp"
-#include "fordyca/subsystem/perception/foraging_perception_subsystem.hpp"
 #include "fordyca/fsm/d1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/d2/block_to_cache_site_fsm.hpp"
 #include "fordyca/fsm/d2/block_to_new_cache_fsm.hpp"
 #include "fordyca/fsm/d2/cache_transferer_fsm.hpp"
+#include "fordyca/strategy/config/strategy_config.hpp"
 #include "fordyca/strategy/explore/block_factory.hpp"
 #include "fordyca/strategy/explore/cache_factory.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
+#include "fordyca/subsystem/perception/foraging_perception_subsystem.hpp"
 #include "fordyca/tasks/d1/collector.hpp"
 #include "fordyca/tasks/d2/cache_collector.hpp"
 #include "fordyca/tasks/d2/cache_finisher.hpp"
 #include "fordyca/tasks/d2/cache_starter.hpp"
 #include "fordyca/tasks/d2/cache_transferer.hpp"
-#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -85,68 +86,67 @@ task_executive_builder::tasking_map task_executive_builder::d2_tasks_create(
     rmath::rng* rng) {
   const auto* task_config =
       config_repo.config_get<cta::config::task_alloc_config>();
-  const auto* strat_config =
-      config_repo.config_get<fsconfig::strategy_config>();
+  const auto* strat_config = config_repo.config_get<fsconfig::strategy_config>();
   auto cache_color = carepr::light_type_index()[carepr::light_type_index::kCache];
 
   fsexplore::block_factory block_factory;
   fsexplore::cache_factory cache_factory;
   csstrategy::nest_acq::factory nest_acq_factory;
-  csfsm::fsm_params fsm_params {
+  csfsm::fsm_params fsm_params{
     saa(),
     inta_tracker(),
     nz_tracker(),
   };
   auto strategy_cachep = fstrategy::strategy_params{
-    &fsm_params,
-    nullptr,
-    cache_sel_matrix(),
-    perception()->known_objects(),
-    cache_color
+    .fsm =&fsm_params,
+    .explore = &strat_config->caches.explore,
+    .bsel_matrix = nullptr,
+    .csel_matrix = cache_sel_matrix(),
+    .accessor = perception()->known_objects(),
+    .ledtaxis_target = cache_color
   };
   auto strategy_blockp = fstrategy::strategy_params{
-    &fsm_params,
-    nullptr,
-    cache_sel_matrix(),
-    perception()->known_objects(),
-    rutils::color()
-  };
-
-  fsm::fsm_ro_params params = {
-    .bsel_matrix = block_sel_matrix(),
+    .fsm = &fsm_params,
+    .explore = &strat_config->blocks.explore,
+    .bsel_matrix = nullptr,
     .csel_matrix = cache_sel_matrix(),
-    .store = perception()->model<fspds::dpo_store>(),
     .accessor = perception()->known_objects(),
-    .strategy_config = *strat_config
+    .ledtaxis_target = rutils::color()
   };
+  fsm::fsm_ro_params params = { .bsel_matrix = block_sel_matrix(),
+                                .csel_matrix = cache_sel_matrix(),
+                                .store = perception()->model<fspds::dpo_store>(),
+                                .accessor = perception()->known_objects(),
+                                .strategy = *strat_config };
 
   auto cache_starter_fsm = std::make_unique<fsm::d2::block_to_cache_site_fsm>(
       &params,
       &fsm_params,
       block_factory.create(
-          strat_config->explore.block_strategy, &strategy_blockp, rng),
+          strat_config->blocks.explore.strategy, &strategy_blockp, rng),
       rng);
 
   auto cache_finisher_fsm = std::make_unique<fsm::d2::block_to_new_cache_fsm>(
       &params,
       &fsm_params,
       block_factory.create(
-          strat_config->explore.block_strategy, &strategy_blockp, rng),
+          strat_config->blocks.explore.strategy, &strategy_blockp, rng),
       rng);
 
   auto cache_transferer_fsm = std::make_unique<fsm::d2::cache_transferer_fsm>(
       &params,
       &fsm_params,
       cache_factory.create(
-          strat_config->explore.cache_strategy, &strategy_cachep, rng),
+          strat_config->caches.explore.strategy, &strategy_cachep, rng),
       rng);
 
   auto cache_collector_fsm = std::make_unique<fsm::d1::cached_block_to_nest_fsm>(
       &params,
       &fsm_params,
       cache_factory.create(
-          strat_config->explore.cache_strategy, &strategy_cachep, rng),
+          strat_config->caches.explore.strategy, &strategy_cachep, rng),
       nest_acq_factory.create(strat_config->nest_acq.strategy,
+                              &strat_config->nest_acq,
                               &fsm_params,
                               rng),
       rng);
@@ -199,9 +199,12 @@ void task_executive_builder::d2_exec_est_init(
       config_repo.config_get<cta::config::task_alloc_config>();
 
   auto* cache_starter = map.find(ftd2::foraging_task::kCacheStarterName)->second;
-  auto* cache_finisher = map.find(ftd2::foraging_task::kCacheFinisherName)->second;
-  auto* cache_transferer = map.find(ftd2::foraging_task::kCacheTransfererName)->second;
-  auto* cache_collector = map.find(ftd2::foraging_task::kCacheCollectorName)->second;
+  auto* cache_finisher =
+      map.find(ftd2::foraging_task::kCacheFinisherName)->second;
+  auto* cache_transferer =
+      map.find(ftd2::foraging_task::kCacheTransfererName)->second;
+  auto* cache_collector =
+      map.find(ftd2::foraging_task::kCacheCollectorName)->second;
   if (!task_config->exec_est.seed_enabled) {
     return;
   }
@@ -222,13 +225,17 @@ void task_executive_builder::d2_exec_est_init(
         ->last_subtask(cache_collector);
   }
   rmath::rangez cs_bounds =
-      task_config->exec_est.ranges.find(ftd2::foraging_task::kCacheStarterName)->second;
+      task_config->exec_est.ranges.find(ftd2::foraging_task::kCacheStarterName)
+          ->second;
   rmath::rangez cf_bounds =
-      task_config->exec_est.ranges.find(ftd2::foraging_task::kCacheFinisherName)->second;
-  rmath::rangez ct_bounds =
-      task_config->exec_est.ranges.find(ftd2::foraging_task::kCacheTransfererName)->second;
+      task_config->exec_est.ranges.find(ftd2::foraging_task::kCacheFinisherName)
+          ->second;
+  rmath::rangez ct_bounds = task_config->exec_est.ranges
+                                .find(ftd2::foraging_task::kCacheTransfererName)
+                                ->second;
   rmath::rangez cc_bounds =
-      task_config->exec_est.ranges.find(ftd2::foraging_task::kCacheCollectorName)->second;
+      task_config->exec_est.ranges.find(ftd2::foraging_task::kCacheCollectorName)
+          ->second;
 
   ER_INFO("Seeding exec estimate for tasks: '%s'=%s, '%s'=%s",
           cache_starter->name().c_str(),
@@ -251,9 +258,12 @@ void task_executive_builder::d2_subtasks_init(const tasking_map& map,
                                               cta::ds::bi_tdgraph* graph,
                                               rmath::rng* rng) {
   auto* cache_starter = map.find(ftd2::foraging_task::kCacheStarterName)->second;
-  auto* cache_finisher = map.find(ftd2::foraging_task::kCacheFinisherName)->second;
-  auto* cache_transferer = map.find(ftd2::foraging_task::kCacheTransfererName)->second;
-  auto* cache_collector = map.find(ftd2::foraging_task::kCacheCollectorName)->second;
+  auto* cache_finisher =
+      map.find(ftd2::foraging_task::kCacheFinisherName)->second;
+  auto* cache_transferer =
+      map.find(ftd2::foraging_task::kCacheTransfererName)->second;
+  auto* cache_collector =
+      map.find(ftd2::foraging_task::kCacheCollectorName)->second;
 
   /*
    * As part of seeding exec estimates, we set the last executed subtask for a
@@ -278,7 +288,8 @@ std::unique_ptr<cta::bi_tdgraph_executive> task_executive_builder::operator()(
     rmath::rng* rng) {
   const auto* task_config =
       config_repo.config_get<cta::config::task_alloc_config>();
-  cta::ds::ds_variant variant = std::make_unique<cta::ds::bi_tdgraph>(task_config);
+  cta::ds::ds_variant variant =
+      std::make_unique<cta::ds::bi_tdgraph>(task_config);
   auto* graph = std::get<std::unique_ptr<cta::ds::bi_tdgraph>>(variant).get();
 
   const auto* execp =

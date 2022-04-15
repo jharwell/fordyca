@@ -27,20 +27,20 @@
 
 #include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/arena/config/arena_map_config.hpp"
+#include "cosm/argos/convergence_calculator.hpp"
+#include "cosm/argos/vis/config/visualization_config.hpp"
 #include "cosm/foraging/oracle/foraging_oracle.hpp"
-#include "cosm/pal/config/output_config.hpp"
 #include "cosm/oracle/config/aggregate_oracle_config.hpp"
 #include "cosm/oracle/tasking_oracle.hpp"
-#include "cosm/argos/convergence_calculator.hpp"
 #include "cosm/pal/argos/swarm_iterator.hpp"
-#include "cosm/argos/vis/config/visualization_config.hpp"
+#include "cosm/pal/config/output_config.hpp"
 
-#include "fordyca/controller/foraging_controller.hpp"
-#include "fordyca/argos/support/tv/config/tv_manager_config.hpp"
 #include "fordyca/argos/metrics/base_fs_output_manager.hpp"
+#include "fordyca/argos/support/tv/config/tv_manager_config.hpp"
 #include "fordyca/argos/support/tv/env_dynamics.hpp"
 #include "fordyca/argos/support/tv/fordyca_pd_adaptor.hpp"
 #include "fordyca/argos/support/tv/tv_manager.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -75,7 +75,8 @@ void argos_swarm_manager::init(ticpp::Element& node) {
 
   /* initialize arena map and distribute blocks */
   const auto* aconfig = config()->config_get<caconfig::arena_map_config>();
-  const auto* vconfig = config()->config_get<cavis::config::visualization_config>();
+  const auto* vconfig =
+      config()->config_get<cavis::config::visualization_config>();
   arena_map_create<carena::caching_arena_map>(aconfig);
   if (!delay_arena_map_init()) {
     arena_map_init(vconfig, nullptr);
@@ -118,8 +119,8 @@ void argos_swarm_manager::tv_init(const fastv::config::tv_manager_config* tvp) {
    * they are disabled, and trying to figure out how to get things to work if
    * they are omitted is waaayyyy too much work. See FORDYCA#621 too.
    */
-  auto envd =
-      std::make_unique<fastv::env_dynamics>(&tvp->env_dynamics, this, arena_map());
+  auto envd = std::make_unique<fastv::env_dynamics>(
+      &tvp->env_dynamics, this, arena_map());
 
   auto popd = std::make_unique<fastv::fordyca_pd_adaptor>(
       &tvp->population_dynamics, this, envd.get(), arena_map(), rng());
@@ -139,23 +140,23 @@ void argos_swarm_manager::tv_init(const fastv::config::tv_manager_config* tvp) {
                     ->rda_adaptor());
   };
   cpargos::swarm_iterator::controllers<controller::foraging_controller,
-                                          cpal::iteration_order::ekSTATIC>(
+                                       cpal::iteration_order::ekSTATIC>(
       this, cb, cpal::kRobotType);
 } /* tv_init() */
 
 void argos_swarm_manager::output_init(const cpconfig::output_config* output) {
   swarm_manager_adaptor::output_init(output);
 
-/* #if (LIBRA_ER == LIBRA_ER_ALL) */
-/*   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.ros"), */
-/*                  output_root() / "manager.log"); */
-/*   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.argos"), */
-/*                  output_root() / "manager.log"); */
-/*   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.events"), */
-/*                  output_root() / "manager.log"); */
-/*   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.metrics"), */
-/*                  output_root() / "manager.log"); */
-/* #endif */
+  /* #if (LIBRA_ER == LIBRA_ER_ALL) */
+  /*   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.ros"), */
+  /*                  output_root() / "manager.log"); */
+  /*   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.argos"), */
+  /*                  output_root() / "manager.log"); */
+  /*   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.events"), */
+  /*                  output_root() / "manager.log"); */
+  /*   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.metrics"), */
+  /*                  output_root() / "manager.log"); */
+  /* #endif */
 } /* output_init() */
 
 void argos_swarm_manager::oracle_init(
@@ -215,7 +216,8 @@ const carena::caching_arena_map* argos_swarm_manager::arena_map(void) const {
       swarm_manager_adaptor::arena_map());
 }
 carena::caching_arena_map* argos_swarm_manager::arena_map(void) {
-  return static_cast<carena::caching_arena_map*>(swarm_manager_adaptor::arena_map());
+  return static_cast<carena::caching_arena_map*>(
+      swarm_manager_adaptor::arena_map());
 }
 
 NS_END(support, argos, fordyca);

@@ -52,7 +52,7 @@ class cache_transferer_fsm final : public block_to_goal_fsm {
  public:
   cache_transferer_fsm(const fsm_ro_params* c_ro,
                          const csfsm::fsm_params* c_no,
-                       std::unique_ptr<csstrategy::base_strategy> exp_behavior,
+                       std::unique_ptr<cssexplore::base_explore> explore,
                        rmath::rng* rng);
   ~cache_transferer_fsm(void) override = default;
 

@@ -29,14 +29,14 @@
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
-#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
-#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
-#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
 #include "fordyca/controller/cognitive/d2/events/cache_found.hpp"
 #include "fordyca/events/dynamic_cache_interactor.hpp"
+#include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
-#include "fordyca/events/existing_cache_interactor.hpp"
+#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/tasks/d2/foraging_task.hpp"
 
 /*******************************************************************************
@@ -113,7 +113,6 @@ void cache_proximity::visit(fsm::block_to_goal_fsm& fsm) {
   fsm.inject_event(fsm::foraging_signal::ekCACHE_PROXIMITY,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
-
 
 /*******************************************************************************
  * Member Functions

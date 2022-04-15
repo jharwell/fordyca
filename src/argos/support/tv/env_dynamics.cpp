@@ -25,9 +25,9 @@
 
 #include "cosm/arena/caching_arena_map.hpp"
 
-#include "fordyca/controller/foraging_controller.hpp"
-#include "fordyca/argos/support/tv/config/env_dynamics_config.hpp"
 #include "fordyca/argos/support/argos_swarm_manager.hpp"
+#include "fordyca/argos/support/tv/config/env_dynamics_config.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -64,8 +64,7 @@ void env_dynamics::register_controller(const cpcontroller::controller2D& c) {
   m_rda.register_controller(c.entity_id());
 } /* register_controller() */
 
-void env_dynamics::unregister_controller(
-    const cpcontroller::controller2D& c) {
+void env_dynamics::unregister_controller(const cpcontroller::controller2D& c) {
   m_rda.unregister_controller(c.entity_id());
   penalties_flush(c);
 } /* unregister_controller() */

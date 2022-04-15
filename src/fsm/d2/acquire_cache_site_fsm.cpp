@@ -28,10 +28,10 @@
 #include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
-#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/d2/cache_site_selector.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -96,8 +96,8 @@ bool acquire_cache_site_fsm::site_exploration_term_cb(void) const {
 boost::optional<csfsm::acquire_goal_fsm::candidate_type>
 acquire_cache_site_fsm::site_select(void) {
   auto selector = cache_site_selector(mc_matrix);
-  if (auto best =
-          selector(mc_accessor->known_caches(), saa()->sensing()->rpos2D(), rng())) {
+  if (auto best = selector(
+          mc_accessor->known_caches(), saa()->sensing()->rpos2D(), rng())) {
     ER_INFO("Select cache site@%s for acquisition", best->to_str().c_str());
     m_sel_success = true;
     m_sel_exec = true;

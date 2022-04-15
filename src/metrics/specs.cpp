@@ -47,71 +47,43 @@ NS_END(perception);
 
 NS_START(blocks);
 
-cmspecs::name_spec kManipulation = {
-  "block_manipulation",
-  "blocks/manipulation"
-};
+cmspecs::name_spec kManipulation = { "block_manipulation",
+                                     "blocks/manipulation" };
 
 NS_END(blocks);
 
 NS_START(caches);
 
-cmspecs::name_spec kAcqCounts = {
-  "cache_acq_counts",
-  "caches/acq_counts"
-};
+cmspecs::name_spec kAcqCounts = { "cache_acq_counts", "caches/acq_counts" };
 
-cmspecs::name_spec kAcqLocs2D  = {
-  "cache_acq_locs2D",
-  "caches/acq/locs2D"
-};
-cmspecs::name_spec kAcqExploreLocs2D = {
-  "cache_acq_explore_locs2D",
-  "caches/acq/explore_locs2D"
-};
-cmspecs::name_spec kAcqVectorLocs2D = {
-  "cache_acq_vector_locs2D",
-  "caches/acq/vector_locs2D"
-};
+cmspecs::name_spec kAcqLocs2D = { "cache_acq_locs2D", "caches/acq/locs2D" };
+cmspecs::name_spec kAcqExploreLocs2D = { "cache_acq_explore_locs2D",
+                                         "caches/acq/explore_locs2D" };
+cmspecs::name_spec kAcqVectorLocs2D = { "cache_acq_vector_locs2D",
+                                        "caches/acq/vector_locs2D" };
 
-cmspecs::name_spec kSiteSelection = {
-  "cache_site_selection",
-  "caches/site_selection"
-};
-cmspecs::name_spec kUtilization = {
-  "cache_utilization",
-  "caches/utilization"
-};
-cmspecs::name_spec kLocations = {
-  "cache_locations",
-  "caches/locations"
-};
-cmspecs::name_spec kLifecycle = {
-  "cache_lifecycle",
-  "caches/lifecycle"
-};
+cmspecs::name_spec kSiteSelection = { "cache_site_selection",
+                                      "caches/site_selection" };
+cmspecs::name_spec kUtilization = { "cache_utilization", "caches/utilization" };
+cmspecs::name_spec kLocations = { "cache_locations", "caches/locations" };
+cmspecs::name_spec kLifecycle = { "cache_lifecycle", "caches/lifecycle" };
 
 NS_END(caches);
 
 NS_START(tasks, exec);
 
-
-cmspecs::name_spec kGeneralist = {
-  "task_execution_generalist",
-  "tasks/execution/" + ftd0::foraging_task::kGeneralistName
-};
-cmspecs::name_spec kHarvester = {
-  "task_execution_harvester",
-  "tasks/execution/" + ftd1::foraging_task::kHarvesterName
-};
-cmspecs::name_spec kCollector = {
-  "task_execution_collector",
-  "tasks/execution/" + ftd1::foraging_task::kCollectorName
-};
-cmspecs::name_spec kCacheStarter = {
-  "task_execution_cache_starter",
-  "tasks/execution/" + ftd2::foraging_task::kCacheStarterName
-};
+cmspecs::name_spec kGeneralist = { "task_execution_generalist",
+                                   "tasks/execution/" +
+                                       ftd0::foraging_task::kGeneralistName };
+cmspecs::name_spec kHarvester = { "task_execution_harvester",
+                                  "tasks/execution/" +
+                                      ftd1::foraging_task::kHarvesterName };
+cmspecs::name_spec kCollector = { "task_execution_collector",
+                                  "tasks/execution/" +
+                                      ftd1::foraging_task::kCollectorName };
+cmspecs::name_spec kCacheStarter = { "task_execution_cache_starter",
+                                     "tasks/execution/" +
+                                         ftd2::foraging_task::kCacheStarterName };
 cmspecs::name_spec kCacheFinisher = {
   "task_execution_cache_finisher",
   "tasks/execution/" + ftd2::foraging_task::kCacheFinisherName
@@ -128,18 +100,10 @@ cmspecs::name_spec kCacheCollector = {
 NS_END(exec);
 NS_START(tab);
 
-cmspecs::name_spec kGeneralist = {
-  "task_tab_generalist",
-  "tasks/tab/generalist"
-};
-cmspecs::name_spec kHarvester = {
-  "task_tab_harvester",
-  "tasks/tab/harvester"
-};
-cmspecs::name_spec kCollector = {
-  "task_tab_collector",
-  "tasks/tab/collector"
-};
+cmspecs::name_spec kGeneralist = { "task_tab_generalist",
+                                   "tasks/tab/generalist" };
+cmspecs::name_spec kHarvester = { "task_tab_harvester", "tasks/tab/harvester" };
+cmspecs::name_spec kCollector = { "task_tab_collector", "tasks/tab/collector" };
 
 NS_END(tab);
 

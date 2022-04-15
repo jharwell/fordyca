@@ -37,4 +37,3 @@ NS_START(fordyca, math);
 using new_cache_utility = existing_cache_utility;
 
 NS_END(math, fordyca);
-

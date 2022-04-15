@@ -31,12 +31,12 @@
 #include "fordyca/controller/cognitive/d1/bitd_mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d1/bitd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d1/bitd_omdpo_controller.hpp"
-#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
-#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
-#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/d1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
+#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
 #include "fordyca/tasks/d1/collector.hpp"
 #include "fordyca/tasks/d1/foraging_task.hpp"
 
@@ -50,18 +50,17 @@ using carepr::base_cache;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cached_block_pickup::cached_block_pickup(
-    const carepr::arena_cache* cache,
-    crepr::base_block3D* block,
-    const rtypes::type_uuid& id,
-    const rtypes::timestep& t)
-    : ER_CLIENT_INIT("fordyca.controller.cognitive.d1.events.cached_block_pickup"),
+cached_block_pickup::cached_block_pickup(const carepr::arena_cache* cache,
+                                         crepr::base_block3D* block,
+                                         const rtypes::type_uuid& id,
+                                         const rtypes::timestep& t)
+    : ER_CLIENT_INIT("fordyca.controller.cognitive.d1.events.cached_block_"
+                     "pickup"),
       base_block_pickup(block, id, t),
       mc_timestep(t),
       mc_cache(cache) {}
 
 cached_block_pickup::~cached_block_pickup(void) = default;
-
 
 /*******************************************************************************
  * Controllers
