@@ -29,7 +29,8 @@
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/repr/config/nest_config.hpp"
 #include "cosm/spatial/strategy/blocks/drop/factory.hpp"
-#include "cosm/spatial/strategy/nest_acq/factory.hpp"
+#include "cosm/spatial/strategy/nest/acq/factory.hpp"
+#include "cosm/spatial/strategy/nest/exit/factory.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
 #include "fordyca/controller/config/foraging_controller_repository.hpp"
@@ -79,26 +80,37 @@ void crw_controller::init(ticpp::Element& node) {
 
   const auto* nest = repo.config_get<crepr::config::nest_config>();
 
-  auto block_factory = fsexplore::block_factory();
-  auto nest_factory = csstrategy::nest_acq::factory();
-  auto drop_factory = csstrategy::blocks::drop::factory();
+  auto block_search_factory = fsexplore::block_factory();
+  auto nest_acq_factory = csstrategy::nest::acq::factory();
+  auto nest_exit_factory = csstrategy::nest::exit::factory();
+  auto block_drop_factory = csstrategy::blocks::drop::factory();
 
-  auto block_acq = block_factory.create(
-      fsexplore::block_factory::kCRW, &strategy_params, rng());
+  auto block_acq = block_search_factory.create(fsexplore::block_factory::kCRW,
+                                        &strategy_params,
+                                        rng());
   auto nest_acq =
-      nest_factory.create(strat_config->nest_acq.strategy,
-                          &strat_config->nest_acq,
+      nest_acq_factory.create(strat_config->nest.acq.strategy,
+                          &strat_config->nest.acq,
                           &fsm_params,
                           rng());
-  auto block_drop = drop_factory.create(strat_config->blocks.drop.strategy,
-                                        &fsm_params,
-                                        &strat_config->blocks.drop,
-                                        rng());
+  auto nest_exit =
+      nest_exit_factory.create(strat_config->nest.exit.strategy,
+                               &strat_config->nest.exit,
+                               &fsm_params,
+                               rng());
+  auto block_drop = block_drop_factory.create(strat_config->blocks.drop.strategy,
+                                              &fsm_params,
+                                              &strat_config->blocks.drop,
+                                              rng());
 
+  cffsm::strategy_set strategies = {
+    .explore = std::move(block_acq),
+    .nest_acq = std::move(nest_acq),
+    .nest_exit = std::move(nest_exit),
+    .block_drop = std::move(block_drop)
+  };
   m_fsm = std::make_unique<fsm::d0::crw_fsm>(&fsm_params,
-                                             std::move(block_acq),
-                                             std::move(nest_acq),
-                                             std::move(block_drop),
+                                             std::move(strategies),
                                              nest->center,
                                              rng());
 

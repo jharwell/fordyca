@@ -348,8 +348,8 @@ XML configuration:
 
 - Required by: All controllers.
 - Required child attributes if present: None.
-- Required child tags if present: [ ``explore``, ``nest_acq`` ].
-- Optional child attributes: None.
+- Required child tags if present: [ ``explore``, ``nest``, ``blocks`` ].
+- Optional child attributes: [ ``caches`` ]
 - Optional child tags: None.
 
 XML configuration:
@@ -357,68 +357,16 @@ XML configuration:
 .. code-block:: XML
 
    <strategy>
-       <explore>
-       ...
-       </explore>
-       <nest_acq>
-       ...
-       </nest_cq>
+       <blocks>
+         ...
+       </blocks>
+       <caches>
+         ...
+       </caches>
+       <nest>
+         ...
+       </nest>
    </strategy>
-
-``strategy/explore``
---------------------
-
-- Required by: All but CRW.
-- Required child attributes if present: ``block_strategy``.
-- Required child tags if present: None.
-- Optional child attributes: ``cache_strategy``.
-- Optional child tags: None.
-
-XML configuration:
-
-.. code-block:: XML
-
-   <strategy>
-       <explore
-          block_strategy="CRW|likelihood_search"
-          cache_strategy="CRW|likelihood_search|utility_search|ledtaxis_search"
-       </explore>
-       ...
-   </strategy>
-
-``strategy/nest_acq``
----------------------
-
-- Required by: All controllers.
-- Required child attributes if present: ``strategy``.
-- Required child tags if present: None.
-- Optional child attributes: None.
-- Optional child tags: None.
-
-XML configuration:
-
-.. code-block:: XML
-
-   <strategy>
-       <nest_acq
-          strategy="wander|random_thresh|wander_random_thresh"
-       </nest_acq>
-       ...
-   </strategy>
-
-
-- ``strategy`` - The strategy robots should use once they have entered the nest
-  with an object to choose a precise location to drop it at. Valid values are:
-
-  - ``wander`` - Perform phototaxis+wander, avoiding collisions as needed, for a
-    random number of timesteps before acquiring the nest.
-
-  - ``random_thresh`` - Perform phototaxis+collision avoidance, choosing a
-    random point along the vector pointing from where the robot enters the nest
-    to the center to treat as the center/use as the nest acquisition point, and
-    phototaxis to that point.
-
-  - ``wander_random_thresh`` - ``random_thresh`` + ``wander``.
 
 ``perception``
 --------------

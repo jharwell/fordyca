@@ -45,12 +45,12 @@ NS_START(fordyca, fsm);
 acquire_free_block_fsm::acquire_free_block_fsm(
     const fsm_ro_params* c_ro,
     const csfsm::fsm_params* c_no,
-    std::unique_ptr<cssexplore::base_explore> behavior,
+    std::unique_ptr<cssexplore::base_explore> exp_behavior,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_free_block"),
       acquire_goal_fsm(
           c_no,
-          std::move(behavior),
+          std::move(exp_behavior),
           rng,
           acquire_goal_fsm::hook_list{
               RCPPSW_STRUCT_DOT_INITIALIZER(

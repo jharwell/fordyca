@@ -63,9 +63,7 @@ class crw_fsm final : public cffsm::foraging_util_hfsm,
                       public cta::taskable {
  public:
   crw_fsm(const csfsm::fsm_params* params,
-          std::unique_ptr<cssexplore::base_explore> explore,
-          std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
-          std::unique_ptr<cssblocks::drop::base_drop> block_drop,
+          cffsm::strategy_set strategies,
           const rmath::vector2d& nest_loc,
           rmath::rng* rng);
 

@@ -24,8 +24,6 @@
 #include "fordyca/fsm/d1/block_to_existing_cache_fsm.hpp"
 
 #include "cosm/arena/repr/light_type_index.hpp"
-#include "cosm/spatial/strategy/nest_acq/base_nest_acq.hpp"
-#include "cosm/spatial/strategy/blocks/drop/base_drop.hpp"
 
 #include "fordyca/strategy/explore/block_factory.hpp"
 #include "fordyca/strategy/explore/cache_factory.hpp"

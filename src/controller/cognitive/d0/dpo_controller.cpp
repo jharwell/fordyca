@@ -30,9 +30,10 @@
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/repr/config/nest_config.hpp"
-#include "cosm/spatial/strategy/nest_acq/factory.hpp"
+#include "cosm/spatial/strategy/nest/acq/factory.hpp"
+#include "cosm/spatial/strategy/nest/exit/factory.hpp"
+#include "cosm/spatial/strategy/blocks/drop/factory.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
-#include "cosm/spatial/strategy/blocks/drop/base_drop.hpp"
 
 #include "fordyca/controller/cognitive/block_sel_matrix.hpp"
 #include "fordyca/controller/config/block_sel/block_sel_matrix_config.hpp"
@@ -162,19 +163,33 @@ void dpo_controller::private_init(
     .strategy = *strat_config
   };
 
-  auto block = fsexplore::block_factory().create(strat_config->blocks.explore.strategy,
+  auto explore = fsexplore::block_factory().create(strat_config->blocks.explore.strategy,
                                                  &strategy_params,
                                                  rng());
-  auto nest_acq = csstrategy::nest_acq::factory().create(strat_config->nest_acq.strategy,
-                                                         &strat_config->nest_acq,
+  auto nest_acq = cssnest::acq::factory().create(strat_config->nest.acq.strategy,
+                                                         &strat_config->nest.acq,
                                                          &fsm_params,
                                                          rng());
+  auto nest_exit = cssnest::exit::factory().create(strat_config->nest.exit.strategy,
+                                                  &strat_config->nest.exit,
+                                                  &fsm_params,
+                                                  rng());
+
+  auto block_drop = cssblocks::drop::factory().create(strat_config->blocks.drop.strategy,
+                                                    &fsm_params,
+                                                    &strat_config->blocks.drop,
+                                                    rng());
+  cffsm::strategy_set strategies = {
+    .explore = std::move(explore),
+    .nest_acq = std::move(nest_acq),
+    .nest_exit = std::move(nest_exit),
+    .block_drop = std::move(block_drop)
+  };
 
   m_fsm = std::make_unique<fsm::d0::dpo_fsm>(
       &fsm_ro_params,
       &fsm_params,
-      std::move(block),
-      std::move(nest_acq),
+      std::move(strategies),
       rng());
 
   /* Set DPO FSM supervision */

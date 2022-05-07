@@ -112,7 +112,7 @@ void d0_metrics_manager::collect_from_controller(
    * All d0 controllers provide these.
    */
   collect(cmspecs::spatial::kNestZone.scoped(), *controller->nz_tracker());
-  collect(cmspecs::strategy::kNestAcq.scoped(), *controller->fsm());
+  collect(cmspecs::strategy::nest::kAcq.scoped(), *controller->fsm());
   collect(cmspecs::blocks::kAcqCounts.scoped(), *controller);
   collect(cmspecs::blocks::kTransporter.scoped(), *controller);
   collect(fmspecs::blocks::kManipulation.scoped(),

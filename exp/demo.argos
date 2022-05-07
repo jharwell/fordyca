@@ -53,10 +53,15 @@
                 strategy="CRW"
                 min_duration="50"/>
             </blocks>
-            <nest_acq
-                strategy="wander"
-                duration="20"
-                />
+            <nest>
+              <acq
+                  strategy="wander"
+                  duration="20"
+                  />
+              <exit
+                  strategy="anti_phototaxis"
+                  />
+            </nest>
         </strategy>
         <sensing_subsystemQ3D>
           <!-- -5pi/6 : 5pi/6 -->

@@ -24,8 +24,6 @@
 #include "fordyca/fsm/d1/cached_block_to_nest_fsm.hpp"
 
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
-#include "cosm/spatial/strategy/nest_acq/base_nest_acq.hpp"
-#include "cosm/spatial/strategy/blocks/drop/base_drop.hpp"
 
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
@@ -45,12 +43,10 @@ using csel_matrix = controller::cognitive::cache_sel_matrix;
 cached_block_to_nest_fsm::cached_block_to_nest_fsm(
     const fsm_ro_params* c_ro,
     const csfsm::fsm_params* c_no,
-    std::unique_ptr<cssexplore::base_explore> explore,
-    std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
+    cffsm::strategy_set strategies,
     rmath::rng* rng)
     : foraging_util_hfsm(c_no,
-                         std::move(nest_acq),
-                         nullptr,
+                         std::move(strategies),
                          rng,
                          ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.d1.cached_block_to_nest"),
@@ -84,7 +80,11 @@ cached_block_to_nest_fsm::cached_block_to_nest_fsm(
           RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&finished)),
       mc_nest_loc(std::get<rmath::vector2d>(
           c_ro->csel_matrix->find(csel_matrix::kNestLoc)->second)),
-      m_cache_fsm(c_ro, c_no, std::move(explore), rng, true) {}
+      m_cache_fsm(c_ro,
+                  c_no,
+                  std::move(foraging_util_hfsm::strategies().explore),
+                  rng,
+                  true) {}
 
 RCPPSW_HFSM_STATE_DEFINE(cached_block_to_nest_fsm,
                          start,

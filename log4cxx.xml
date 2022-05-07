@@ -24,7 +24,7 @@
   </category>
 
   <category name="cosm.hal.sensors.proximity" >
-    <priority value ="debug" />
+    <priority value ="trace" />
   </category>
   <category name="cosm.hal.sensors.env" >
     <priority value ="trace" />

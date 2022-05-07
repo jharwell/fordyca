@@ -1,7 +1,7 @@
 /**
- * \file strategy_config.hpp
+ * \file nest_config.hpp
  *
- * \copyright 2021 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -23,13 +23,12 @@
 /*******************************************************************************
   * Includes
 ******************************************************************************/
-#include <string>
-
 #include "rcppsw/config/base_config.hpp"
 
-#include "fordyca/strategy/config/blocks_config.hpp"
-#include "fordyca/strategy/config/caches_config.hpp"
-#include "fordyca/strategy/config/nest_config.hpp"
+#include "cosm/spatial/strategy/nest/config/acq_config.hpp"
+#include "cosm/spatial/strategy/nest/config/exit_config.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
   * Namespaces
@@ -40,18 +39,15 @@ NS_START(fordyca, strategy, config);
   * Structure Definitions
 ******************************************************************************/
 /**
-  * \struct strategy_config
+  * \struct nest_config
   * \ingroup strategy config
   *
-  * \brief Configuration for different strategies that can be employed by
-  * robots for doing things like exploring, collision avoidance, etc.
+  * \brief Configuration for strategies related to things robots can do related
+  * to the nest while foraging.
   */
-struct strategy_config final : public rconfig::base_config {
-  /* clang-format off */
-  nest_config   nest{};
-  blocks_config blocks{};
-  caches_config caches{};
-  /* clang-format on */
+struct nest_config final : public rconfig::base_config {
+  cssnest::config::acq_config acq{};
+  cssnest::config::exit_config exit{};
 };
 
 NS_END(config, strategy, fordyca);

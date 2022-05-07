@@ -66,8 +66,7 @@ class dpo_fsm final : public cffsm::foraging_util_hfsm,
  public:
   dpo_fsm(const fsm_ro_params* c_ro,
           const csfsm::fsm_params* c_no,
-          std::unique_ptr<cssexplore::base_explore> explore,
-          std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
+          cffsm::strategy_set strategies,
           rmath::rng* rng);
   ~dpo_fsm(void) override = default;
   dpo_fsm(const dpo_fsm&) = delete;
@@ -146,4 +145,3 @@ class dpo_fsm final : public cffsm::foraging_util_hfsm,
 };
 
 NS_END(d0, fsm, fordyca);
-

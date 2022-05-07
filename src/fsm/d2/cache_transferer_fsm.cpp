@@ -23,9 +23,6 @@
  ******************************************************************************/
 #include "fordyca/fsm/d2/cache_transferer_fsm.hpp"
 
-#include "cosm/spatial/strategy/nest_acq/base_nest_acq.hpp"
-#include "cosm/spatial/strategy/blocks/drop/base_drop.hpp"
-
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 
 /*******************************************************************************
@@ -39,11 +36,11 @@ NS_START(fordyca, fsm, d2);
 cache_transferer_fsm::cache_transferer_fsm(
     const fsm_ro_params* c_ro,
     const csfsm::fsm_params* c_no,
-    std::unique_ptr<cssexplore::base_explore> explore,
+    cffsm::strategy_set strategies,
     rmath::rng* rng)
     : block_to_goal_fsm(&m_dest_cache_fsm, &m_src_cache_fsm, c_no, rng),
-      m_src_cache_fsm(c_ro, c_no, explore->clone(), rng, true),
-      m_dest_cache_fsm(c_ro, c_no, explore->clone(), rng, false) {}
+      m_src_cache_fsm(c_ro, c_no, strategies.explore->clone(), rng, true),
+      m_dest_cache_fsm(c_ro, c_no, strategies.explore->clone(), rng, false) {}
 
 /*******************************************************************************
  * Block Acquisition Metrics

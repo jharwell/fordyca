@@ -58,12 +58,10 @@ class free_block_to_nest_fsm final : public cffsm::foraging_util_hfsm,
                                      public cfsm::block_transporter<foraging_transport_goal>,
                                      public cta::taskable {
  public:
-  free_block_to_nest_fsm(
-      const fsm_ro_params* c_ro,
-      const csfsm::fsm_params* c_no,
-      std::unique_ptr<cssexplore::base_explore> explore,
-      std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
-      rmath::rng* rng);
+  free_block_to_nest_fsm(const fsm_ro_params* c_ro,
+                         const csfsm::fsm_params* c_no,
+                         cffsm::strategy_set strategies,
+                         rmath::rng* rng);
 
   free_block_to_nest_fsm(const free_block_to_nest_fsm&) = delete;
   free_block_to_nest_fsm& operator=(const free_block_to_nest_fsm&) = delete;
