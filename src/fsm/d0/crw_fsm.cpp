@@ -27,9 +27,6 @@
 #include "cosm/subsystem/actuation_subsystem2D.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/subsystem/sensing_subsystemQ3D.hpp"
-#include "cosm/spatial/strategy/nest_acq/base_nest_acq.hpp"
-#include "cosm/spatial/strategy/blocks/drop/base_drop.hpp"
-
 
 #include "fordyca/fsm/foraging_signal.hpp"
 
@@ -42,14 +39,11 @@ NS_START(fordyca, fsm, d0);
  * Constructors/Destructors
  ******************************************************************************/
 crw_fsm::crw_fsm(const csfsm::fsm_params* params,
-                 std::unique_ptr<cssexplore::base_explore> explore,
-                 std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
-                 std::unique_ptr<cssblocks::drop::base_drop> block_drop,
+                 cffsm::strategy_set strategies,
                  const rmath::vector2d& nest_loc,
                  rmath::rng* rng)
     : foraging_util_hfsm(params,
-                         std::move(nest_acq),
-                         std::move(block_drop),
+                         std::move(strategies),
                          rng,
                          ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.d0.crw"),
@@ -87,7 +81,7 @@ crw_fsm::crw_fsm(const csfsm::fsm_params* params,
                                              &exit_drop_carried_block)),
       mc_nest_loc(nest_loc),
       m_explore_fsm(params,
-                    std::move(explore),
+                    std::move(foraging_util_hfsm::strategies().explore),
                     rng,
                     std::bind(&crw_fsm::block_detected, this)) {}
 
@@ -165,7 +159,7 @@ RCPPSW_HFSM_STATE_DEFINE(crw_fsm,
 
   if (ffsm::foraging_signal::ekBLOCK_DROP == data->signal()) {
     m_explore_fsm.task_reset();
-    ER_INFO("Block drop signal received");
+    ER_INFO("Block drop signal  received");
     internal_event(ekST_DROP_CARRIED_BLOCK);
   }
   return fsm::foraging_signal::ekHANDLED;

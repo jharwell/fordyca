@@ -25,7 +25,9 @@
 
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/spatial/strategy/blocks/drop/base_drop.hpp"
-#include "cosm/spatial/strategy/nest_acq/base_nest_acq.hpp"
+#include "cosm/spatial/strategy/nest/acq/base_acq.hpp"
+#include "cosm/spatial/strategy/nest/exit/base_exit.hpp"
+#include "cosm/spatial/strategy/explore/base_explore.hpp"
 
 #include "fordyca/fsm/foraging_signal.hpp"
 #include "fordyca/strategy/foraging_strategy.hpp"
@@ -40,10 +42,12 @@ NS_START(fordyca, fsm, d0);
  ******************************************************************************/
 dpo_fsm::dpo_fsm(const fsm_ro_params* c_ro,
                  const csfsm::fsm_params* c_no,
-                 std::unique_ptr<cssexplore::base_explore> explore,
-                 std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
+                 cffsm::strategy_set strategies,
                  rmath::rng* rng)
-    : foraging_util_hfsm(c_no, nullptr, nullptr, rng, ekST_MAX_STATES),
+    : foraging_util_hfsm(c_no,
+                         std::move(strategies),
+                         rng,
+                         ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.d0.dpo"),
       RCPPSW_HFSM_CONSTRUCT_STATE(leaving_nest, &start),
       RCPPSW_HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
@@ -56,7 +60,14 @@ dpo_fsm::dpo_fsm(const fsm_ro_params* c_ro,
                                              nullptr,
                                              &entry_leaving_nest,
                                              nullptr)),
-      m_block_fsm(c_ro, c_no, std::move(explore), std::move(nest_acq), rng) {
+      m_block_fsm(c_ro,
+                  c_no,
+                  cffsm::strategy_set(
+                      std::move(foraging_util_hfsm::strategies().explore),
+                      std::move(foraging_util_hfsm::strategies().nest_acq),
+                      nullptr,
+                      nullptr),
+                  rng) {
   hfsm::change_parent(ekST_LEAVING_NEST, &start);
 }
 

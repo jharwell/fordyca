@@ -214,10 +214,7 @@ int bitd_dpo_controller::current_task_depth(void) const {
 } /* current_task_depth() */
 
 int bitd_dpo_controller::current_task_id(void) const {
-  if (nullptr != executive()->current_task()) {
-    return executive()->graph()->vertex_id(executive()->current_task());
-  }
-  return -1;
+  return executive()->graph()->vertex_id(executive()->current_task());
 } /* current_task_id() */
 
 int bitd_dpo_controller::task_id(const std::string& task_name) const {

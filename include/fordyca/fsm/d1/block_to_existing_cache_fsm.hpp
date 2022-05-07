@@ -83,4 +83,3 @@ class block_to_existing_cache_fsm final : public block_to_goal_fsm {
 };
 
 NS_END(d1, fsm, fordyca);
-

@@ -29,14 +29,15 @@
 #include "cosm/arena/repr/light_type_index.hpp"
 #include "cosm/ds/cell2D.hpp"
 #include "cosm/repr/base_block3D.hpp"
-#include "cosm/spatial/strategy/nest_acq/factory.hpp"
+#include "cosm/spatial/strategy/nest/acq/factory.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/ta/bi_tdgraph_allocator.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/config/task_alloc_config.hpp"
 #include "cosm/ta/config/task_executive_config.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
-#include "cosm/spatial/strategy/blocks/drop/base_drop.hpp"
+#include "cosm/spatial/strategy/nest/exit/factory.hpp"
+#include "cosm/spatial/strategy/blocks/drop/factory.hpp"
 
 #include "fordyca/controller/config/d1/controller_repository.hpp"
 #include "fordyca/fsm/d0/dpo_fsm.hpp"
@@ -114,9 +115,11 @@ task_executive_builder::tasking_map task_executive_builder::d1_tasks_create(
   ER_ASSERT(nullptr != mc_bsel_matrix, "NULL block selection matrix");
   ER_ASSERT(nullptr != mc_csel_matrix, "NULL cache selection matrix");
 
-  fsexplore::block_factory block_factory;
-  fsexplore::cache_factory cache_factory;
-  csstrategy::nest_acq::factory nest_acq_factory;
+  fsexplore::block_factory block_search_factory;
+  fsexplore::cache_factory cache_search_factory;
+  cssnest::acq::factory nest_acq_factory;
+  cssnest::exit::factory nest_exit_factory;
+  cssblocks::drop::factory block_drop_factory;
 
   fsm::fsm_ro_params ro_params = { .bsel_matrix = block_sel_matrix(),
                                    .csel_matrix = mc_csel_matrix,
@@ -125,25 +128,50 @@ task_executive_builder::tasking_map task_executive_builder::d1_tasks_create(
                                    .accessor = m_perception->known_objects(),
                                    .strategy = *strat_config };
 
+  cffsm::strategy_set generalist_strategies = {
+    .explore = block_search_factory.create(strat_config->blocks.explore.strategy,
+                                    &strategy_blockp,
+                                    rng),
+    .nest_acq = nest_acq_factory.create(strat_config->nest.acq.strategy,
+                                        &strat_config->nest.acq,
+                                        &fsm_params,
+                                        rng),
+    .nest_exit = nest_exit_factory.create(strat_config->nest.exit.strategy,
+                                         &strat_config->nest.exit,
+                                         &fsm_params,
+                                         rng),
+    .block_drop = block_drop_factory.create(strat_config->blocks.drop.strategy,
+                                            &fsm_params,
+                                            &strat_config->blocks.drop,
+                                            rng),
+  };
   auto generalist_fsm = std::make_unique<fsm::d0::free_block_to_nest_fsm>(
       &ro_params,
       &fsm_params,
-      block_factory.create(
-          strat_config->blocks.explore.strategy, &strategy_blockp, rng),
-      nest_acq_factory.create(strat_config->nest_acq.strategy,
-                              &strat_config->nest_acq,
-                              &fsm_params,
-                              rng),
+      std::move(generalist_strategies),
       rng);
+
+  cffsm::strategy_set collector_strategies = {
+    .explore = cache_search_factory.create(strat_config->caches.explore.strategy,
+                                           &strategy_cachep,
+                                           rng),
+    .nest_acq = nest_acq_factory.create(strat_config->nest.acq.strategy,
+                                        &strat_config->nest.acq,
+                                        &fsm_params,
+                                        rng),
+    .nest_exit = nest_exit_factory.create(strat_config->nest.exit.strategy,
+                                          &strat_config->nest.exit,
+                                          &fsm_params,
+                                          rng),
+    .block_drop = block_drop_factory.create(strat_config->blocks.drop.strategy,
+                                            &fsm_params,
+                                            &strat_config->blocks.drop,
+                                            rng),
+  };
   auto collector_fsm = std::make_unique<fsm::d1::cached_block_to_nest_fsm>(
       &ro_params,
       &fsm_params,
-      cache_factory.create(
-          strat_config->caches.explore.strategy, &strategy_cachep, rng),
-      nest_acq_factory.create(strat_config->nest_acq.strategy,
-                              &strat_config->nest_acq,
-                              &fsm_params,
-                              rng),
+      std::move(collector_strategies),
       rng);
 
   auto harvester_fsm = std::make_unique<fsm::d1::block_to_existing_cache_fsm>(

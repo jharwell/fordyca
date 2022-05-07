@@ -166,4 +166,3 @@ class d2_loop_functions final : public d1::d1_loop_functions,
 };
 
 NS_END(d2, support, argos, fordyca);
-

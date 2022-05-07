@@ -147,7 +147,7 @@ csubsystem::sensing_subsystemQ3D::sensor_map static sensing_init(
   auto light2 = chrsensors::light_sensor(robot_ns);
 
   auto sonar = chrsensors::sonar_sensor(robot_ns, &sensing->sonar);
-  auto lidar = chrsensors::lidar_sensor(robot_ns);
+  auto lidar = chrsensors::lidar_sensor(robot_ns, &sensing->proximity);
   auto proximity = chsensors::proximity_sensor(robot_ns, &sensing->proximity);
   auto odometry = chrsensors::odometry_sensor(robot_ns);
   auto env_impl = chrsensors::env_sensor(std::move(sonar), std::move(light1));

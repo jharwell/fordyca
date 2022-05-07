@@ -88,4 +88,3 @@ class birtd_dpo_controller : public d1::bitd_dpo_controller,
 };
 
 NS_END(cognitive, d2, controller, fordyca);
-

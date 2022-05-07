@@ -58,7 +58,7 @@ class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
  public:
   acquire_free_block_fsm(const fsm_ro_params* c_ro,
                          const csfsm::fsm_params* c_no,
-                         std::unique_ptr<cssexplore::base_explore> behavior,
+                         std::unique_ptr<cssexplore::base_explore> exp_behavior,
                          rmath::rng* rng);
 
   ~acquire_free_block_fsm(void) override = default;
