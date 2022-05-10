@@ -27,19 +27,18 @@
 #include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
-
 #include "fordyca/controller/cognitive/d2/birtd_dpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_odpo_controller.hpp"
 #include "fordyca/controller/cognitive/d2/birtd_omdpo_controller.hpp"
-#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
-#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
-#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
-#include "fordyca/fsm/block_to_goal_fsm.hpp"
-#include "fordyca/fsm/foraging_signal.hpp"
-#include "fordyca/tasks/d2/foraging_task.hpp"
-#include "fordyca/fsm/d1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
+#include "fordyca/fsm/block_to_goal_fsm.hpp"
+#include "fordyca/fsm/d1/cached_block_to_nest_fsm.hpp"
+#include "fordyca/fsm/foraging_signal.hpp"
+#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
+#include "fordyca/tasks/d2/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,7 +55,8 @@ cached_block_pickup::cached_block_pickup(const carepr::arena_cache* cache,
                                          crepr::base_block3D* block,
                                          const rtypes::type_uuid& id,
                                          const rtypes::timestep& t)
-    : ER_CLIENT_INIT("fordyca.controller.cognitive.d2.events.cached_block_pickup"),
+    : ER_CLIENT_INIT("fordyca.controller.cognitive.d2.events.cached_block_"
+                     "pickup"),
       base_pickup(cache, block, id, t) {}
 
 cached_block_pickup::~cached_block_pickup(void) = default;
@@ -67,11 +67,12 @@ cached_block_pickup::~cached_block_pickup(void) = default;
 void cached_block_pickup::visit(fccd2::birtd_dpo_controller& controller) {
   controller.ndc_uuid_push();
 
-  base_pickup::visit(*controller.perception()->model<fspds::dpo_semantic_map>());
-  base_pickup::visit(static_cast<ccontroller::block_carrying_controller&>(controller));
+  base_pickup::visit(*controller.perception()->model<fspds::dpo_store>());
+  base_pickup::visit(
+      static_cast<ccontroller::block_carrying_controller&>(controller));
 
   if (dispatch_cache_interactor(controller.current_task(),
-                                   controller.cache_sel_matrix())) {
+                                controller.cache_sel_matrix())) {
     controller.csel_exception_added(true);
   }
 
@@ -82,10 +83,11 @@ void cached_block_pickup::visit(fccd2::birtd_mdpo_controller& controller) {
   controller.ndc_uuid_push();
 
   base_pickup::visit(*controller.perception()->model<fspds::dpo_semantic_map>());
-  base_pickup::visit(static_cast<ccontroller::block_carrying_controller&>(controller));
+  base_pickup::visit(
+      static_cast<ccontroller::block_carrying_controller&>(controller));
 
   if (dispatch_cache_interactor(controller.current_task(),
-                                   controller.cache_sel_matrix())) {
+                                controller.cache_sel_matrix())) {
     controller.csel_exception_added(true);
   }
   controller.ndc_uuid_pop();
@@ -95,10 +97,11 @@ void cached_block_pickup::visit(fccd2::birtd_odpo_controller& controller) {
   controller.ndc_uuid_push();
 
   base_pickup::visit(*controller.perception()->model<fspds::dpo_store>());
-  base_pickup::visit(static_cast<ccontroller::block_carrying_controller&>(controller));
+  base_pickup::visit(
+      static_cast<ccontroller::block_carrying_controller&>(controller));
 
   if (dispatch_cache_interactor(controller.current_task(),
-                                   controller.cache_sel_matrix())) {
+                                controller.cache_sel_matrix())) {
     controller.csel_exception_added(true);
   }
 
@@ -109,10 +112,11 @@ void cached_block_pickup::visit(fccd2::birtd_omdpo_controller& controller) {
   controller.ndc_uuid_push();
 
   base_pickup::visit(*controller.perception()->model<fspds::dpo_semantic_map>());
-  base_pickup::visit(static_cast<ccontroller::block_carrying_controller&>(controller));
+  base_pickup::visit(
+      static_cast<ccontroller::block_carrying_controller&>(controller));
 
   if (dispatch_cache_interactor(controller.current_task(),
-                                   controller.cache_sel_matrix())) {
+                                controller.cache_sel_matrix())) {
     controller.csel_exception_added(true);
   }
   controller.ndc_uuid_pop();
