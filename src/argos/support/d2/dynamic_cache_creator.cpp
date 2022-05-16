@@ -44,7 +44,7 @@ NS_START(fordyca, argos, support, d2);
 dynamic_cache_creator::dynamic_cache_creator(const params* const p,
                                              rmath::rng* rng)
     : base_creator(p->map, p->cache_dim),
-      ER_CLIENT_INIT("fordyca.support.d2.dynamic_cache_creator"),
+      ER_CLIENT_INIT("fordyca.argos.support.d2.dynamic_cache_creator"),
       mc_min_blocks(p->min_blocks),
       mc_min_dist(p->min_dist),
       mc_strict_constraints(p->strict_constraints),
@@ -96,8 +96,9 @@ dynamic_cache_creator::create_all(const fascaches::create_ro_params& c_params,
                      [&](const auto& c) { return c.get(); });
       sanity_caches.push_back(cache_i.cache.get());
 
-      auto verifier =
-          fascaches::creation_verifier(m_map, cache_dim(), mc_strict_constraints);
+      auto verifier = fascaches::creation_verifier(m_map,
+                                                   cache_dim(),
+                                                   mc_strict_constraints);
       if (!verifier.verify_single(cache_i.cache.get(),
                                   sanity_caches,
                                   all_blocks,
@@ -250,9 +251,15 @@ cads::acache_vectorno dynamic_cache_creator::avoidance_caches_calc(
 } /* avoidance_caches_calc() */
 
 void dynamic_cache_creator::cache_delete(const cache_i_result& cache_i) {
-  ER_INFO("Delete created cache%d", cache_i.cache->id().v());
+  ER_INFO("Delete (badly) created cache%d", cache_i.cache->id().v());
 
-  /* clear out all cache host cell AND cells that were in CACHE_EXTENT */
+  /*
+   * Clear out cache host cell. Note that we STILL need to clear the
+   * CACHE_EXTENT, even though that is only set upon successful creation. If
+   * this function is called as a result of a cache being created with a bad
+   * center, then just clearing the "center" cell is not guaranteed to reset the
+   * arena to a good state--we need to clear all cache extent cells.
+   */
   events::cell2D_empty_visitor hc(cache_i.cache->dcenter2D());
   caops::cache_extent_clear_visitor ec(cache_i.cache.get());
 

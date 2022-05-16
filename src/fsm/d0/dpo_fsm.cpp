@@ -59,7 +59,7 @@ dpo_fsm::dpo_fsm(const fsm_ro_params* c_ro,
           RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest,
                                              nullptr,
                                              &entry_leaving_nest,
-                                             nullptr)),
+                                             &exit_leaving_nest)),
       m_block_fsm(c_ro,
                   c_no,
                   cffsm::strategy_set(

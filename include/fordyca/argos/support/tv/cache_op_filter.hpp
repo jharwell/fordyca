@@ -51,7 +51,8 @@ NS_START(fordyca, argos, support, tv);
 class cache_op_filter : public rer::client<cache_op_filter> {
  public:
   explicit cache_op_filter(const carena::caching_arena_map* const map)
-      : ER_CLIENT_INIT("fordyca.support.tv.cache_op_filter"), mc_map(map) {}
+      : ER_CLIENT_INIT("fordyca.argos.support.tv.cache_op_filter"),
+        mc_map(map) {}
 
   ~cache_op_filter(void) override = default;
   cache_op_filter& operator=(const cache_op_filter&) = delete;

@@ -40,7 +40,7 @@ static_cache_creator::static_cache_creator(
     const std::vector<rmath::vector2d>& centers,
     const rtypes::spatial_dist& cache_dim)
     : base_creator(map, cache_dim),
-      ER_CLIENT_INIT("fordyca.support.d1.static_cache_creator"),
+      ER_CLIENT_INIT("fordyca.argos.support.d1.static_cache_creator"),
       mc_centers(centers) {}
 
 /*******************************************************************************

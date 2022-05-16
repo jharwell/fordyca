@@ -29,6 +29,7 @@
 
 #include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/repr/sim_block3D.hpp"
+#include "cosm/spatial/dimension_checker.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -141,5 +142,35 @@ void base_manager::bloctree_update(const cads::acache_vectoro& caches) {
 
   m_map->created_caches_clear();
 } /* bloctree_update() */
+
+rtypes::spatial_dist base_manager::cache_dim_calc(void) const {
+  using checker = cspatial::dimension_checker;
+
+  /*
+   * Depending on floating point rounding errors, the value we are holding from
+   * parsed XML configuration might be such that when converted to an integer
+   * grid index, we get a dimension one less than we intend. This function makes
+   * sure that doesn't happen.
+   */
+  auto even_multiple = checker::even_multiple(arena_map()->grid_resolution(),
+                                              config()->dimension);
+  ER_ASSERT(rmath::is_multiple_of(even_multiple.v(),
+                                  arena_map()->grid_resolution().v()),
+            "Cache dimension not a multiple of grid resolution: %.12f %% %.12f != 0",
+            even_multiple.v(),
+            arena_map()->grid_resolution().v());
+
+  auto odd_dsize = checker::odd_dsize(arena_map()->grid_resolution(),
+                                      even_multiple);
+
+  /* Caches must be odd in X,Y so the center is well defined */
+  auto int_dim = static_cast<int>(odd_dsize.v() / arena_map()->grid_resolution().v());
+  ER_ASSERT(RCPPSW_IS_ODD(int_dim),
+            "Cache dimension has no defined center: %.12f/%.12f=%d is even",
+            odd_dsize.v(),
+            arena_map()->grid_resolution().v(),
+            int_dim);
+  return odd_dsize;
+} /* cache_dim_calc() */
 
 NS_END(caches, support, argos, fordyca);

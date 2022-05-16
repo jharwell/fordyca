@@ -75,4 +75,3 @@ class static_cache_creator : public fascaches::base_creator,
 };
 
 NS_END(d1, support, argos, fordyca);
-

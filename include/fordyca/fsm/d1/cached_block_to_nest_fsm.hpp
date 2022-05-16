@@ -180,6 +180,7 @@ class cached_block_to_nest_fsm final : public cffsm::foraging_util_hfsm,
   RCPPSW_HFSM_ENTRY_INHERIT_ND(csfsm::util_hfsm, entry_wait_for_signal);
 
   RCPPSW_HFSM_EXIT_INHERIT(cffsm::foraging_util_hfsm, exit_transport_to_nest);
+  RCPPSW_HFSM_EXIT_INHERIT(cffsm::foraging_util_hfsm, exit_leaving_nest);
 
   /* foraging states */
   RCPPSW_HFSM_STATE_DECLARE(cached_block_to_nest_fsm, start, rpfsm::event_data);

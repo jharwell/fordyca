@@ -56,7 +56,7 @@ class block_op_penalty_handler final : public ctv::temporal_penalty_handler,
                            const ctv::config::temporal_penalty_config* const config,
                            const std::string& name)
       : temporal_penalty_handler(config, name),
-        ER_CLIENT_INIT("fordyca.support.tv.block_op_penalty_handler"),
+        ER_CLIENT_INIT("fordyca.argos.support.tv.block_op_penalty_handler"),
         m_map(map),
         m_filter(m_map),
         m_id_calc(m_map) {}
