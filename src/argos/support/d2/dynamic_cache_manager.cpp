@@ -26,7 +26,6 @@
 #include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/foraging/repr/block_cluster.hpp"
 #include "cosm/repr/sim_block3D.hpp"
-#include "cosm/spatial/dimension_checker.hpp"
 
 #include "fordyca/argos/support/d2/dynamic_cache_creator.hpp"
 #include "fordyca/events/cell2D_empty.hpp"
@@ -44,7 +43,7 @@ dynamic_cache_manager::dynamic_cache_manager(
     carena::caching_arena_map* arena_map,
     rmath::rng* rng)
     : base_manager(config, arena_map),
-      ER_CLIENT_INIT("fordyca.support.d2.dynamic_cache_manager"),
+      ER_CLIENT_INIT("fordyca.argos.support.d2.dynamic_cache_manager"),
       m_rng(rng),
       m_map(arena_map) {}
 
@@ -70,15 +69,9 @@ dynamic_cache_manager::create(const fascaches::create_ro_params& c_params,
                                                 c_params.clusters,
                                                 usable_cb,
                                                 absorbable_cb)) {
-    using checker = cspatial::dimension_checker;
-    auto even_multiple = checker::even_multiple(arena_map()->grid_resolution(),
-                                                config()->dimension);
-    auto odd_dsize =
-        checker::odd_dsize(arena_map()->grid_resolution(), even_multiple);
-
     support::d2::dynamic_cache_creator::params params = {
       .map = m_map,
-      .cache_dim = odd_dsize,
+      .cache_dim = cache_dim_calc(),
       .min_dist = config()->dynamic.min_dist,
       .min_blocks = config()->dynamic.min_blocks,
       .strict_constraints = config()->strict_constraints

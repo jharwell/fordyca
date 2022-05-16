@@ -116,6 +116,17 @@ class base_manager : public fmetrics::caches::lifecycle_metrics,
                                    const cads::acache_vectorno& c_existing_caches) const;
 
   /**
+   * \brief Calculate the run-time size of the cache from configuration.
+   *
+   *
+   * The calculated value must be:
+   *
+   * - An odd multiple of the  \ref base_arena_map grid resolution so that
+   *   caches have an unambiguous center.
+   */
+  rtypes::spatial_dist cache_dim_calc(void) const;
+
+  /**
    * \brief Check the dimension that a derived class wants to use to create
    * caches with, and modify it if necessary.
    *

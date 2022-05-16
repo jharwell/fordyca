@@ -121,6 +121,7 @@ class dpo_fsm final : public cffsm::foraging_util_hfsm,
   RCPPSW_HFSM_STATE_INHERIT(cffsm::foraging_util_hfsm, leaving_nest,
                      rpfsm::event_data);
   RCPPSW_HFSM_ENTRY_INHERIT_ND(cffsm::foraging_util_hfsm, entry_leaving_nest);
+  RCPPSW_HFSM_EXIT_INHERIT(cffsm::foraging_util_hfsm, exit_leaving_nest);
 
   /* foraging states */
   RCPPSW_HFSM_STATE_DECLARE(dpo_fsm, start, rpfsm::event_data);

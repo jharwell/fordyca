@@ -58,7 +58,7 @@ NS_START(fordyca, argos, support, tv);
 class block_op_filter : public rer::client<block_op_filter> {
  public:
   explicit block_op_filter(const carena::caching_arena_map* const map)
-      : ER_CLIENT_INIT("fordyca.support.tv.block_op_filter"),
+      : ER_CLIENT_INIT("fordyca.argos.support.tv.block_op_filter"),
         mc_map(map) {}
 
   ~block_op_filter(void) override = default;

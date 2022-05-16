@@ -67,14 +67,8 @@ class free_block_pickup_interactor final
 
  private:
   bool robot_goal_acquired(const TController& controller) const override {
-    /*
-     * Don't let robots pick up blocks when are avoiding collision. This
-     * prevents robots from mistaking another robot as a block if it gets REALLY
-     * close.
-     */
     return controller.goal_acquired() &&
-        fsm::foraging_acq_goal::ekBLOCK == controller.acquisition_goal() &&
-        !controller.inta_tracker()->exp_interference();
+        fsm::foraging_acq_goal::ekBLOCK == controller.acquisition_goal();
   }
 
   void robot_previsit_hook(TController& controller) const override {

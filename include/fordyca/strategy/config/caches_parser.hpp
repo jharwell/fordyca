@@ -62,7 +62,7 @@ class caches_parser final : public rer::client<caches_parser>,
   static inline const std::string kXMLRoot = "caches";
 
   void parse(const ticpp::Element& node) override;
-  bool validate(void) const override RCPPSW_ATTR(pure, cold);
+  bool validate(void) const override RCPPSW_ATTR(const, cold);
 
   RCPPSW_COLD std::string xml_root(void) const override { return kXMLRoot; }
 

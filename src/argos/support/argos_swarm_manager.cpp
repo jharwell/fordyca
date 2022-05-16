@@ -51,7 +51,7 @@ NS_START(fordyca, argos, support);
  * Constructors/Destructors
  ******************************************************************************/
 argos_swarm_manager::argos_swarm_manager(void)
-    : ER_CLIENT_INIT("fordyca.support.argos_swarm_manager"),
+    : ER_CLIENT_INIT("fordyca.argos.support.argos_swarm_manager"),
       m_tv_manager(nullptr),
       m_conv_calc(nullptr),
       m_oracle(nullptr) {}

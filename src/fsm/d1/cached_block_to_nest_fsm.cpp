@@ -76,7 +76,7 @@ cached_block_to_nest_fsm::cached_block_to_nest_fsm(
           RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest,
                                              nullptr,
                                              &entry_leaving_nest,
-                                             nullptr),
+                                             &exit_leaving_nest),
           RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&finished)),
       mc_nest_loc(std::get<rmath::vector2d>(
           c_ro->csel_matrix->find(csel_matrix::kNestLoc)->second)),
