@@ -63,7 +63,7 @@ class blocks_parser final : public rer::client<blocks_parser>,
   static inline const std::string kXMLRoot = "blocks";
 
   void parse(const ticpp::Element& node) override;
-  bool validate(void) const override RCPPSW_ATTR(pure, cold);
+  bool validate(void) const override RCPPSW_ATTR(const, cold);
 
   RCPPSW_COLD std::string xml_root(void) const override { return kXMLRoot; }
 

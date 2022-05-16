@@ -29,7 +29,6 @@
 #include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/repr/sim_block3D.hpp"
 #include "cosm/spatial/conflict_checker.hpp"
-#include "cosm/spatial/dimension_checker.hpp"
 
 #include "fordyca/argos/support/caches/creation_verifier.hpp"
 #include "fordyca/argos/support/d1/static_cache_creator.hpp"
@@ -49,7 +48,7 @@ static_cache_manager::static_cache_manager(
     const std::vector<rmath::vector2d>& cache_locs,
     rmath::rng* rng)
     : base_manager(config, map),
-      ER_CLIENT_INIT("fordyca.support.d1.static_cache_manager"),
+      ER_CLIENT_INIT("fordyca.argos.support.d1.static_cache_manager"),
       mc_cache_locs(cache_locs),
       m_rng(rng) {}
 
@@ -82,17 +81,13 @@ static_cache_manager::create(const fascaches::create_ro_params& c_params,
                                                 c_params.clusters,
                                                 usable_cb,
                                                 absorbable_cb)) {
-    auto allocated = blocks_alloc(for_creation->usable, for_creation->absorbable);
+    auto allocated = blocks_alloc(for_creation->usable,
+                                  for_creation->absorbable);
 
     /* (re)-create the caches */
-    using checker = cspatial::dimension_checker;
-    auto even_multiple = checker::even_multiple(arena_map()->grid_resolution(),
-                                                config()->dimension);
-
-    auto odd_dsize =
-        checker::odd_dsize(arena_map()->grid_resolution(), even_multiple);
-
+    auto odd_dsize = cache_dim_calc();
     static_cache_creator creator(arena_map(), mc_cache_locs, odd_dsize);
+
 
     auto res = creator.create_all(c_params, std::move(allocated), initial);
 
@@ -112,10 +107,12 @@ static_cache_manager::create(const fascaches::create_ro_params& c_params,
         carena::free_blocks_calculator(initial)(c_all_blocks, sanity_caches);
     auto verifier = fascaches::creation_verifier(
         arena_map(), odd_dsize, config()->strict_constraints);
-    ER_ASSERT(
-        verifier.sanity_checks(
-            sanity_caches, free_blocks, c_params.clusters, arena_map()->nests()),
-        "One or more caches failed verification");
+
+    auto sanity_ok = verifier.sanity_checks(sanity_caches,
+                                            free_blocks,
+                                            c_params.clusters,
+                                            arena_map()->nests());
+    ER_ASSERT(sanity_ok, "One or more caches failed verification");
 
     caches_created(res.created.size());
     caches_discarded(res.n_discarded);

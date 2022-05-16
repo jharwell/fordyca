@@ -41,7 +41,7 @@ NS_START(fordyca, argos, support, caches);
 creation_verifier::creation_verifier(carena::caching_arena_map* const map,
                                      const rtypes::spatial_dist& cache_dim,
                                      bool strict_constraints)
-    : ER_CLIENT_INIT("fordyca.support.creation_verifier"),
+    : ER_CLIENT_INIT("fordyca.argos.support.creation_verifier"),
       mc_cache_dim(cache_dim),
       mc_strict_constraints(strict_constraints),
       m_map(map) {}
@@ -49,7 +49,6 @@ creation_verifier::creation_verifier(carena::caching_arena_map* const map,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-
 bool creation_verifier::verify_single(
     RCPPSW_UNUSED const carepr::arena_cache* cache,
     const cads::acache_vectorro& c_caches,
@@ -88,6 +87,22 @@ bool creation_verifier::sanity_checks(
     const cds::block3D_vectorno& c_free_blocks,
     const cfds::block3D_cluster_vectorro& c_clusters,
     const cads::nest_vectorro& c_nests) const {
+
+  for (const auto &c : c_caches) {
+    ER_CHECK(RCPPSW_IS_ODD(c->ddims2D().x()),
+             "Cache%d@%s/%s does not have a defined center in X: size=%zu",
+             c->id().v(),
+             rcppsw::to_string(c->rcenter2D()).c_str(),
+             rcppsw::to_string(c->dcenter2D()).c_str(),
+             c->ddims2D().x());
+    ER_CHECK(RCPPSW_IS_ODD(c->ddims2D().y()),
+             "Cache%d@%s/%s does not have a defined center in Y: size=%zu",
+             c->id().v(),
+             rcppsw::to_string(c->rcenter2D()).c_str(),
+             rcppsw::to_string(c->dcenter2D()).c_str(),
+             c->ddims2D().x());
+  } /* for->id(&..) */
+
   for (const auto& c : c_caches) {
     ER_CHECK(sanity_check_internal_consistency(c),
              "Cache%d@%s/%s not internally consistent",
