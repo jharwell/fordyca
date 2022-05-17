@@ -101,6 +101,11 @@ class generalist final : public rer::client<generalist>,
                             const);
   bool is_phototaxiing_to_goal(bool include_ca) const override RCPPSW_PURE;
 
+  /* block carrying */
+  RCPPSW_WRAP_DECL_OVERRIDE(const cssblocks::drop::base_drop*,
+                            block_drop_strategy,
+                            const);
+
   /* task metrics */
   bool task_at_interface(void) const override { return false; }
   bool task_completed(void) const override { return task_finished(); }
@@ -117,4 +122,3 @@ class generalist final : public rer::client<generalist>,
 };
 
 NS_END(d0, tasks, fordyca);
-

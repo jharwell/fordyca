@@ -242,24 +242,6 @@ foraging_controller::~foraging_controller(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool foraging_controller::block_detect(const ccontroller::block_detect_context& context) {
-  switch (context) {
-    case ccontroller::block_detect_context::ekROBOT:
-      {
-        if (in_nest()) {
-          return false;
-        } else {
-          return saa()->sensing()->env()->detect("block");
-        }
-      }
-    case ccontroller::block_detect_context::ekARENA:
-      return m_block_detect_status;
-    default:
-      ER_FATAL_SENTINEL("Bad context value: %d",
-                        rcppsw::as_underlying(context));
-  } /* switch() */
-} /* block_detect() */
-
 void foraging_controller::init(ticpp::Element& node) {
   /* verify environment variables set up for logging */
   ER_ENV_VERIFY();
@@ -395,6 +377,27 @@ rmath::vector3d foraging_controller::ts_velocity(
   }
   return {};
 } /* ts_velocity() */
+
+/*******************************************************************************
+ * Block Carrying Controller Metrics
+ ******************************************************************************/
+bool foraging_controller::block_detect(const ccontroller::block_detect_context& context) {
+  switch (context) {
+    case ccontroller::block_detect_context::ekROBOT:
+      {
+        if (in_nest()) {
+          return false;
+        } else {
+          return saa()->sensing()->env()->detect("block");
+        }
+      }
+    case ccontroller::block_detect_context::ekARENA:
+      return m_block_detect_status;
+    default:
+      ER_FATAL_SENTINEL("Bad context value: %d",
+                        rcppsw::as_underlying(context));
+  } /* switch() */
+} /* block_detect() */
 
 /*******************************************************************************
  * Nest Zone Metrics

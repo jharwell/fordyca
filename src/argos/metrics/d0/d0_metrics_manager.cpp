@@ -162,14 +162,14 @@ void d0_metrics_manager::collect_from_cognitive_controller(
  * Template Instantiations
  ******************************************************************************/
 template void d0_metrics_manager::collect_from_controller(
-    const controller::reactive::d0::crw_controller* const c);
+    const fcrd0::crw_controller* const c);
 template void d0_metrics_manager::collect_from_controller(
-    const controller::cognitive::d0::dpo_controller* const c);
+    const fccd0::dpo_controller* const c);
 template void d0_metrics_manager::collect_from_controller(
-    const controller::cognitive::d0::mdpo_controller* const c);
+    const fccd0::mdpo_controller* const c);
 template void d0_metrics_manager::collect_from_controller(
-    const controller::cognitive::d0::odpo_controller* const c);
+    const fccd0::odpo_controller* const c);
 template void d0_metrics_manager::collect_from_controller(
-    const controller::cognitive::d0::omdpo_controller* const c);
+    const fccd0::omdpo_controller* const c);
 
 NS_END(d0, metrics, argos, fordyca);

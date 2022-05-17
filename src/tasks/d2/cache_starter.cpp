@@ -186,4 +186,13 @@ RCPPSW_WRAP_DEF_OVERRIDE(
     *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
     const);
 
+/*******************************************************************************
+ * Block Carrying
+ ******************************************************************************/
+RCPPSW_WRAP_DEF_OVERRIDE(
+    cache_starter,
+    block_drop_strategy,
+    *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
+    const);
+
 NS_END(d2, tasks, fordyca);

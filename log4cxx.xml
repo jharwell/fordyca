@@ -24,10 +24,10 @@
   </category>
 
   <category name="cosm.hal.sensors.proximity" >
-    <priority value ="trace" />
+    <priority value ="info" />
   </category>
   <category name="cosm.hal.sensors.env" >
-    <priority value ="trace" />
+    <priority value ="info" />
   </category>
   <category name="cosm.hal.ros" >
     <priority value ="info" />
@@ -45,7 +45,7 @@
     <priority value ="info" />
   </category>
   <category name="cosm.steer2D.force_calculator" >
-    <priority value ="debug" />
+    <priority value ="info" />
   </category>
   <category name="cosm.spatial.fsm" >
     <priority value ="debug" />
@@ -57,7 +57,7 @@
     <priority value ="debug" />
   </category>
   <category name="cosm.subsystem" >
-    <priority value ="debug" />
+    <priority value ="info" />
   </category>
   <category name="cosm.tv.population_dynamics" >
     <priority value ="info" />
@@ -131,7 +131,7 @@
   </category>
 
   <category name="fordyca.ros" >
-    <priority value ="debug" />
+    <priority value ="info" />
   </category>
 
   <category name="rcppsw.metrics" >

@@ -99,6 +99,11 @@ class cache_finisher final : public foraging_task,
                             const);
   bool is_phototaxiing_to_goal(bool) const override { return false; }
 
+  /* block carrying */
+  RCPPSW_WRAP_DECL_OVERRIDE(const cssblocks::drop::base_drop*,
+                            block_drop_strategy,
+                            const);
+
   /* task metrics */
   bool task_completed(void) const override { return task_finished(); }
 
@@ -110,4 +115,3 @@ class cache_finisher final : public foraging_task,
 };
 
 NS_END(d2, tasks, fordyca);
-

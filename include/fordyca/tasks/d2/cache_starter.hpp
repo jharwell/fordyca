@@ -105,6 +105,11 @@ class cache_starter final : public foraging_task,
   RCPPSW_WRAP_DECL_OVERRIDE(bool, site_select_success, const);
   RCPPSW_WRAP_DECL_OVERRIDE(nlopt::result, nlopt_result, const);
 
+  /* block carrying */
+  RCPPSW_WRAP_DECL_OVERRIDE(const cssblocks::drop::base_drop*,
+                            block_drop_strategy,
+                            const);
+
   /* task metrics */
   bool task_completed(void) const override { return task_finished(); }
 
@@ -116,4 +121,3 @@ class cache_starter final : public foraging_task,
 };
 
 NS_END(d2, tasks, fordyca);
-

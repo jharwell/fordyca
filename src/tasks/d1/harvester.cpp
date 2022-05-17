@@ -196,6 +196,15 @@ RCPPSW_WRAP_DEF_OVERRIDE(
     const);
 
 /*******************************************************************************
+ * Block Carrying
+ ******************************************************************************/
+RCPPSW_WRAP_DEF_OVERRIDE(
+    harvester,
+    block_drop_strategy,
+    *static_cast<fsm::d1::block_to_existing_cache_fsm*>(polled_task::mechanism()),
+    const);
+
+/*******************************************************************************
  * Task Metrics
  ******************************************************************************/
 bool harvester::task_at_interface(void) const {

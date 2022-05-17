@@ -30,6 +30,7 @@
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 #include "cosm/ta/abort_probability.hpp"
 #include "cosm/ta/logical_task.hpp"
+#include "cosm/spatial/strategy/blocks/metrics/drop_metrics.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/foraging_transport_goal.hpp"
@@ -52,7 +53,8 @@ NS_START(fordyca, tasks);
 class base_foraging_task
     : public cfsm::block_transporter<fsm::foraging_transport_goal>,
       public cfsm::metrics::block_transporter_metrics,
-      public csmetrics::goal_acq_metrics {
+      public csmetrics::goal_acq_metrics,
+      public cssblocks::metrics::drop_metrics {
  public:
   base_foraging_task(void) = default;
   ~base_foraging_task(void) override = default;

@@ -233,7 +233,8 @@ bool crw_fsm::is_phototaxiing_to_goal(bool include_ca) const {
 
 foraging_transport_goal crw_fsm::block_transport_goal(void) const {
   if (ekST_TRANSPORT_TO_NEST == current_state() ||
-      ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
+      ekST_WAIT_FOR_BLOCK_DROP == current_state() ||
+      ekST_DROP_CARRIED_BLOCK == current_state()) {
     return foraging_transport_goal::ekNEST;
   }
   return foraging_transport_goal::ekNONE;

@@ -155,7 +155,7 @@ void crw_controller::control_step(void) {
 } /* control_step() */
 
 /*******************************************************************************
- * Goal Acquisition Metrics
+ * Goal Acquisition
  ******************************************************************************/
 RCPPSW_WRAP_DEF_OVERRIDE(crw_controller, goal_acquired, *m_fsm, const);
 RCPPSW_WRAP_DEF_OVERRIDE(crw_controller, entity_acquired_id, *m_fsm, const);
@@ -167,11 +167,18 @@ RCPPSW_WRAP_DEF_OVERRIDE(crw_controller, vector_loc3D, *m_fsm, const);
 RCPPSW_WRAP_DEF_OVERRIDE(crw_controller, explore_loc3D, *m_fsm, const);
 
 /*******************************************************************************
- * Block Transportation Metrics
+ * Block Transportation
  ******************************************************************************/
 bool crw_controller::is_phototaxiing_to_goal(bool include_ca) const {
   return m_fsm->is_phototaxiing_to_goal(include_ca);
 } /* is_phototaxiing_to_goal() */
+
+/*******************************************************************************
+ * Block Carrying Controller
+ ******************************************************************************/
+const cssblocks::drop::base_drop* crw_controller::block_drop_strategy(void) const {
+  return m_fsm->block_drop_strategy();
+} /* block_drop_strategy() */
 
 NS_END(reactive, d0, controller, fordyca);
 

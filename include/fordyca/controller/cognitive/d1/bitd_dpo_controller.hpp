@@ -153,6 +153,9 @@ class bitd_dpo_controller : public d0::dpo_controller,
 
   void task_status_update(tasks::task_status s) { m_task_status = s; }
 
+  /* block carrying controller */
+  const cssblocks::drop::base_drop* block_drop_strategy(void) const override;
+
  protected:
   /**
    * \brief Initialization that derived classes may also need to perform, if

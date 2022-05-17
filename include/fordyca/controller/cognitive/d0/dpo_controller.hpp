@@ -105,6 +105,9 @@ class dpo_controller : public cognitive::cognitive_controller,
     return m_block_sel_matrix.get();
   }
 
+  /* block carrying controller */
+  const cssblocks::drop::base_drop* block_drop_strategy(void) const override;
+
  protected:
   /**
    * \brief Initialization that derived classes may also need to perform, if
@@ -138,4 +141,3 @@ class dpo_controller : public cognitive::cognitive_controller,
 };
 
 NS_END(cognitive, d0, controller, fordyca);
-

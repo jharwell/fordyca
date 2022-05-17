@@ -102,6 +102,11 @@ class collector : public foraging_task,
                             const);
   bool is_phototaxiing_to_goal(bool include_ca) const override RCPPSW_PURE;
 
+  /* block carrying */
+  RCPPSW_WRAP_DECL_OVERRIDE(const cssblocks::drop::base_drop*,
+                            block_drop_strategy,
+                            const);
+
   /* task metrics */
   bool task_at_interface(void) const override RCPPSW_PURE;
   bool task_completed(void) const override { return task_finished(); }

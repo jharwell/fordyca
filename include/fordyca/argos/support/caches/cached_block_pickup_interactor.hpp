@@ -117,7 +117,7 @@ class cached_block_pickup_interactor : public rer::client<
    * robot for block pickup.
    */
   fsupport::interactor_status process_cached_block_pickup(TController& controller,
-                                                rtypes::timestep t) {
+                                                          rtypes::timestep t) {
     const ctv::temporal_penalty& p = m_penalty_handler->penalty_next();
     auto status = fsupport::interactor_status::ekNO_EVENT;
 

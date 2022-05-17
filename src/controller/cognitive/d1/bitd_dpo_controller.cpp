@@ -185,6 +185,7 @@ RCPPSW_WRAP_DEFP_OVERRIDE(bitd_dpo_controller,
                           fsm::foraging_transport_goal::ekNONE,
                           const);
 
+
 /*******************************************************************************
  * Goal Acquisition
  ******************************************************************************/
@@ -225,6 +226,16 @@ int bitd_dpo_controller::task_id(const std::string& task_name) const {
 int bitd_dpo_controller::current_task_tab(void) const {
   return executive()->graph()->active_tab_id();
 } /* current_task_tab() */
+
+/*******************************************************************************
+ * Block Carrying Controller
+ ******************************************************************************/
+const cssblocks::drop::base_drop* bitd_dpo_controller::block_drop_strategy(void) const {
+  if (nullptr != current_task()) {
+    current_task()->block_drop_strategy();
+  }
+  return nullptr;
+} /* block_drop_strategy() */
 
 NS_END(cognitive, d1, controller, fordyca);
 

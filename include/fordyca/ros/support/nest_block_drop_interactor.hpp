@@ -23,8 +23,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-
 #include "cosm/ros/interactors/nest_block_process.hpp"
+#include "cosm/spatial/strategy/blocks/drop/base_drop.hpp"
 
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/fsm/foraging_transport_goal.hpp"
@@ -76,17 +76,24 @@ class nest_block_drop_interactor final
   }
 
   void robot_previsit_hook(TController& controller) const override {
+    auto penalty = rtypes::timestep(0);
+
+    /*
+     * If the block drop strategy is defined, then obviously it takes that long
+     * to drop a block, so we use that as our drop "penalty".
+     */
+    if (auto strategy = controller.block_drop_strategy()) {
+      penalty = strategy->config()->duration;
+    }
+
     /*
      * Penalty served needs to be set here rather than in the free block pickup
      * event, because the penalty is generic, and the event handles concrete
      * classes--no clean way to mix the two.
-     *
-     * We set the penalty duration to 0 for now for simplicity with real
-     * robots. This may be revisited later.
      */
     controller.block_manip_recorder()->record(
         fmetrics::blocks::block_manip_events::ekFREE_DROP,
-        rtypes::timestep(0));
+                                              penalty);
   }
 };
 

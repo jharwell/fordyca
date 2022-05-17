@@ -194,7 +194,16 @@ RCPPSW_WRAP_DEF_OVERRIDE(
     const);
 
 /*******************************************************************************
- * Block Transport Metrics
+ * Block Carrying
+ ******************************************************************************/
+RCPPSW_WRAP_DEF_OVERRIDE(
+    collector,
+    block_drop_strategy,
+    *static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism()),
+    const);
+
+/*******************************************************************************
+ * Block Transportation
  ******************************************************************************/
 bool collector::is_phototaxiing_to_goal(bool include_ca) const {
   return static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism())

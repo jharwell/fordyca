@@ -199,7 +199,14 @@ void dpo_controller::private_init(
 void dpo_controller::reset(void) { cognitive_controller::reset(); } /* reset() */
 
 /*******************************************************************************
- * Goal Acquisition Metrics
+ * Block Carrying Controller
+ ******************************************************************************/
+const cssblocks::drop::base_drop* dpo_controller::block_drop_strategy(void) const {
+  return m_fsm->block_drop_strategy();
+} /* block_drop_strategy() */
+
+/*******************************************************************************
+ * Goal Acquisition
  ******************************************************************************/
 RCPPSW_WRAP_DEFP_OVERRIDE(dpo_controller, goal_acquired, m_fsm, false, const);
 RCPPSW_WRAP_DEFP_OVERRIDE(dpo_controller,
@@ -244,7 +251,7 @@ RCPPSW_WRAP_DEFP_OVERRIDE(dpo_controller,
                           const);
 
 /*******************************************************************************
- * Block Transportation Metrics
+ * Block Transportation
  ******************************************************************************/
 bool dpo_controller::is_phototaxiing_to_goal(bool include_ca) const {
   return m_fsm->is_phototaxiing_to_goal(include_ca);
