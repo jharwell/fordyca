@@ -53,7 +53,8 @@ class d0_robot_metrics_manager : public crmetrics::robot_metrics_manager,
   d0_robot_metrics_manager(const cros::topic& robot_ns,
                            const rmconfig::metrics_config* mconfig);
 
-  void collect_from_controller(const fcontroller::foraging_controller* c);
+  template<class T>
+  void collect_from_controller(const T* controller);
 };
 
 NS_END(d0, metrics, ros, fordyca);

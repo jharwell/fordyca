@@ -78,6 +78,9 @@ class crw_controller : public rer::client<crw_controller>,
                             const);
   bool is_phototaxiing_to_goal(bool include_ca) const override RCPPSW_PURE;
 
+  /* block carrying controller metrics */
+  const cssblocks::drop::base_drop* block_drop_strategy(void) const override;
+
   const fsm::d0::crw_fsm* fsm(void) const { return m_fsm.get(); }
   fsm::d0::crw_fsm* fsm(void) { return m_fsm.get(); }
 

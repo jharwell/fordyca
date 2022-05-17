@@ -59,12 +59,21 @@ struct manipulation_metrics_data : public rmetrics::base_data {
   array_type interval{};
   array_type cum{};
 
+  /**
+   * \brief Accumulate data. We ignore the "cum" field on \p rhs, and accumulate
+   * into our "cum" field using the "interval" field of \p rhs.
+   *
+   * This is the most meaningful semantics I could come up with; I couldn't find
+   * a way to justify accumulating already cumulative data again (it would have
+   * required some additional changes/contortions elsewhere).
+   */
   manipulation_metrics_data& operator+=(const manipulation_metrics_data& rhs) {
     for (size_t i = 0; i < fmblocks::block_manip_events::ekMAX_EVENTS; ++i) {
-      this->interval[i].events += rhs.interval[i].events;
-      this->interval[i].penalties += rhs.interval[i].penalties;
-      this->cum[i].events += rhs.cum[i].events;
-      this->cum[i].penalties += rhs.cum[i].penalties;
+      ral::mt_accum(this->interval[i].events, rhs.interval[i].events);
+      ral::mt_accum(this->interval[i].penalties, rhs.interval[i].penalties);
+
+      ral::mt_accum(this->cum[i].events, rhs.interval[i].events);
+      ral::mt_accum(this->cum[i].penalties, rhs.interval[i].penalties);
     } /* for(i..) */
     return *this;
   }

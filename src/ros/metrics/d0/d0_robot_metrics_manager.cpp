@@ -37,6 +37,7 @@
 #include "cosm/ros/metrics/topic_sink.hpp"
 
 #include "fordyca/controller/reactive/d0/crw_controller.hpp"
+#include "fordyca/fsm/d0/crw_fsm.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
 #include "fordyca/metrics/specs.hpp"
 #include "fordyca/ros/metrics/blocks/manipulation_metrics_topic_sink.hpp"
@@ -76,14 +77,26 @@ d0_robot_metrics_manager::d0_robot_metrics_manager(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
+template <class TController>
 void d0_robot_metrics_manager::collect_from_controller(
-    const fcontroller::foraging_controller* const c) {
+    const TController* const c) {
   crmetrics::robot_metrics_manager::collect_from_controller(c);
 
   /*
    * All d0 controllers provide these.
    */
+  collect(cmspecs::spatial::kNestZone.scoped(), *c->nz_tracker());
+  collect(cmspecs::strategy::nest::kAcq.scoped(), *c->fsm());
+  collect(cmspecs::blocks::kAcqCounts.scoped(), *c);
+  collect(cmspecs::blocks::kTransporter.scoped(), *c);
   collect(fmspecs::blocks::kManipulation.scoped(), *c->block_manip_recorder());
 } /* collect_from_controller() */
+
+
+/*******************************************************************************
+ * Template Instantiations
+ ******************************************************************************/
+template void d0_robot_metrics_manager::collect_from_controller(
+    const fcrd0::crw_controller* const c);
 
 NS_END(d0, metrics, ros, fordyca);

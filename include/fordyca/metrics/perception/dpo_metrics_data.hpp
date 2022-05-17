@@ -58,4 +58,3 @@ struct dpo_metrics_data : public rmetrics::base_data {
 };
 
 NS_END(perception, metrics, fordyca);
-
