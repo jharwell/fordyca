@@ -28,7 +28,7 @@
 #include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/controller/cognitive/block_sel_matrix.hpp"
-#include "fordyca/ds/dp_block_map.hpp"
+#include "fordyca/subsystem/perception/ds/dp_block_map.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -40,7 +40,7 @@ using bselm = controller::cognitive::block_sel_matrix;
  * Constructors/Destructors
  ******************************************************************************/
 block_acq_validator::block_acq_validator(
-    const ds::dp_block_map* map,
+    const fspds::dp_block_map* map,
     const controller::cognitive::block_sel_matrix* matrix)
     : ER_CLIENT_INIT("fordyca.fsm.block_acq_validator"),
       mc_map(map),
@@ -60,7 +60,7 @@ bool block_acq_validator::operator()(const rmath::vector2d& loc,
             loc.to_str().c_str());
     return false;
   }
-  const auto& config = boost::get<config::block_sel::block_pickup_policy_config>(
+  const auto& config = std::get<fcconfig::block_sel::block_pickup_policy_config>(
       mc_matrix->find(bselm::kPickupPolicy)->second);
 
   /*
@@ -68,7 +68,7 @@ bool block_acq_validator::operator()(const rmath::vector2d& loc,
    * validation if we make it this far.
    */
   if (bselm::kPickupPolicyClusterProx == config.policy) {
-    auto range = mc_map->const_values_range();
+    auto range = mc_map->values_range();
     if (!range.empty()) {
       auto avg_position =
           std::accumulate(range.begin(),

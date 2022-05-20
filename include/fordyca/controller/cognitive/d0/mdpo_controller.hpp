@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D0_MDPO_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D0_MDPO_CONTROLLER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -29,11 +28,9 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+namespace fordyca::controller::config::d0 { class mdpo_controller_repository; }
 
-namespace config { namespace d0 { class mdpo_controller_repository; }}
-
-NS_START(controller, cognitive);
+NS_START(fordyca, controller, cognitive);
 
 class mdpo_perception_subsystem;
 
@@ -58,6 +55,9 @@ NS_START(d0);
 class mdpo_controller : public dpo_controller,
                         public rer::client<mdpo_controller> {
  public:
+  using perception_subsystem_type = mdpo_perception_subsystem;
+
+
   mdpo_controller(void) RCPPSW_COLD;
   ~mdpo_controller(void) override RCPPSW_COLD;
 
@@ -65,9 +65,6 @@ class mdpo_controller : public dpo_controller,
   void init(ticpp::Element& node) override RCPPSW_COLD;
   void control_step(void) override;
   std::type_index type_index(void) const override {return typeid(*this); }
-
-  mdpo_perception_subsystem* mdpo_perception(void) RCPPSW_PURE;
-  const mdpo_perception_subsystem* mdpo_perception(void) const RCPPSW_PURE;
 
   /**
    * \brief Initialization that derived classes may also need to perform, if the
@@ -91,4 +88,3 @@ class mdpo_controller : public dpo_controller,
 
 NS_END(cognitive, d0, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D0_MDPO_CONTROLLER_HPP_ */

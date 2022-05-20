@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_TASK_EXECUTIVE_BUILDER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_TASK_EXECUTIVE_BUILDER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -32,12 +31,9 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace config {
-namespace d2 { class controller_repository; }
-}
+namespace fordyca::controller::config::d2 { class controller_repository; }
 
-NS_START(controller, cognitive, d2);
+NS_START(fordyca, controller, cognitive, d2);
 
 /*******************************************************************************
  * Class Definitions
@@ -52,10 +48,14 @@ NS_START(controller, cognitive, d2);
 class task_executive_builder : public d1::task_executive_builder,
                                public rer::client<task_executive_builder> {
  public:
-  task_executive_builder(const controller::cognitive::block_sel_matrix* bsel_matrix,
-                      const controller::cognitive::cache_sel_matrix* csel_matrix,
-                      csubsystem::saa_subsystemQ3D* saa,
-                      foraging_perception_subsystem* perception) RCPPSW_COLD;
+  task_executive_builder(
+      const controller::cognitive::block_sel_matrix* bsel_matrix,
+      const controller::cognitive::cache_sel_matrix* csel_matrix,
+      cspatial::interference_tracker* inta,
+      cspatial::nest_zone_tracker* nz,
+      csubsystem::saa_subsystemQ3D* saa,
+      fsperception::foraging_perception_subsystem* perception) RCPPSW_COLD;
+
   ~task_executive_builder(void) override RCPPSW_COLD;
 
   RCPPSW_COLD std::unique_ptr<cta::bi_tdgraph_executive>
@@ -84,4 +84,3 @@ class task_executive_builder : public d1::task_executive_builder,
 
 NS_END(cognitive, d2, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_TASK_EXECUTIVE_BUILDER_HPP_ */

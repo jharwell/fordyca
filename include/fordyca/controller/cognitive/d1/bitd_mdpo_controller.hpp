@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D1_BITD_MDPO_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D1_BITD_MDPO_CONTROLLER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -29,9 +28,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller, cognitive);
-class mdpo_perception_subsystem;
-NS_START(d1);
+NS_START(fordyca, controller, cognitive, d1);
 
 /*******************************************************************************
  * Class Definitions
@@ -64,9 +61,6 @@ class bitd_mdpo_controller : public d1::bitd_dpo_controller,
   void control_step(void) override;
   std::type_index type_index(void) const override { return typeid(*this); }
 
-  mdpo_perception_subsystem* mdpo_perception(void) RCPPSW_PURE;
-  const mdpo_perception_subsystem* mdpo_perception(void) const RCPPSW_PURE;
-
  protected:
   /**
    * \brief Initialization that derived classes may also need to perform, if
@@ -88,4 +82,3 @@ class bitd_mdpo_controller : public d1::bitd_dpo_controller,
 
 NS_END(cognitive, d1, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D1_BITD_MDPO_CONTROLLER_HPP_ */

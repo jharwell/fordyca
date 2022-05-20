@@ -18,12 +18,12 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_FORAGING_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_FORAGING_CONTROLLER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <any>
 #include <memory>
 #include <string>
 #include <typeindex>
@@ -33,8 +33,10 @@
 #include "cosm/controller/manip_event_recorder.hpp"
 #include "cosm/fsm/block_transporter.hpp"
 #include "cosm/fsm/metrics/block_transporter_metrics.hpp"
-#include "cosm/metrics/config/output_config.hpp"
-#include "cosm/pal/argos_controller2D_adaptor.hpp"
+#include "cosm/hal/subsystem/config/sensing_subsystemQ3D_config.hpp"
+#include "cosm/pal/config/output_config.hpp"
+#include "cosm/pal/controller/controller2D.hpp"
+#include "cosm/spatial/metrics/nest_zone_metrics.hpp"
 #include "cosm/subsystem/subsystem_fwd.hpp"
 
 #include "fordyca/fordyca.hpp"
@@ -44,13 +46,8 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace fordyca::controller::cognitive {
-class foraging_perception_subsystem;
-} // namespace fordyca::controller::cognitive
-
 namespace cosm::subsystem::config {
 struct actuation_subsystem2D_config;
-struct sensing_subsystemQ3D_config;
 } // namespace cosm::subsystem::config
 namespace cosm::steer2D::config {
 struct force_calculator_config;
@@ -61,6 +58,10 @@ class robot_dynamics_applicator;
 namespace cosm::repr {
 class unicell_entity2D;
 } // namespace cosm::repr
+
+namespace cosm::spatial {
+class nest_zone_tracker;
+} /* namespace cosm::spatial */
 
 namespace rcppsw::math::config {
 struct rng_config;
@@ -86,12 +87,13 @@ NS_START(fordyca, controller);
  * overlays.
  */
 class foraging_controller
-    : public cpal::argos_controller2D_adaptor,
+    : public cpcontroller::controller2D,
       public ccontroller::block_carrying_controller,
       public cfsm::block_transporter<fsm::foraging_transport_goal>,
       public cfsm::metrics::block_transporter_metrics,
       public ccontroller::irv_recipient_controller,
-      public rer::client<foraging_controller> {
+      public rer::client<foraging_controller>,
+      public csmetrics::nest_zone_metrics {
  public:
   using block_manip_recorder_type = ccontroller::manip_event_recorder<
       metrics::blocks::block_manip_events::ekMAX_EVENTS>;
@@ -102,17 +104,16 @@ class foraging_controller
   foraging_controller(const foraging_controller&) = delete;
   foraging_controller& operator=(const foraging_controller&) = delete;
 
-  /* argos_controller2D overrides */
+  /* controller2D overrides */
   void init(ticpp::Element& node) override RCPPSW_COLD;
   void reset(void) override RCPPSW_COLD;
-  rtypes::type_uuid entity_id(void) const override final;
 
   /* rda_recipient_controller overrides */
   double applied_movement_throttle(void) const override final;
   void irv_init(const ctv::robot_dynamics_applicator* rda) override final;
 
   /* block carrying controller overrides */
-  bool block_detected(void) const override;
+  bool block_detect(const ccontroller::block_detect_context& context) override;
 
   /* movement metrics */
   rtypes::spatial_dist
@@ -120,44 +121,43 @@ class foraging_controller
   rmath::vector3d
   ts_velocity(const csmetrics::movement_category& category) const override;
 
-  /**
-   * \brief By default controllers have no perception subsystem, and are
-   * basically blind centipedes.
-   */
-  virtual const cognitive::foraging_perception_subsystem* perception(void) const {
-    return nullptr;
-  }
-
-  /**
-   * \brief By default controllers have no perception subsystem, and are
-   * basically blind centipedes.
-   */
-  virtual cognitive::foraging_perception_subsystem* perception(void) {
-    return nullptr;
-  }
-
-  /**
-   * \brief If \c TRUE, the robot is currently at least most of the way in the
-   * nest, as reported by the sensors.
-   */
-  bool in_nest(void) const;
+  /* nest zone metrics */
+  RCPPSW_WRAP_DECL_OVERRIDE(bool, in_nest, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(bool, entered_nest, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(bool, exited_nest, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(rtypes::timestep, nest_duration, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(rtypes::timestep, nest_entry_time, const);
 
   const block_manip_recorder_type* block_manip_recorder(void) const {
     return &m_block_manip;
   }
   block_manip_recorder_type* block_manip_recorder(void) { return &m_block_manip; }
+  const cspatial::nest_zone_tracker* nz_tracker(void) const {
+    return m_nz_tracker.get();
+  }
+
+  const class csubsystem::saa_subsystemQ3D* saa(void) const {
+    return cpal::controller::controller2D::saa();
+  }
+
+ protected:
+  class csubsystem::saa_subsystemQ3D* saa(void) {
+    return cpal::controller::controller2D::saa();
+  }
+  cspatial::nest_zone_tracker* nz_tracker(void) { return m_nz_tracker.get(); }
+  void block_detect_status_update(void);
 
  private:
   void
-  saa_init(const csubsystem::config::actuation_subsystem2D_config* actuation_p,
-           const csubsystem::config::sensing_subsystemQ3D_config* sensing_p);
-  void output_init(const cmconfig::output_config* outputp);
+  saa_init(const csubsystem::config::actuation_subsystem2D_config* actuation,
+           const chal::subsystem::config::sensing_subsystemQ3D_config* sensing);
+  fs::path output_init(const cpconfig::output_config* outputp) override;
 
   /* clang-format off */
-  block_manip_recorder_type m_block_manip{};
+  bool                                         m_block_detect_status{false};
+  block_manip_recorder_type                    m_block_manip{};
+  std::unique_ptr<cspatial::nest_zone_tracker> m_nz_tracker{nullptr};
   /* clang-format on */
 };
 
 NS_END(controller, fordyca);
-
-#endif /* INCLUDE_FORDYCA_CONTROLLER_FORAGING_CONTROLLER_HPP_ */

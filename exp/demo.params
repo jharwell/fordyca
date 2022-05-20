@@ -1,0 +1,83 @@
+<?xml version="1.0" ?>
+<params>
+  <crw_controller>
+    <rng seed="123"/>
+    <output
+        output_parent="output"
+        output_leaf="__current_date__"
+        />
+    <sensing_subsystemQ3D>
+      <!-- -5pi/6 : 5pi/6 -->
+      <proximity_sensor fov="-2.61:2.61"
+                        delta="0.06" />
+
+      <env_sensor>
+        <!-- NEST: The nest is a relatively light gray. -->
+        <nest range="0.6:0.8"
+              consensus="3"/>
+        <!-- BLOCK: Blocks are black. -->
+        <block range="-0.05:0.05"
+               consensus="4"/>
+      </env_sensor>
+    </sensing_subsystemQ3D>
+    <nest dims="1.0, 4.0" center="2, 3" />
+    <strategy>
+      <nest_acq
+          strategy="wander"
+          />
+    </strategy>
+    <actuation_subsystem2D>
+      <force_calculator>
+        <avoidance_force lookahead="0.5"
+                         max="0.08"/>
+        <wander_force circle_distance="4.0"
+                      circle_radius="100.0"
+                      max="0.09"
+                      interval="1">
+          <!-- 5 degrees max delta. -->
+          <bias_angle src="uniform"
+                      max_delta="0.0872"/>
+        </wander_force>
+        <phototaxis_force max="0.08"/>
+      </force_calculator>
+
+      <!-- 25 degrees soft_turn_max. -->
+      <diff_drive soft_turn_max="0.436"
+                  max_speed="0.1" />
+    </actuation_subsystem2D>
+
+  </crw_controller>
+
+  <loop_functions>
+    <output output_parent="output"
+            output_leaf="__current_date__">
+      <metrics
+          metrics_path="metrics">
+        <sinks>
+          <network>
+            <stream
+                output_interval="100"
+                block_acq_counts="blocks/acq-counts"
+                spatial_interference_counts="spatial/interference/counts"
+                block_transporter="blocks/transporter"
+                block_transportee="blocks/transportee"
+                block_clusters="blocks/clusters"
+                spatial_movement='spatial/movement'
+                block_manipulation="blocks/manipulation"/>
+          </network>
+          <file>
+            <append
+                output_interval="100"
+                block_acq_counts="blocks-acq-counts"
+                spatial_interference_counts="spatial-interference-counts"
+                block_transporter="blocks-transporter"
+                block_transportee="blocks-transportee"
+                block_clusters="blocks-clusters"
+                spatial_movement='spatial-movement'
+                block_manipulation="blocks-manipulation"/>
+          </file>
+        </sinks>
+      </metrics>
+    </output>
+  </loop_functions>
+</params>

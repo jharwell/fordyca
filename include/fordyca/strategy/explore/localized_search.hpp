@@ -18,17 +18,18 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_STRATEGY_EXPLORE_LOCALIZED_SEARCH_HPP_
-#define INCLUDE_FORDYCA_STRATEGY_EXPLORE_LOCALIZED_SEARCH_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <memory>
 
-#include "fordyca/strategy/foraging_strategy.hpp"
 #include "rcppsw/math/vector2.hpp"
+
 #include "cosm/spatial/fsm/vector_fsm.hpp"
+
+#include "fordyca/strategy/foraging_strategy.hpp"
 #include "fordyca/strategy/explore/crw_adaptor.hpp"
 
 /*******************************************************************************
@@ -51,22 +52,12 @@ NS_START(fordyca, strategy, explore);
 class localized_search : public foraging_strategy,
                          public rer::client<localized_search> {
  public:
-  localized_search(const foraging_strategy::params* const c_params,
-                   rmath::rng* rng)
-      : localized_search(c_params->saa, rng) {}
-
-  localized_search(csubsystem::saa_subsystemQ3D* saa, rmath::rng* rng);
+  localized_search(const fstrategy::strategy_params* const c_params,
+                   rmath::rng* rng);
 
   ~localized_search(void) override = default;
   localized_search(const localized_search&) = delete;
   localized_search& operator=(const localized_search&) = delete;
-
-  /* interference metrics */
-  bool exp_interference(void) const override final RCPPSW_PURE;
-  bool entered_interference(void) const override final RCPPSW_PURE;
-  bool exited_interference(void) const override final RCPPSW_PURE;
-  rtypes::timestep interference_duration(void) const override final;
-  rmath::vector3z interference_loc3D(void) const override final RCPPSW_PURE;
 
   /* taskable overrides */
 
@@ -100,8 +91,21 @@ class localized_search : public foraging_strategy,
   void task_execute(void) override final;
 
   /* prototype overrides */
-  std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
-    return std::make_unique<localized_search>(saa(), rng());
+  std::unique_ptr<cssexplore::base_explore> clone(void) const override {
+    csfsm::fsm_params fsm_params {
+      saa(),
+      inta_tracker(),
+      nz_tracker(),
+    };
+    fstrategy::strategy_params params {
+      &fsm_params,
+      config(),
+      nullptr,
+      nullptr,
+      accessor(),
+      {}
+    };
+    return std::make_unique<localized_search>(&params, rng());
   }
 
  private:
@@ -112,5 +116,3 @@ class localized_search : public foraging_strategy,
 };
 
 NS_END(explore, strategy, fordyca);
-
-#endif /* INCLUDE_FORDYCA_STRATEGY_EXPLORE_LOCALIZED_SEARCH_HPP_ */

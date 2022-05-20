@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_CONTROLLER_FWD_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_CONTROLLER_FWD_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -32,81 +31,79 @@
 /*******************************************************************************
  * Depth0 Macros
  ******************************************************************************/
-#define DEPTH0_NON_ORACULAR_CONTROLLER_TYPES     \
-  controller::reactive::d0::crw_controller,      \
-      controller::cognitive::d0::dpo_controller, \
-      controller::cognitive::d0::mdpo_controller
+#define D0_REACTIVE_CONTROLLER_TYPES fcontroller::reactive::d0::crw_controller
 
-#define DEPTH0_ORACULAR_CONTROLLER_TYPES      \
-  controller::cognitive::d0::odpo_controller, \
-      controller::cognitive::d0::omdpo_controller
+#define D0_NON_ORACULAR_CONTROLLER_TYPES      \
+  fcontroller::cognitive::d0::dpo_controller, \
+      fcontroller::cognitive::d0::mdpo_controller
 
-#define DEPTH0_REACTIVE_CONTROLLER_TYPES \
-  controller::cognitive::d0::reactive::crw_controller
+#define D0_ORACULAR_CONTROLLER_TYPES           \
+  fcontroller::cognitive::d0::odpo_controller, \
+      fcontroller::cognitive::d0::omdpo_controller
 
-#define DEPTH0_COGNITIVE_CONTROLLER_TYPES         \
-  controller::cognitive::d0::dpo_controller,      \
-      controller::cognitive::d0::mdpo_controller, \
-      controller::cognitive::d0::odpo_controller, \
-      controller::cognitive::d0::omdpo_controller
+#define D0_COGNITIVE_CONTROLLER_TYPES              \
+  fcontroller::cognitive::d0::dpo_controller,      \
+      fcontroller::cognitive::d0::mdpo_controller, \
+      fcontroller::cognitive::d0::odpo_controller, \
+      fcontroller::cognitive::d0::omdpo_controller
 
-#define DEPTH0_CONTROLLER_TYPES \
-  DEPTH0_NON_ORACULAR_CONTROLLER_TYPES, DEPTH0_ORACULAR_CONTROLLER_TYPES
+#define D0_CONTROLLER_TYPES \
+  D0_NON_ORACULAR_CONTROLLER_TYPES, D0_ORACULAR_CONTROLLER_TYPES
 
 /*******************************************************************************
  * Depth1 Macros
  ******************************************************************************/
-#define DEPTH1_ORACULAR_CONTROLLER_TYPES           \
-  controller::cognitive::d1::bitd_odpo_controller, \
-      controller::cognitive::d1::bitd_omdpo_controller
+#define D1_ORACULAR_CONTROLLER_TYPES                \
+  fcontroller::cognitive::d1::bitd_odpo_controller, \
+      fcontroller::cognitive::d1::bitd_omdpo_controller
 
-#define DEPTH1_NON_ORACULAR_CONTROLLER_TYPES      \
-  controller::cognitive::d1::bitd_dpo_controller, \
-      controller::cognitive::d1::bitd_mdpo_controller
+#define D1_NON_ORACULAR_CONTROLLER_TYPES           \
+  fcontroller::cognitive::d1::bitd_dpo_controller, \
+      fcontroller::cognitive::d1::bitd_mdpo_controller
 
-#define DEPTH1_REACTIVE_CONTROLLER_TYPES
+#define D1_REACTIVE_CONTROLLER_TYPES
 
-#define DEPTH1_COGNITIVE_CONTROLLER_TYPES              \
-  controller::cognitive::d1::bitd_dpo_controller,      \
-      controller::cognitive::d1::btd_mdpo_controller,  \
-      controller::cognitive::d1::bitd_odpo_controller, \
-      controller::cognitive::d1::bitd_omdpo_controller
+#define D1_COGNITIVE_CONTROLLER_TYPES                   \
+  fcontroller::cognitive::d1::bitd_dpo_controller,      \
+      fcontroller::cognitive::d1::btd_mdpo_controller,  \
+      fcontroller::cognitive::d1::bitd_odpo_controller, \
+      fcontroller::cognitive::d1::bitd_omdpo_controller
 
-#define DEPTH1_CONTROLLER_TYPES \
-  DEPTH1_NON_ORACULAR_CONTROLLER_TYPES, DEPTH1_ORACULAR_CONTROLLER_TYPES
+#define D1_CONTROLLER_TYPES \
+  D1_NON_ORACULAR_CONTROLLER_TYPES, D1_ORACULAR_CONTROLLER_TYPES
 
 /*******************************************************************************
  * Depth2 Macros
  ******************************************************************************/
-#define DEPTH2_ORACULAR_CONTROLLER_TYPES            \
-  controller::cognitive::d2::birtd_odpo_controller, \
-      controller::cognitive::d2::birtd_omdpo_controller
+#define D2_ORACULAR_CONTROLLER_TYPES                 \
+  fcontroller::cognitive::d2::birtd_odpo_controller, \
+      fcontroller::cognitive::d2::birtd_omdpo_controller
 
-#define DEPTH2_NON_ORACULAR_CONTROLLER_TYPES       \
-  controller::cognitive::d2::birtd_dpo_controller, \
-      controller::cognitive::d2::birtd_mdpo_controller
+#define D2_NON_ORACULAR_CONTROLLER_TYPES            \
+  fcontroller::cognitive::d2::birtd_dpo_controller, \
+      fcontroller::cognitive::d2::birtd_mdpo_controller
 
-#define DEPTH2_REACTIVE_CONTROLLER_TYPES
+#define D2_REACTIVE_CONTROLLER_TYPES
 
-#define DEPTH2_COGNITIVE_CONTROLLER_TYPES               \
-  controller::cognitive::d2::birtd_dpo_controller,      \
-      controller::cognitive::d2::birtd_mdpo_controller, \
-      controller::cognitive::d2::birtd_odpo_controller, \
-      controller::cognitive::d2::birtd_omdpo_controller
+#define D2_COGNITIVE_CONTROLLER_TYPES                    \
+  fcontroller::cognitive::d2::birtd_dpo_controller,      \
+      fcontroller::cognitive::d2::birtd_mdpo_controller, \
+      fcontroller::cognitive::d2::birtd_odpo_controller, \
+      fcontroller::cognitive::d2::birtd_omdpo_controller
 
-#define DEPTH2_CONTROLLER_TYPES \
-  DEPTH2_NON_ORACULAR_CONTROLLER_TYPES, DEPTH2_ORACULAR_CONTROLLER_TYPES
+#define D2_CONTROLLER_TYPES \
+  D2_NON_ORACULAR_CONTROLLER_TYPES, D2_ORACULAR_CONTROLLER_TYPES
 
 /*******************************************************************************
  * Other Macros
  ******************************************************************************/
-#define ORACULAR_CONTROLLER_TYPES                                     \
-  DEPTH0_ORACULAR_CONTROLLER_TYPES, DEPTH1_ORACULAR_CONTROLLER_TYPES, \
-      DEPTH2_ORACULAR_CONTROLLER_TYPES
+#define ORACULAR_CONTROLLER_TYPES                             \
+  D0_ORACULAR_CONTROLLER_TYPES, D1_ORACULAR_CONTROLLER_TYPES, \
+      D2_ORACULAR_CONTROLLER_TYPES
 
-#define NON_ORACULAR_CONTROLLER_TYPES                                         \
-  DEPTH0_NON_ORACULAR_CONTROLLER_TYPES, DEPTH1_NON_ORACULAR_CONTROLLER_TYPES, \
-      DEPTH2_NON_ORACULAR_CONTROLLER_TYPES
+#define NON_ORACULAR_CONTROLLER_TYPES                                 \
+  D0_NON_ORACULAR_CONTROLLER_TYPES, D1_NON_ORACULAR_CONTROLLER_TYPES, \
+      D2_NON_ORACULAR_CONTROLLER_TYPES
 
 #define CONTROLLER_TYPES ORACULAR_CONTROLLER_TYPES, NON_ORACULAR_CONTROLLER_TYPES
 
@@ -124,53 +121,72 @@ class odpo_controller;
 class mdpo_controller;
 class omdpo_controller;
 } // namespace cognitive::d0
+
 namespace d0 {
-using oracular_typelist = rmpl::typelist<DEPTH0_ORACULAR_CONTROLLER_TYPES>;
-using non_oracular_typelist =
-    rmpl::typelist<DEPTH0_NON_ORACULAR_CONTROLLER_TYPES>;
-using typelist = rmpl::typelist<DEPTH0_ORACULAR_CONTROLLER_TYPES,
-                                DEPTH0_NON_ORACULAR_CONTROLLER_TYPES>;
+using reactive_typelist = rmpl::typelist<D0_REACTIVE_CONTROLLER_TYPES>;
+using cognitive_typelist =
+    rmpl::typelist<D0_ORACULAR_CONTROLLER_TYPES, D0_NON_ORACULAR_CONTROLLER_TYPES>;
+
+using oracular_typelist = rmpl::typelist<D0_ORACULAR_CONTROLLER_TYPES>;
+using non_oracular_typelist = rmpl::typelist<D0_NON_ORACULAR_CONTROLLER_TYPES>;
+using typelist = rmpl::typelist<D0_REACTIVE_CONTROLLER_TYPES,
+                                D0_ORACULAR_CONTROLLER_TYPES,
+                                D0_NON_ORACULAR_CONTROLLER_TYPES>;
+template <typename T>
+using is_cognitive =
+    typename boost::mpl::contains<fcontroller::d0::cognitive_typelist, T>::type;
+
+template <typename T>
+using is_reactive =
+    typename boost::mpl::contains<fcontroller::d0::reactive_typelist, T>::type;
 } // namespace d0
+
 namespace cognitive::d1 {
 class bitd_dpo_controller;
 class bitd_mdpo_controller;
 class bitd_odpo_controller;
 class bitd_omdpo_controller;
 } // namespace cognitive::d1
+
 namespace d1 {
-using oracular_typelist = rmpl::typelist<DEPTH1_ORACULAR_CONTROLLER_TYPES>;
-using typelist = rmpl::typelist<DEPTH1_ORACULAR_CONTROLLER_TYPES,
-                                DEPTH1_NON_ORACULAR_CONTROLLER_TYPES>;
+using cognitive_typelist =
+    rmpl::typelist<D1_ORACULAR_CONTROLLER_TYPES, D1_NON_ORACULAR_CONTROLLER_TYPES>;
+using oracular_typelist = rmpl::typelist<D1_ORACULAR_CONTROLLER_TYPES>;
+using typelist =
+    rmpl::typelist<D1_ORACULAR_CONTROLLER_TYPES, D1_NON_ORACULAR_CONTROLLER_TYPES>;
 } // namespace d1
+
 namespace cognitive::d2 {
 class birtd_dpo_controller;
 class birtd_mdpo_controller;
 class birtd_odpo_controller;
 class birtd_omdpo_controller;
 } // namespace cognitive::d2
+
 namespace d2 {
-using oracular_typelist = rmpl::typelist<DEPTH2_ORACULAR_CONTROLLER_TYPES>;
-using typelist = rmpl::typelist<DEPTH2_ORACULAR_CONTROLLER_TYPES,
-                                DEPTH2_NON_ORACULAR_CONTROLLER_TYPES>;
+using cognitive_typelist =
+    rmpl::typelist<D2_ORACULAR_CONTROLLER_TYPES, D2_NON_ORACULAR_CONTROLLER_TYPES>;
+using oracular_typelist = rmpl::typelist<D2_ORACULAR_CONTROLLER_TYPES>;
+using typelist =
+    rmpl::typelist<D2_ORACULAR_CONTROLLER_TYPES, D2_NON_ORACULAR_CONTROLLER_TYPES>;
 } // namespace d2
+
 using oracular_typelist = rmpl::typelist<ORACULAR_CONTROLLER_TYPES>;
 using non_oracular_typelist = rmpl::typelist<NON_ORACULAR_CONTROLLER_TYPES>;
 using typelist =
     rmpl::typelist<ORACULAR_CONTROLLER_TYPES, NON_ORACULAR_CONTROLLER_TYPES>;
-using d1d2_typelist = rmpl::typelist<DEPTH1_ORACULAR_CONTROLLER_TYPES,
-                                     DEPTH1_NON_ORACULAR_CONTROLLER_TYPES,
-                                     DEPTH2_ORACULAR_CONTROLLER_TYPES,
-                                     DEPTH2_NON_ORACULAR_CONTROLLER_TYPES>;
+using d1d2_typelist = rmpl::typelist<D1_ORACULAR_CONTROLLER_TYPES,
+                                     D1_NON_ORACULAR_CONTROLLER_TYPES,
+                                     D2_ORACULAR_CONTROLLER_TYPES,
+                                     D2_NON_ORACULAR_CONTROLLER_TYPES>;
 
 template <typename T>
-using is_d0 = typename boost::mpl::contains<controller::d0::typelist, T>::type;
+using is_d0 = typename boost::mpl::contains<fcontroller::d0::typelist, T>::type;
 
 template <typename T>
-using is_d1 = typename boost::mpl::contains<controller::d1::typelist, T>::type;
+using is_d1 = typename boost::mpl::contains<fcontroller::d1::typelist, T>::type;
 
 template <typename T>
-using is_d2 = typename boost::mpl::contains<controller::d2::typelist, T>::type;
+using is_d2 = typename boost::mpl::contains<fcontroller::d2::typelist, T>::type;
 
 NS_END(controller, fordyca);
-
-#endif /* INCLUDE_FORDYCA_CONTROLLER_CONTROLLER_FWD_HPP_ */

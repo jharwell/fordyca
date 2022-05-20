@@ -1,1 +1,1 @@
-./libra/commitlint.config.js
+libra/commitlint.config.js

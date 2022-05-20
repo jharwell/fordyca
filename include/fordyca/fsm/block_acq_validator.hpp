@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_BLOCK_ACQ_VALIDATOR_HPP_
-#define INCLUDE_FORDYCA_FSM_BLOCK_ACQ_VALIDATOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -29,14 +28,13 @@
 #include "rcppsw/types/type_uuid.hpp"
 
 #include "fordyca/fordyca.hpp"
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca);
-namespace ds {
-class dp_block_map;
-} /* namespace ds */
+
 namespace controller::cognitive {
 class block_sel_matrix;
 } // namespace controller::cognitive
@@ -56,7 +54,7 @@ NS_START(fsm);
  */
 class block_acq_validator : public rer::client<block_acq_validator> {
  public:
-  block_acq_validator(const ds::dp_block_map* map,
+  block_acq_validator(const fspds::dp_block_map* map,
                       const controller::cognitive::block_sel_matrix* matrix);
 
   block_acq_validator(const block_acq_validator& v) = delete;
@@ -67,11 +65,9 @@ class block_acq_validator : public rer::client<block_acq_validator> {
 
  private:
   /* clang-format off */
-  const ds::dp_block_map* const                         mc_map;
+  const fspds::dp_block_map* const                      mc_map;
   const controller::cognitive::block_sel_matrix * const mc_matrix;
   /* clang-format on */
 };
 
 NS_END(fsm, fordyca);
-
-#endif /* INCLUDE_FORDYCA_FSM_BLOCK_ACQ_VALIDATOR_HPP_ */

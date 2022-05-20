@@ -1,0 +1,5 @@
+sphinx
+docutils==0.016
+sphinx-rtd-theme
+breathe
+cmake

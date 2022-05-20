@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_STRATEGY_EXPLORE_LEDTAXIS_CACHE_SEARCH_HPP_
-#define INCLUDE_FORDYCA_STRATEGY_EXPLORE_LEDTAXIS_CACHE_SEARCH_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -45,21 +44,11 @@ NS_START(fordyca, strategy, explore);
  * CRW at that location, with the idea being that the ledtaxis of another
  * cache being nearby is higher, given that you've found one there before.
  */
-class ledtaxis_cache_search : public foraging_strategy,
+class ledtaxis_cache_search final : public foraging_strategy,
                               public rer::client<ledtaxis_cache_search> {
  public:
-  explicit ledtaxis_cache_search(const foraging_strategy::params* const c_params,
-                                 rmath::rng* rng)
-      : ledtaxis_cache_search(c_params->saa,
-                              c_params->ledtaxis_target,
-                              rng) {}
-  ledtaxis_cache_search(csubsystem::saa_subsystemQ3D* saa,
-                        const rutils::color& ledtaxis_target,
-                        rmath::rng* rng)
-      : foraging_strategy(saa, rng),
-        ER_CLIENT_INIT("fordyca.fsm.strategy.ledtaxis_cache_search"),
-        m_crw(saa, rng),
-        m_taxis(saa, ledtaxis_target, rng) {}
+  ledtaxis_cache_search(const fstrategy::strategy_params* params,
+                        rmath::rng* rng);
 
   ~ledtaxis_cache_search(void) override = default;
   ledtaxis_cache_search(const ledtaxis_cache_search&) = delete;
@@ -91,18 +80,22 @@ class ledtaxis_cache_search : public foraging_strategy,
   bool task_finished(void) const override final { return false; }
   void task_execute(void) override final;
 
-  /* interference metrics */
-  bool exp_interference(void) const override final RCPPSW_PURE;
-  bool entered_interference(void) const override final RCPPSW_PURE;
-  bool exited_interference(void) const override final RCPPSW_PURE;
-  rtypes::timestep interference_duration(void) const override final;
-  rmath::vector3z interference_loc3D(void) const override final RCPPSW_PURE;
-
   /* prototype overrides */
-  std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
-    return std::make_unique<ledtaxis_cache_search>(saa(),
-                                                   m_taxis.target(),
-                                                   rng());
+  std::unique_ptr<cssexplore::base_explore> clone(void) const override {
+    csfsm::fsm_params fsm_params {
+      saa(),
+      inta_tracker(),
+      nz_tracker(),
+    };
+    fstrategy::strategy_params params {
+      &fsm_params,
+      config(),
+      nullptr,
+      nullptr,
+      accessor(),
+      m_taxis.target()
+    };
+    return std::make_unique<ledtaxis_cache_search>(&params, rng());
   }
 
  private:
@@ -113,5 +106,3 @@ class ledtaxis_cache_search : public foraging_strategy,
 };
 
 NS_END(explore, strategy, fordyca);
-
-#endif /* INCLUDE_FORDYCA_STRATEGY_EXPLORE_LEDTAXIS_CACHE_SEARCH_HPP_ */

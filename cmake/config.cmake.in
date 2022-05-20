@@ -1,0 +1,20 @@
+@PACKAGE_INIT@
+
+set(COSM_HAL_TARGET @COSM_HAL_TARGET@)
+set(COSM_BUILD_FOR @COSM_BUILD_FOR@)
+set(COSM_WITH_VIS @COSM_WITH_VIS@)
+
+if("${COSM_BUILD_FOR}" MATCHES "ARGOS_FOOTBOT")
+  find_package(cosm-argos-footbot)
+elseif("${COSM_BUILD_FOR}" MATCHES "ROS_ETURTLEBOT3")
+  find_package(cosm-ros-eturtlebot3
+    HINTS ${CMAKE_INSTALL_PREFIX})
+endif()
+
+set(@PROJECT_NAME@_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+
+include("${CMAKE_CURRENT_LIST_DIR}/@fordyca_LIBRARY_NAME@-exports.cmake")
+set(@PROJECT_NAME@_INCLUDE_DIRS ${@PROJECT_NAME@_INSTALL_PREFIX}/include)
+
+
+check_required_components(fordyca)

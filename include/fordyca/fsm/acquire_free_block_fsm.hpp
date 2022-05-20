@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_ACQUIRE_FREE_BLOCK_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_ACQUIRE_FREE_BLOCK_FSM_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -38,13 +37,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace ds {
-class dpo_store;
-}
-
-NS_START(fsm);
+NS_START(fordyca, fsm);
 
 /*******************************************************************************
  * Class Definitions
@@ -63,9 +56,9 @@ NS_START(fsm);
 class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
                                public csfsm::acquire_goal_fsm {
  public:
-  acquire_free_block_fsm(const fsm_ro_params* c_params,
-                         csubsystem::saa_subsystemQ3D* saa,
-                         std::unique_ptr<csstrategy::base_strategy> exp_behavior,
+  acquire_free_block_fsm(const fsm_ro_params* c_ro,
+                         const csfsm::fsm_params* c_no,
+                         std::unique_ptr<cssexplore::base_explore> exp_behavior,
                          rmath::rng* rng);
 
   ~acquire_free_block_fsm(void) override = default;
@@ -81,17 +74,15 @@ class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
   acq_goal_internal(void) RCPPSW_CONST;
   boost::optional<acquire_goal_fsm::candidate_type> block_select(void) const;
   bool candidates_exist(void) const RCPPSW_PURE;
-  bool block_exploration_term_cb(void) const;
-  bool block_acquired_cb(bool explore_result) const;
+  bool block_exploration_term_cb(void);
+  bool block_acquired_cb(bool explore_result);
   bool block_acq_valid(const rmath::vector2d& loc,
                        const rtypes::type_uuid& id) const;
 
   /* clang-format off */
   const controller::cognitive::block_sel_matrix* const mc_matrix;
-  const ds::dpo_store*      const                      mc_store;
+  const fspds::dpo_store*      const                   mc_store;
   /* clang-format on */
 };
 
 NS_END(fsm, fordyca);
-
-#endif /* INCLUDE_FORDYCA_FSM_ACQUIRE_FREE_BLOCK_FSM_HPP_ */

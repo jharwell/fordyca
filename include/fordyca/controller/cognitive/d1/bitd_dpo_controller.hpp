@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D1_BITD_DPO_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D1_BITD_DPO_CONTROLLER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -46,13 +45,9 @@ class bi_tab;
 } /* namespace ds */
 }
 
-NS_START(fordyca);
+namespace fordyca::controller::config::d1 { class controller_repository; }
 
-namespace config {
-namespace d1 { class controller_repository; }
-}
-
-NS_START(controller, cognitive);
+NS_START(fordyca, controller, cognitive);
 class cache_sel_matrix;
 NS_START(d1);
 
@@ -158,6 +153,9 @@ class bitd_dpo_controller : public d0::dpo_controller,
 
   void task_status_update(tasks::task_status s) { m_task_status = s; }
 
+  /* block carrying controller */
+  const cssblocks::drop::base_drop* block_drop_strategy(void) const override;
+
  protected:
   /**
    * \brief Initialization that derived classes may also need to perform, if
@@ -222,4 +220,3 @@ class bitd_dpo_controller : public d0::dpo_controller,
 
 NS_END(cognitive, d1, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D1_BITD_DPO_CONTROLLER_HPP_ */

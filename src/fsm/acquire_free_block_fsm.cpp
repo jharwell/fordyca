@@ -29,10 +29,10 @@
 #include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 
 #include "fordyca/controller/cognitive/block_selector.hpp"
-#include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/block_acq_validator.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,13 +43,13 @@ NS_START(fordyca, fsm);
  * Constructors/Destructors
  ******************************************************************************/
 acquire_free_block_fsm::acquire_free_block_fsm(
-    const fsm_ro_params* c_params,
-    csubsystem::saa_subsystemQ3D* saa,
-    std::unique_ptr<csstrategy::base_strategy> exp_behavior,
+    const fsm_ro_params* c_ro,
+    const csfsm::fsm_params* c_no,
+    std::unique_ptr<cssexplore::base_explore> exp_behavior,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_free_block"),
       acquire_goal_fsm(
-          saa,
+          c_no,
           std::move(exp_behavior),
           rng,
           acquire_goal_fsm::hook_list{
@@ -78,23 +78,23 @@ acquire_free_block_fsm::acquire_free_block_fsm(
                             this,
                             std::placeholders::_1,
                             std::placeholders::_2)) }),
-      mc_matrix(c_params->bsel_matrix),
-      mc_store(c_params->store) {}
+      mc_matrix(c_ro->bsel_matrix),
+      mc_store(c_ro->store) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool acquire_free_block_fsm::block_exploration_term_cb(void) const {
-  return saa()->sensing()->ground()->detect("block");
+bool acquire_free_block_fsm::block_exploration_term_cb(void) {
+  return saa()->sensing()->env()->detect("block");
 } /* block_exploration_term_cb() */
 
-bool acquire_free_block_fsm::block_acquired_cb(bool explore_result) const {
+bool acquire_free_block_fsm::block_acquired_cb(bool explore_result) {
   if (explore_result) {
     ER_ASSERT(block_exploration_term_cb(),
               "No block detected after successful exploration?");
     return true;
   } else {
-    if (saa()->sensing()->ground()->detect("block")) {
+    if (saa()->sensing()->env()->detect("block")) {
       return true;
     }
     ER_WARN("Robot arrived at goal, but no block was detected.");
@@ -107,7 +107,7 @@ acquire_free_block_fsm::block_select(void) const {
   controller::cognitive::block_selector selector(mc_matrix);
 
   if (const auto* best =
-          selector(mc_store->blocks(), saa()->sensing()->rpos2D())) {
+          selector(mc_store->tracked_blocks(), saa()->sensing()->rpos2D())) {
     return boost::make_optional(acquire_goal_fsm::candidate_type(
         best->rcenter2D(), kBLOCK_ARRIVAL_TOL, best->id()));
   } else {
@@ -116,12 +116,12 @@ acquire_free_block_fsm::block_select(void) const {
 } /* block_select() */
 
 bool acquire_free_block_fsm::candidates_exist(void) const {
-  return !mc_store->blocks().empty();
+  return !mc_store->known_blocks().empty();
 } /* candidates_exist() */
 
 bool acquire_free_block_fsm::block_acq_valid(const rmath::vector2d& loc,
                                              const rtypes::type_uuid& id) const {
-  return block_acq_validator(&mc_store->blocks(), mc_matrix)(loc, id);
+  return block_acq_validator(&mc_store->tracked_blocks(), mc_matrix)(loc, id);
 } /* block_acq_valid() */
 
 /*******************************************************************************

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_INTERACTOR_STATUS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_INTERACTOR_STATUS_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -85,5 +84,3 @@ enum class interactor_status {
 };
 
 NS_END(support, fordyca);
-
-#endif /* INCLUDE_FORDYCA_SUPPORT_INTERACTOR_STATUS_HPP_ */

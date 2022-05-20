@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+
+<ros-configuration>
+  <launch>
+
+    <node
+        name="fordyca_rosbridge_d0_master_node"
+        pkg="fordyca_rosbridge"
+        type="fordyca_rosbridge_d0_master_node"
+        output="screen"/>
+
+    <group ns="sierra">
+      <node
+          name="sierra_timekeeper"
+          pkg="sierra_rosbridge"
+          type="sierra_timekeeper.py"
+          required="true"/>
+      <param
+          name="experiment/param_file"
+          value="$(env HOME)/git/fordyca/exp/demo.params"/>
+      <param
+          name="experiment/length"
+          value="10000"/>
+      <param
+          name="experiment/n_robots"
+          value="1"/>
+      <param
+          name="controller/rate"
+          value="5"/>
+    </group>
+  </launch>
+</ros-configuration>

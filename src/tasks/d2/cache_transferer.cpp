@@ -23,10 +23,10 @@
  ******************************************************************************/
 #include "fordyca/tasks/d2/cache_transferer.hpp"
 
-#include "fordyca/events/block_found.hpp"
-#include "fordyca/events/cache_vanished.hpp"
-#include "fordyca/events/robot_cache_block_drop.hpp"
-#include "fordyca/events/robot_cached_block_pickup.hpp"
+#include "fordyca/controller/cognitive/d2/events/block_found.hpp"
+#include "fordyca/controller/cognitive/d2/events/cache_block_drop.hpp"
+#include "fordyca/controller/cognitive/d2/events/cache_vanished.hpp"
+#include "fordyca/controller/cognitive/d2/events/cached_block_pickup.hpp"
 #include "fordyca/fsm/d2/cache_transferer_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
 
@@ -47,7 +47,6 @@ cache_transferer::cache_transferer(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-
 void cache_transferer::task_start(cta::taskable_argument* const) {
   foraging_signal_argument a(fsm::foraging_signal::ekACQUIRE_CACHED_BLOCK);
   cta::polled_task::mechanism()->task_start(&a);
@@ -100,16 +99,19 @@ void cache_transferer::active_interface_update(int) {
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void cache_transferer::accept(events::detail::robot_cache_block_drop& visitor) {
-  visitor.visit(*this);
+void cache_transferer::accept(fccd2::events::cache_block_drop& visitor) {
+  auto& fsm = *static_cast<ffsm::block_to_goal_fsm*>(mechanism());
+  static_cast<fccd1::events::cache_block_drop&>(visitor).visit(fsm);
 }
 
-void cache_transferer::accept(events::detail::robot_cached_block_pickup& visitor) {
-  visitor.visit(*this);
+void cache_transferer::accept(fccd2::events::cached_block_pickup& visitor) {
+  auto& fsm = *static_cast<ffsm::block_to_goal_fsm*>(mechanism());
+  static_cast<fccd1::events::cached_block_pickup&>(visitor).visit(fsm);
 }
 
-void cache_transferer::accept(events::detail::cache_vanished& visitor) {
-  visitor.visit(*this);
+void cache_transferer::accept(fccd2::events::cache_vanished& visitor) {
+  auto& fsm = *static_cast<ffsm::block_to_goal_fsm*>(mechanism());
+  static_cast<fccd1::events::cache_vanished&>(visitor).visit(fsm);
 }
 
 /*******************************************************************************
@@ -165,6 +167,15 @@ RCPPSW_WRAP_DEF_OVERRIDE(
 RCPPSW_WRAP_DEF_OVERRIDE(
     cache_transferer,
     entity_acquired_id,
+    *static_cast<fsm::d2::cache_transferer_fsm*>(polled_task::mechanism()),
+    const);
+
+/*******************************************************************************
+ * Block Carrying
+ ******************************************************************************/
+RCPPSW_WRAP_DEF_OVERRIDE(
+    cache_transferer,
+    block_drop_strategy,
     *static_cast<fsm::d2::cache_transferer_fsm*>(polled_task::mechanism()),
     const);
 

@@ -18,17 +18,14 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_CACHES_SITE_SELECTION_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_CACHES_SITE_SELECTION_METRICS_COLLECTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <list>
-#include <string>
-
-#include "rcppsw/metrics/base_metrics_collector.hpp"
+#include "rcppsw/metrics/base_collector.hpp"
 #include "fordyca/fordyca.hpp"
+#include "fordyca/metrics/caches/site_selection_metrics_data.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,46 +42,26 @@ NS_START(fordyca, metrics, caches);
  * \brief Collector for \ref site_selection_metrics.
  *
  * Metrics CANNOT be collected in parallel; concurrent updates to the gathered
- * stats are not supported. Metrics are output at the specified interval.
+ * stats are not supported.
  */
-class site_selection_metrics_collector final : public rmetrics::base_metrics_collector {
+class site_selection_metrics_collector final : public rmetrics::base_collector {
  public:
   /**
-   * \param ofname_stem Output file name stem.
-   * \param interval Collection interval.
+   * \param sink The metrics sink to use.
    */
-  site_selection_metrics_collector(const std::string& ofname_stem,
-                                   const rtypes::timestep& interval);
+  explicit site_selection_metrics_collector(
+      std::unique_ptr<rmetrics::base_sink> sink);
 
-  void reset(void) override;
-  void reset_after_interval(void) override;
+  /* base_collector overrides */
   void collect(const rmetrics::base_metrics& metrics) override;
+  void reset_after_interval(void) override;
+  const rmetrics::base_data* data(void) const override { return &m_data; }
 
  private:
-  struct stats {
-    uint int_n_successes{0};
-    uint int_n_fails{0};
-    uint int_nlopt_stopval{0};
-    uint int_nlopt_ftol{0};
-    uint int_nlopt_xtol{0};
-    uint int_nlopt_maxeval{0};
-
-    uint cum_n_successes{0};
-    uint cum_n_fails{0};
-    uint cum_nlopt_stopval{0};
-    uint cum_nlopt_ftol{0};
-    uint cum_nlopt_xtol{0};
-    uint cum_nlopt_maxeval{0};
-  };
-
-  std::list<std::string> csv_header_cols(void) const override;
-  boost::optional<std::string> csv_line_build(void) override;
-
   /* clang-format off */
-  struct stats m_stats{};
+  site_selection_metrics_data m_data{};
   /* clang-format on */
 };
 
 NS_END(caches, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_CACHES_SITE_SELECTION_METRICS_COLLECTOR_HPP_ */

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_NEW_CACHE_SELECTOR_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_NEW_CACHE_SELECTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -28,13 +27,16 @@
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "fordyca/ds/dp_cache_map.hpp"
-#include "fordyca/ds/dp_block_map.hpp"
 
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::repr {
+class base_block3D;
+} /* namespace cosm::repr */
+
 NS_START(fordyca, controller, cognitive);
 class cache_sel_matrix;
 NS_START(d2);
@@ -65,13 +67,13 @@ class new_cache_selector: public rer::client<new_cache_selector> {
    *
    * \return The "best" new cache.
    */
-  const crepr::base_block3D* operator()(const ds::dp_block_map& new_caches,
-                                        const ds::dp_cache_map& existing_caches,
+  const crepr::base_block3D* operator()(const fspds::dp_block_map& new_caches,
+                                        const fspds::dp_cache_map& existing_caches,
                                         const rmath::vector2d& position) const;
 
  private:
-  bool new_cache_is_excluded(const ds::dp_cache_map& existing_caches,
-                             const ds::dp_block_map& blocks,
+  bool new_cache_is_excluded(const fspds::dp_cache_map& existing_caches,
+                             const fspds::dp_block_map& blocks,
                              const crepr::base_block3D* new_cache) const;
 
   /* clang-format off */
@@ -81,4 +83,3 @@ class new_cache_selector: public rer::client<new_cache_selector> {
 
 NS_END(cognitive, d2, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_NEW_CACHE_SELECTOR_HPP_ */

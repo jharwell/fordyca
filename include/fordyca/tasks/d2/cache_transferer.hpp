@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_D2_CACHE_TRANSFERER_HPP_
-#define INCLUDE_FORDYCA_TASKS_D2_CACHE_TRANSFERER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -56,14 +55,22 @@ class cache_transferer final : public foraging_task,
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,
-   * because when visiting a \ref existing_cache_interactor, you have no way to
-   * way which d2 task the object ACTUALLY is without using a set of if()
-   * statements, which is a brittle design. This is not the cleanest, but is
-   * still more elegant than the alternative.
+   * because when visiting a given task which is a member of a set of tasks
+   * which all implement the same interface, you have no way to way which task
+   * the object ACTUALLY is without using a set of if() statements, which is a
+   * brittle design. This is not the cleanest, but is still more elegant than
+   * the alternative.
+   *
+   * I wish you didn't have to stub out the d1 events.
    */
-  void accept(events::detail::robot_cache_block_drop& visitor) override;
-  void accept(events::detail::robot_cached_block_pickup& visitor) override;
-  void accept(events::detail::cache_vanished& visitor) override;
+  /* existing cache interaction events */
+  RCPPSW_VISITOR_ACCEPT_STUB(fccd1::events::cached_block_pickup);
+  RCPPSW_VISITOR_ACCEPT_STUB(fccd1::events::cache_vanished);
+  RCPPSW_VISITOR_ACCEPT_STUB(fccd1::events::cache_block_drop);
+
+  void accept(fccd2::events::cached_block_pickup& visitor) override;
+  void accept(fccd2::events::cache_vanished& visitor) override;
+  void accept(fccd2::events::cache_block_drop& visitor) override;
 
   /* goal acquisition metrics */
   RCPPSW_WRAP_DECL_OVERRIDE(bool, goal_acquired, const);
@@ -83,6 +90,11 @@ class cache_transferer final : public foraging_task,
                             const);
   bool is_phototaxiing_to_goal(bool) const override { return false; }
 
+  /* block carrying */
+  RCPPSW_WRAP_DECL_OVERRIDE(const cssblocks::drop::base_drop*,
+                            block_drop_strategy,
+                            const);
+
   /* task metrics */
   bool task_completed(void) const override { return task_finished(); }
 
@@ -94,5 +106,3 @@ class cache_transferer final : public foraging_task,
 };
 
 NS_END(d2, tasks, fordyca);
-
-#endif /* INCLUDE_FORDYCA_TASKS_D2_CACHE_TRANSFERER_HPP_ */

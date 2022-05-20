@@ -17,7 +17,7 @@
   <controllers>
 
     <crw_controller id="ffc"
-                               library="libfordyca">
+                               library="libfordyca-argos-footbot">
       <actuators>
         <differential_steering implementation="default" />
         <leds implementation="default" medium="leds" />
@@ -36,8 +36,8 @@
       </sensors>
       <params>
         <output
-          output_root="output"
-          output_dir="__current_date__"
+          output_parent="output"
+          output_leaf="__current_date__"
           />
         <perception
             los_dim="0.4">
@@ -47,44 +47,61 @@
                      repeat_deposit="false"/>
         </perception>
         <nest dims="1.0, 4.0" center="2, 3" />
-        <exploration
-            block_strategy="CRW"
-            cache_strategy="ledtaxis_search"/>
+        <strategy>
+          <blocks>
+            <explore
+                strategy="CRW"
+                min_duration="50"/>
+            </blocks>
+            <nest>
+              <acq
+                  strategy="wander"
+                  duration="20"
+                  />
+              <exit
+                  strategy="anti_phototaxis"
+                  />
+            </nest>
+        </strategy>
         <sensing_subsystemQ3D>
-                     <!-- -5pi/6 : 5pi/6 -->
+          <!-- -5pi/6 : 5pi/6 -->
           <proximity_sensor fov="-2.61:2.61"
                             delta="0.1" />
 
-          <ground_sensor>
-          <!-- NEST: The nest is a relatively light gray. -->
+
+          <env_sensor>
+            <!-- NEST: The nest is a relatively light gray. -->
             <nest range="0.6:0.8"
                   consensus="3"/>
-          <!-- BLOCK: Blocks are black. -->
+            <!-- BLOCK: Blocks are black. -->
             <block range="-0.05:0.05"
                    consensus="4"/>
-          <!-- CACHE: Caches are dark gray. -->
+            <!-- CACHE: Caches are dark gray. -->
             <cache range="0.3:0.5"
                    consensus="3"/>
-          </ground_sensor>
-          </sensing_subsystemQ3D>
-          <actuation_subsystem2D>
+          </env_sensor>
+        </sensing_subsystemQ3D>
+        <actuation_subsystem2D>
           <force_calculator>
             <avoidance_force lookahead="0.5"
-                             max="8"/>
+                             max="0.08"/>
             <arrival_force slowing_radius="0.2"
-                           slowing_speed_min="1.0"
-                           max="8"/>
+                           slowing_speed_min="0.01"
+                           max="0.08"/>
             <wander_force circle_distance="4.0"
                           circle_radius="100.0"
-                          max_angle_delta="5"
-                          max="9.0"
-                          interval="1"
-                          normal_dist="false"/>
-            <phototaxis_force max="8"/>
+                          max="0.09"
+                          interval="1">
+              <!-- 5 degrees max delta. -->
+              <bias_angle src="uniform"
+                          max_delta="0.0872"/>
+            </wander_force>
+            <phototaxis_force max="0.08"/>
           </force_calculator>
 
-          <diff_drive soft_turn_max="25"
-                              max_speed="10.0" />
+          <!-- 25 degrees soft_turn_max. -->
+          <diff_drive soft_turn_max="0.836"
+                      max_speed="0.09" />
         </actuation_subsystem2D>
       </params>
     </crw_controller>
@@ -94,47 +111,55 @@
   <!-- ****************** -->
   <!-- * Loop functions * -->
   <!-- ****************** -->
-  <loop_functions library="libfordyca"
+  <loop_functions library="libfordyca-argos-footbot"
                   label="d0_loop_functions">
-    <output output_root="output"
-            output_dir="__current_date__">
+    <output output_parent="output"
+            output_leaf="__current_date__">
       <metrics
-          output_dir="metrics">
-          <append
-              output_interval="1000"
-              block_transporter="block-transporter.csv"
-              block_transportee="block-transportee.csv"
-              fsm_collision_counts="fsm-collision-counts.csv"
-              fsm_movement="fsm-movement.csv"
-              block_acq_counts="block-acq-counts.csv"
-              block_manipulation="block-manipulation.csv"
-              />
-          <create
-              output_interval="10"
-              fsm_collision_locs2D="fsm-collision-locs.csv"
-              block_acq_locs2D="block-acq-locs.csv"
-              block_acq_explore_locs2D="block-acq-explore-locs.csv"
-              block_acq_vector_locs2D="block-acq-vector-locs.csv"
-              swarm_dist_pos2D="swarm-dist-pos2D.csv"/>
+          metrics_path="metrics">
+        <sinks>
+          <file>
+            <append
+                output_interval="1000"
+                block_transporter="block-transporter.csv"
+                block_transportee="block-transportee.csv"
+                spatial_interference_counts="spatial-interference-counts.csv"
+                spatial_movement="spatial-movement.csv"
+                spatial_nest_zone='spatial-nest-zone'
+                block_acq_counts="block-acq-counts.csv"
+                block_manipulation="block-manipulation.csv"
+                />
+            <create
+                output_interval="10"
+                spatial_interference_locs2D="spatial-interference-locs.csv"
+                block_acq_locs2D="block-acq-locs.csv"
+                block_acq_explore_locs2D="block-acq-explore-locs.csv"
+                block_acq_vector_locs2D="block-acq-vector-locs.csv"
+                spatial_dist_pos2D="spatial-dist-pos2D.csv"/>
+          </file>
+        </sinks>
       </metrics>
     </output>
 
     <arena_map>
       <grid2D resolution="0.2"
-            dims="12, 6, 2"/>
+              dims="12, 6, 2"/>
       <blocks>
         <distribution
             arena_resolution="0.2"
-            dist_type="single_source">
+            dist_type="random">
           <manifest
-              n_cube="10"
-              n_ramp="10"
+              n_cube="100"
+              n_ramp="0"
               unit_dim="0.2"
               />
         </distribution>
       </blocks>
       <nests>
-        <nest dims="1.0, 4.0" center="2, 3" />
+        <nest dims="1.0, 4.0"
+              center="2, 3"
+              light_height="5.0"
+              light_intensity="10.0"/>
       </nests>
     </arena_map>
     <visualization robot_id="true"
@@ -182,7 +207,7 @@
   <!-- ******************* -->
   <physics_engines>
     <dynamics2d id="dyn2d0">
-     </dynamics2d>
+    </dynamics2d>
   </physics_engines>
 
   <!-- ********* -->

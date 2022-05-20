@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_D2_ACQUIRE_NEW_CACHE_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_D2_ACQUIRE_NEW_CACHE_FSM_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -27,9 +26,10 @@
 #include <memory>
 
 #include "cosm/spatial/fsm/acquire_goal_fsm.hpp"
-#include "fordyca/fordyca.hpp"
 #include "cosm/subsystem/subsystem_fwd.hpp"
+
 #include "fordyca/fsm/fsm_ro_params.hpp"
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,7 +37,6 @@
 NS_START(fordyca);
 
 namespace controller::cognitive { class cache_sel_matrix; }
-namespace ds { class dpo_store; }
 
 NS_START(fsm, d2);
 
@@ -57,9 +56,9 @@ NS_START(fsm, d2);
 class acquire_new_cache_fsm final : public rer::client<acquire_new_cache_fsm>,
                               public csfsm::acquire_goal_fsm {
  public:
-  acquire_new_cache_fsm(const fsm_ro_params* c_params,
-                        csubsystem::saa_subsystemQ3D* saa,
-                        std::unique_ptr<csstrategy::base_strategy> exp_behavior,
+  acquire_new_cache_fsm(const fsm_ro_params* c_ro,
+                        const csfsm::fsm_params* c_no,
+                        std::unique_ptr<cssexplore::base_explore> explore,
                         rmath::rng* rng);
   ~acquire_new_cache_fsm(void) override = default;
 
@@ -77,10 +76,8 @@ class acquire_new_cache_fsm final : public rer::client<acquire_new_cache_fsm>,
 
   /* clang-format off */
   const controller::cognitive::cache_sel_matrix* const mc_matrix;
-  const ds::dpo_store*      const                      mc_store;
+  const fspds::dpo_store*      const                   mc_store;
   /* clang-format on */
 };
 
 NS_END(d2, fsm, fordyca);
-
-#endif /* INCLUDE_FORDYCA_FSM_D2_ACQUIRE_NEW_CACHE_FSM_HPP_ */

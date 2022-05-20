@@ -11,6 +11,7 @@
                (substitute-in-file-name "$rcppsw/include")
                (substitute-in-file-name "$fordyca/include")
                (substitute-in-file-name "$cosm/include")
+               (substitute-in-file-name "/opt/ros/noetic/include")
                (concat
                 (projectile-project-root)
                 "include")
@@ -23,23 +24,32 @@
           (setq flycheck-gcc-include-path includes-list)
           (add-to-list 'flycheck-clang-args "-std=c++17")
           (add-to-list 'flycheck-clang-args "-fPIC")
+          (add-to-list 'flycheck-clang-args "-Wno-pragma-once-outside-header")
           (add-to-list 'flycheck-clang-args (concat "-isystem" (substitute-in-file-name
-                                                                 "$rcppsw")))
-          (add-to-list 'flycheck-clang-args (concat "-isystem" (substitute-in-file-name
-                                                                "$localroot/include")))
+                                                                "$localroot/system/include")))
           (add-to-list 'flycheck-clang-args (concat "-isystem" "/usr/include/eigen3"))
+          (add-to-list 'flycheck-clang-args "-ftemplate-backtrace-limit=0")
           (add-to-list 'flycheck-clang-definitions "COSM_HAL_TARGET=COSM_HAL_TARGET_ARGOS_FOOTBOT")
-          (add-to-list 'flycheck-clang-definitions "COSM_PAL_TARGET=COSM_PAL_TARGET_ARGOS")
+          (add-to-list 'flycheck-clang-definitions "COSM_ENABLE_PAL_TARGET_ARGOS")
+          ;; (add-to-list 'flycheck-clang-definitions "COSM_HAL_TARGET=COSM_HAL_TARGET_ROS_TURTLEBOT3")
+          ;; (add-to-list 'flycheck-clang-definitions "COSM_ENABLE_PAL_TARGET_ROS")
+          (add-to-list 'flycheck-clang-definitions "RCPPSW_ER_SYSTEM_LOG4CXX")
+          (add-to-list 'flycheck-clang-definitions "RCPPSW_AL_MT_SAFE_TYPES")
+          (add-to-list 'flycheck-clang-definitions "LIBRA_ER=LIBRA_ER_ALL")
 
           (add-to-list 'flycheck-gcc-args "-fPIC")
           (add-to-list 'flycheck-gcc-definitions "COSM_HAL_TARGET=COSM_HAL_TARGET_ARGOS_FOOTBOT")
-          (add-to-list 'flycheck-gcc-definitions "COSM_PAL_TARGET=COSM_PAL_TARGET_ARGOS")
+          (add-to-list 'flycheck-gcc-definitions "COSM_ENABLE_PAL_TARGET_ARGOS")
+          ;; (add-to-list 'flycheck-gcc-definitions "COSM_HAL_TARGET=COSM_HAL_TARGET_ROS_TURTLEBOT3")
+          ;; (add-to-list 'flycheck-gcc-definitions "COSM_ENABLE_PAL_TARGET_ROS")
+          (add-to-list 'flycheck-gcc-definitions "RCPPSW_AL_MT_SAFE_TYPES")
           (add-to-list 'flycheck-gcc-args "-std=c++17")
           (add-to-list 'flycheck-gcc-args (concat "-isystem" (substitute-in-file-name
-                                                              "$rcppsw")))
+                                                              "$rcppsw/ext")))
           (add-to-list 'flycheck-gcc-args (concat "-isystem" (substitute-in-file-name
-                                                              "$localroot/include")))
+                                                              "$localroot/system/include")))
           (add-to-list 'flycheck-gcc-args (concat "-isystem" "/usr/include/eigen3"))
+          (add-to-list 'flycheck-gcc-definitions "LIBRA_ER=LIBRA_ER_ALL")
           )
         )))
 

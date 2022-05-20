@@ -24,16 +24,16 @@
 #include "fordyca/controller/cognitive/d1/bitd_mdpo_controller.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/ds/cell2D.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
-#include "cosm/subsystem/perception/config/perception_config.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 
-#include "fordyca/config/d1/controller_repository.hpp"
 #include "fordyca/controller/cognitive/d1/task_executive_builder.hpp"
-#include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
-#include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/controller/config/d1/controller_repository.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/perception_subsystem_factory.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,7 +44,7 @@ NS_START(fordyca, controller, cognitive, d1);
  * Constructors/Destructor
  ******************************************************************************/
 bitd_mdpo_controller::bitd_mdpo_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.d1.bitd_mdpo") {}
+    : ER_CLIENT_INIT("fordyca.controller.cognitive.d1.bitd_mdpo") {}
 
 bitd_mdpo_controller::~bitd_mdpo_controller(void) = default;
 
@@ -54,7 +54,7 @@ bitd_mdpo_controller::~bitd_mdpo_controller(void) = default;
 void bitd_mdpo_controller::init(ticpp::Element& node) {
   foraging_controller::init(node);
 
-  ndc_push();
+  ndc_uuid_push();
   ER_INFO("Initializing...");
   config::d1::controller_repository config_repo;
 
@@ -66,11 +66,12 @@ void bitd_mdpo_controller::init(ticpp::Element& node) {
 
   shared_init(config_repo);
   ER_INFO("Initialization finished");
-  ndc_pop();
+  ndc_uuid_pop();
 } /* init() */
 
 void bitd_mdpo_controller::control_step(void) {
-  ndc_pusht();
+  mdc_ts_update();
+  ndc_uuid_push();
   ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
@@ -79,13 +80,23 @@ void bitd_mdpo_controller::control_step(void) {
   perception()->update(nullptr);
 
   /*
+   * Reset steering forces tracking so per-timestep visualizations are
+   * correct. This can't be done when applying the steering forces because then
+   * they are always 0 during loop function visualization.
+   */
+  saa()->steer_force2D().tracking_reset();
+
+  /*
    * Execute the current task/allocate a new task/abort a task/etc and apply
    * steering forces if normal operation, otherwise handle abnormal operation
    * state.
    */
   supervisor()->run();
 
-  ndc_pop();
+  /* Update block detection status for use in the loop functions */
+  block_detect_status_update();
+
+  ndc_uuid_pop();
 } /* control_step() */
 
 void bitd_mdpo_controller::shared_init(
@@ -94,37 +105,32 @@ void bitd_mdpo_controller::shared_init(
   bitd_dpo_controller::shared_init(config_repo);
 
   /* MDPO perception subsystem */
-  auto p = *config_repo.config_get<cspconfig::perception_config>();
-  rmath::vector2d padding(p.occupancy_grid.resolution.v() * 5,
-                          p.occupancy_grid.resolution.v() * 5);
-  p.occupancy_grid.dims += padding;
+  auto p = *config_repo.config_get<fspconfig::perception_config>();
+  rmath::vector2d padding(p.mdpo.rlos.grid2D.resolution.v() * 5,
+                          p.mdpo.rlos.grid2D.resolution.v() * 5);
+  p.mdpo.rlos.grid2D.dims += padding;
 
-  bitd_dpo_controller::perception(
-      std::make_unique<mdpo_perception_subsystem>(&p, GetId()));
+  auto factory = fsperception::perception_subsystem_factory();
+  perception(factory.create(p.type, &p));
 
   /*
    * Task executive. Even though we use the same executive as the \ref
    * bitd_dpo_controller, we have to replace it because we have our own
    * perception subsystem, which is used to create the executive's graph.
    */
-  executive(task_executive_builder(
-      block_sel_matrix(), cache_sel_matrix(), saa(), perception())(config_repo,
-                                                                   rng()));
+  executive(task_executive_builder(block_sel_matrix(),
+                                   cache_sel_matrix(),
+                                   inta_tracker(),
+                                   nz_tracker(),
+                                   saa(),
+                                   perception())(config_repo, rng()));
   executive()->task_abort_notify(std::bind(
       &bitd_mdpo_controller::task_abort_cb, this, std::placeholders::_1));
 } /* shared_init() */
 
-mdpo_perception_subsystem* bitd_mdpo_controller::mdpo_perception(void) {
-  return static_cast<mdpo_perception_subsystem*>(dpo_controller::perception());
-} /* perception() */
+NS_END(cognitive, d1, controller, fordyca);
 
-const mdpo_perception_subsystem*
-bitd_mdpo_controller::mdpo_perception(void) const {
-  return static_cast<const mdpo_perception_subsystem*>(
-      dpo_controller::perception());
-} /* perception() */
-
-using namespace argos; // NOLINT
+using namespace fccd1; // NOLINT
 
 RCPPSW_WARNING_DISABLE_PUSH()
 RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
@@ -134,5 +140,3 @@ RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 REGISTER_CONTROLLER(bitd_mdpo_controller, "bitd_mdpo_controller");
 
 RCPPSW_WARNING_DISABLE_POP()
-
-NS_END(cognitive, d1, controller, fordyca);

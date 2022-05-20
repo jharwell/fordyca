@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_MATH_CACHE_SITE_UTILITY_HPP_
-#define INCLUDE_FORDYCA_MATH_CACHE_SITE_UTILITY_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -74,5 +73,3 @@ class cache_site_utility : public rmath::sigmoid,
 };
 
 NS_END(math, fordyca);
-
-#endif /* INCLUDE_FORDYCA_MATH_CACHE_SITE_UTILITY_HPP_ */

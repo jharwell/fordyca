@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_CACHE_ACQ_POINT_SELECTOR_HPP_
-#define INCLUDE_FORDYCA_FSM_CACHE_ACQ_POINT_SELECTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -77,5 +76,3 @@ class cache_acq_point_selector : public rer::client<cache_acq_point_selector> {
 };
 
 NS_END(fsm, fordyca);
-
-#endif /* INCLUDE_FORDYCA_FSM_CACHE_ACQ_POINT_SELECTOR_HPP_ */

@@ -43,7 +43,6 @@ Thumbs.db
 GPATH
 GRTAGS
 GTAGS
-.clang_complete
 compile_commands.json
 
 # Build process
@@ -54,7 +53,7 @@ ext/cosm
 node_modules
 
 # Runtime
-*.txt
+
 .gdb_history
 *.csv
 output

@@ -24,13 +24,14 @@
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
 
 #include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/ds/cell2D.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
-#include "cosm/subsystem/perception/config/perception_config.hpp"
 
-#include "fordyca/config/d2/controller_repository.hpp"
-#include "fordyca/controller/cognitive/mdpo_perception_subsystem.hpp"
-#include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/controller/config/d2/controller_repository.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
+#include "fordyca/subsystem/perception/mdpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/perception_subsystem_factory.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,7 +42,7 @@ NS_START(fordyca, controller, cognitive, d2);
  * Constructors/Destructor
  ******************************************************************************/
 birtd_mdpo_controller::birtd_mdpo_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.d2.birtd_mdpo") {}
+    : ER_CLIENT_INIT("fordyca.controller.cognitive.d2.birtd_mdpo") {}
 
 birtd_mdpo_controller::~birtd_mdpo_controller(void) = default;
 
@@ -50,7 +51,7 @@ birtd_mdpo_controller::~birtd_mdpo_controller(void) = default;
  ******************************************************************************/
 void birtd_mdpo_controller::init(ticpp::Element& node) {
   foraging_controller::init(node);
-  ndc_push();
+  ndc_uuid_push();
   ER_INFO("Initializing");
 
   config::d2::controller_repository config_repo;
@@ -63,7 +64,7 @@ void birtd_mdpo_controller::init(ticpp::Element& node) {
   shared_init(config_repo);
 
   ER_INFO("Initialization finished");
-  ndc_pop();
+  ndc_uuid_pop();
 } /* init() */
 
 void birtd_mdpo_controller::shared_init(
@@ -72,26 +73,18 @@ void birtd_mdpo_controller::shared_init(
   birtd_dpo_controller::shared_init(config_repo);
 
   /* MDPO perception subsystem */
-  auto p = *config_repo.config_get<cspconfig::perception_config>();
-  rmath::vector2d padding(p.occupancy_grid.resolution.v() * 5,
-                          p.occupancy_grid.resolution.v() * 5);
-  p.occupancy_grid.dims += padding;
+  auto p = *config_repo.config_get<fspconfig::perception_config>();
+  rmath::vector2d padding(p.mdpo.rlos.grid2D.resolution.v() * 5,
+                          p.mdpo.rlos.grid2D.resolution.v() * 5);
+  p.mdpo.rlos.grid2D.dims += padding;
 
-  bitd_dpo_controller::perception(
-      std::make_unique<mdpo_perception_subsystem>(&p, GetId()));
+  auto factory = fsperception::perception_subsystem_factory();
+  perception(factory.create(p.type, &p));
 } /* shared_init() */
 
-mdpo_perception_subsystem* birtd_mdpo_controller::mdpo_perception(void) {
-  return static_cast<mdpo_perception_subsystem*>(dpo_controller::perception());
-} /* mdpo_perception() */
+NS_END(cognitive, d2, controller, fordyca);
 
-const mdpo_perception_subsystem*
-birtd_mdpo_controller::mdpo_perception(void) const {
-  return static_cast<const mdpo_perception_subsystem*>(
-      dpo_controller::perception());
-} /* mdpo_perception() */
-
-using namespace argos; // NOLINT
+using namespace fccd2; // NOLINT
 
 RCPPSW_WARNING_DISABLE_PUSH()
 RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
@@ -102,5 +95,3 @@ REGISTER_CONTROLLER(birtd_mdpo_controller,
                     "birtd_mdpo_controller"); // NOLINT
 
 RCPPSW_WARNING_DISABLE_POP()
-
-NS_END(cognitive, d2, controller, fordyca);

@@ -26,13 +26,14 @@
 #include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 #include "cosm/ta/config/task_alloc_config.hpp"
 
-#include "fordyca/events/block_found.hpp"
-#include "fordyca/events/block_vanished.hpp"
-#include "fordyca/events/cache_found.hpp"
-#include "fordyca/events/cache_vanished.hpp"
-#include "fordyca/events/robot_cache_block_drop.hpp"
-#include "fordyca/events/robot_cached_block_pickup.hpp"
-#include "fordyca/events/robot_free_block_pickup.hpp"
+#include "fordyca/controller/cognitive/d1/events/block_vanished.hpp"
+#include "fordyca/controller/cognitive/d1/events/cache_block_drop.hpp"
+#include "fordyca/controller/cognitive/d1/events/cache_vanished.hpp"
+#include "fordyca/controller/cognitive/d1/events/free_block_pickup.hpp"
+#include "fordyca/controller/cognitive/d2/events/block_vanished.hpp"
+#include "fordyca/controller/cognitive/d2/events/cache_block_drop.hpp"
+#include "fordyca/controller/cognitive/d2/events/cache_vanished.hpp"
+#include "fordyca/controller/cognitive/d2/events/free_block_pickup.hpp"
 #include "fordyca/fsm/d1/block_to_existing_cache_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
 
@@ -102,18 +103,40 @@ void harvester::active_interface_update(int) {
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void harvester::accept(events::detail::robot_cache_block_drop& visitor) {
-  visitor.visit(*this);
+void harvester::accept(fccd1::events::cache_block_drop& visitor) {
+  auto& fsm = *static_cast<fsm::d1::block_to_existing_cache_fsm*>(mechanism());
+  visitor.visit(fsm);
 }
-void harvester::accept(events::detail::robot_free_block_pickup& visitor) {
-  visitor.visit(*this);
-}
-void harvester::accept(events::detail::cache_vanished& visitor) {
-  visitor.visit(*this);
+void harvester::accept(fccd2::events::cache_block_drop& visitor) {
+  auto& fsm = *static_cast<fsm::d1::block_to_existing_cache_fsm*>(mechanism());
+  static_cast<fccd1::events::cache_block_drop&>(visitor).visit(fsm);
 }
 
-void harvester::accept(events::detail::block_vanished& visitor) {
-  visitor.visit(*this);
+void harvester::accept(fccd1::events::free_block_pickup& visitor) {
+  auto& fsm = *static_cast<fsm::d1::block_to_existing_cache_fsm*>(mechanism());
+  visitor.visit(fsm);
+}
+void harvester::accept(fccd2::events::free_block_pickup& visitor) {
+  auto& fsm = *static_cast<fsm::d1::block_to_existing_cache_fsm*>(mechanism());
+  static_cast<fccd1::events::free_block_pickup&>(visitor).visit(fsm);
+}
+
+void harvester::accept(fccd1::events::cache_vanished& visitor) {
+  auto& fsm = *static_cast<ffsm::block_to_goal_fsm*>(mechanism());
+  visitor.visit(fsm);
+}
+void harvester::accept(fccd2::events::cache_vanished& visitor) {
+  auto& fsm = *static_cast<fsm::d1::block_to_existing_cache_fsm*>(mechanism());
+  static_cast<fccd1::events::cache_vanished&>(visitor).visit(fsm);
+}
+
+void harvester::accept(fccd1::events::block_vanished& visitor) {
+  auto& fsm = *static_cast<fsm::d1::block_to_existing_cache_fsm*>(mechanism());
+  visitor.visit(fsm);
+}
+void harvester::accept(fccd2::events::block_vanished& visitor) {
+  auto& fsm = *static_cast<fsm::d1::block_to_existing_cache_fsm*>(mechanism());
+  static_cast<fccd1::events::block_vanished&>(visitor).visit(fsm);
 }
 
 /*******************************************************************************
@@ -169,6 +192,15 @@ RCPPSW_WRAP_DEF_OVERRIDE(
 RCPPSW_WRAP_DEF_OVERRIDE(
     harvester,
     entity_acquired_id,
+    *static_cast<fsm::d1::block_to_existing_cache_fsm*>(polled_task::mechanism()),
+    const);
+
+/*******************************************************************************
+ * Block Carrying
+ ******************************************************************************/
+RCPPSW_WRAP_DEF_OVERRIDE(
+    harvester,
+    block_drop_strategy,
     *static_cast<fsm::d1::block_to_existing_cache_fsm*>(polled_task::mechanism()),
     const);
 

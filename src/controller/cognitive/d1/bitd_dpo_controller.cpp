@@ -26,23 +26,24 @@
 #include <fstream>
 
 #include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/ds/cell2D.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
-#include "cosm/hal/subsystem/config/saa_xml_names.hpp"
+#include "cosm/hal/subsystem/config/sensing_subsystemQ3D_config.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/repr/config/nest_config.hpp"
-#include "cosm/subsystem/config/sensing_subsystemQ3D_config.hpp"
+#include "cosm/subsystem/actuation_subsystem2D.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
 
-#include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
-#include "fordyca/config/cache_sel/cache_sel_matrix_config.hpp"
-#include "fordyca/config/d1/controller_repository.hpp"
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/controller/cognitive/d1/task_executive_builder.hpp"
-#include "fordyca/controller/cognitive/dpo_perception_subsystem.hpp"
-#include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/controller/config/block_sel/block_sel_matrix_config.hpp"
+#include "fordyca/controller/config/cache_sel/cache_sel_matrix_config.hpp"
+#include "fordyca/controller/config/d1/controller_repository.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
+#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
 
 /*******************************************************************************
@@ -54,7 +55,7 @@ NS_START(fordyca, controller, cognitive, d1);
  * Constructors/Destructor
  ******************************************************************************/
 bitd_dpo_controller::bitd_dpo_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.d1.bitd_dpo"),
+    : ER_CLIENT_INIT("fordyca.controller.cognitive.d1.bitd_dpo"),
       m_cache_sel_matrix(),
       m_executive() {}
 
@@ -64,13 +65,22 @@ bitd_dpo_controller::~bitd_dpo_controller(void) = default;
  * Member Functions
  ******************************************************************************/
 void bitd_dpo_controller::control_step(void) {
-  ndc_pusht();
+  mdc_ts_update();
+  ndc_uuid_push();
   ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
             block()->md()->robot_id().v());
 
-  dpo_perception()->update(nullptr);
+  /* non-oracular controller */
+  perception()->update(nullptr);
+
+  /*
+   * Reset steering forces tracking so per-timestep visualizations are
+   * correct. This can't be done when applying the steering forces because then
+   * they are always 0 during loop function visualization.
+   */
+  saa()->steer_force2D().tracking_reset();
 
   /*
    * Execute the current task/allocate a new task/abort a task/etc and apply
@@ -79,13 +89,16 @@ void bitd_dpo_controller::control_step(void) {
    */
   supervisor()->run();
 
-  ndc_pop();
+  /* Update block detection status for use in the loop functions */
+  block_detect_status_update();
+
+  ndc_uuid_pop();
 } /* control_step() */
 
 void bitd_dpo_controller::init(ticpp::Element& node) {
   foraging_controller::init(node);
 
-  ndc_push();
+  ndc_uuid_push();
   ER_INFO("Initializing...");
   config::d1::controller_repository config_repo;
 
@@ -99,7 +112,7 @@ void bitd_dpo_controller::init(ticpp::Element& node) {
   private_init(config_repo);
 
   ER_INFO("Initialization finished");
-  ndc_pop();
+  ndc_uuid_pop();
 } /* init() */
 
 void bitd_dpo_controller::shared_init(
@@ -120,14 +133,11 @@ void bitd_dpo_controller::shared_init(
    * initialization in the base controller, and needs to happen here when we
    * have an XML repository with the correct configuration in it.
    */
-  using saa_names = chsubsystem::config::saa_xml_names;
-  auto sensing_p =
-      config_repo.config_get<csubsystem::config::sensing_subsystemQ3D_config>();
-  auto ground = chal::sensors::ground_sensor(
-      GetSensor<chal::sensors::ground_sensor::impl_type>(
-          saa_names::ground_sensor),
-      &sensing_p->ground);
-  saa()->sensing()->replace(ground);
+  auto sensing =
+      config_repo
+          .config_get<chal::subsystem::config::sensing_subsystemQ3D_config>();
+
+  saa()->sensing()->env()->config_update(&sensing->env);
 } /* shared_init() */
 
 void bitd_dpo_controller::private_init(
@@ -135,6 +145,8 @@ void bitd_dpo_controller::private_init(
   /* task executive */
   m_executive = task_executive_builder(block_sel_matrix(),
                                        m_cache_sel_matrix.get(),
+                                       inta_tracker(),
+                                       nz_tracker(),
                                        saa(),
                                        perception())(config_repo, rng());
   executive()->task_abort_notify(std::bind(
@@ -173,6 +185,7 @@ RCPPSW_WRAP_DEFP_OVERRIDE(bitd_dpo_controller,
                           fsm::foraging_transport_goal::ekNONE,
                           const);
 
+
 /*******************************************************************************
  * Goal Acquisition
  ******************************************************************************/
@@ -202,10 +215,7 @@ int bitd_dpo_controller::current_task_depth(void) const {
 } /* current_task_depth() */
 
 int bitd_dpo_controller::current_task_id(void) const {
-  if (nullptr != executive()->current_task()) {
-    return executive()->graph()->vertex_id(executive()->current_task());
-  }
-  return -1;
+  return executive()->graph()->vertex_id(executive()->current_task());
 } /* current_task_id() */
 
 int bitd_dpo_controller::task_id(const std::string& task_name) const {
@@ -217,7 +227,19 @@ int bitd_dpo_controller::current_task_tab(void) const {
   return executive()->graph()->active_tab_id();
 } /* current_task_tab() */
 
-using namespace argos; // NOLINT
+/*******************************************************************************
+ * Block Carrying Controller
+ ******************************************************************************/
+const cssblocks::drop::base_drop* bitd_dpo_controller::block_drop_strategy(void) const {
+  if (nullptr != current_task()) {
+    current_task()->block_drop_strategy();
+  }
+  return nullptr;
+} /* block_drop_strategy() */
+
+NS_END(cognitive, d1, controller, fordyca);
+
+using namespace fccd1; // NOLINT
 
 RCPPSW_WARNING_DISABLE_PUSH()
 RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
@@ -227,5 +249,3 @@ RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 REGISTER_CONTROLLER(bitd_dpo_controller, "bitd_dpo_controller");
 
 RCPPSW_WARNING_DISABLE_POP()
-
-NS_END(cognitive, d1, controller, fordyca);

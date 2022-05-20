@@ -23,8 +23,6 @@
  ******************************************************************************/
 #include "fordyca/controller/cognitive/block_sel_matrix.hpp"
 
-#include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
-
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -47,12 +45,12 @@ block_sel_matrix::block_sel_matrix(
  * Member Functions
  ******************************************************************************/
 void block_sel_matrix::sel_exception_add(const rtypes::type_uuid& id) {
-  boost::get<std::vector<rtypes::type_uuid>>(this->find(kSelExceptions)->second)
+  std::get<std::vector<rtypes::type_uuid>>(this->find(kSelExceptions)->second)
       .push_back(id);
 } /* sel_exception_add() */
 
 void block_sel_matrix::sel_exceptions_clear(void) {
-  boost::get<std::vector<rtypes::type_uuid>>(this->operator[](kSelExceptions))
+  std::get<std::vector<rtypes::type_uuid>>(this->operator[](kSelExceptions))
       .clear();
 } /* sel_exceptions_clear() */
 

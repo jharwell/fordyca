@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_D0_GENERALIST_HPP_
-#define INCLUDE_FORDYCA_TASKS_D0_GENERALIST_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -38,7 +37,7 @@ NS_START(fordyca, tasks, d0);
  ******************************************************************************/
 /**
  * \class generalist
- * \ingroup tasks
+ * \ingroup tasks d0
  *
  * \brief Class representing depth 0 task allocation: Perform the whole foraging
  * task: (1) Find a free block, and (2) bring it to the nest.
@@ -49,16 +48,40 @@ NS_START(fordyca, tasks, d0);
  * because it does not have any, but it IS still abortable if its current
  * execution time takes too long (as configured by parameters).
  */
-class generalist final : public foraging_task {
+class generalist final : public rer::client<generalist>,
+                         public foraging_task {
  public:
   generalist(const cta::config::task_alloc_config* config,
              std::unique_ptr<cta::taskable> mechanism);
 
-  /* event handling */
-  void accept(events::detail::robot_free_block_pickup& visitor) override;
-  void accept(events::detail::robot_free_block_drop&) override {}
-  void accept(events::detail::robot_nest_block_drop& visitor) override;
-  void accept(events::detail::block_vanished& visitor) override;
+  /*
+   * Event handling. This CANNOT be done using the regular visitor pattern,
+   * because when visiting a given task which is a member of a set of tasks
+   * which all implement the same interface, you have no way to way which task
+   * the object ACTUALLY is without using a set of if() statements, which is a
+   * brittle design. This is not the cleanest, but is still more elegant than
+   * the alternative.
+   *
+   * I wish you didn't have to stub out the d1 and d2 events.
+   */
+
+  /* free block interaction events */
+  void accept(fccd0::events::free_block_pickup& visitor) override;
+  void accept(fccd0::events::free_block_drop& ) override {}
+  void accept(fccd0::events::block_vanished& visitor) override;
+
+  void accept(fccd1::events::free_block_pickup& visitor) override;
+  void accept(fccd1::events::free_block_drop& ) override {}
+  void accept(fccd1::events::block_vanished& visitor) override;
+
+  void accept(fccd2::events::free_block_pickup& visitor) override;
+  void accept(fccd2::events::free_block_drop& ) override {}
+  void accept(fccd2::events::block_vanished& visitor) override;
+
+  /* nest interaction events */
+  void accept(fccd0::events::nest_block_drop& visitor) override;
+  void accept(fccd1::events::nest_block_drop& visitor) override;
+  void accept(fccd2::events::nest_block_drop& visitor) override;
 
   /* goal acquisition metrics */
   RCPPSW_WRAP_DECL_OVERRIDE(bool, goal_acquired, const);
@@ -78,6 +101,11 @@ class generalist final : public foraging_task {
                             const);
   bool is_phototaxiing_to_goal(bool include_ca) const override RCPPSW_PURE;
 
+  /* block carrying */
+  RCPPSW_WRAP_DECL_OVERRIDE(const cssblocks::drop::base_drop*,
+                            block_drop_strategy,
+                            const);
+
   /* task metrics */
   bool task_at_interface(void) const override { return false; }
   bool task_completed(void) const override { return task_finished(); }
@@ -94,5 +122,3 @@ class generalist final : public foraging_task {
 };
 
 NS_END(d0, tasks, fordyca);
-
-#endif /* INCLUDE_FORDYCA_TASKS_D0_GENERALIST_HPP_ */

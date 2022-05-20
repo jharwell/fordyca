@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_TASKS_FWD_HPP_
-#define INCLUDE_FORDYCA_TASKS_TASKS_FWD_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -46,5 +45,3 @@ class cache_collector;
 } // namespace d2
 
 NS_END(fordyca, tasks);
-
-#endif /* INCLUDE_FORDYCA_TASKS_TASKS_FWD_HPP_ */

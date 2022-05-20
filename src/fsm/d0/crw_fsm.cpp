@@ -38,18 +38,22 @@ NS_START(fordyca, fsm, d0);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-crw_fsm::crw_fsm(csubsystem::saa_subsystemQ3D* const saa,
-                 std::unique_ptr<csstrategy::base_strategy> explore,
-                 std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
+crw_fsm::crw_fsm(const csfsm::fsm_params* params,
+                 cffsm::strategy_set strategies,
                  const rmath::vector2d& nest_loc,
                  rmath::rng* rng)
-    : foraging_util_hfsm(saa, std::move(nest_acq), rng, ekST_MAX_STATES),
+    : foraging_util_hfsm(params,
+                         std::move(strategies),
+                         rng,
+                         ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.d0.crw"),
       RCPPSW_HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
+      RCPPSW_HFSM_CONSTRUCT_STATE(drop_carried_block, &start),
       RCPPSW_HFSM_CONSTRUCT_STATE(leaving_nest, &start),
       RCPPSW_HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       RCPPSW_HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
       RCPPSW_HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
+      entry_drop_carried_block(),
       RCPPSW_HFSM_CONSTRUCT_STATE(wait_for_block_drop, hfsm::top_state()),
       RCPPSW_HFSM_DEFINE_STATE_MAP(
           mc_state_map,
@@ -70,10 +74,14 @@ crw_fsm::crw_fsm(csubsystem::saa_subsystemQ3D* const saa,
           RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_drop,
                                              nullptr,
                                              &entry_wait_for_signal,
-                                             nullptr)),
+                                             nullptr),
+          RCPPSW_HFSM_STATE_MAP_ENTRY_EX_ALL(&drop_carried_block,
+                                             nullptr,
+                                             &entry_drop_carried_block,
+                                             &exit_drop_carried_block)),
       mc_nest_loc(nest_loc),
-      m_explore_fsm(saa,
-                    std::move(explore),
+      m_explore_fsm(params,
+                    std::move(foraging_util_hfsm::strategies().explore),
                     rng,
                     std::bind(&crw_fsm::block_detected, this)) {}
 
@@ -93,6 +101,16 @@ RCPPSW_HFSM_STATE_DEFINE(crw_fsm, start, rpfsm::event_data* data) {
       return fsm::foraging_signal::ekHANDLED;
     } else if (fsm::foraging_signal::ekENTERED_NEST == data->signal()) {
       internal_event(ekST_WAIT_FOR_BLOCK_DROP);
+      return fsm::foraging_signal::ekHANDLED;
+    } else if (fsm::foraging_signal::ekDROPPED_BLOCK == data->signal()) {
+      /*
+       * We can't just switch states--ekST_LEAVING_NEST checks if we are still
+       * in a child signal context, so we need to explicitly say that we have
+       * handled the signal and things are back to normal.
+       */
+      data->signal(fsm::foraging_signal::ekRUN);
+      data->type(rpfsm::event_type::ekNORMAL);
+      internal_event(ekST_LEAVING_NEST);
       return fsm::foraging_signal::ekHANDLED;
     }
   }
@@ -117,6 +135,8 @@ RCPPSW_HFSM_STATE_DEFINE_ND(crw_fsm, acquire_block) {
 RCPPSW_HFSM_STATE_DEFINE(crw_fsm,
                          wait_for_block_pickup,
                          rpfsm::event_data* data) {
+  ER_DEBUG("Waiting for block pickup: signal=%d", data->signal());
+
   if (fsm::foraging_signal::ekBLOCK_PICKUP == data->signal()) {
     m_explore_fsm.task_reset();
     ER_INFO("Block pickup signal received");
@@ -132,15 +152,28 @@ RCPPSW_HFSM_STATE_DEFINE(crw_fsm,
   return fsm::foraging_signal::ekHANDLED;
 }
 
-RCPPSW_HFSM_STATE_DEFINE(crw_fsm, wait_for_block_drop, rpfsm::event_data* data) {
-  if (fsm::foraging_signal::ekBLOCK_DROP == data->signal()) {
+RCPPSW_HFSM_STATE_DEFINE(crw_fsm,
+                         wait_for_block_drop,
+                         rpfsm::event_data* data) {
+  ER_DEBUG("Wait for block drop signal: signal=%d", data->signal());
+
+  if (ffsm::foraging_signal::ekBLOCK_DROP == data->signal()) {
     m_explore_fsm.task_reset();
-    m_task_finished = true;
-    ER_INFO("Block drop signal received");
-    internal_event(ekST_LEAVING_NEST);
+    ER_INFO("Block drop signal  received");
+    internal_event(ekST_DROP_CARRIED_BLOCK);
   }
   return fsm::foraging_signal::ekHANDLED;
 }
+
+RCPPSW_HFSM_ENTRY_DEFINE_ND(crw_fsm, entry_drop_carried_block) {
+  ER_DEBUG("Begin dropping block");
+}
+
+RCPPSW_HFSM_EXIT_DEFINE(crw_fsm, exit_drop_carried_block) {
+  ER_DEBUG("Finished dropping block");
+  m_task_finished = true;
+}
+
 
 /*******************************************************************************
  * Goal Acquisition Metrics
@@ -178,6 +211,14 @@ rtypes::type_uuid crw_fsm::entity_acquired_id(void) const {
   return rtypes::constants::kNoUUID;
 } /* entity_acquired_id() */
 
+csmetrics::goal_acq_metrics::goal_type crw_fsm::acquisition_goal(void) const {
+  if (ekST_ACQUIRE_BLOCK == current_state() ||
+      ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
+    return fsm::to_goal_type(foraging_acq_goal::ekBLOCK);
+  }
+  return fsm::to_goal_type(foraging_acq_goal::ekNONE);
+} /* block_transport_goal() */
+
 /*******************************************************************************
  * Block Transport Metrics
  ******************************************************************************/
@@ -188,38 +229,16 @@ bool crw_fsm::is_phototaxiing_to_goal(bool include_ca) const {
     return foraging_transport_goal::ekNEST == block_transport_goal() &&
            !exp_interference();
   }
-
 } /* is_phototaxiing_to_goal() */
 
-/*******************************************************************************
- * Collision Metrics
- ******************************************************************************/
-bool crw_fsm::exp_interference(void) const {
-  return (m_explore_fsm.task_running() && m_explore_fsm.exp_interference()) ||
-         cffsm::foraging_util_hfsm::exp_interference();
-} /* exp_interference() */
-
-bool crw_fsm::entered_interference(void) const {
-  return (m_explore_fsm.task_running() && m_explore_fsm.entered_interference()) ||
-         cffsm::foraging_util_hfsm::entered_interference();
-} /* entered_interference() */
-
-bool crw_fsm::exited_interference(void) const {
-  return (m_explore_fsm.task_running() && m_explore_fsm.exited_interference()) ||
-         cffsm::foraging_util_hfsm::exited_interference();
-} /* exited_interference() */
-
-rtypes::timestep crw_fsm::interference_duration(void) const {
-  if (m_explore_fsm.task_running()) {
-    return m_explore_fsm.interference_duration();
-  } else {
-    return cffsm::foraging_util_hfsm::interference_duration();
+foraging_transport_goal crw_fsm::block_transport_goal(void) const {
+  if (ekST_TRANSPORT_TO_NEST == current_state() ||
+      ekST_WAIT_FOR_BLOCK_DROP == current_state() ||
+      ekST_DROP_CARRIED_BLOCK == current_state()) {
+    return foraging_transport_goal::ekNEST;
   }
-} /* interference_duration() */
-
-rmath::vector3z crw_fsm::interference_loc3D(void) const {
-  return saa()->sensing()->dpos3D();
-} /* interference_loc3D() */
+  return foraging_transport_goal::ekNONE;
+} /* block_transport_goal() */
 
 /*******************************************************************************
  * General Member Functions
@@ -240,25 +259,9 @@ void crw_fsm::run(void) {
   }
 } /* run() */
 
-bool crw_fsm::block_detected(void) const {
-  return saa()->sensing()->ground()->detect("block");
+bool crw_fsm::block_detected(void) {
+  return saa()->sensing()->env()->detect("block");
 } /* block_detected() */
-
-foraging_transport_goal crw_fsm::block_transport_goal(void) const {
-  if (ekST_TRANSPORT_TO_NEST == current_state() ||
-      ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return foraging_transport_goal::ekNEST;
-  }
-  return foraging_transport_goal::ekNONE;
-} /* block_transport_goal() */
-
-csmetrics::goal_acq_metrics::goal_type crw_fsm::acquisition_goal(void) const {
-  if (ekST_ACQUIRE_BLOCK == current_state() ||
-      ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
-    return fsm::to_goal_type(foraging_acq_goal::ekBLOCK);
-  }
-  return fsm::to_goal_type(foraging_acq_goal::ekNONE);
-} /* block_transport_goal() */
 
 /*******************************************************************************
  * Taskable Interface
@@ -267,7 +270,6 @@ void crw_fsm::task_reset(void) {
   init();
   m_explore_fsm.task_reset();
   m_task_finished = false;
-  inta_tracker()->inta_reset();
 } /* task_reset() */
 
 NS_END(d0, fsm, fordyca);

@@ -18,18 +18,19 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_D2_ACQUIRE_CACHE_SITE_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_D2_ACQUIRE_CACHE_SITE_FSM_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <nlopt.hpp>
+
 #include "cosm/spatial/fsm/acquire_goal_fsm.hpp"
-#include "fordyca/fordyca.hpp"
 #include "cosm/subsystem/subsystem_fwd.hpp"
+
 #include "fordyca/fsm/fsm_ro_params.hpp"
 #include "fordyca/metrics/caches/site_selection_metrics.hpp"
-#include <nlopt.hpp>
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,7 +38,6 @@
 NS_START(fordyca);
 
 namespace controller::cognitive { class cache_sel_matrix; }
-namespace ds { class dpo_store; }
 
 NS_START(fsm, d2);
 
@@ -59,8 +59,8 @@ class acquire_cache_site_fsm : public rer::client<acquire_cache_site_fsm>,
                                public csfsm::acquire_goal_fsm,
                                public metrics::caches::site_selection_metrics {
  public:
-  acquire_cache_site_fsm(const fsm_ro_params* c_params,
-                         csubsystem::saa_subsystemQ3D* saa,
+  acquire_cache_site_fsm(const fsm_ro_params* c_ro,
+                         const csfsm::fsm_params* c_no,
                          rmath::rng* rng);
   ~acquire_cache_site_fsm(void) override = default;
 
@@ -87,14 +87,14 @@ class acquire_cache_site_fsm : public rer::client<acquire_cache_site_fsm>,
   bool site_acquired_cb(bool explore_result) const RCPPSW_CONST;
 
   /* clang-format off */
-  bool                                                 m_sel_success{false};
-  bool                                                 m_sel_exec{false};
-  nlopt::result                                        m_nlopt_res{};
-  const controller::cognitive::cache_sel_matrix* const mc_matrix;
-  const ds::dpo_store*      const                      mc_store;
+  const controller::cognitive::cache_sel_matrix* mc_matrix;
+  const fsperception::known_objects_accessor*    mc_accessor;
+
+  bool                                           m_sel_success{false};
+  bool                                           m_sel_exec{false};
+  nlopt::result                                  m_nlopt_res{};
   /* clang-format on */
 };
 
 NS_END(d2, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_D2_ACQUIRE_CACHE_SITE_FSM_HPP_ */

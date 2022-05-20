@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_D1_BLOCK_TO_EXISTING_CACHE_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_D1_BLOCK_TO_EXISTING_CACHE_FSM_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -58,8 +57,8 @@ NS_START(fordyca, fsm, d1);
  */
 class block_to_existing_cache_fsm final : public block_to_goal_fsm {
  public:
-   block_to_existing_cache_fsm(const fsm_ro_params* c_params,
-                               csubsystem::saa_subsystemQ3D* saa,
+   block_to_existing_cache_fsm(const fsm_ro_params* c_ro,
+                               const csfsm::fsm_params* c_no,
                                rmath::rng* rng);
 
   ~block_to_existing_cache_fsm(void) override = default;
@@ -84,5 +83,3 @@ class block_to_existing_cache_fsm final : public block_to_goal_fsm {
 };
 
 NS_END(d1, fsm, fordyca);
-
-#endif /* INCLUDE_FORDYCA_FSM_D1_BLOCK_TO_EXISTING_CACHE_FSM_HPP_ */

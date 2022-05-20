@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_D1_FORAGING_TASK_HPP_
-#define INCLUDE_FORDYCA_TASKS_D1_FORAGING_TASK_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -54,8 +53,8 @@ NS_START(fordyca, tasks, d1);
 class foraging_task : public base_foraging_task,
                       public cta::polled_task {
  public:
-  inline static const std::string kCollectorName = "Collector";
-  inline static const std::string kHarvesterName = "Harvester";
+  static inline const std::string kCollectorName = "collector";
+  static inline const std::string kHarvesterName = "harvester";
 
   foraging_task(const std::string& name,
                 const struct cta::config::task_alloc_config *config,
@@ -69,5 +68,3 @@ class foraging_task : public base_foraging_task,
 };
 
 NS_END(d1, tasks, fordyca);
-
-#endif /* INCLUDE_FORDYCA_TASKS_D1_FORAGING_TASK_HPP_ */

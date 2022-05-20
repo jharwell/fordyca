@@ -26,20 +26,24 @@
 #include <fstream>
 
 #include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/ds/cell2D.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/repr/config/nest_config.hpp"
-#include "cosm/spatial/strategy/nest_acq/factory.hpp"
-#include "cosm/subsystem/perception/config/perception_config.hpp"
+#include "cosm/spatial/strategy/nest/acq/factory.hpp"
+#include "cosm/spatial/strategy/nest/exit/factory.hpp"
+#include "cosm/spatial/strategy/blocks/drop/factory.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
-#include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
-#include "fordyca/config/d0/dpo_controller_repository.hpp"
-#include "fordyca/config/strategy/strategy_config.hpp"
 #include "fordyca/controller/cognitive/block_sel_matrix.hpp"
-#include "fordyca/controller/cognitive/dpo_perception_subsystem.hpp"
+#include "fordyca/controller/config/block_sel/block_sel_matrix_config.hpp"
+#include "fordyca/controller/config/d0/dpo_controller_repository.hpp"
 #include "fordyca/fsm/d0/dpo_fsm.hpp"
+#include "fordyca/strategy/config/strategy_config.hpp"
 #include "fordyca/strategy/explore/block_factory.hpp"
+#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_store.hpp"
+#include "fordyca/subsystem/perception/perception_subsystem_factory.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,9 +54,8 @@ NS_START(fordyca, controller, cognitive, d0);
  * Constructors/Destructor
  ******************************************************************************/
 dpo_controller::dpo_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.d0.dpo"),
+    : ER_CLIENT_INIT("fordyca.controller.cognitive.d0.dpo"),
       m_block_sel_matrix(),
-      m_perception(),
       m_fsm() {}
 
 dpo_controller::~dpo_controller(void) = default;
@@ -64,23 +67,24 @@ void dpo_controller::fsm(std::unique_ptr<fsm::d0::dpo_fsm> fsm) {
   m_fsm = std::move(fsm);
 } /* fsm() */
 
-void dpo_controller::perception(
-    std::unique_ptr<foraging_perception_subsystem> perception) {
-  m_perception = std::move(perception);
-}
-
-double dpo_controller::los_dim(void) const {
-  return perception()->los_dim();
-} /* los_dim() */
-
 void dpo_controller::control_step(void) {
-  ndc_pusht();
+  mdc_ts_update();
+  ndc_uuid_push();
+
+  /*
+   * Reset steering forces tracking so per-timestep visualizations are
+   * correct. This can't be done when applying the steering forces because then
+   * they are always 0 during loop function visualization.
+   */
+  saa()->steer_force2D().tracking_reset();
+
   ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
             block()->md()->robot_id().v());
 
-  m_perception->update(nullptr);
+  /* Update perception */
+  perception()->update(nullptr);
 
   /*
    * Run the FSM and apply steering forces if normal operation, otherwise handle
@@ -88,17 +92,16 @@ void dpo_controller::control_step(void) {
    */
   supervisor()->run();
 
-  ndc_pop();
+  /* Update block detection status for use in the loop functions */
+  block_detect_status_update();
+
+  ndc_uuid_pop();
 } /* control_step() */
 
 void dpo_controller::init(ticpp::Element& node) {
-  /*
-   * Note that we do not call \ref crw_controller::init()--there
-   * is nothing in there that we need.
-   */
-  foraging_controller::init(node);
+  cognitive_controller::init(node);
 
-  ndc_push();
+  ndc_uuid_push();
   ER_INFO("Initializing...");
 
   /* parse and validate parameters */
@@ -114,18 +117,20 @@ void dpo_controller::init(ticpp::Element& node) {
   private_init(config_repo);
 
   ER_INFO("Initialization finished");
-  ndc_pop();
+  ndc_uuid_pop();
 } /* init() */
 
 void dpo_controller::shared_init(
     const config::d0::dpo_controller_repository& config_repo) {
-  const auto* perception = config_repo.config_get<cspconfig::perception_config>();
+  const auto* perception_config =
+      config_repo.config_get<fspconfig::perception_config>();
   const auto* block_matrix =
       config_repo.config_get<config::block_sel::block_sel_matrix_config>();
   const auto* nest = config_repo.config_get<crepr::config::nest_config>();
 
   /* DPO perception subsystem */
-  m_perception = std::make_unique<dpo_perception_subsystem>(perception);
+  auto factory = fsperception::perception_subsystem_factory();
+  perception(factory.create(perception_config->type, perception_config));
 
   /* block selection matrix */
   m_block_sel_matrix =
@@ -134,70 +139,133 @@ void dpo_controller::shared_init(
 
 void dpo_controller::private_init(
     const config::d0::dpo_controller_repository& config_repo) {
-  const auto* strat_config =
-      config_repo.config_get<fcstrategy::strategy_config>();
+  const auto* strat_config = config_repo.config_get<fsconfig::strategy_config>();
 
-  fstrategy::foraging_strategy::params strategy_params(
-      saa(), nullptr, nullptr, nullptr, rutils::color());
-  fsm::fsm_ro_params fsm_ro_params = { .bsel_matrix = block_sel_matrix(),
-                                       .csel_matrix = nullptr,
-                                       .store = perception()->dpo_store(),
-                                       .strategy_config = *strat_config };
+  csfsm::fsm_params fsm_params{
+    saa(),
+    inta_tracker(),
+    nz_tracker(),
+  };
+
+  auto strategy_params = fstrategy::strategy_params{
+    .fsm = &fsm_params,
+    .explore = &strat_config->blocks.explore,
+    .bsel_matrix = nullptr,
+    .csel_matrix = nullptr,
+    .accessor = nullptr,
+    .ledtaxis_target = rutils::color()
+  };
+  fsm::fsm_ro_params fsm_ro_params = {
+    .bsel_matrix = block_sel_matrix(),
+    .csel_matrix = nullptr,
+    .store = perception()->model<fspds::dpo_store>(),
+    .accessor = perception()->known_objects(),
+    .strategy = *strat_config
+  };
+
+  auto explore = fsexplore::block_factory().create(strat_config->blocks.explore.strategy,
+                                                 &strategy_params,
+                                                 rng());
+  auto nest_acq = cssnest::acq::factory().create(strat_config->nest.acq.strategy,
+                                                         &strat_config->nest.acq,
+                                                         &fsm_params,
+                                                         rng());
+  auto nest_exit = cssnest::exit::factory().create(strat_config->nest.exit.strategy,
+                                                  &strat_config->nest.exit,
+                                                  &fsm_params,
+                                                  rng());
+
+  auto block_drop = cssblocks::drop::factory().create(strat_config->blocks.drop.strategy,
+                                                    &fsm_params,
+                                                    &strat_config->blocks.drop,
+                                                    rng());
+  cffsm::strategy_set strategies = {
+    .explore = std::move(explore),
+    .nest_acq = std::move(nest_acq),
+    .nest_exit = std::move(nest_exit),
+    .block_drop = std::move(block_drop)
+  };
+
   m_fsm = std::make_unique<fsm::d0::dpo_fsm>(
       &fsm_ro_params,
-      saa(),
-      fsexplore::block_factory().create(
-          strat_config->explore.block_strategy, &strategy_params, rng()),
-      csstrategy::nest_acq::factory().create(
-          strat_config->nest_acq.strategy, saa(), rng()),
+      &fsm_params,
+      std::move(strategies),
       rng());
 
   /* Set DPO FSM supervision */
   supervisor()->supervisee_update(m_fsm.get());
 } /* private_init() */
 
-dpo_perception_subsystem* dpo_controller::dpo_perception(void) {
-  return static_cast<dpo_perception_subsystem*>(m_perception.get());
-} /* dpo_perception() */
-
-const dpo_perception_subsystem* dpo_controller::dpo_perception(void) const {
-  return static_cast<const dpo_perception_subsystem*>(m_perception.get());
-} /* dpo_perception() */
-
-void dpo_controller::reset(void) {
-  crw_controller::Reset();
-  m_perception->reset();
-} /* reset() */
+void dpo_controller::reset(void) { cognitive_controller::reset(); } /* reset() */
 
 /*******************************************************************************
- * Goal Acquisition Metrics
+ * Block Carrying Controller
  ******************************************************************************/
-RCPPSW_WRAP_DEF_OVERRIDE(dpo_controller, goal_acquired, *m_fsm, const);
-RCPPSW_WRAP_DEF_OVERRIDE(dpo_controller, entity_acquired_id, *m_fsm, const);
-RCPPSW_WRAP_DEF_OVERRIDE(dpo_controller, is_exploring_for_goal, *m_fsm, const);
-RCPPSW_WRAP_DEF_OVERRIDE(dpo_controller, is_vectoring_to_goal, *m_fsm, const);
-RCPPSW_WRAP_DEF_OVERRIDE(dpo_controller, acquisition_goal, *m_fsm, const);
-RCPPSW_WRAP_DEF_OVERRIDE(dpo_controller, block_transport_goal, *m_fsm, const);
-RCPPSW_WRAP_DEF_OVERRIDE(dpo_controller, acquisition_loc3D, *m_fsm, const);
-RCPPSW_WRAP_DEF_OVERRIDE(dpo_controller, vector_loc3D, *m_fsm, const);
-RCPPSW_WRAP_DEF_OVERRIDE(dpo_controller, explore_loc3D, *m_fsm, const);
+const cssblocks::drop::base_drop* dpo_controller::block_drop_strategy(void) const {
+  return m_fsm->block_drop_strategy();
+} /* block_drop_strategy() */
 
 /*******************************************************************************
- * Block Transportation Metrics
+ * Goal Acquisition
+ ******************************************************************************/
+RCPPSW_WRAP_DEFP_OVERRIDE(dpo_controller, goal_acquired, m_fsm, false, const);
+RCPPSW_WRAP_DEFP_OVERRIDE(dpo_controller,
+                          entity_acquired_id,
+                          m_fsm,
+                          rtypes::constants::kNoUUID,
+                          const);
+RCPPSW_WRAP_DEFP_OVERRIDE(dpo_controller,
+                          is_exploring_for_goal,
+                          m_fsm,
+                          csmetrics::goal_acq_metrics::exp_status(),
+                          const);
+RCPPSW_WRAP_DEFP_OVERRIDE(dpo_controller,
+                          is_vectoring_to_goal,
+                          m_fsm,
+                          false,
+                          const);
+RCPPSW_WRAP_DEFP_OVERRIDE(dpo_controller,
+                          acquisition_goal,
+                          m_fsm,
+                          ffsm::to_goal_type(ffsm::foraging_acq_goal::ekNONE),
+                          const);
+RCPPSW_WRAP_DEFP_OVERRIDE(dpo_controller,
+                          block_transport_goal,
+                          m_fsm,
+                          ffsm::foraging_transport_goal::ekNONE,
+                          const);
+RCPPSW_WRAP_DEFP_OVERRIDE(dpo_controller,
+                          acquisition_loc3D,
+                          m_fsm,
+                          rmath::vector3z(),
+                          const);
+RCPPSW_WRAP_DEFP_OVERRIDE(dpo_controller,
+                          vector_loc3D,
+                          m_fsm,
+                          rmath::vector3z(),
+                          const);
+RCPPSW_WRAP_DEFP_OVERRIDE(dpo_controller,
+                          explore_loc3D,
+                          m_fsm,
+                          rmath::vector3z(),
+                          const);
+
+/*******************************************************************************
+ * Block Transportation
  ******************************************************************************/
 bool dpo_controller::is_phototaxiing_to_goal(bool include_ca) const {
   return m_fsm->is_phototaxiing_to_goal(include_ca);
 } /* is_phototaxiing_to_goal() */
 
-using namespace argos; // NOLINT
+NS_END(cognitive, d0, controller, fordyca);
 
 RCPPSW_WARNING_DISABLE_PUSH()
 RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
 RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
 RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 
+using namespace fccd0; // NOLINT
+
 REGISTER_CONTROLLER(dpo_controller, "dpo_controller");
 
 RCPPSW_WARNING_DISABLE_POP()
-
-NS_END(cognitive, d0, controller, fordyca);

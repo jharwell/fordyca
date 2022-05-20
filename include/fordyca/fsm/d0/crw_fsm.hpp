@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_D0_CRW_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_D0_CRW_FSM_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -63,21 +62,13 @@ class crw_fsm final : public cffsm::foraging_util_hfsm,
                       public cfsm::metrics::block_transporter_metrics,
                       public cta::taskable {
  public:
-  crw_fsm(csubsystem::saa_subsystemQ3D* saa,
-          std::unique_ptr<csstrategy::base_strategy> explore,
-          std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
+  crw_fsm(const csfsm::fsm_params* params,
+          cffsm::strategy_set strategies,
           const rmath::vector2d& nest_loc,
           rmath::rng* rng);
 
   crw_fsm(const crw_fsm&) = delete;
   crw_fsm& operator=(const crw_fsm&) = delete;
-
-  /* interference metrics */
-  bool exp_interference(void) const override RCPPSW_PURE;
-  bool entered_interference(void) const override RCPPSW_PURE;
-  bool exited_interference(void) const override RCPPSW_PURE;
-  rtypes::timestep interference_duration(void) const override RCPPSW_PURE;
-  rmath::vector3z interference_loc3D(void) const override RCPPSW_PURE;
 
   /* goal acquisition metrics */
   csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCPPSW_PURE;
@@ -111,7 +102,7 @@ class crw_fsm final : public cffsm::foraging_util_hfsm,
   void run(void);
 
  private:
-  bool block_detected(void) const;
+  bool block_detected(void);
 
   enum fsm_states {
     ekST_START, /* Initial state */
@@ -120,6 +111,7 @@ class crw_fsm final : public cffsm::foraging_util_hfsm,
     ekST_LEAVING_NEST,          /* Block dropped in nest--time to go */
     ekST_WAIT_FOR_BLOCK_PICKUP,
     ekST_WAIT_FOR_BLOCK_DROP,
+    ekST_DROP_CARRIED_BLOCK,
     ekST_MAX_STATES
   };
 
@@ -127,6 +119,9 @@ class crw_fsm final : public cffsm::foraging_util_hfsm,
   RCPPSW_HFSM_STATE_INHERIT(cffsm::foraging_util_hfsm,
                      transport_to_nest,
                      nest_transport_data);
+  RCPPSW_HFSM_STATE_INHERIT(cffsm::foraging_util_hfsm,
+                            drop_carried_block,
+                            rpfsm::event_data);
   RCPPSW_HFSM_STATE_INHERIT(cffsm::foraging_util_hfsm, leaving_nest,
                      rpfsm::event_data);
 
@@ -142,8 +137,10 @@ class crw_fsm final : public cffsm::foraging_util_hfsm,
   RCPPSW_HFSM_STATE_DECLARE_ND(crw_fsm, acquire_block);
   RCPPSW_HFSM_STATE_DECLARE(crw_fsm, wait_for_block_pickup,
                      rpfsm::event_data);
+  RCPPSW_HFSM_ENTRY_DECLARE_ND(crw_fsm, entry_drop_carried_block);
+  RCPPSW_HFSM_EXIT_DECLARE(crw_fsm, exit_drop_carried_block);
   RCPPSW_HFSM_STATE_DECLARE(crw_fsm, wait_for_block_drop,
-                     rpfsm::event_data);
+                            rpfsm::event_data);
 
   /**
    * \brief Defines the state map for the FSM.
@@ -167,5 +164,3 @@ class crw_fsm final : public cffsm::foraging_util_hfsm,
 };
 
 NS_END(d0, controller, fordyca);
-
-#endif /* INCLUDE_FORDYCA_FSM_D0_CRW_FSM_HPP_ */

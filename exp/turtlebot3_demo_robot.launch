@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+
+<ros-configuration>
+  <launch>
+
+    <group ns="tb3_0">
+      <include file="$(find turtlebot3_bringup)/launch/turtlebot3_robot.launch"/>
+      <param name="tf_prefix" value="tb3_0"/>
+      <param name="id" value="0"/>
+      <node
+          name="fordyca_rosbridge_crw_node"
+          pkg="fordyca_rosbridge"
+          type="fordyca_rosbridge_crw_node"
+          output="screen"/>
+    </group>
+  </launch>
+</ros-configuration>

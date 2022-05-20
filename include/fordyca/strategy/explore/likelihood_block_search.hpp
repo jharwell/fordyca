@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_STRATEGY_EXPLORE_LIKELIHOOD_BLOCK_SEARCH_HPP_
-#define INCLUDE_FORDYCA_STRATEGY_EXPLORE_LIKELIHOOD_BLOCK_SEARCH_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -27,16 +26,12 @@
 #include <memory>
 
 #include "fordyca/strategy/explore/localized_search.hpp"
+#include "fordyca/subsystem/perception/known_objects_accessor.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace ds {
-class dpo_store;
-} /* namespace ds */
-
-NS_START(strategy, explore);
+NS_START(fordyca, strategy, explore);
 
 /*******************************************************************************
  * Class Definitions
@@ -49,19 +44,10 @@ NS_START(strategy, explore);
  * CRW at that location, with the idea being that the likelihood of another
  * block being nearby is higher, given that you've found one there before.
  */
-class likelihood_block_search : public localized_search {
+class likelihood_block_search final : public localized_search {
  public:
-  likelihood_block_search(const foraging_strategy::params* const c_params,
-                          rmath::rng* rng)
-      : likelihood_block_search(c_params->saa,
-                                c_params->dpo_store,
-                                rng) {}
-
-  likelihood_block_search(csubsystem::saa_subsystemQ3D* saa,
-                          const ds::dpo_store* store,
-                          rmath::rng* rng)
-      : localized_search(saa, rng),
-        mc_store(store) {}
+  likelihood_block_search(const fstrategy::strategy_params* const c_params,
+                          rmath::rng* rng);
 
   ~likelihood_block_search(void) override = default;
   likelihood_block_search(const likelihood_block_search&) = delete;
@@ -71,18 +57,24 @@ class likelihood_block_search : public localized_search {
   void task_start(cta::taskable_argument*) override final;
 
   /* prototype overrides */
-  std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
-    return std::make_unique<likelihood_block_search>(saa(),
-                                                     mc_store,
-                                                     rng());
-  }
+  std::unique_ptr<cssexplore::base_explore> clone(void) const override {
+    csfsm::fsm_params fsm_params {
+      saa(),
+      inta_tracker(),
+      nz_tracker(),
+    };
+    fstrategy::strategy_params params {
+      &fsm_params,
+      config(),
+      nullptr,
+      nullptr,
+      accessor(),
+      {}
+    };
 
- private:
-  /* clang-format off */
-  const ds::dpo_store* mc_store;
-  /* clang-format on */
+    return std::make_unique<likelihood_block_search>(&params, rng());
+  }
 };
 
 NS_END(explore, strategy, fordyca);
 
-#endif /* INCLUDE_FORDYCA_STRATEGY_EXPLORE_LIKELIHOOD_BLOCK_SEARCH_HPP_ */

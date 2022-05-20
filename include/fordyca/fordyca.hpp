@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FORDYCA_HPP_
-#define INCLUDE_FORDYCA_FORDYCA_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -168,29 +167,136 @@
  */
 
 namespace fordyca {
-namespace config {
-namespace strategy {}
-} /* namespace config */
+
+namespace repr {}
 
 namespace strategy {
 namespace explore {}
+namespace config {}
 } /* namespace strategy */
 
 namespace controller {
-namespace cognitive {}
-namespace reactive {}
+namespace cognitive {
+namespace d0 {}
+namespace d1 {}
+namespace d2 {}
 }
+namespace reactive {
+namespace d0 {}
+}
+namespace config {
+namespace strategy {}
+} /* namespace config */
+} /* namespace controller */
+
+namespace ds {}
+
+namespace subsystem {
+
+namespace perception {
+namespace ds {}
+namespace config {}
+namespace events {}
+} /* namespace perception */
+
+} /* namespace subsystem */
+
+namespace fsm {}
+namespace tasks {
+namespace d0 {}
+namespace d1 {}
+namespace d2 {}
+} /* namespace tasks */
+namespace events {}
+
+namespace metrics {
+namespace specs {}
+namespace blocks {}
+} /* namespace metrics */
+
+namespace argos {
+namespace metrics {}
+
+namespace support {
+namespace tv {}
+namespace caches {}
+namespace d0 {}
+namespace d1 {}
+namespace d2 {}
+namespace mpl {}
+} /* namespace support */
+
+} /* namespace argos */
+
+namespace ros {
+
+namespace metrics {}
+namespace support {
+namespace d0 {}
+} /* namespace support */
+
+namespace metrics {
+namespace blocks {}
+} /* namespace metrics */
+
+} /* namespace ros */
+
+namespace support {}
 
 } /* namespace fordyca */
 
-namespace fconfig = fordyca::config;
-namespace fcstrategy = fconfig::strategy;
+namespace fds = fordyca::ds;
+
+namespace ffsm = fordyca::fsm;
+
+namespace fsubsystem = fordyca::subsystem;
+namespace fsperception = fsubsystem::perception;
+namespace fspds = fsperception::ds;
+namespace fspevents = fsperception::events;
+namespace fspconfig = fsperception::config;
 
 namespace fstrategy = fordyca::strategy;
 namespace fsexplore = fstrategy::explore;
+namespace fsconfig = fstrategy::config;
+
+namespace ftasks = fordyca::tasks;
+namespace ftd0 = ftasks::d0;
+namespace ftd1 = ftasks::d1;
+namespace ftd2 = ftasks::d2;
+
+namespace fevents = fordyca::events;
+
+namespace fmetrics = fordyca::metrics;
+namespace fmspecs = fmetrics::specs;
+namespace fmblocks = fmetrics::blocks;
 
 namespace fcontroller = fordyca::controller;
 namespace fccognitive = fcontroller::cognitive;
+namespace fccd0 = fccognitive::d0;
+namespace fccd1 = fccognitive::d1;
+namespace fccd2 = fccognitive::d2;
+namespace fcconfig = fcontroller::config;
+namespace fccstrategy = fcconfig::strategy;
 namespace fcreactive = fcontroller::reactive;
+namespace fcreactive = fcontroller::reactive;
+namespace fcrd0 = fcreactive::d0;
 
-#endif /* INCLUDE_FORDYCA_FORDYCA_HPP_ */
+namespace fargos = fordyca::argos;
+namespace fametrics = fargos::metrics;
+namespace fasupport = fargos::support;
+namespace fsupport = fordyca::support;
+namespace fastv = fasupport::tv;
+namespace fascaches = fasupport::caches;
+namespace fasmpl = fasupport::mpl;
+
+namespace fasd0 = fasupport::d0;
+namespace fasd1 = fasupport::d1;
+namespace fasd2 = fasupport::d2;
+
+namespace frepr = fordyca::repr;
+
+namespace fros = fordyca::ros;
+namespace frmetrics = fros::metrics;
+namespace frsupport = fros::support;
+namespace frsd0 = frsupport::d0;
+namespace frmblocks = frmetrics::blocks;

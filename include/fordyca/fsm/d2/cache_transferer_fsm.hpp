@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_D2_CACHE_TRANSFERER_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_D2_CACHE_TRANSFERER_FSM_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -51,9 +50,9 @@ NS_START(fsm, d2);
  */
 class cache_transferer_fsm final : public block_to_goal_fsm {
  public:
-  cache_transferer_fsm(const fsm_ro_params* c_params,
-                       csubsystem::saa_subsystemQ3D* saa,
-                       std::unique_ptr<csstrategy::base_strategy> exp_behavior,
+  cache_transferer_fsm(const fsm_ro_params* c_ro,
+                         const csfsm::fsm_params* c_no,
+                       cffsm::strategy_set strategies,
                        rmath::rng* rng);
   ~cache_transferer_fsm(void) override = default;
 
@@ -79,5 +78,3 @@ class cache_transferer_fsm final : public block_to_goal_fsm {
 };
 
 NS_END(d2, fsm, fordyca);
-
-#endif /* INCLUDE_FORDYCA_FSM_D2_CACHE_TRANSFERER_FSM_HPP_ */

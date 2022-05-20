@@ -18,15 +18,14 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPR_FORAGER_LOS_HPP_
-#define INCLUDE_FORDYCA_REPR_FORAGER_LOS_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include "cosm/arena/ds/cache_vector.hpp"
 #include "cosm/ds/block3D_vector.hpp"
-#include "cosm/repr/los2D.hpp"
+#include "cosm/repr/grid2D_los.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -47,10 +46,12 @@ NS_START(fordyca, repr);
  * arena, but it also exposes non-const access to the blocks and caches within
  * that part of the arena by necessity for event processing.
  */
-class forager_los final : public crepr::los2D, public rer::client<forager_los> {
+class forager_los final : public crepr::grid2D_los,
+                          public rer::client<forager_los> {
  public:
-  explicit forager_los(const const_grid_view& c_view)
-      : los2D(c_view), ER_CLIENT_INIT("fordyca.repr.forager_los") {}
+  forager_los(const rtypes::type_uuid& c_id,
+              const grid_view_type& c_view,
+              const rtypes::discretize_ratio& c_resolution);
 
   /**
    * \brief Get the list of blocks currently in the LOS.
@@ -60,5 +61,3 @@ class forager_los final : public crepr::los2D, public rer::client<forager_los> {
 };
 
 NS_END(repr, fordyca);
-
-#endif /* INCLUDE_FORDYCA_REPR_FORAGER_LOS_HPP_ */

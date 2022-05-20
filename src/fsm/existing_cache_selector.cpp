@@ -28,6 +28,7 @@
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/fsm/cache_acq_validator.hpp"
 #include "fordyca/math/existing_cache_utility.hpp"
+#include "fordyca/subsystem/perception/ds/dp_cache_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,7 +42,7 @@ using cselm = controller::cognitive::cache_sel_matrix;
 existing_cache_selector::existing_cache_selector(
     bool is_pickup,
     const controller::cognitive::cache_sel_matrix* const matrix,
-    const ds::dp_cache_map* cache_map)
+    const fspds::dp_cache_map* cache_map)
     : ER_CLIENT_INIT("fordyca.fsm.existing_cache_selector"),
       mc_is_pickup(is_pickup),
       mc_matrix(matrix),
@@ -51,14 +52,14 @@ existing_cache_selector::existing_cache_selector(
  * Member Functions
  ******************************************************************************/
 const carepr::base_cache*
-existing_cache_selector::operator()(const ds::dp_cache_map& existing_caches,
+existing_cache_selector::operator()(const fspds::dp_cache_map& existing_caches,
                                     const rmath::vector2d& position,
                                     const rtypes::timestep& t) {
   const carepr::base_cache* best = nullptr;
   ER_ASSERT(!existing_caches.empty(), "No known existing caches");
 
   double max_utility = 0.0;
-  for (const auto& c : existing_caches.const_values_range()) {
+  for (const auto& c : existing_caches.values_range()) {
     fsm::cache_acq_validator validator(mc_cache_map, mc_matrix, mc_is_pickup);
 
     if (!validator(c.ent()->rcenter2D(), c.ent()->id(), t) ||
@@ -67,7 +68,7 @@ existing_cache_selector::operator()(const ds::dp_cache_map& existing_caches,
     }
     math::existing_cache_utility u(
         c.ent()->rcenter2D(),
-        boost::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second));
+        std::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second));
 
     double utility = u.calc(position, c.density(), c.ent()->n_blocks());
     ER_ASSERT(utility > 0.0, "Bad utility calculation");
@@ -84,15 +85,15 @@ existing_cache_selector::operator()(const ds::dp_cache_map& existing_caches,
     }
   } /* for(existing_cache..) */
 
-  ER_CHECKI(nullptr != best,
-            "Best utility: existing_cache%d@%s/%s w/%zu blocks: %f",
-            best->id().v(),
-            rcppsw::to_string(best->rcenter2D()).c_str(),
-            rcppsw::to_string(best->dcenter2D()).c_str(),
-            best->n_blocks(),
-            max_utility);
-  ER_CHECKD(nullptr != best,
-            "No best existing cache found: all known caches excluded!");
+  ER_CONDI(nullptr != best,
+           "Best utility: existing_cache%d@%s/%s w/%zu blocks: %f",
+           best->id().v(),
+           rcppsw::to_string(best->rcenter2D()).c_str(),
+           rcppsw::to_string(best->dcenter2D()).c_str(),
+           best->n_blocks(),
+           max_utility);
+  ER_CONDD(nullptr == best,
+           "No best existing cache found: all known caches excluded!");
   return best;
 } /* operator()() */
 
@@ -108,7 +109,7 @@ bool existing_cache_selector::cache_is_excluded(
    * This threshold prevents that behavior, forcing robots to at least LEAVE
    * the cache, even if they will then immediately return to it.
    */
-  if (cache->contains_point2D(position)) {
+  if (cache->contains_point(position)) {
     ER_DEBUG("Ignoring cache%d@%s/%s: robot@%s inside it",
              cache->id().v(),
              rcppsw::to_string(cache->rcenter2D()).c_str(),
@@ -119,10 +120,10 @@ bool existing_cache_selector::cache_is_excluded(
 
   std::vector<rtypes::type_uuid> exceptions;
   if (mc_is_pickup) {
-    exceptions = boost::get<std::vector<rtypes::type_uuid>>(
+    exceptions = std::get<std::vector<rtypes::type_uuid>>(
         mc_matrix->find(cselm::kPickupExceptions)->second);
   } else {
-    exceptions = boost::get<std::vector<rtypes::type_uuid>>(
+    exceptions = std::get<std::vector<rtypes::type_uuid>>(
         mc_matrix->find(cselm::kDropExceptions)->second);
   }
 

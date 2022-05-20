@@ -18,24 +18,19 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_DYNAMIC_CACHE_INTERACTOR_HPP_
-#define INCLUDE_FORDYCA_EVENTS_DYNAMIC_CACHE_INTERACTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
-#include "fordyca/fordyca.hpp"
+#include "fordyca/controller/cognitive/events_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
-namespace detail {
-class block_proximity;
-class cache_proximity;
-} // namespace detail
 
 /*******************************************************************************
  * Structure Definitions
@@ -48,9 +43,7 @@ class cache_proximity;
  * interact with dynamic caches in FORDYCA.
  */
 class dynamic_cache_interactor
-    : public rpvisitor::polymorphic_accept_set<detail::block_proximity,
-                                               detail::cache_proximity> {};
+    : public rpvisitor::polymorphic_accept_set<fccd2::events::block_proximity,
+                                               fccd2::events::cache_proximity> {};
 
 NS_END(events, fordyca);
-
-#endif /* INCLUDE_FORDYCA_EVENTS_DYNAMIC_CACHE_INTERACTOR_HPP_ */

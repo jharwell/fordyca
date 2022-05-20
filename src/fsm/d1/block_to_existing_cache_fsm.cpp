@@ -35,41 +35,26 @@
 NS_START(fordyca, fsm, d1);
 
 /*******************************************************************************
+ * Forward Decls
+ ******************************************************************************/
+static acquire_existing_cache_fsm cache_fsm_build(const fsm_ro_params* c_ro,
+                                                  const csfsm::fsm_params* c_no,
+                                                  rmath::rng* rng);
+
+static acquire_free_block_fsm block_fsm_build(const fsm_ro_params* c_ro,
+                                              const csfsm::fsm_params* c_no,
+                                              rmath::rng* rng);
+
+/*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 block_to_existing_cache_fsm::block_to_existing_cache_fsm(
-    const fsm_ro_params* const c_params,
-    csubsystem::saa_subsystemQ3D* saa,
+    const fsm_ro_params* c_ro,
+    const csfsm::fsm_params* c_no,
     rmath::rng* rng)
-    : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, saa, rng),
-      m_cache_fsm(
-          c_params,
-          saa,
-          fsexplore::cache_factory().create(
-              c_params->strategy_config.explore.cache_strategy,
-              std::make_unique<fstrategy::foraging_strategy::params>(
-                  saa,
-                  nullptr,
-                  c_params->csel_matrix,
-                  c_params->store,
-                  carepr::light_type_index()[carepr::light_type_index::kCache])
-                  .get(),
-              rng),
-          rng,
-          false),
-      m_block_fsm(c_params,
-                  saa,
-                  fsexplore::block_factory().create(
-                      c_params->strategy_config.explore.block_strategy,
-                      std::make_unique<fstrategy::foraging_strategy::params>(
-                          saa,
-                          nullptr,
-                          nullptr,
-                          c_params->store,
-                          rutils::color())
-                          .get(),
-                      rng),
-                  rng) {}
+    : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, c_no, rng),
+      m_cache_fsm(cache_fsm_build(c_ro, c_no, rng)),
+      m_block_fsm(block_fsm_build(c_ro, c_no, rng)) {}
 
 /*******************************************************************************
  * FSM Metrics
@@ -114,5 +99,47 @@ rtypes::type_uuid block_to_existing_cache_fsm::entity_acquired_id(void) const {
   }
   return rtypes::constants::kNoUUID;
 } /* entity_acquired_id() */
+
+/*******************************************************************************
+ * Non-Member Functions
+ ******************************************************************************/
+acquire_existing_cache_fsm cache_fsm_build(const fsm_ro_params* c_ro,
+                                           const csfsm::fsm_params* c_no,
+                                           rmath::rng* rng) {
+  auto strategy_params = fstrategy::strategy_params{
+    .fsm = c_no,
+    .explore = &c_ro->strategy.caches.explore,
+    .bsel_matrix = nullptr,
+    .csel_matrix = c_ro->csel_matrix,
+    .accessor = c_ro->accessor,
+    .ledtaxis_target = carepr::light_type_index()[carepr::light_type_index::kCache]
+  };
+
+  auto strategy = fsexplore::cache_factory().create(
+      c_ro->strategy.caches.explore.strategy, &strategy_params, rng);
+
+  return acquire_existing_cache_fsm(c_ro,
+                                    c_no,
+                                    std::move(strategy),
+                                    rng,
+                                    false);
+} /* cache_fsm_build() */
+
+acquire_free_block_fsm block_fsm_build(const fsm_ro_params* c_ro,
+                                       const csfsm::fsm_params* c_no,
+                                       rmath::rng* rng) {
+  auto strategy_params = fstrategy::strategy_params{
+    .fsm = c_no,
+    .explore = &c_ro->strategy.blocks.explore,
+    .bsel_matrix = nullptr,
+    .csel_matrix = nullptr,
+    .accessor = c_ro->accessor,
+    .ledtaxis_target = rutils::color()
+  };
+  auto strategy = fsexplore::block_factory().create(
+      c_ro->strategy.blocks.explore.strategy, &strategy_params, rng);
+
+  return acquire_free_block_fsm(c_ro, c_no, std::move(strategy), rng);
+} /* block_fsm_build() */
 
 NS_END(d1, controller, fordyca);

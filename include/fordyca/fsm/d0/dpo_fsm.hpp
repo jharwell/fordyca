@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_D0_DPO_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_D0_DPO_FSM_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -65,10 +64,9 @@ class dpo_fsm final : public cffsm::foraging_util_hfsm,
                       public cfsm::block_transporter<foraging_transport_goal>,
                       public cta::taskable {
  public:
-  dpo_fsm(const fsm_ro_params * params,
-          csubsystem::saa_subsystemQ3D* saa,
-          std::unique_ptr<csstrategy::base_strategy> explore,
-          std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
+  dpo_fsm(const fsm_ro_params* c_ro,
+          const csfsm::fsm_params* c_no,
+          cffsm::strategy_set strategies,
           rmath::rng* rng);
   ~dpo_fsm(void) override = default;
   dpo_fsm(const dpo_fsm&) = delete;
@@ -84,13 +82,6 @@ class dpo_fsm final : public cffsm::foraging_util_hfsm,
   bool task_finished(void) const override { return m_task_finished; }
   bool task_running(void) const override { return !m_task_finished; }
   void task_reset(void) override { init(); }
-
-  /* collision metrics */
-  RCPPSW_WRAP_DECL_OVERRIDE(bool, exp_interference, const);
-  RCPPSW_WRAP_DECL_OVERRIDE(bool, entered_interference, const);
-  RCPPSW_WRAP_DECL_OVERRIDE(bool, exited_interference, const);
-  RCPPSW_WRAP_DECL_OVERRIDE(rtypes::timestep, interference_duration, const);
-  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, interference_loc3D, const);
 
   /* goal acquisition metrics */
   RCPPSW_WRAP_DECL_OVERRIDE(exp_status, is_exploring_for_goal, const);
@@ -154,5 +145,3 @@ class dpo_fsm final : public cffsm::foraging_util_hfsm,
 };
 
 NS_END(d0, fsm, fordyca);
-
-#endif /* INCLUDE_FORDYCA_FSM_D0_DPO_FSM_HPP_ */

@@ -27,6 +27,8 @@
 
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/math/new_cache_utility.hpp"
+#include "fordyca/subsystem/perception/ds/dp_block_map.hpp"
+#include "fordyca/subsystem/perception/ds/dp_cache_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,14 +48,14 @@ new_cache_selector::new_cache_selector(
  * Member Functions
  ******************************************************************************/
 const crepr::base_block3D*
-new_cache_selector::operator()(const ds::dp_block_map& new_caches,
-                               const ds::dp_cache_map& existing_caches,
+new_cache_selector::operator()(const fspds::dp_block_map& new_caches,
+                               const fspds::dp_cache_map& existing_caches,
                                const rmath::vector2d& position) const {
   const crepr::base_block3D* best = nullptr;
   ER_ASSERT(!new_caches.empty(), "No known new caches");
 
   double max_utility = 0.0;
-  for (const auto& c : new_caches.const_values_range()) {
+  for (const auto& c : new_caches.values_range()) {
     if (new_cache_is_excluded(existing_caches, new_caches, c.ent())) {
       continue;
     }
@@ -63,7 +65,7 @@ new_cache_selector::operator()(const ds::dp_block_map& new_caches,
      */
     math::new_cache_utility u(
         c.ent()->rcenter2D(),
-        boost::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second));
+        std::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second));
 
     double utility = u.calc(position, c.density());
     ER_ASSERT(utility > 0.0, "Bad utility calculation");
@@ -80,32 +82,32 @@ new_cache_selector::operator()(const ds::dp_block_map& new_caches,
     }
   } /* for(new_cache..) */
 
-  ER_CHECKI(nullptr != best,
-            "Best utility: new cache%d@%s/%s: %f",
-            best->id().v(),
-            rcppsw::to_string(best->ranchor2D()).c_str(),
-            rcppsw::to_string(best->danchor2D()).c_str(),
-            max_utility);
+  ER_CONDI(nullptr != best,
+           "Best utility: new cache%d@%s/%s: %f",
+           best->id().v(),
+           rcppsw::to_string(best->ranchor2D()).c_str(),
+           rcppsw::to_string(best->danchor2D()).c_str(),
+           max_utility);
 
-  ER_CHECKW(nullptr != best,
-            "No best new cache found: all known new caches excluded!");
+  ER_CONDW(nullptr == best,
+           "No best new cache found: all known new caches excluded!");
   return best;
 } /* operator() */
 
 bool new_cache_selector::new_cache_is_excluded(
-    const ds::dp_cache_map& existing_caches,
-    const ds::dp_block_map& blocks,
+    const fspds::dp_cache_map& existing_caches,
+    const fspds::dp_block_map& blocks,
     const crepr::base_block3D* const new_cache) const {
-  auto cache_prox = boost::get<rtypes::spatial_dist>(
+  auto cache_prox = std::get<rtypes::spatial_dist>(
       mc_matrix->find(cselm::kCacheProxDist)->second);
-  auto cluster_prox = boost::get<rtypes::spatial_dist>(
+  auto cluster_prox = std::get<rtypes::spatial_dist>(
       mc_matrix->find(cselm::kClusterProxDist)->second);
 
   /*
    * Use the center rather than the anchor to get a distance unaffected by the
    * relative position of an existing cache and new cache.
    */
-  for (const auto& ec : existing_caches.const_values_range()) {
+  for (const auto& ec : existing_caches.values_range()) {
     double dist = (ec.ent()->rcenter2D() - new_cache->rcenter2D()).length();
     if (cache_prox >= dist) {
       ER_DEBUG("Ignoring new cache%d@%s/%s: Too close to cache%d@%s/%s (%f <= "
@@ -132,7 +134,7 @@ bool new_cache_selector::new_cache_is_excluded(
    * So, we approximate a block distribution as a single block, and only choose
    * new caches that are sufficiently far from any potential clusters.
    */
-  for (const auto& b : blocks.const_values_range()) {
+  for (const auto& b : blocks.values_range()) {
     if (b.ent() == new_cache) {
       continue;
     }

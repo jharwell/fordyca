@@ -25,9 +25,12 @@
 
 #include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 
-#include "fordyca/events/cache_vanished.hpp"
-#include "fordyca/events/robot_cached_block_pickup.hpp"
-#include "fordyca/events/robot_nest_block_drop.hpp"
+#include "fordyca/controller/cognitive/d1/events/cache_vanished.hpp"
+#include "fordyca/controller/cognitive/d1/events/cached_block_pickup.hpp"
+#include "fordyca/controller/cognitive/d1/events/nest_block_drop.hpp"
+#include "fordyca/controller/cognitive/d2/events/cache_vanished.hpp"
+#include "fordyca/controller/cognitive/d2/events/cached_block_pickup.hpp"
+#include "fordyca/controller/cognitive/d2/events/nest_block_drop.hpp"
 #include "fordyca/fsm/d1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/tasks/argument.hpp"
@@ -104,14 +107,34 @@ void collector::active_interface_update(int) {
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void collector::accept(events::detail::robot_cached_block_pickup& visitor) {
-  visitor.visit(*this);
+void collector::accept(fccd1::events::cached_block_pickup& visitor) {
+  auto& fsm = *static_cast<fsm::d1::cached_block_to_nest_fsm*>(mechanism());
+  visitor.visit(fsm);
 }
-void collector::accept(events::detail::robot_nest_block_drop& visitor) {
-  visitor.visit(*this);
+
+void collector::accept(fccd2::events::cached_block_pickup& visitor) {
+  auto& fsm = *static_cast<fsm::d1::cached_block_to_nest_fsm*>(mechanism());
+  static_cast<fccd1::events::cached_block_pickup&>(visitor).visit(fsm);
 }
-void collector::accept(events::detail::cache_vanished& visitor) {
-  visitor.visit(*this);
+
+void collector::accept(fccd1::events::cache_vanished& visitor) {
+  auto& fsm = *static_cast<fsm::d1::cached_block_to_nest_fsm*>(mechanism());
+  visitor.visit(fsm);
+}
+
+void collector::accept(fccd2::events::cache_vanished& visitor) {
+  auto& fsm = *static_cast<fsm::d1::cached_block_to_nest_fsm*>(mechanism());
+  static_cast<fccd1::events::cache_vanished&>(visitor).visit(fsm);
+}
+
+void collector::accept(fccd1::events::nest_block_drop& visitor) {
+  auto& fsm = *static_cast<fsm::d1::cached_block_to_nest_fsm*>(mechanism());
+  visitor.visit(fsm);
+}
+
+void collector::accept(fccd2::events::nest_block_drop& visitor) {
+  auto& fsm = *static_cast<fsm::d1::cached_block_to_nest_fsm*>(mechanism());
+  static_cast<fccd1::events::nest_block_drop&>(visitor).visit(fsm);
 }
 
 /*******************************************************************************
@@ -171,7 +194,16 @@ RCPPSW_WRAP_DEF_OVERRIDE(
     const);
 
 /*******************************************************************************
- * Block Transport Metrics
+ * Block Carrying
+ ******************************************************************************/
+RCPPSW_WRAP_DEF_OVERRIDE(
+    collector,
+    block_drop_strategy,
+    *static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism()),
+    const);
+
+/*******************************************************************************
+ * Block Transportation
  ******************************************************************************/
 bool collector::is_phototaxiing_to_goal(bool include_ca) const {
   return static_cast<fsm::d1::cached_block_to_nest_fsm*>(polled_task::mechanism())

@@ -18,34 +18,29 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_CACHE_SEL_MATRIX_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_CACHE_SEL_MATRIX_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <boost/variant.hpp>
 #include <map>
 #include <string>
 #include <vector>
+#include <variant>
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/range.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/types/spatial_dist.hpp"
 
-#include "fordyca/config/cache_sel/cache_pickup_policy_config.hpp"
+#include "fordyca/controller/config/cache_sel/cache_sel_matrix_config.hpp"
 #include "fordyca/controller/cognitive/cache_sel_exception.hpp"
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace config::cache_sel {
-struct cache_sel_matrix_config;
-} // namespace config::cache_sel
-NS_START(controller, cognitive);
+NS_START(fordyca, controller, cognitive);
 
 /**
  * \brief \ref boost::variant containing all the different object/POD types that
@@ -53,9 +48,9 @@ NS_START(controller, cognitive);
  * matrix can have the same type.
  */
 using cache_sel_variant =
-    boost::variant<rtypes::spatial_dist,
+    std::variant<rtypes::spatial_dist,
                    rmath::vector2d,
-                   rmath::rangeu,
+                   rmath::rangez,
                    std::vector<rtypes::type_uuid>,
                    config::cache_sel::cache_pickup_policy_config,
                    bool>;
@@ -81,27 +76,27 @@ class cache_sel_matrix final
     : public rer::client<cache_sel_matrix>,
       private std::map<std::string, cache_sel_variant> {
  public:
-  inline static const std::string kNestLoc = "nest_loc";
-  inline static const std::string kCacheProxDist = "cache_prox_dist";
-  inline static const std::string kClusterProxDist = "cluster_prox_dist";
-  inline static const std::string kBlockProxDist = "block_prox_dist";
-  inline static const std::string kNestProxDist = "nest_prox_dist";
-  inline static const std::string kSiteXRange = "site_xrange";
-  inline static const std::string kSiteYRange = "site_yrange";
-  inline static const std::string kPickupExceptions = "pickup_exceptions";
-  inline static const std::string kDropExceptions = "drop_exceptions";
-  inline static const std::string kStrictConstraints = "strict_constraints";
-  inline static const std::string kNewCacheDropTolerance = "new_cache_tol";
+  static inline const std::string kNestLoc = "nest_loc";
+  static inline const std::string kCacheProxDist = "cache_prox_dist";
+  static inline const std::string kClusterProxDist = "cluster_prox_dist";
+  static inline const std::string kBlockProxDist = "block_prox_dist";
+  static inline const std::string kNestProxDist = "nest_prox_dist";
+  static inline const std::string kSiteXRange = "site_xrange";
+  static inline const std::string kSiteYRange = "site_yrange";
+  static inline const std::string kPickupExceptions = "pickup_exceptions";
+  static inline const std::string kDropExceptions = "drop_exceptions";
+  static inline const std::string kStrictConstraints = "strict_constraints";
+  static inline const std::string kNewCacheDropTolerance = "new_cache_tol";
 
   /**
    * \brief Policy that must be satisfied before a robot will be able to pickup
    * from *ANY* cache.
    */
-  inline static const std::string kPickupPolicy = "pickup_policy";
-  inline static const std::string kPickupPolicyNull = "";
-  inline static const std::string kPickupPolicyTime = "time";
-  inline static const std::string kPickupPolicyCacheSize = "cache_size";
-  inline static const std::string kPickupPolicyCacheDuration = "cache_duration";
+  static inline const std::string kPickupPolicy = "pickup_policy";
+  static inline const std::string kPickupPolicyNull = "";
+  static inline const std::string kPickupPolicyTime = "time";
+  static inline const std::string kPickupPolicyCacheSize = "cache_size";
+  static inline const std::string kPickupPolicyCacheDuration = "cache_duration";
 
   using std::map<std::string, cache_sel_variant>::find;
   cache_sel_matrix(const config::cache_sel::cache_sel_matrix_config* config,
@@ -130,4 +125,3 @@ class cache_sel_matrix final
 
 NS_END(cognitive, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_CACHE_SEL_MATRIX_HPP_ */

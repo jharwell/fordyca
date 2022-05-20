@@ -18,21 +18,20 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_BIRTD_OMDPO_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_BIRTD_OMDPO_CONTROLLER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <memory>
+
 #include "fordyca/controller/cognitive/d2/birtd_mdpo_controller.hpp"
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller, cognitive);
-class oracular_info_receptor;
-NS_START(d2);
+NS_START(fordyca, controller, cognitive, d2);
 
 /*******************************************************************************
  * Class Definitions
@@ -58,14 +57,13 @@ class birtd_omdpo_controller : public d2::birtd_mdpo_controller,
   void control_step(void) override;
   std::type_index type_index(void) const override { return {typeid(*this)}; }
 
-  void oracle_init(std::unique_ptr<oracular_info_receptor> receptor) RCPPSW_COLD;
+  void oracle_init(std::unique_ptr<fsperception::oracular_info_receptor> receptor) RCPPSW_COLD;
 
  private:
   /* clang-format off */
-  std::unique_ptr<oracular_info_receptor> m_receptor;
+  std::unique_ptr<fsperception::oracular_info_receptor> m_receptor;
   /* clang-format on */
 };
 
 NS_END(cognitive, d2, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_BIRTD_OMDPO_CONTROLLER_HPP_ */

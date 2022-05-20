@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_FORAGING_ACQ_GOAL_HPP_
-#define INCLUDE_FORDYCA_FSM_FORAGING_ACQ_GOAL_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -68,5 +67,3 @@ csmetrics::goal_acq_metrics::goal_type
 to_goal_type(const foraging_acq_goal& goal);
 
 NS_END(fsm, fordyca);
-
-#endif /* INCLUDE_FORDYCA_FSM_FORAGING_ACQ_GOAL_HPP_ */

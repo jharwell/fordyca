@@ -34,67 +34,12 @@ NS_START(fordyca, metrics, caches);
  * Constructors/Destructor
  ******************************************************************************/
 site_selection_metrics_collector::site_selection_metrics_collector(
-    const std::string& ofname_stem,
-    const rtypes::timestep& interval)
-    : base_metrics_collector(ofname_stem,
-                             interval,
-                             rmetrics::output_mode::ekAPPEND) {}
+    std::unique_ptr<rmetrics::base_sink> sink)
+    : base_collector(std::move(sink)) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<std::string>
-site_selection_metrics_collector::csv_header_cols(void) const {
-  auto merged = dflt_csv_header_cols();
-  auto cols = std::list<std::string>{
-    /* clang-format off */
-    "int_n_successes",
-    "int_n_fails",
-    "int_nlopt_stopval",
-    "int_nlopt_ftol",
-    "int_nlopt_xtol",
-    "int_nlopt_maxeval",
-    "cum_n_successes",
-    "cum_n_fails",
-    "cum_nlopt_stopval",
-    "cum_nlopt_ftol",
-    "cum_nlopt_xtol",
-    "cum_nlopt_maxeval",
-    /* clang-format on */
-  };
-  merged.splice(merged.end(), cols);
-  return merged;
-} /* csv_header_cols() */
-
-void site_selection_metrics_collector::reset(void) {
-  base_metrics_collector::reset();
-  reset_after_interval();
-} /* reset() */
-
-boost::optional<std::string>
-site_selection_metrics_collector::csv_line_build(void) {
-  if (!(timestep() % interval() == 0UL)) {
-    return boost::none;
-  }
-  std::string line;
-
-  line += csv_entry_intavg(m_stats.int_n_successes);
-  line += csv_entry_intavg(m_stats.int_n_fails);
-  line += csv_entry_intavg(m_stats.int_nlopt_stopval);
-  line += csv_entry_intavg(m_stats.int_nlopt_ftol);
-  line += csv_entry_intavg(m_stats.int_nlopt_xtol);
-  line += csv_entry_intavg(m_stats.int_nlopt_maxeval);
-
-  line += csv_entry_tsavg(m_stats.cum_n_successes);
-  line += csv_entry_tsavg(m_stats.cum_n_fails);
-  line += csv_entry_tsavg(m_stats.cum_nlopt_stopval);
-  line += csv_entry_tsavg(m_stats.cum_nlopt_ftol);
-  line += csv_entry_tsavg(m_stats.cum_nlopt_xtol);
-  line += csv_entry_tsavg(m_stats.cum_nlopt_maxeval, true);
-
-  return boost::make_optional(line);
-} /* csv_line_build() */
-
 void site_selection_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
   const auto& m = dynamic_cast<const site_selection_metrics&>(metrics);
@@ -104,38 +49,38 @@ void site_selection_metrics_collector::collect(
   }
 
   if (m.site_select_success()) {
-    ++m_stats.int_n_successes;
-    m_stats.int_nlopt_stopval +=
+    ++m_data.interval.n_successes;
+    m_data.interval.nlopt_stopval +=
         static_cast<uint>(nlopt::result::STOPVAL_REACHED == res);
-    m_stats.int_nlopt_ftol +=
+    m_data.interval.nlopt_ftol +=
         static_cast<uint>(nlopt::result::FTOL_REACHED == res);
-    m_stats.int_nlopt_xtol +=
+    m_data.interval.nlopt_xtol +=
         static_cast<uint>(nlopt::result::XTOL_REACHED == res);
-    m_stats.int_nlopt_maxeval +=
+    m_data.interval.nlopt_maxeval +=
         static_cast<uint>(nlopt::result::MAXEVAL_REACHED == res);
 
-    ++m_stats.cum_n_successes;
-    m_stats.cum_nlopt_stopval +=
+    ++m_data.cum.n_successes;
+    m_data.cum.nlopt_stopval +=
         static_cast<uint>(nlopt::result::STOPVAL_REACHED == res);
-    m_stats.cum_nlopt_ftol +=
+    m_data.cum.nlopt_ftol +=
         static_cast<uint>(nlopt::result::FTOL_REACHED == res);
-    m_stats.cum_nlopt_xtol +=
+    m_data.cum.nlopt_xtol +=
         static_cast<uint>(nlopt::result::XTOL_REACHED == res);
-    m_stats.cum_nlopt_maxeval +=
+    m_data.cum.nlopt_maxeval +=
         static_cast<uint>(nlopt::result::MAXEVAL_REACHED == res);
   } else {
-    ++m_stats.int_n_fails;
-    ++m_stats.cum_n_fails;
+    ++m_data.interval.n_fails;
+    ++m_data.cum.n_fails;
   }
 } /* collect() */
 
 void site_selection_metrics_collector::reset_after_interval(void) {
-  m_stats.int_n_successes = 0;
-  m_stats.int_n_fails = 0;
-  m_stats.int_nlopt_stopval = 0;
-  m_stats.int_nlopt_ftol = 0;
-  m_stats.int_nlopt_xtol = 0;
-  m_stats.int_nlopt_maxeval = 0;
+  m_data.interval.n_successes = 0;
+  m_data.interval.n_fails = 0;
+  m_data.interval.nlopt_stopval = 0;
+  m_data.interval.nlopt_ftol = 0;
+  m_data.interval.nlopt_xtol = 0;
+  m_data.interval.nlopt_maxeval = 0;
 } /* reset_after_interval() */
 
 NS_END(caches, metrics, fordyca);

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_STRATEGY_EXPLORE_CRW_ADAPTOR_HPP_
-#define INCLUDE_FORDYCA_STRATEGY_EXPLORE_CRW_ADAPTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -50,30 +49,25 @@ NS_START(fordyca, strategy, explore);
 class crw_adaptor final : public foraging_strategy,
                           public rpdecorator::decorator<csstrategy::explore::crw> {
  public:
-  crw_adaptor(const foraging_strategy::params* c_params, rmath::rng* rng);
-  crw_adaptor(csubsystem::saa_subsystemQ3D* saa, rmath::rng* rng);
+  crw_adaptor(const fstrategy::strategy_params* c_params, rmath::rng* rng);
 
   ~crw_adaptor(void) override = default;
   crw_adaptor(const crw_adaptor&) = delete;
   crw_adaptor& operator=(const crw_adaptor&) = delete;
 
-  /* interference metrics */
-  RCPPSW_WRAP_DECLDEF_OVERRIDE(exp_interference, decoratee(), const);
-  RCPPSW_WRAP_DECLDEF_OVERRIDE(entered_interference, decoratee(), const);
-  RCPPSW_WRAP_DECLDEF_OVERRIDE(exited_interference, decoratee(), const);
-  RCPPSW_WRAP_DECLDEF_OVERRIDE(interference_duration, decoratee(), const);
-  RCPPSW_WRAP_DECLDEF_OVERRIDE(interference_loc3D, decoratee(), const);
+  RCPPSW_WRAP_DECLDEF_OVERRIDE(min_duration_met, decoratee(), const);
 
+  /* taskable overrides */
   RCPPSW_WRAP_DECLDEF_OVERRIDE(task_reset, decoratee());
   RCPPSW_WRAP_DECLDEF_OVERRIDE(task_running, decoratee(), const);
   RCPPSW_WRAP_DECLDEF_OVERRIDE(task_finished, decoratee(), const);
   RCPPSW_WRAP_DECLDEF_OVERRIDE(task_execute, decoratee());
-  void task_start(cta::taskable_argument* arg) override { decoratee().task_start(arg); }
+  void task_start(cta::taskable_argument* arg) override {
+    decoratee().task_start(arg);
+  }
 
   /* prototype overrides */
   RCPPSW_WRAP_DECLDEF_OVERRIDE(clone, decoratee(), const);
 };
 
 NS_END(explore, strategy, fordyca);
-
-#endif /* INCLUDE_FORDYCA_STRATEGY_EXPLORE_CRW_ADAPTOR_HPP_ */

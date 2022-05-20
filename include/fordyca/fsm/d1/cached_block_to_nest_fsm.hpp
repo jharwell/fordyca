@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_D1_CACHED_BLOCK_TO_NEST_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_D1_CACHED_BLOCK_TO_NEST_FSM_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -72,10 +71,9 @@ class cached_block_to_nest_fsm final : public cffsm::foraging_util_hfsm,
                                        public cta::taskable {
  public:
   cached_block_to_nest_fsm(
-      const fsm_ro_params* c_params,
-      csubsystem::saa_subsystemQ3D* saa,
-      std::unique_ptr<csstrategy::base_strategy> explore,
-      std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
+      const fsm_ro_params* c_ro,
+      const csfsm::fsm_params* c_no,
+      cffsm::strategy_set strategies,
       rmath::rng *rng);
   ~cached_block_to_nest_fsm(void) override = default;
 
@@ -214,4 +212,3 @@ class cached_block_to_nest_fsm final : public cffsm::foraging_util_hfsm,
 
 NS_END(d1, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_D1_CACHED_BLOCK_TO_NEST_FSM_HPP_ */

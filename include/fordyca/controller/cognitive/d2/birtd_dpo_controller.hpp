@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_BIRTD_DPO_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_BIRTD_DPO_CONTROLLER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -29,7 +28,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace fordyca::config::d2 { class controller_repository; }
+namespace fordyca::controller::config::d2 { class controller_repository; }
 
 NS_START(fordyca, controller, cognitive, d2);
 
@@ -73,7 +72,7 @@ class birtd_dpo_controller : public d1::bitd_dpo_controller,
    */
   void task_start_cb(cta::polled_task* task,
                      const cta::ds::bi_tab*);
-  void private_init(const config::d2::controller_repository& config_repo) RCPPSW_COLD;
+  void private_init(const fcconfig::d2::controller_repository& config_repo) RCPPSW_COLD;
 
 
   /* clang-format off */
@@ -89,5 +88,3 @@ class birtd_dpo_controller : public d1::bitd_dpo_controller,
 };
 
 NS_END(cognitive, d2, controller, fordyca);
-
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_D2_BIRTD_DPO_CONTROLLER_HPP_ */

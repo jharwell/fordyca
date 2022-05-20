@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_CACHE_ACQ_VALIDATOR_HPP_
-#define INCLUDE_FORDYCA_FSM_CACHE_ACQ_VALIDATOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -29,7 +28,10 @@
 #include "rcppsw/types/timestep.hpp"
 #include "rcppsw/types/type_uuid.hpp"
 
+#include "cosm/arena/ds/cache_vector.hpp"
+
 #include "fordyca/fordyca.hpp"
+#include "fordyca/subsystem/perception/perception_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -39,9 +41,6 @@ class base_cache;
 } // namespace cosm::arena::repr
 
 NS_START(fordyca);
-namespace ds {
-class dp_cache_map;
-} /* namespace ds */
 
 namespace controller::cognitive {
 class cache_sel_matrix;
@@ -62,7 +61,11 @@ NS_START(fsm);
  */
 class cache_acq_validator : public rer::client<cache_acq_validator> {
  public:
-  cache_acq_validator(const ds::dp_cache_map* dpo_map,
+  cache_acq_validator(const fspds::dp_cache_map* dpo_map,
+                      const controller::cognitive::cache_sel_matrix* csel_matrix,
+                      bool for_pickup);
+
+  cache_acq_validator(const cads::bcache_vectorno& caches,
                       const controller::cognitive::cache_sel_matrix* csel_matrix,
                       bool for_pickup);
 
@@ -84,10 +87,8 @@ class cache_acq_validator : public rer::client<cache_acq_validator> {
   /* clang-format off */
   const bool                                           mc_for_pickup;
   const controller::cognitive::cache_sel_matrix* const mc_csel_matrix;
-  const ds::dp_cache_map*             const            mc_dpo_map;
+  const cads::bcache_vectorno                          mc_caches;
   /* clang-format on */
 };
 
 NS_END(fsm, fordyca);
-
-#endif /* INCLUDE_FORDYCA_FSM_CACHE_ACQ_VALIDATOR_HPP_ */

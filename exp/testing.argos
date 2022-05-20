@@ -18,10 +18,10 @@
   <controllers>
 
     <crw_controller id="fbc"
-                          library="libfordyca">
+                          library="libfordyca-argos-footbot">
       <actuators>
         <differential_steering implementation="default" />
-        <!-- <leds implementation="default" medium="leds" /> -->
+        <leds implementation="default" medium="leds" />
         <!-- <range_and_bearing implementation="default" /> -->
       </actuators>
       <sensors>
@@ -40,15 +40,19 @@
       <params>
         <rng seed="123"/>
         <output
-            output_root="output"
-            output_dir="__current_date__"
+            output_parent="output"
+            output_leaf="__current_date__"
             />
         <perception
-            los_dim="0.4">
-          <grid2D resolution="0.2"
-                dims="12, 6, 2"/>
-          <pheromone rho="0.00001"
-                     repeat_deposit="false"/>
+            type="dpo">
+          <dpo>
+            <rlos dim="0.4">
+              <grid2D resolution="0.2"
+                      dims="12, 6, 2"/>
+            </rlos>
+            <pheromone rho="0.00001"
+                       repeat_deposit="false"/>
+          </dpo>
         </perception>
         <task_executive
             update_exec_ests="true"
@@ -88,7 +92,7 @@
               tab_init_policy="max_depth">
             <task_partition
                 always_partition="false"
-                never_partition="true">
+                never_partition="false">
               <src_sigmoid_sel
                   input_src="exec">
                 <sigmoid_sel
@@ -150,9 +154,20 @@
               cache_size="3"/>
         </cache_sel_matrix>
         <strategy>
-          <explore
-              block_strategy="CRW"
-              cache_strategy="utility_search"/>
+          <blocks>
+            <explore
+                strategy="CRW"
+                min_duration="50"/>
+            <drop
+                strategy="backup"
+                duration="50"
+                />
+          </blocks>
+          <caches>
+            <explore
+                strategy="utility_search"
+                min_duration="50"/>
+            </caches>
           <nest_acq
               strategy="random_thresh"
               />
@@ -162,7 +177,7 @@
           <proximity_sensor fov="-2.61:2.61"
                             delta="0.1" />
 
-          <ground_sensor>
+          <env_sensor>
             <!-- NEST: The nest is a relatively light gray. -->
             <nest range="0.6:0.8"
                   consensus="3"/>
@@ -172,26 +187,29 @@
             <!-- CACHE: Caches are dark gray. -->
             <cache range="0.3:0.5"
                    consensus="3"/>
-          </ground_sensor>
+          </env_sensor>
         </sensing_subsystemQ3D>
         <actuation_subsystem2D>
           <force_calculator>
             <avoidance_force lookahead="0.5"
-                             max="8"/>
+                             max="0.08"/>
             <arrival_force slowing_radius="0.2"
-                           slowing_speed_min="1.0"
-                           max="8"/>
+                           slowing_speed_min="0.01"
+                           max="0.08"/>
             <wander_force circle_distance="4.0"
                           circle_radius="100.0"
-                          max_angle_delta="5"
-                          max="9.0"
-                          interval="1"
-                          normal_dist="false"/>
-            <phototaxis_force max="8"/>
+                          max="0.09"
+                          interval="1">
+              <!-- 5 degrees max delta. -->
+              <bias_angle src="uniform"
+                          max_delta="0.0872"/>
+            </wander_force>
+            <phototaxis_force max="0.08"/>
           </force_calculator>
 
-          <diff_drive soft_turn_max="15"
-                      max_speed="10.0" />
+          <!-- 25 degrees soft_turn_max. -->
+          <diff_drive soft_turn_max="1.04"
+                      max_speed="0.1" />
         </actuation_subsystem2D>
       </params>
     </crw_controller>
@@ -201,55 +219,61 @@
   <!-- ****************** -->
   <!-- * Loop functions * -->
   <!-- ****************** -->
-  <loop_functions library="libfordyca"
+  <loop_functions library="libfordyca-argos-footbot"
                   label="d0_loop_functions">
     <output
-        output_root="output"
-        output_dir="__current_date__">
+        output_parent="output"
+        output_leaf="__current_date__">
       <metrics
-          output_dir="metrics">
-        <append
-            output_interval="1000"
-            block_acq_counts="block-acq-counts"
-            block_transporter="block-transporter"
-            block_transportee="block-transportee"
-            block_manipulation="block-manipulation"
-            cache_acq_counts="cache-acq-counts"
-            cache_utilization="cache-utilization"
-            cache_lifecycle="cache-lifecycle"
-            fsm_interference_counts="fsm-interference-counts"
-            cache_site_selection="cache-site-selection"
-            task_execution_generalist="task-execution-generalist"
-            task_execution_collector="task-execution-collector"
-            task_execution_harvester="task-execution-harvester"
-            task_execution_cache_starter="task-execution-cache_starter"
-            task_execution_cache_finisher="task-execution-cache_finisher"
-            task_execution_cache_transferer="task-execution-cache_transferer"
-            task_execution_cache_collector="task-execution-cache_collector"
-            task_tab_generalist="task-tab-generalist"
-            task_tab_collector="task-tab-collector"
-            task_tab_harvester="task-tab-harvester"
-            task_distribution="task-distribution"
-            spatial_movement='spatial-movement'
-            perception_crw="perception-crw"
-            perception_mcrw="perception-mcrw"
-            swarm_convergence="swarm-convergence"
-            tv_population="tv-population"
-            block_distributor="block-distributor"
-            block_motion="block-motion"
-            nest_acq_strategy="nest-acq-strategy"
-            block_clusters="block-clusters"
-            tv_environment="tv-environment"/>
+          metrics_path="metrics">
+        <sinks>
+          <file>
+            <append
+                output_interval="1000"
+                block_acq_counts="block-acq-counts"
+                block_transporter="block-transporter"
+                block_transportee="block-transportee"
+                block_manipulation="block-manipulation"
+                cache_acq_counts="cache-acq-counts"
+                cache_utilization="cache-utilization"
+                cache_lifecycle="cache-lifecycle"
+                perception_dpo="perception-dpo"
+                spatial_interference_counts="spatial-interference-counts"
+                cache_site_selection="cache-site-selection"
+                task_execution_generalist="task-execution-generalist"
+                task_execution_collector="task-execution-collector"
+                task_execution_harvester="task-execution-harvester"
+                task_execution_cache_starter="task-execution-cache_starter"
+                task_execution_cache_finisher="task-execution-cache_finisher"
+                task_execution_cache_transferer="task-execution-cache_transferer"
+                task_execution_cache_collector="task-execution-cache_collector"
+                task_tab_generalist="task-tab-generalist"
+                task_tab_collector="task-tab-collector"
+                task_tab_harvester="task-tab-harvester"
+                task_distribution="task-distribution"
+                spatial_movement='spatial-movement'
+                spatial_nest_zone='spatial-nest-zone'
+                perception_crw="perception-crw"
+                perception_mcrw="perception-mcrw"
+                swarm_convergence="swarm-convergence"
+                tv_population="tv-population"
+                block_distributor="block-distributor"
+                block_motion="block-motion"
+                nest_acq_strategy="nest-acq-strategy"
+                block_clusters="block-clusters"
+                tv_environment="tv-environment"/>
 
-        <truncate output_interval="10"
-                block_acq_locs2D="block-acq-locs"
-                block_acq_explore_locs2D="block-acq-explore-locs"
-                block_acq_vector_locs2D="block-acq-vector-locs"
-                cache_acq_locs2D="cache-acq-locs"
-                cache_acq_explore_locs2D="cache-acq-explore-locs"
-                cache_acq_vector_locs2D="cache-acq-vector-locs"
-                cache_locations="cache-locations"
-                swarm_dist2D_pos="swarm-dist-pos2D"/>
+            <truncate output_interval="10"
+                      block_acq_locs2D="block-acq-locs"
+                      block_acq_explore_locs2D="block-acq-explore-locs"
+                      block_acq_vector_locs2D="block-acq-vector-locs"
+                      cache_acq_locs2D="cache-acq-locs"
+                      cache_acq_explore_locs2D="cache-acq-explore-locs"
+                      cache_acq_vector_locs2D="cache-acq-vector-locs"
+                      cache_locations="cache-locations"
+                      spatial_dist_pos2D="spatial-dist-pos2D"/>
+          </file>
+        </sinks>
       </metrics>
     </output>
     <!-- <convergence -->
@@ -318,7 +342,7 @@
           birth_mu="0.0"
           death_lambda="0.0"
           malfunction_lambda="0.000"
-          max_size="00"
+          max_size="0"
           repair_mu="0.000"/>
     </temporal_variance>
 
@@ -399,7 +423,8 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,10,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="16" max_trials="1000">
+
+      <entity quantity="11" max_trials="1000">
         <foot-bot id="fb" omnidirectional_camera_aperture="89">
           <controller config="fbc" />
           <!-- <battery model= "time_motion"/> -->
@@ -452,17 +477,17 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <!-- <visualization> -->
-  <!--   <qt-opengl autoplay="false"> -->
-  <!--      <!-\- <frame_grabbing directory="frames" -\-> -->
-  <!--      <!-\-                 base_name="frame_" -\-> -->
-  <!--      <!-\-                 format="png" -\-> -->
-  <!--      <!-\-                 quality="100" -\-> -->
-  <!--      <!-\-                 headless_grabbing="true" -\-> -->
-  <!--      <!-\-                 headless_frame_size="1600x1200" -\-> -->
-  <!--      <!-\-                 /> -\-> -->
-  <!--     <user_functions label="d0_qt_user_functions" /> -->
-  <!--   </qt-opengl> -->
-  <!-- </visualization> -->
+  <visualization>
+    <qt-opengl autoplay="true">
+       <!-- <frame_grabbing directory="frames" -->
+       <!--                 base_name="frame_" -->
+       <!--                 format="png" -->
+       <!--                 quality="100" -->
+       <!--                 headless_grabbing="true" -->
+       <!--                 headless_frame_size="1600x1200" -->
+       <!--                 /> -->
+      <user_functions label="d0_qt_user_functions" />
+    </qt-opengl>
+  </visualization>
 
 </argos-configuration>

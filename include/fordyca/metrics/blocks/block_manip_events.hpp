@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_BLOCKS_BLOCK_MANIP_EVENTS_HPP_
-#define INCLUDE_FORDYCA_METRICS_BLOCKS_BLOCK_MANIP_EVENTS_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -62,4 +61,3 @@ enum block_manip_events {
 
 NS_END(blocks, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_BLOCKS_BLOCK_MANIP_EVENTS_HPP_ */

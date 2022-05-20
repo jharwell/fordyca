@@ -18,13 +18,12 @@
  * RCPPSW.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_BLOCK_SEL_MATRIX_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_BLOCK_SEL_MATRIX_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <boost/variant.hpp>
+#include <variant>
 #include <map>
 #include <string>
 #include <vector>
@@ -32,17 +31,13 @@
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/types/type_uuid.hpp"
 
-#include "fordyca/config/block_sel/block_pickup_policy_config.hpp"
+#include "fordyca/controller/config/block_sel/block_sel_matrix_config.hpp"
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace config { namespace block_sel {
-struct block_sel_matrix_config;
-}} // namespace config::block_sel
-NS_START(controller, cognitive);
+NS_START(fordyca, controller, cognitive);
 
 /**
  * \brief \ref boost::variant containing all the different object/POD types that
@@ -50,7 +45,7 @@ NS_START(controller, cognitive);
  * matrix can have the same type.
  */
 using block_sel_variant =
-    boost::variant<double,
+    std::variant<double,
                    rmath::vector2d,
                    std::vector<rtypes::type_uuid>,
                    config::block_sel::block_pickup_policy_config>;
@@ -69,18 +64,18 @@ using block_sel_variant =
  */
 class block_sel_matrix : public std::map<std::string, block_sel_variant> {
  public:
-  inline static const std::string kNestLoc = "nest_loc";
-  inline static const std::string kCubePriority = "cube_priority";
-  inline static const std::string kRampPriority = "ramp_priority";
-  inline static const std::string kSelExceptions = "sel_exceptions";
+  static inline const std::string kNestLoc = "nest_loc";
+  static inline const std::string kCubePriority = "cube_priority";
+  static inline const std::string kRampPriority = "ramp_priority";
+  static inline const std::string kSelExceptions = "sel_exceptions";
 
   /**
    * \brief The conditions that must be satisfied before a robot will be
    * able to pickup a block (if applicable).
    */
-  inline static const std::string kPickupPolicy = "pickup_policy";
-  inline static const std::string kPickupPolicyNull = "";
-  inline static const std::string kPickupPolicyClusterProx = "cluster_proximity";
+  static inline const std::string kPickupPolicy = "pickup_policy";
+  static inline const std::string kPickupPolicyNull = "";
+  static inline const std::string kPickupPolicyClusterProx = "cluster_proximity";
 
   explicit block_sel_matrix(
       const config::block_sel::block_sel_matrix_config* config,
@@ -107,4 +102,3 @@ class block_sel_matrix : public std::map<std::string, block_sel_variant> {
 
 NS_END(cognitive, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_COGNITIVE_BLOCK_SEL_MATRIX_HPP_ */

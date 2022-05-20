@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_REACTIVE_D0_CRW_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_REACTIVE_D0_CRW_CONTROLLER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -28,7 +27,7 @@
 
 #include "rcppsw/patterns/fsm/base_fsm.hpp"
 
-#include "fordyca//controller/foraging_controller.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,8 +48,8 @@ NS_START(controller, reactive, d0);
  * \brief The most basic form of a foraging controller: roam around randomly
  * until you find a block, and then bring it back to the nest; repeat.
  */
-class crw_controller : public foraging_controller,
-                       public rer::client<crw_controller> {
+class crw_controller : public rer::client<crw_controller>,
+                       public foraging_controller {
  public:
   crw_controller(void) RCPPSW_COLD;
   ~crw_controller(void) override RCPPSW_COLD;
@@ -79,15 +78,16 @@ class crw_controller : public foraging_controller,
                             const);
   bool is_phototaxiing_to_goal(bool include_ca) const override RCPPSW_PURE;
 
+  /* block carrying controller */
+  const cssblocks::drop::base_drop* block_drop_strategy(void) const override;
+
   const fsm::d0::crw_fsm* fsm(void) const { return m_fsm.get(); }
   fsm::d0::crw_fsm* fsm(void) { return m_fsm.get(); }
 
  private:
   /* clang-format off */
-  std::unique_ptr<fsm::d0::crw_fsm> m_fsm;
+  std::unique_ptr<fsm::d0::crw_fsm> m_fsm{nullptr};
   /* clang-format on */
 };
 
 NS_END(d0, reactive, controller, fordyca);
-
-#endif /* INCLUDE_FORDYCA_CONTROLLER_REACTIVE_D0_CRW_CONTROLLER_HPP_ */

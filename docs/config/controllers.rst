@@ -1,3 +1,4 @@
+============================
 Controller XML Configuration
 ============================
 
@@ -102,10 +103,7 @@ The following controllers are available:
 
 
 
-The following root XML tags are defined under ``<params>`` Parameters for robot exploration, collision avoidance,
-                                                           Parameters for robot
-                                                           exploration,
-                                                           collision avoidance,
+The following root XML tags are defined under ``<params>``.
 
 .. list-table::
    :widths: 25,50,50
@@ -169,7 +167,7 @@ The following root XML tags are defined under ``<params>`` Parameters for robot 
 
 
 ``block_sel_matrix``
---------------------
+====================
 
 - Required child attributes if present: ``nest``.
 - Required child tags if present: none.
@@ -193,7 +191,7 @@ XML configuration:
 ``nest`` - The location of the nest.
 
 ``block_sel_matrix/block_priorities``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------
 
 - Required by: None. If omitted, the default priority values shown below are
   used.
@@ -222,7 +220,7 @@ XML configuration:
   ramp blocks during block selection. Default if omitted: 1.0
 
 ``block_sel_matrix/pickup_policy``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------------
 
 - Required by: None.
 - Required child attributes if present: ``policy``.
@@ -260,7 +258,7 @@ XML configuration:
   ``cluster_proximity`` pickup policy.
 
 ``cache_sel_matrix``
---------------------
+====================
 
 - Required by: [d1, d2] controllers.
 - Required child attributes if present: all.
@@ -306,7 +304,7 @@ XML configuration:
   locations by arena boundaries).
 
 ``cache_sel_matrix/pickup_policy``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------------
 
 - Required by: [d1, d2] controllers.
 - Required child attributes if present: ``policy``.
@@ -346,12 +344,12 @@ XML configuration:
     ``pickup_policy`` tag is present.
 
 ``strategy``
--------------
+============
 
 - Required by: All controllers.
 - Required child attributes if present: None.
-- Required child tags if present: [ ``explore``, ``nest_acq`` ].
-- Optional child attributes: None.
+- Required child tags if present: [ ``explore``, ``nest``, ``blocks`` ].
+- Optional child attributes: [ ``caches`` ]
 - Optional child tags: None.
 
 XML configuration:
@@ -359,76 +357,132 @@ XML configuration:
 .. code-block:: XML
 
    <strategy>
-       <explore>
-       ...
-       </explore>
-       <nest_acq>
-       ...
-       </nest_cq>
+       <blocks>
+         ...
+       </blocks>
+       <caches>
+         ...
+       </caches>
+       <nest>
+         ...
+       </nest>
    </strategy>
-
-``strategy/explore``
-^^^^^^^^^^^^^^^^^^^^
-
-- Required by: All but CRW.
-- Required child attributes if present: ``block_strategy``.
-- Required child tags if present: None.
-- Optional child attributes: ``cache_strategy``.
-- Optional child tags: None.
-
-XML configuration:
-
-.. code-block:: XML
-
-   <strategy>
-       <explore
-          block_strategy="CRW|likelihood_search"
-          cache_strategy="CRW|likelihood_search|utility_search|ledtaxis_search"
-       </explore>
-       ...
-   </strategy>
-
-``strategy/nest_acq``
-^^^^^^^^^^^^^^^^^^^^^
-
-- Required by: All controllers.
-- Required child attributes if present: ``strategy``.
-- Required child tags if present: None.
-- Optional child attributes: None.
-- Optional child tags: None.
-
-XML configuration:
-
-.. code-block:: XML
-
-   <strategy>
-       <nest_acq
-          strategy="wander|random_thresh|wander_random_thresh"
-       </nest_acq>
-       ...
-   </strategy>
-
-
-- ``strategy`` - The strategy robots should use once they have entered the nest
-  with an object to choose a precise location to drop it at. Valid values are:
-
-  - ``wander`` - Perform phototaxis+wander, avoiding collisions as needed, for a
-    random number of timesteps before acquiring the nest.
-
-  - ``random_thresh`` - Perform phototaxis+collision avoidance, choosing a
-    random point along the vector pointing from where the robot enters the nest
-    to the center to treat as the center/use as the nest acquisition point, and
-    phototaxis to that point.
-
-  - ``wander_random_thresh`` - ``random_thresh`` + ``wander``.
-
-Additional notes to :xref:`COSM` controller docs
-================================================
 
 ``perception``
 --------------
 
-- ``grid`` child tag required by [``MDPO``, ``BITD-MDPO``, ``BIRTD-MDPO`` ]
+- Required child attributes if present: [ ``type`` ].
+- Required child tags if present: none.
+- Optional child tags: [ ``rlos``, ``dpo``, ``mdpo`` ]
+- Optional child attributes: none.
+
+XML configuration:
+
+.. code-block:: XML
+
+   <perception
+     type="STRING">
+     <rlos>
+        ...
+     </rlos>
+     <dpo>
+         ...
+     <dpo/>
+     <mdpo>
+         ...
+     <mdpo/>
+   </perception>
+
+- ``type`` - The perception type to use.
+
+``perception/dpo``
+^^^^^^^^^^^^^^^^^^
+
+Parameters for the Decaying Pheromone Object (DPO) perception type.
+
+- Required child attributes if present: none.
+- Required child tags if present: [ ``rlos``, ``pheromone`` ].
+- Optional child tags: none.
+- Optional child attributes: none.
+
+XML configuration:
+
+.. code-block:: XML
+
+   <perception>
+     ...
+     <dpo>
+       <rlos>
+         ...
+       </rlos>
+       <pheromone>
+         ...
+       </pheromone
+     </dpo>
+     ...
+   </perception>
+
+``perception/dpo/pheromone``
+""""""""""""""""""""""""""""
+
+Parameters controlling the decay of the pheromone-based memory for the Decaying
+Pheromone Object (DPO) perception model.
+
+- Required child attributes if present: ``rho``.
+- Required child tags if present: none.
+- Optional child attributes: ``repeat_deposit``.
+- Optional child tags: none.
+
+XML configuration:
+
+.. code-block:: XML
+
+   <dpo>
+     ...
+     <pheromone rho="FLOAT"
+                repeat_deposit="false"/>
+     ...
+   </dpo>
+
+- ``rho`` How fast the relevance of information about a particular cell within a
+  robot's 2D map of the world loses relevance. Should be < 1.0.
+
+- ``repeat_deposit`` - If *true*, then repeated pheromone deposits for objects a
+  robot already knows about will be enabled. ``rho`` should be updated
+  accordingly, probably to a larger value to enable faster decay. Default if
+  omitted: *false*.
+
+
+``perception/mdpo``
+^^^^^^^^^^^^^^^^^^^
+
+Parameters for the Mapped Decaying Pheromone Object (MDPO) perception model.
+
+- Required child attributes if present: none.
+- Required child tags if present: [ ``rlos``, ``pheromone`` ].
+- Optional child tags: none.
+- Optional child attributes: none.
+
+XML configuration:
+
+.. code-block:: XML
+
+   <perception>
+     ...
+     <mdpo>
+       <rlos>
+         ...
+       </rlos>
+       <pheromone>
+         ...
+       </pheromone
+     </mdpo>
+     ...
+   </perception>
+
+
+Additional notes to :xref:`COSM` controller docs
+================================================
 
 ``task_alloc/stoch_nbhd1``
 ---------------------------------

@@ -24,7 +24,9 @@
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 
 #include "cosm/spatial/fsm/acquire_goal_fsm.hpp"
+#include "cosm/subsystem/actuation_subsystem2D.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
@@ -40,10 +42,10 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 block_to_goal_fsm::block_to_goal_fsm(csfsm::acquire_goal_fsm* const goal_fsm,
                                      csfsm::acquire_goal_fsm* const block_fsm,
-                                     csubsystem::saa_subsystemQ3D* saa,
+                                     const csfsm::fsm_params* c_no,
                                      rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.block_to_goal"),
-      foraging_util_hfsm(saa, nullptr, rng, ekST_MAX_STATES),
+      foraging_util_hfsm(c_no, {}, rng, ekST_MAX_STATES),
       RCPPSW_HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       RCPPSW_HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
       RCPPSW_HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),

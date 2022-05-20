@@ -18,26 +18,20 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_EXISTING_CACHE_INTERACTOR_HPP_
-#define INCLUDE_FORDYCA_EVENTS_EXISTING_CACHE_INTERACTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
+#include "fordyca/controller/cognitive/events_fwd.hpp"
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
-
-namespace detail {
-class robot_cached_block_pickup;
-class robot_cache_block_drop;
-class cache_vanished;
-} // namespace detail
 
 /*******************************************************************************
  * Structure Definitions
@@ -50,10 +44,12 @@ class cache_vanished;
  * interact with existing caches in FORDYCA.
  */
 class existing_cache_interactor
-    : public rpvisitor::polymorphic_accept_set<detail::robot_cache_block_drop,
-                                               detail::robot_cached_block_pickup,
-                                               detail::cache_vanished> {};
+    : public rpvisitor::polymorphic_accept_set<fccd1::events::cache_block_drop,
+                                               fccd1::events::cached_block_pickup,
+                                               fccd1::events::cache_vanished,
+
+                                               fccd2::events::cache_block_drop,
+                                               fccd2::events::cached_block_pickup,
+                                               fccd2::events::cache_vanished> {};
 
 NS_END(events, fordyca);
-
-#endif /* INCLUDE_FORDYCA_EVENTS_EXISTING_CACHE_INTERACTOR_HPP_ */

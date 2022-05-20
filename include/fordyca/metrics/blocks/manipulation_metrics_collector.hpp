@@ -18,21 +18,16 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_COLLECTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include <list>
-#include <atomic>
-#include <vector>
+#include <memory>
 
-#include "rcppsw/metrics/base_metrics_collector.hpp"
+#include "rcppsw/metrics/base_collector.hpp"
 
-#include "fordyca/fordyca.hpp"
-#include "fordyca/metrics/blocks/block_manip_events.hpp"
+#include "fordyca/metrics/blocks/manipulation_metrics_data.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,42 +47,27 @@ NS_START(fordyca, metrics, blocks);
  * gathered stats are supported. Metrics are written out at the specified
  * collection interval.
  */
-class manipulation_metrics_collector final : public rmetrics::base_metrics_collector {
+class manipulation_metrics_collector final : public rmetrics::base_collector {
  public:
   /**
-   * \param ofname_stem The output file name stem.
-   * \param interval Collection interval.
+   * \param sink The metrics sink to use.
    */
-  manipulation_metrics_collector(const std::string& ofname_stem,
-                                 const rtypes::timestep& interval);
+  explicit manipulation_metrics_collector(
+      std::unique_ptr<rmetrics::base_sink> sink);
 
-  void reset(void) override;
+  /* base_collector overrides */
   void collect(const rmetrics::base_metrics& metrics) override;
   void reset_after_interval(void) override;
+  const rmetrics::base_data* data(void) const override { return &m_data; }
+
+#if defined(COSM_PAL_TARGET_ROS)
+  void collect(const manipulation_metrics_data& data) { m_data += data; }
+#endif
 
  private:
-  std::list<std::string> csv_header_cols(void) const override;
-
-  boost::optional<std::string> csv_line_build(void) override;
-
-  /**
-   * \brief Container for holding collected statistics. Must be atomic so counts
-   * are valid in parallel metric collection contexts. Ideally the penalties
-   * would be atomic \ref rtypes::timestep, but that type does not meet the
-   * std::atomic requirements.
-   */
-  struct stats {
-    std::atomic_size_t events{0};
-    std::atomic_size_t penalties{0};
-  };
-
-
   /* clang-format off */
-  std::vector<stats> m_interval{block_manip_events::ekMAX_EVENTS};
-  std::vector<stats> m_cum{block_manip_events::ekMAX_EVENTS};
+  manipulation_metrics_data m_data{};
   /* clang-format on */
 };
 
 NS_END(blocks, metrics, fordyca);
-
-#endif /* INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_COLLECTOR_HPP_ */

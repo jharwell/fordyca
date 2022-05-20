@@ -34,43 +34,24 @@ NS_START(fordyca, metrics, tv);
  * Constructors/Destructor
  ******************************************************************************/
 env_dynamics_metrics_collector::env_dynamics_metrics_collector(
-    const std::string& ofname_stem)
-    : base_metrics_collector(ofname_stem,
-                             rtypes::timestep(1),
-                             rmetrics::output_mode::ekAPPEND) {}
+    std::unique_ptr<rmetrics::base_sink> sink)
+    : base_collector(std::move(sink)) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<std::string>
-env_dynamics_metrics_collector::csv_header_cols(void) const {
-  auto merged = dflt_csv_header_cols();
-  auto cols = std::list<std::string>{
-    /* clang-format off */
-      "swarm_motion_throttle",
-      "block_manip_penalty",
-      "cache_usage_penalty"
-    /* clang-format on */
-  };
-  merged.splice(merged.end(), cols);
-  return merged;
-} /* csv_header_cols() */
-
-boost::optional<std::string>
-env_dynamics_metrics_collector::csv_line_build(void) {
-  std::string line;
-  line += rcppsw::to_string(m_avg_motion_throttle) + separator();
-  line += rcppsw::to_string(m_block_manip_penalty) + separator();
-  line += rcppsw::to_string(m_cache_usage_penalty);
-  return boost::make_optional(line);
-} /* csv_line_build() */
-
 void env_dynamics_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
   const auto& m = dynamic_cast<const env_dynamics_metrics&>(metrics);
-  m_avg_motion_throttle = m.avg_motion_throttle();
-  m_block_manip_penalty = m.arena_block_manip_penalty();
-  m_cache_usage_penalty = m.cache_usage_penalty();
+  m_data.interval.avg_motion_throttle = m.avg_motion_throttle();
+  m_data.interval.block_manip_penalty = m.arena_block_manip_penalty();
+  m_data.interval.cache_usage_penalty = m.cache_usage_penalty();
 } /* collect() */
+
+void env_dynamics_metrics_collector::reset_after_interval(void) {
+  m_data.interval.avg_motion_throttle = 0;
+  m_data.interval.block_manip_penalty = rtypes::timestep{ 0 };
+  m_data.interval.cache_usage_penalty = rtypes::timestep{ 0 };
+} /* reset_after_interval() */
 
 NS_END(tv, metrics, fordyca);

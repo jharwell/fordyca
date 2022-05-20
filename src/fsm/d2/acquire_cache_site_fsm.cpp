@@ -25,12 +25,13 @@
 
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
-#include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/d2/cache_site_selector.hpp"
 #include "fordyca/fsm/foraging_acq_goal.hpp"
+#include "fordyca/subsystem/perception/ds/dpo_semantic_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,12 +41,12 @@ NS_START(fordyca, fsm, d2);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-acquire_cache_site_fsm::acquire_cache_site_fsm(const fsm_ro_params* c_params,
-                                               csubsystem::saa_subsystemQ3D* saa,
+acquire_cache_site_fsm::acquire_cache_site_fsm(const fsm_ro_params* c_ro,
+                                               const csfsm::fsm_params* c_no,
                                                rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.d2.acquire_cache_site"),
       acquire_goal_fsm(
-          saa,
+          c_no,
           nullptr, /* never explore for cache sites */
           rng,
           acquire_goal_fsm::hook_list{
@@ -76,8 +77,8 @@ acquire_cache_site_fsm::acquire_cache_site_fsm(const fsm_ro_params* c_params,
                   [](const rmath::vector2d&, const rtypes::type_uuid&) noexcept {
                     return true;
                   }) }),
-      mc_matrix(c_params->csel_matrix),
-      mc_store(c_params->store) {}
+      mc_matrix(c_ro->csel_matrix),
+      mc_accessor(c_ro->accessor) {}
 
 /*******************************************************************************
  * Member Functions
@@ -95,8 +96,8 @@ bool acquire_cache_site_fsm::site_exploration_term_cb(void) const {
 boost::optional<csfsm::acquire_goal_fsm::candidate_type>
 acquire_cache_site_fsm::site_select(void) {
   auto selector = cache_site_selector(mc_matrix);
-  if (auto best =
-          selector(mc_store->caches(), saa()->sensing()->rpos2D(), rng())) {
+  if (auto best = selector(
+          mc_accessor->known_caches(), saa()->sensing()->rpos2D(), rng())) {
     ER_INFO("Select cache site@%s for acquisition", best->to_str().c_str());
     m_sel_success = true;
     m_sel_exec = true;

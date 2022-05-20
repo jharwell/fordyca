@@ -26,6 +26,7 @@
 #include "cosm/repr/base_block3D.hpp"
 
 #include "fordyca/math/block_utility.hpp"
+#include "fordyca/subsystem/perception/ds/dp_block_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,13 +45,13 @@ block_selector::block_selector(const block_sel_matrix* const sel_matrix)
  * Member Functions
  ******************************************************************************/
 const crepr::base_block3D*
-block_selector::operator()(const ds::dp_block_map& blocks,
+block_selector::operator()(const fspds::dp_block_map& blocks,
                            const rmath::vector2d& position) {
   double max_utility = 0.0;
   const crepr::base_block3D* best = nullptr;
 
   ER_ASSERT(!blocks.empty(), "No known perceived blocks");
-  for (const auto& b : blocks.const_values_range()) {
+  for (const auto& b : blocks.values_range()) {
     if (block_is_excluded(position, b.ent())) {
       continue;
     }
@@ -61,10 +62,10 @@ block_selector::operator()(const ds::dp_block_map& blocks,
      */
     double priority =
         (crepr::block_type::ekCUBE == b.ent()->md()->type())
-            ? boost::get<double>(mc_matrix->find(bselm::kCubePriority)->second)
-            : boost::get<double>(mc_matrix->find(bselm::kRampPriority)->second);
+            ? std::get<double>(mc_matrix->find(bselm::kCubePriority)->second)
+            : std::get<double>(mc_matrix->find(bselm::kRampPriority)->second);
     rmath::vector2d nest_loc =
-        boost::get<rmath::vector2d>(mc_matrix->find(bselm::kNestLoc)->second);
+        std::get<rmath::vector2d>(mc_matrix->find(bselm::kNestLoc)->second);
 
     double utility = math::block_utility(b.ent()->ranchor2D(), nest_loc)(
         position, b.density(), priority);
@@ -81,14 +82,14 @@ block_selector::operator()(const ds::dp_block_map& blocks,
     }
   } /* for(block..) */
 
-  ER_CHECKI(nullptr != best,
-            "Best utility: block%d@%s/%s: %f",
-            best->id().v(),
-            rcppsw::to_string(best->ranchor2D()).c_str(),
-            rcppsw::to_string(best->danchor2D()).c_str(),
-            max_utility);
+  ER_CONDI(nullptr != best,
+           "Best utility: block%d@%s/%s: %f",
+           best->id().v(),
+           rcppsw::to_string(best->ranchor2D()).c_str(),
+           rcppsw::to_string(best->danchor2D()).c_str(),
+           max_utility);
 
-  ER_CHECKW(nullptr != best, "No best block found: all known blocks excluded!");
+  ER_CONDW(nullptr == best, "No best block found: all known blocks excluded!");
   return best;
 } /* operator() */
 
@@ -109,7 +110,7 @@ bool block_selector::block_is_excluded(
              block_dim);
     return true;
   }
-  auto exceptions = boost::get<std::vector<rtypes::type_uuid>>(
+  auto exceptions = std::get<std::vector<rtypes::type_uuid>>(
       mc_matrix->find(bselm::kSelExceptions)->second);
   if (std::any_of(exceptions.begin(), exceptions.end(), [&](auto& id) {
         return id == block->id();

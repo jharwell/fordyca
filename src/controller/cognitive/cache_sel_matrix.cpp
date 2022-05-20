@@ -23,8 +23,6 @@
  ******************************************************************************/
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 
-#include "fordyca/config/cache_sel/cache_sel_matrix_config.hpp"
-
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -58,12 +56,12 @@ cache_sel_matrix::cache_sel_matrix(
 void cache_sel_matrix::sel_exception_add(const cache_sel_exception& ex) {
   switch (ex.type) {
     case cache_sel_exception::ekPICKUP: {
-      auto& vec = boost::get<std::vector<rtypes::type_uuid>>(
+      auto& vec = std::get<std::vector<rtypes::type_uuid>>(
           this->find(kPickupExceptions)->second);
       vec.push_back(ex.id);
     } break;
     case cache_sel_exception::ekDROP: {
-      auto& vec = boost::get<std::vector<rtypes::type_uuid>>(
+      auto& vec = std::get<std::vector<rtypes::type_uuid>>(
           this->find(kDropExceptions)->second);
       vec.push_back(ex.id);
     } break;
@@ -73,8 +71,8 @@ void cache_sel_matrix::sel_exception_add(const cache_sel_exception& ex) {
 } /* sel_exception_add() */
 
 void cache_sel_matrix::sel_exceptions_clear(void) {
-  boost::get<std::vector<rtypes::type_uuid>>(this->at(kPickupExceptions)).clear();
-  boost::get<std::vector<rtypes::type_uuid>>(this->at(kDropExceptions)).clear();
+  std::get<std::vector<rtypes::type_uuid>>(this->at(kPickupExceptions)).clear();
+  std::get<std::vector<rtypes::type_uuid>>(this->at(kDropExceptions)).clear();
 } /* sel_exceptions_clear() */
 
 NS_END(cognitive, controller, fordyca);

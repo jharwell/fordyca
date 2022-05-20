@@ -23,11 +23,11 @@
  ******************************************************************************/
 #include "fordyca/tasks/d2/cache_starter.hpp"
 
-#include "fordyca/events/block_proximity.hpp"
-#include "fordyca/events/block_vanished.hpp"
-#include "fordyca/events/cache_proximity.hpp"
-#include "fordyca/events/robot_free_block_drop.hpp"
-#include "fordyca/events/robot_free_block_pickup.hpp"
+#include "fordyca/controller/cognitive/d2/events/block_proximity.hpp"
+#include "fordyca/controller/cognitive/d2/events/block_vanished.hpp"
+#include "fordyca/controller/cognitive/d2/events/cache_proximity.hpp"
+#include "fordyca/controller/cognitive/d2/events/free_block_drop.hpp"
+#include "fordyca/controller/cognitive/d2/events/free_block_pickup.hpp"
 #include "fordyca/fsm/d2/block_to_cache_site_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
 
@@ -87,6 +87,30 @@ void cache_starter::active_interface_update(int) {
     }
   }
 } /* active_interface_update() */
+
+/*******************************************************************************
+ * Event Handling
+ ******************************************************************************/
+void cache_starter::accept(fccd2::events::free_block_drop& visitor) {
+  auto& fsm = *static_cast<ffsm::block_to_goal_fsm*>(mechanism());
+  visitor.visit(fsm);
+}
+void cache_starter::accept(fccd2::events::free_block_pickup& visitor) {
+  auto& fsm = *static_cast<ffsm::block_to_goal_fsm*>(mechanism());
+  visitor.visit(fsm);
+}
+void cache_starter::accept(fccd2::events::block_vanished& visitor) {
+  auto& fsm = *static_cast<ffsm::block_to_goal_fsm*>(mechanism());
+  visitor.visit(fsm);
+}
+void cache_starter::accept(fccd2::events::block_proximity& visitor) {
+  auto& fsm = *static_cast<ffsm::block_to_goal_fsm*>(mechanism());
+  visitor.visit(fsm);
+}
+void cache_starter::accept(fccd2::events::cache_proximity& visitor) {
+  auto& fsm = *static_cast<ffsm::block_to_goal_fsm*>(mechanism());
+  visitor.visit(fsm);
+}
 
 /*******************************************************************************
  * FSM Metrics
@@ -163,22 +187,12 @@ RCPPSW_WRAP_DEF_OVERRIDE(
     const);
 
 /*******************************************************************************
- * Event Handling
+ * Block Carrying
  ******************************************************************************/
-void cache_starter::accept(events::detail::robot_free_block_drop& visitor) {
-  visitor.visit(*this);
-}
-void cache_starter::accept(events::detail::robot_free_block_pickup& visitor) {
-  visitor.visit(*this);
-}
-void cache_starter::accept(events::detail::block_vanished& visitor) {
-  visitor.visit(*this);
-}
-void cache_starter::accept(events::detail::block_proximity& visitor) {
-  visitor.visit(*this);
-}
-void cache_starter::accept(events::detail::cache_proximity& visitor) {
-  visitor.visit(*this);
-}
+RCPPSW_WRAP_DEF_OVERRIDE(
+    cache_starter,
+    block_drop_strategy,
+    *static_cast<fsm::d2::block_to_cache_site_fsm*>(polled_task::mechanism()),
+    const);
 
 NS_END(d2, tasks, fordyca);

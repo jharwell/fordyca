@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_BLOCK_TO_GOAL_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_BLOCK_TO_GOAL_FSM_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -70,7 +69,7 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
  public:
   block_to_goal_fsm(csfsm::acquire_goal_fsm* goal_fsm,
                     csfsm::acquire_goal_fsm* block_fsm,
-                    csubsystem::saa_subsystemQ3D* saa,
+                    const csfsm::fsm_params* c_no,
                     rmath::rng* rng);
   ~block_to_goal_fsm(void) override = default;
 
@@ -177,5 +176,3 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
 };
 
 NS_END(fsm, fordyca);
-
-#endif /* INCLUDE_FORDYCA_FSM_BLOCK_TO_GOAL_FSM_HPP_ */

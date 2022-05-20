@@ -26,16 +26,17 @@
 #include <fstream>
 
 #include "cosm/arena/repr/base_cache.hpp"
+#include "cosm/ds/cell2D.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 
-#include "fordyca/config/d2/controller_repository.hpp"
 #include "fordyca/controller/cognitive/block_sel_matrix.hpp"
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/controller/cognitive/d2/task_executive_builder.hpp"
-#include "fordyca/controller/cognitive/dpo_perception_subsystem.hpp"
+#include "fordyca/controller/config/d2/controller_repository.hpp"
+#include "fordyca/subsystem/perception/dpo_perception_subsystem.hpp"
 #include "fordyca/tasks/d2/foraging_task.hpp"
 
 /*******************************************************************************
@@ -47,18 +48,28 @@ NS_START(fordyca, controller, cognitive, d2);
  * Constructors/Destructor
  ******************************************************************************/
 birtd_dpo_controller::birtd_dpo_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.d2.birtd_dpo") {}
+    : ER_CLIENT_INIT("fordyca.controller.cognitive.d2.birtd_dpo") {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void birtd_dpo_controller::control_step(void) {
-  ndc_pusht();
+  mdc_ts_update();
+  ndc_uuid_push();
   ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
             block()->md()->robot_id().v());
-  dpo_perception()->update(nullptr);
+
+  /* non-oracular controller */
+  perception()->update(nullptr);
+
+  /*
+   * Reset steering forces tracking so per-timestep visualizations are
+   * correct. This can't be done when applying the steering forces because then
+   * they are always 0 during loop function visualization.
+   */
+  saa()->steer_force2D().tracking_reset();
 
   /*
    * Execute the current task/allocate a new task/abort a task/etc and apply
@@ -67,12 +78,15 @@ void birtd_dpo_controller::control_step(void) {
    */
   supervisor()->run();
 
-  ndc_pop();
+  /* Update block detection status for use in the loop functions */
+  block_detect_status_update();
+
+  ndc_uuid_pop();
 } /* control_step() */
 
 void birtd_dpo_controller::init(ticpp::Element& node) {
   foraging_controller::init(node);
-  ndc_push();
+  ndc_uuid_push();
   ER_INFO("Initializing");
 
   config::d2::controller_repository config_repo;
@@ -86,7 +100,7 @@ void birtd_dpo_controller::init(ticpp::Element& node) {
   private_init(config_repo);
 
   ER_INFO("Initialization finished");
-  ndc_pop();
+  ndc_uuid_pop();
 } /* init() */
 
 void birtd_dpo_controller::private_init(
@@ -95,9 +109,12 @@ void birtd_dpo_controller::private_init(
    * Rebind executive to use d2 task decomposition graph instead of d1
    * version.
    */
-  executive(task_executive_builder(
-      block_sel_matrix(), cache_sel_matrix(), saa(), perception())(config_repo,
-                                                                   rng()));
+  executive(task_executive_builder(block_sel_matrix(),
+                                   cache_sel_matrix(),
+                                   inta_tracker(),
+                                   nz_tracker(),
+                                   saa(),
+                                   perception())(config_repo, rng()));
 
   /*
    * Set task alloction callback, rebind task abort callback (original was lost
@@ -143,7 +160,9 @@ void birtd_dpo_controller::task_start_cb(cta::polled_task* const task,
   current_task(dynamic_cast<tasks::base_foraging_task*>(task));
 } /* task_start_cb() */
 
-using namespace argos; // NOLINT
+NS_END(cognitive, d2, controller, fordyca);
+
+using namespace fccd2; // NOLINT
 
 RCPPSW_WARNING_DISABLE_PUSH()
 RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
@@ -154,5 +173,3 @@ REGISTER_CONTROLLER(birtd_dpo_controller,
                     "birtd_dpo_controller"); // NOLINT
 
 RCPPSW_WARNING_DISABLE_POP()
-
-NS_END(cognitive, d2, controller, fordyca);

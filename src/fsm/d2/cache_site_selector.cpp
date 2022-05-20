@@ -27,6 +27,8 @@
 
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/math/cache_site_utility.hpp"
+#include "fordyca/subsystem/perception/ds/dp_block_map.hpp"
+#include "fordyca/subsystem/perception/ds/dp_cache_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,7 +48,7 @@ cache_site_selector::cache_site_selector(
  * Member Functions
  ******************************************************************************/
 boost::optional<rmath::vector2d>
-cache_site_selector::operator()(const ds::dp_cache_map& known_caches,
+cache_site_selector::operator()(const cads::bcache_vectorno& known_caches,
                                 rmath::vector2d position,
                                 rmath::rng* rng) {
   double max_utility;
@@ -79,7 +81,7 @@ cache_site_selector::operator()(const ds::dp_cache_map& known_caches,
 
   bool site_ok = verify_site(site, known_caches);
   bool strict =
-      boost::get<bool>(mc_matrix->find(cselm::kStrictConstraints)->second);
+      std::get<bool>(mc_matrix->find(cselm::kStrictConstraints)->second);
 
   if (site_ok || (!site_ok && !strict)) {
     return boost::make_optional(site);
@@ -90,18 +92,19 @@ cache_site_selector::operator()(const ds::dp_cache_map& known_caches,
   }
 } /* operator()() */
 
-bool cache_site_selector::verify_site(const rmath::vector2d& site,
-                                      const ds::dp_cache_map& known_caches) const {
+bool cache_site_selector::verify_site(
+    const rmath::vector2d& site,
+    const cads::bcache_vectorno& known_caches) const {
   const nest_constraint_data* ndata = &std::get<1>(m_constraints)[0];
 
   /* check distances to known caches */
-  for (const auto& c : known_caches.const_values_range()) {
-    ER_CHECK(rtypes::spatial_dist((c.ent()->rcenter2D() - site).length()) >=
+  for (const auto& c : known_caches) {
+    ER_CHECK(rtypes::spatial_dist((c->rcenter2D() - site).length()) >=
                  std::get<0>(m_constraints)[0].cache_prox,
              "Cache site@%s too close to cache%d (%f <= %f)",
              rcppsw::to_string(site).c_str(),
-             c.ent()->id().v(),
-             (c.ent()->rcenter2D() - site).length(),
+             c->id().v(),
+             (c->rcenter2D() - site).length(),
              std::get<0>(m_constraints)[0].cache_prox.v());
   } /* for(&c..) */
 
@@ -124,7 +127,7 @@ void cache_site_selector::opt_initialize(const opt_init_conditions* cond,
                                          std::vector<double>* initial_guess,
                                          rmath::rng* rng) {
   rmath::vector2d nest_loc =
-      boost::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second);
+      std::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second);
 
   ER_INFO("Known caches: [%s]", rcppsw::to_string(cond->known_caches).c_str());
 
@@ -138,9 +141,9 @@ void cache_site_selector::opt_initialize(const opt_init_conditions* cond,
           std::get<1>(m_constraints).size());
 
   auto xrange =
-      boost::get<rmath::rangeu>(mc_matrix->find(cselm::kSiteXRange)->second);
+      std::get<rmath::rangez>(mc_matrix->find(cselm::kSiteXRange)->second);
   auto yrange =
-      boost::get<rmath::rangeu>(mc_matrix->find(cselm::kSiteYRange)->second);
+      std::get<rmath::rangez>(mc_matrix->find(cselm::kSiteYRange)->second);
   *utility_data = { cond->position, nest_loc };
   m_alg.set_max_objective(&__site_utility_func, utility_data);
   m_alg.set_ftol_rel(kUTILITY_TOL);
@@ -166,20 +169,21 @@ void cache_site_selector::opt_initialize(const opt_init_conditions* cond,
           yrange.to_str().c_str());
 } /* opt_initialize() */
 
-void cache_site_selector::constraints_create(const ds::dp_cache_map& known_caches,
-                                             const rmath::vector2d& nest_loc) {
-  for (const auto& c : known_caches.const_values_range()) {
+void cache_site_selector::constraints_create(
+    const cads::bcache_vectorno& known_caches,
+    const rmath::vector2d& nest_loc) {
+  for (const auto& c : known_caches) {
     std::get<0>(m_constraints)
-        .push_back({ c.ent(),
+        .push_back({ c,
                      this,
-                     boost::get<rtypes::spatial_dist>(
+                     std::get<rtypes::spatial_dist>(
                          mc_matrix->find(cselm::kCacheProxDist)->second) });
   } /* for(&c..) */
 
   std::get<1>(m_constraints)
       .push_back({ nest_loc,
                    this,
-                   boost::get<rtypes::spatial_dist>(
+                   std::get<rtypes::spatial_dist>(
                        mc_matrix->find(cselm::kNestProxDist)->second) });
 
   for (auto& c : std::get<0>(m_constraints)) {

@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_CACHES_LIFECYCLE_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_CACHES_LIFECYCLE_METRICS_COLLECTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -27,8 +26,9 @@
 #include <string>
 #include <list>
 
-#include "rcppsw/metrics/base_metrics_collector.hpp"
+#include "rcppsw/metrics/base_collector.hpp"
 #include "fordyca/fordyca.hpp"
+#include "fordyca/metrics/caches/lifecycle_metrics_data.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,46 +45,27 @@ NS_START(fordyca, metrics, caches);
  * \brief Collector for \ref lifecycle_metrics.
  *
  * Metrics CANNOT be collected in parallel; concurrent updates to the gathered
- * stats are not supported. Metrics are output at the specified interval.
+ * stats are not supported.
  */
-class lifecycle_metrics_collector final : public rmetrics::base_metrics_collector {
- public:
+class lifecycle_metrics_collector final : public rmetrics::base_collector {
+   public:
   /**
-   * \param ofname_stem Output file name stem.
-   * \param interval Collection interval.
+   * \param sink The metrics sink to use.
    */
-  lifecycle_metrics_collector(const std::string& ofname_stem,
-                              const rtypes::timestep& interval);
+  explicit lifecycle_metrics_collector(
+      std::unique_ptr<rmetrics::base_sink> sink);
 
-  void reset(void) override;
-  void reset_after_interval(void) override;
+  /* base_collector overrides */
   void collect(const rmetrics::base_metrics& metrics) override;
+  void reset_after_interval(void) override;
+  const rmetrics::base_data* data(void) const override { return &m_data; }
+
 
  private:
-  /**
-   * \brief All stats are cumulative within an interval.
-   */
-  struct stats {
-    size_t int_created{0};
-    size_t int_depleted{0};
-    size_t int_discarded{0};
-    rtypes::timestep int_depletion_sum{0};
-
-    size_t cum_created{0};
-    size_t cum_depleted{0};
-    size_t cum_discarded{0};
-    rtypes::timestep cum_depletion_sum{0};
-  };
-
-
-  std::list<std::string> csv_header_cols(void) const override;
-  boost::optional<std::string> csv_line_build(void) override;
-
   /* clang-format off */
-  struct stats   m_stats{};
+  lifecycle_metrics_data m_data{};
   /* clang-format on */
 };
 
 NS_END(caches, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_CACHES_LIFECYCLE_METRICS_COLLECTOR_HPP_ */

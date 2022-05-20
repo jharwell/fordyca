@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_CACHES_SITE_SELECTION_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_CACHES_SITE_SELECTION_METRICS_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -78,4 +77,3 @@ class site_selection_metrics : public virtual rmetrics::base_metrics {
 
 NS_END(caches, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_CACHES_SITE_SELECTION_METRICS_HPP_ */

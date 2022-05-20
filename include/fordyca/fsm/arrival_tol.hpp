@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_ARRIVAL_TOL_HPP_
-#define INCLUDE_FORDYCA_FSM_ARRIVAL_TOL_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -58,5 +57,3 @@ static constexpr double kNEW_CACHE_ARRIVAL_TOL = 0.8;
 static constexpr double kCACHE_SITE_ARRIVAL_TOL = 0.8;
 
 NS_END(fordyca, fsm);
-
-#endif /* INCLUDE_FORYDCA_FSM_ARRIVAL_TOL_HPP_ */

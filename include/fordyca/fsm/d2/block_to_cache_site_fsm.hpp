@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_D2_BLOCK_TO_CACHE_SITE_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_D2_BLOCK_TO_CACHE_SITE_FSM_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -54,9 +53,9 @@ NS_START(fordyca, fsm, d2);
 class block_to_cache_site_fsm final : public block_to_goal_fsm,
                                       public virtual metrics::caches::site_selection_metrics {
  public:
-  block_to_cache_site_fsm(const fsm_ro_params* c_params,
-                          csubsystem::saa_subsystemQ3D* saa,
-                          std::unique_ptr<csstrategy::base_strategy> exp_behavior,
+  block_to_cache_site_fsm(const fsm_ro_params* c_ro,
+                          const csfsm::fsm_params* c_no,
+                          cffsm::strategy_set strategies,
                           rmath::rng* rng);
 
   ~block_to_cache_site_fsm(void) override = default;
@@ -87,5 +86,3 @@ class block_to_cache_site_fsm final : public block_to_goal_fsm,
 };
 
 NS_END(d2, fsm, fordyca);
-
-#endif /* INCLUDE_FORDYCA_FSM_D2_BLOCK_TO_CACHE_SITE_FSM_HPP_ */

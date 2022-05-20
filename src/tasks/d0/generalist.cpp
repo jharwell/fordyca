@@ -25,9 +25,15 @@ v * \file generalist.cpp
 
 #include "cosm/subsystem/sensing_subsystemQ3D.hpp"
 
-#include "fordyca/events/block_vanished.hpp"
-#include "fordyca/events/robot_free_block_pickup.hpp"
-#include "fordyca/events/robot_nest_block_drop.hpp"
+#include "fordyca/controller/cognitive/d0/events/block_vanished.hpp"
+#include "fordyca/controller/cognitive/d0/events/free_block_pickup.hpp"
+#include "fordyca/controller/cognitive/d0/events/nest_block_drop.hpp"
+#include "fordyca/controller/cognitive/d1/events/block_vanished.hpp"
+#include "fordyca/controller/cognitive/d1/events/free_block_pickup.hpp"
+#include "fordyca/controller/cognitive/d1/events/nest_block_drop.hpp"
+#include "fordyca/controller/cognitive/d2/events/block_vanished.hpp"
+#include "fordyca/controller/cognitive/d2/events/free_block_pickup.hpp"
+#include "fordyca/controller/cognitive/d2/events/nest_block_drop.hpp"
 #include "fordyca/fsm/d0/free_block_to_nest_fsm.hpp"
 
 /*******************************************************************************
@@ -40,7 +46,8 @@ NS_START(fordyca, tasks, d0);
  ******************************************************************************/
 generalist::generalist(const cta::config::task_alloc_config* const config,
                        std::unique_ptr<cta::taskable> mechanism)
-    : foraging_task(kGeneralistName, config, std::move(mechanism)) {}
+    : ER_CLIENT_INIT("fordyca.tasks.d0.generalist"),
+      foraging_task(kGeneralistName, config, std::move(mechanism)) {}
 
 /*******************************************************************************
  * Member Functions
@@ -58,14 +65,41 @@ rtypes::timestep generalist::current_time(void) const {
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void generalist::accept(events::detail::robot_nest_block_drop& visitor) {
+void generalist::accept(fccd0::events::nest_block_drop& visitor) {
   visitor.visit(*this);
 }
-void generalist::accept(events::detail::robot_free_block_pickup& visitor) {
+void generalist::accept(fccd0::events::free_block_pickup& visitor) {
   visitor.visit(*this);
 }
-void generalist::accept(events::detail::block_vanished& visitor) {
-  visitor.visit(*this);
+void generalist::accept(fccd0::events::block_vanished& visitor) {
+  auto& fsm = *static_cast<fsm::d0::free_block_to_nest_fsm*>(mechanism());
+  visitor.visit(fsm);
+}
+
+void generalist::accept(fccd1::events::nest_block_drop& visitor) {
+  auto& fsm = *static_cast<fsm::d0::free_block_to_nest_fsm*>(mechanism());
+  static_cast<fccd0::events::nest_block_drop&>(visitor).visit(fsm);
+}
+void generalist::accept(fccd1::events::free_block_pickup& visitor) {
+  auto& fsm = *static_cast<fsm::d0::free_block_to_nest_fsm*>(mechanism());
+  static_cast<fccd0::events::free_block_pickup&>(visitor).visit(fsm);
+}
+void generalist::accept(fccd1::events::block_vanished& visitor) {
+  auto& fsm = *static_cast<fsm::d0::free_block_to_nest_fsm*>(mechanism());
+  static_cast<fccd0::events::block_vanished&>(visitor).visit(fsm);
+}
+
+void generalist::accept(fccd2::events::nest_block_drop& visitor) {
+  auto& fsm = *static_cast<fsm::d0::free_block_to_nest_fsm*>(mechanism());
+  static_cast<fccd0::events::nest_block_drop&>(visitor).visit(fsm);
+}
+void generalist::accept(fccd2::events::free_block_pickup& visitor) {
+  auto& fsm = *static_cast<fsm::d0::free_block_to_nest_fsm*>(mechanism());
+  static_cast<fccd0::events::free_block_pickup&>(visitor).visit(fsm);
+}
+void generalist::accept(fccd2::events::block_vanished& visitor) {
+  auto& fsm = *static_cast<fsm::d0::free_block_to_nest_fsm*>(mechanism());
+  static_cast<fccd0::events::block_vanished&>(visitor).visit(fsm);
 }
 
 /*******************************************************************************
@@ -125,7 +159,16 @@ RCPPSW_WRAP_DEF_OVERRIDE(
     const);
 
 /*******************************************************************************
- * Block Transport Metrics
+ * Block Carrying
+ ******************************************************************************/
+RCPPSW_WRAP_DEF_OVERRIDE(
+    generalist,
+    block_drop_strategy,
+    *static_cast<fsm::d0::free_block_to_nest_fsm*>(polled_task::mechanism()),
+    const);
+
+/*******************************************************************************
+ * Block Transportation
  ******************************************************************************/
 bool generalist::is_phototaxiing_to_goal(bool include_ca) const {
   return static_cast<fsm::d0::free_block_to_nest_fsm*>(polled_task::mechanism())

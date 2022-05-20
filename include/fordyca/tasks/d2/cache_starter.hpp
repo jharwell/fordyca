@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_D2_CACHE_STARTER_HPP_
-#define INCLUDE_FORDYCA_TASKS_D2_CACHE_STARTER_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -58,16 +57,30 @@ class cache_starter final : public foraging_task,
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,
-   * because when visiting a \ref free_block_interactor, you have no way to way
-   * which d2 task the object ACTUALLY is without using a set of if()
-   * statements, which is a brittle design. This is not the cleanest, but is
-   * still more elegant than the alternative.
+   * because when visiting a given task which is a member of a set of tasks
+   * which all implement the same interface, you have no way to way which task
+   * the object ACTUALLY is without using a set of if() statements, which is a
+   * brittle design. This is not the cleanest, but is still more elegant than
+   * the alternative.
+   *
+   * I wish you didn't have to stub out the d1 and d2 events.
    */
-  void accept(events::detail::robot_free_block_drop& visitor) override;
-  void accept(events::detail::robot_free_block_pickup& visitor) override;
-  void accept(events::detail::block_vanished& visitor) override;
-  void accept(events::detail::block_proximity& visitor) override;
-  void accept(events::detail::cache_proximity&) override;
+  /* free block interaction events */
+  RCPPSW_VISITOR_ACCEPT_STUB(fccd0::events::free_block_drop);
+  RCPPSW_VISITOR_ACCEPT_STUB(fccd0::events::free_block_pickup);
+  RCPPSW_VISITOR_ACCEPT_STUB(fccd0::events::block_vanished);
+
+  RCPPSW_VISITOR_ACCEPT_STUB(fccd1::events::free_block_drop);
+  RCPPSW_VISITOR_ACCEPT_STUB(fccd1::events::free_block_pickup);
+  RCPPSW_VISITOR_ACCEPT_STUB(fccd1::events::block_vanished);
+
+  void accept(fccd2::events::free_block_drop& visitor) override;
+  void accept(fccd2::events::free_block_pickup& visitor) override;
+  void accept(fccd2::events::block_vanished& visitor) override;
+
+  /* dynamic cache interaction events */
+  void accept(fccd2::events::block_proximity& visitor) override;
+  void accept(fccd2::events::cache_proximity&) override;
 
   /* goal acquisition metrics */
   RCPPSW_WRAP_DECL_OVERRIDE(bool, goal_acquired, const);
@@ -92,6 +105,11 @@ class cache_starter final : public foraging_task,
   RCPPSW_WRAP_DECL_OVERRIDE(bool, site_select_success, const);
   RCPPSW_WRAP_DECL_OVERRIDE(nlopt::result, nlopt_result, const);
 
+  /* block carrying */
+  RCPPSW_WRAP_DECL_OVERRIDE(const cssblocks::drop::base_drop*,
+                            block_drop_strategy,
+                            const);
+
   /* task metrics */
   bool task_completed(void) const override { return task_finished(); }
 
@@ -103,5 +121,3 @@ class cache_starter final : public foraging_task,
 };
 
 NS_END(d2, tasks, fordyca);
-
-#endif /* INCLUDE_FORDYCA_TASKS_D2_CACHE_STARTER_HPP_ */

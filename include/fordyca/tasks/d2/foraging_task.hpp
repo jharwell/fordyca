@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_D2_FORAGING_TASK_HPP_
-#define INCLUDE_FORDYCA_TASKS_D2_FORAGING_TASK_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -62,10 +61,10 @@ class foraging_task
                 std::unique_ptr<cta::taskable> mechanism);
   ~foraging_task(void) override = default;
 
-  inline static const std::string kCacheStarterName = "Cache Starter";
-  inline static const std::string kCacheFinisherName = "Cache Finisher";
-  inline static const std::string kCacheTransfererName = "Cache Transferer";
-  inline static const std::string kCacheCollectorName = "Cache Collector";
+  static inline const std::string kCacheStarterName = "cache_starter";
+  static inline const std::string kCacheFinisherName = "cache_finisher";
+  static inline const std::string kCacheTransfererName = "cache_transferer";
+  static inline const std::string kCacheCollectorName = "cache_collector";
 
   static bool task_in_d2(const polled_task* task) RCPPSW_PURE;
 
@@ -74,5 +73,3 @@ class foraging_task
 };
 
 NS_END(d2, tasks, fordyca);
-
-#endif /* INCLUDE_FORDYCA_TASKS_D2_FORAGING_TASK_HPP_ */

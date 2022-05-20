@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_STRATEGY_EXPLORE_UTILITY_CACHE_SEARCH_HPP_
-#define INCLUDE_FORDYCA_STRATEGY_EXPLORE_UTILITY_CACHE_SEARCH_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -31,12 +30,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace ds {
-class dpo_store;
-} /* namespace ds */
-
-NS_START(strategy, explore);
+NS_START(fordyca, strategy, explore);
 
 /*******************************************************************************
  * Class Definitions
@@ -50,21 +44,10 @@ NS_START(strategy, explore);
  * compute where a cache would ideally be located, and vector to it, begining
  * performing CRW at that location.
  */
-class utility_cache_search : public localized_search {
+class utility_cache_search final : public localized_search {
  public:
-  utility_cache_search(const foraging_strategy::params* const c_params,
-                       rmath::rng* rng)
-      : utility_cache_search(c_params->csel_matrix,
-                             c_params->dpo_store,
-                             c_params->saa,
-                             rng) {}
-  utility_cache_search(const controller::cognitive::cache_sel_matrix* csel_matrix,
-                       const ds::dpo_store* store,
-                       csubsystem::saa_subsystemQ3D* saa,
-                       rmath::rng* rng)
-      : localized_search(saa, rng),
-        mc_matrix(csel_matrix),
-        mc_store(store) {}
+  utility_cache_search(const fstrategy::strategy_params* const c_params,
+                       rmath::rng* rng);
 
   ~utility_cache_search(void) override = default;
   utility_cache_search(const utility_cache_search&) = delete;
@@ -74,20 +57,28 @@ class utility_cache_search : public localized_search {
   void task_start(cta::taskable_argument*) override;
 
   /* prototype overrides */
-  std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
-    return std::make_unique<utility_cache_search>(mc_matrix,
-                                                  mc_store,
-                                                  saa(),
-                                                  rng());
+  std::unique_ptr<cssexplore::base_explore> clone(void) const override {
+    csfsm::fsm_params fsm_params {
+      saa(),
+      inta_tracker(),
+      nz_tracker(),
+    };
+    fstrategy::strategy_params params {
+      &fsm_params,
+      config(),
+      nullptr,
+      mc_matrix,
+      accessor(),
+      {}
+    };
+
+    return std::make_unique<utility_cache_search>(&params, rng());
   }
 
  private:
   /* clang-format off */
   const controller::cognitive::cache_sel_matrix* mc_matrix;
-  const ds::dpo_store*                           mc_store;
   /* clang-format on */
 };
 
 NS_END(explore, strategy, fordyca);
-
-#endif /* INCLUDE_FORDYCA_STRATEGY_EXPLORE_UTILITY_CACHE_SEARCH_HPP_ */

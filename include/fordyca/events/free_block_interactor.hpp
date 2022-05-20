@@ -18,26 +18,20 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_FREE_BLOCK_INTERACTOR_HPP_
-#define INCLUDE_FORDYCA_EVENTS_FREE_BLOCK_INTERACTOR_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
+#include "fordyca/controller/cognitive/events_fwd.hpp"
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
-
-namespace detail {
-class block_vanished;
-class robot_free_block_pickup;
-class robot_free_block_drop;
-} // namespace detail
 
 /*******************************************************************************
  * Structure Definitions
@@ -50,10 +44,16 @@ class robot_free_block_drop;
  * interact with free blocks in FORDYCA.
  */
 class free_block_interactor
-    : public rpvisitor::polymorphic_accept_set<detail::robot_free_block_drop,
-                                               detail::robot_free_block_pickup,
-                                               detail::block_vanished> {};
+    : public rpvisitor::polymorphic_accept_set<fccd0::events::free_block_drop,
+                                               fccd0::events::free_block_pickup,
+                                               fccd0::events::block_vanished,
+
+                                               fccd1::events::free_block_drop,
+                                               fccd1::events::free_block_pickup,
+                                               fccd1::events::block_vanished,
+
+                                               fccd2::events::free_block_drop,
+                                               fccd2::events::free_block_pickup,
+                                               fccd2::events::block_vanished> {};
 
 NS_END(events, fordyca);
-
-#endif /* INCLUDE_FORDYCA_EVENTS_FREE_BLOCK_INTERACTOR_HPP_ */

@@ -3,33 +3,48 @@
 Local Runtime Setup
 ===================
 
-If you have not successfully completed :ref:`ln-build` part of the setup, do
-that first. These steps will not work otherwise.
+If you have not successfully completed the build part of the setup, do that
+first. These steps will not work otherwise.
 
 After successful compilation, follow these steps to setup the FORDYCA runtime
 environment and run a basic foraging scenario on your local laptop.
+
+.. NOTE:: If you don't want to go through this runtime setup each time you start
+          a new shell, add whatever commands you run in the terminal to
+          ``$HOME/.bashrc`` (or whatever the startup file for your shell is) to
+          have them run automatically when you login.
+
+#. Update the *system* dynamic library search paths so the OS can find the
+   libraries that the ARGoS executable requires (supposedly ARGoS will do this
+   for you when you install it via ldconfig to ``/usr/local``, but many people
+   still have trouble with it). On bash::
+
+     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/.local/system/lib/argos3:$HOME/.local/lib/argos3
+
+   Assuming you passed ``--sysprefix=$HOME/.local/system`` and
+   ``--rprefix=$HOME/.local`` to ``bootstrap.sh``. If you passed something else,
+   then update the path above accordingly.
+
+#. Update your ``PATH`` so that the shell can find ARGoS. On bash::
+
+       export PATH=$PATH:/opt/.local/system/bin
+
+   Assuming that you passed ``--sysprefix=$HOME/.local/systembin`` to
+   ``bootstrap.sh``. If you passed something else, then update the above path
+   accordingly.
 
 #. Set the ``ARGOS_PLUGIN_PATH`` variable to contain (1) the path to the
    directory containing the ``libfordyca.so`` file, (2) the path to the ARGoS
    libraries. On bash, that is::
 
-     export ARGOS_PLUGIN_PATH=/opt/local/lib/argos3/lib:$HOME/research/fordyca/build/lib
+     export ARGOS_PLUGIN_PATH=/$HOME/.local/system/lib/argos3/lib:$HOME/research/fordyca/build/lib
 
-   Assuming that you passed ``--prefix=/opt/local --rroot=$HOME/research`` to
-   the `bootstrap.sh` script when you built FORDYCA. If your paths are
-   different, modify the above paths accordingly. Note that you need BOTH of
-   these terms in the path, because this defines the ENTIRE search space for
-   argos to look for libraries (including its own core libraries).
-
-#. Update the *system* dynamic library search paths so the OS can find the
-   libraries that the ARGoS executable requires (supposedly ARGoS will do this
-   for you when you install it via ldconfig, but many people still have trouble
-   with it). On bash::
-
-     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/local/lib/argos3
-
-   Assuming you have installed ARGoS to ``/opt/local``. If you installed it
-   somewhere else, then update the path above accordingly.
+   Assuming that you passed
+   ``--sysprefix=$HOME/.local/system --rroot=$HOME/research`` to
+   ``bootstrap.sh`` script when you built FORDYCA. If your paths are different,
+   modify the above paths accordingly. Note that you need BOTH of these terms in
+   the path, because this defines the ENTIRE search space for argos to look for
+   libraries (including its own core libraries).
 
 #. Unless you compile out event reporting (built FORDYCA with optimizations
    *AND* with ``LIBRA_ER=NONE`` passed to cmake), you will need to set
@@ -43,7 +58,7 @@ environment and run a basic foraging scenario on your local laptop.
 
 #. cd to the ROOT of the FORDYCA repo, and run the demo experiment::
 
-     argos3 -c exp/demo.argos
+     argos3 -c $HOME/research/fordyca/exp/demo.argos
 
    This should pop up a nice GUI from which you can start the experiment (it
    runs depth0 dpo foraging by default). If the simulation seems to start but no
@@ -73,4 +88,4 @@ Before reporting a bug, try:
 
   #. If you get a ``std::bad_cast``, ``boost::get``, or similar exception, then
      verify that the name of [controller, loop functions, qt user functions],
-     match, as specified :ref:`ln-xml-config` are correct.
+     match, as specified in :ref:`ln-xml-config` are correct.

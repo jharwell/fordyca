@@ -41,12 +41,14 @@ using csel_matrix = controller::cognitive::cache_sel_matrix;
  * Constructors/Destructors
  ******************************************************************************/
 cached_block_to_nest_fsm::cached_block_to_nest_fsm(
-    const fsm_ro_params* const c_params,
-    csubsystem::saa_subsystemQ3D* saa,
-    std::unique_ptr<csstrategy::base_strategy> explore,
-    std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
+    const fsm_ro_params* c_ro,
+    const csfsm::fsm_params* c_no,
+    cffsm::strategy_set strategies,
     rmath::rng* rng)
-    : foraging_util_hfsm(saa, std::move(nest_acq), rng, ekST_MAX_STATES),
+    : foraging_util_hfsm(c_no,
+                         std::move(strategies),
+                         rng,
+                         ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.d1.cached_block_to_nest"),
       RCPPSW_HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       RCPPSW_HFSM_CONSTRUCT_STATE(leaving_nest, &start),
@@ -76,9 +78,13 @@ cached_block_to_nest_fsm::cached_block_to_nest_fsm(
                                              &entry_leaving_nest,
                                              nullptr),
           RCPPSW_HFSM_STATE_MAP_ENTRY_EX(&finished)),
-      mc_nest_loc(boost::get<rmath::vector2d>(
-          c_params->csel_matrix->find(csel_matrix::kNestLoc)->second)),
-      m_cache_fsm(c_params, saa, std::move(explore), rng, true) {}
+      mc_nest_loc(std::get<rmath::vector2d>(
+          c_ro->csel_matrix->find(csel_matrix::kNestLoc)->second)),
+      m_cache_fsm(c_ro,
+                  c_no,
+                  std::move(foraging_util_hfsm::strategies().explore),
+                  rng,
+                  true) {}
 
 RCPPSW_HFSM_STATE_DEFINE(cached_block_to_nest_fsm,
                          start,

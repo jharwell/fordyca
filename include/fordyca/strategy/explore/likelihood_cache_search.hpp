@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_STRATEGY_EXPLORE_LIKELIHOOD_CACHE_SEARCH_HPP_
-#define INCLUDE_FORDYCA_STRATEGY_EXPLORE_LIKELIHOOD_CACHE_SEARCH_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -49,16 +48,10 @@ NS_START(strategy, explore);
  * CRW at that location, with the idea being that the likelihood of another
  * cache being nearby is higher, given that you've found one there before.
  */
-class likelihood_cache_search : public localized_search {
+class likelihood_cache_search final : public localized_search {
  public:
-  likelihood_cache_search(const foraging_strategy::params* const c_params,
-                          rmath::rng* rng)
-      : likelihood_cache_search(c_params->saa, c_params->dpo_store, rng) {}
-  likelihood_cache_search(csubsystem::saa_subsystemQ3D* saa,
-                          const ds::dpo_store* store,
-                          rmath::rng* rng)
-      : localized_search(saa, rng),
-        mc_store(store) {}
+  likelihood_cache_search(const fstrategy::strategy_params* const c_params,
+                          rmath::rng* rng);
 
   ~likelihood_cache_search(void) override = default;
   likelihood_cache_search(const likelihood_cache_search&) = delete;
@@ -68,16 +61,23 @@ class likelihood_cache_search : public localized_search {
   void task_start(cta::taskable_argument*) override;
 
   /* prototype overrides */
-  std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
-    return std::make_unique<likelihood_cache_search>(saa(), mc_store, rng());
-  }
+  std::unique_ptr<cssexplore::base_explore> clone(void) const override {
+    csfsm::fsm_params fsm_params {
+      saa(),
+      inta_tracker(),
+      nz_tracker(),
+    };
+    fstrategy::strategy_params params {
+      &fsm_params,
+      config(),
+      nullptr,
+      nullptr,
+      accessor(),
+      {}
+    };
 
- private:
-  /* clang-format off */
-  const ds::dpo_store* mc_store;
-  /* clang-format on */
+    return std::make_unique<likelihood_cache_search>(&params, rng());
+  }
 };
 
 NS_END(explore, strategy, fordyca);
-
-#endif /* INCLUDE_FORDYCA_STRATEGY_EXPLORE_LIKELIHOOD_CACHE_SEARCH_HPP_ */

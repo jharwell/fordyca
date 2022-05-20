@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_D0_FREE_BLOCK_TO_NEST_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_D0_FREE_BLOCK_TO_NEST_FSM_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -40,11 +39,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace ds { class dpo_semantic_map; }
-
-NS_START(fsm, d0);
+NS_START(fordyca, fsm, d0);
 
 /*******************************************************************************
  * Class Definitions
@@ -63,12 +58,10 @@ class free_block_to_nest_fsm final : public cffsm::foraging_util_hfsm,
                                      public cfsm::block_transporter<foraging_transport_goal>,
                                      public cta::taskable {
  public:
-  free_block_to_nest_fsm(
-      const fsm_ro_params* c_params,
-      csubsystem::saa_subsystemQ3D* saa,
-      std::unique_ptr<csstrategy::base_strategy> explore,
-      std::unique_ptr<cssnest_acq::base_nest_acq> nest_acq,
-      rmath::rng* rng);
+  free_block_to_nest_fsm(const fsm_ro_params* c_ro,
+                         const csfsm::fsm_params* c_no,
+                         cffsm::strategy_set strategies,
+                         rmath::rng* rng);
 
   free_block_to_nest_fsm(const free_block_to_nest_fsm&) = delete;
   free_block_to_nest_fsm& operator=(const free_block_to_nest_fsm&) = delete;
@@ -84,13 +77,6 @@ class free_block_to_nest_fsm final : public cffsm::foraging_util_hfsm,
   bool task_running(void) const override {
     return !(ekST_FINISHED == current_state() || ekST_START == current_state());
   }
-
-  /* interference metrics */
-  bool exp_interference(void) const override RCPPSW_PURE;
-  bool entered_interference(void) const override RCPPSW_PURE;
-  bool exited_interference(void) const override RCPPSW_PURE;
-  rtypes::timestep interference_duration(void) const override RCPPSW_PURE;
-  rmath::vector3z interference_loc3D(void) const override RCPPSW_PURE;
 
   /* goal acquisition metrics */
   bool goal_acquired(void) const override RCPPSW_PURE;
@@ -170,4 +156,3 @@ class free_block_to_nest_fsm final : public cffsm::foraging_util_hfsm,
 
 NS_END(d0, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_D0_FREE_BLOCK_TO_NEST_FSM_HPP_ */

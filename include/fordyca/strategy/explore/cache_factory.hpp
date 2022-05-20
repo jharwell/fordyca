@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_STRATEGY_EXPLORE_CACHE_FACTORY_HPP_
-#define INCLUDE_FORDYCA_STRATEGY_EXPLORE_CACHE_FACTORY_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -45,19 +44,17 @@ NS_START(fordyca, strategy, explore);
  * \brief Factory for creating cache exploration strategies.
  */
 class cache_factory :
-    public rpfactory::releasing_factory<csstrategy::base_strategy,
+    public rpfactory::releasing_factory<fstrategy::foraging_strategy,
                                         std::string, /* key type */
-                                        const foraging_strategy::params*,
+                                        const fstrategy::strategy_params*,
                                         rmath::rng*> {
  public:
-  inline static const std::string kCRW = "CRW";
-  inline static const std::string kLikelihoodSearch = "likelihood_search";
-  inline static const std::string kUtilitySearch = "utility_search";
-  inline static const std::string kLEDTaxisSearch = "ledtaxis_search";
+  static inline const std::string kCRW = "CRW";
+  static inline const std::string kLikelihoodSearch = "likelihood_search";
+  static inline const std::string kUtilitySearch = "utility_search";
+  static inline const std::string kLEDTaxisSearch = "ledtaxis_search";
 
   cache_factory(void);
 };
 
 NS_END(explore, strategy, fordyca);
-
-#endif /* INCLUDE_FORDYCA_STRATEGY_EXPLORE_CACHE_FACTORY_HPP_ */

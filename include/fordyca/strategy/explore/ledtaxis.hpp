@@ -18,8 +18,7 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_STRATEGY_EXPLORE_LEDTAXIS_HPP_
-#define INCLUDE_FORDYCA_STRATEGY_EXPLORE_LEDTAXIS_HPP_
+#pragma once
 
 /*******************************************************************************
  * Includes
@@ -47,14 +46,7 @@ NS_START(fordyca, strategy, explore);
 class ledtaxis : public foraging_strategy,
                  public rer::client<ledtaxis> {
  public:
-  explicit ledtaxis(const foraging_strategy::params* const c_params,
-                    rmath::rng* rng)
-      : ledtaxis(c_params->saa,
-                 c_params->ledtaxis_target,
-                 rng) {}
-  ledtaxis(csubsystem::saa_subsystemQ3D* saa,
-           const rutils::color& target,
-           rmath::rng* rng);
+  ledtaxis(const fstrategy::strategy_params* params, rmath::rng* rng);
 
   ~ledtaxis(void) override = default;
   ledtaxis(const ledtaxis&) = delete;
@@ -77,7 +69,7 @@ class ledtaxis : public foraging_strategy,
   void task_execute(void) override final;
 
   /* prototype overrides */
-  std::unique_ptr<csstrategy::base_strategy> clone(void) const override {
+  std::unique_ptr<cssexplore::base_explore> clone(void) const override {
     return nullptr; /* Should not be a top level explore behavior */
   }
 
@@ -97,5 +89,3 @@ class ledtaxis : public foraging_strategy,
 };
 
 NS_END(explore, strategy, fordyca);
-
-#endif /* INCLUDE_FORDYCA_STRATEGY_EXPLORE_LEDTAXIS_HPP_ */
