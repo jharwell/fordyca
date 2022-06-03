@@ -101,7 +101,8 @@
 
           <!-- 25 degrees soft_turn_max. -->
           <diff_drive soft_turn_max="0.836"
-                      max_speed="0.09" />
+                      max_linear_speed="0.09"
+                      max_angular_speed="10"/>
         </actuation_subsystem2D>
       </params>
     </crw_controller>
@@ -128,6 +129,7 @@
                 spatial_nest_zone='spatial-nest-zone'
                 block_acq_counts="block-acq-counts.csv"
                 block_manipulation="block-manipulation.csv"
+                battery_state="battery-state.csv"
                 />
             <create
                 output_interval="10"

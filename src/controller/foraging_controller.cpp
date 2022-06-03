@@ -107,7 +107,7 @@ csubsystem::sensing_subsystemQ3D::sensor_map static sensing_init(
       chal::sensors::odometry_sensor(std::move(position), std::move(steering));
 
   auto rabs = chargos::sensors::wifi_sensor(rab_handle);
-  auto battery = chargos::sensors::battery_sensor(battery_handle);
+  auto battery = chsensors::battery_sensor(battery_handle);
   auto blobs = chargos::sensors::colored_blob_camera_sensor(blobs_handle);
 
   using subsystem = csubsystem::sensing_subsystemQ3D;
