@@ -136,14 +136,7 @@ class foraging_controller
     return m_nz_tracker.get();
   }
 
-  const class csubsystem::saa_subsystemQ3D* saa(void) const {
-    return cpal::controller::controller2D::saa();
-  }
-
  protected:
-  class csubsystem::saa_subsystemQ3D* saa(void) {
-    return cpal::controller::controller2D::saa();
-  }
   cspatial::nest_zone_tracker* nz_tracker(void) { return m_nz_tracker.get(); }
   void block_detect_status_update(void);
 
