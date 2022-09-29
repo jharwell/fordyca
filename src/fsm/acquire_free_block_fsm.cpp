@@ -53,31 +53,25 @@ acquire_free_block_fsm::acquire_free_block_fsm(
           std::move(exp_behavior),
           rng,
           acquire_goal_fsm::hook_list{
-              RCPPSW_STRUCT_DOT_INITIALIZER(
-                  acquisition_goal,
-                  std::bind(&acquire_free_block_fsm::acq_goal_internal)),
-              RCPPSW_STRUCT_DOT_INITIALIZER(
-                  goal_select,
-                  std::bind(&acquire_free_block_fsm::block_select, this)),
-              RCPPSW_STRUCT_DOT_INITIALIZER(
-                  candidates_exist,
-                  std::bind(&acquire_free_block_fsm::candidates_exist, this)),
-              RCPPSW_STRUCT_DOT_INITIALIZER(begin_acq_cb, nullptr),
-              RCPPSW_STRUCT_DOT_INITIALIZER(
-                  goal_acquired_cb,
+
+                  std::bind(&acquire_free_block_fsm::acq_goal_internal),
+
+                  std::bind(&acquire_free_block_fsm::block_select, this),
+
+                  std::bind(&acquire_free_block_fsm::candidates_exist, this),
+               nullptr,
+
                   std::bind(&acquire_free_block_fsm::block_acquired_cb,
                             this,
-                            std::placeholders::_1)),
-              RCPPSW_STRUCT_DOT_INITIALIZER(
-                  explore_term_cb,
+                            std::placeholders::_1),
+
                   std::bind(&acquire_free_block_fsm::block_exploration_term_cb,
-                            this)),
-              RCPPSW_STRUCT_DOT_INITIALIZER(
-                  goal_valid_cb,
+                            this),
+
                   std::bind(&acquire_free_block_fsm::block_acq_valid,
                             this,
                             std::placeholders::_1,
-                            std::placeholders::_2)) }),
+                            std::placeholders::_2) }),
       mc_matrix(c_ro->bsel_matrix),
       mc_store(c_ro->store) {}
 

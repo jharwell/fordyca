@@ -148,19 +148,19 @@ void dpo_controller::private_init(
   };
 
   auto strategy_params = fstrategy::strategy_params{
-    .fsm = &fsm_params,
-    .explore = &strat_config->blocks.explore,
-    .bsel_matrix = nullptr,
-    .csel_matrix = nullptr,
-    .accessor = nullptr,
-    .ledtaxis_target = rutils::color()
+    &fsm_params,
+     &strat_config->blocks.explore,
+     nullptr,
+    nullptr,
+     nullptr,
+     rutils::color()
   };
   fsm::fsm_ro_params fsm_ro_params = {
-    .bsel_matrix = block_sel_matrix(),
-    .csel_matrix = nullptr,
-    .store = perception()->model<fspds::dpo_store>(),
-    .accessor = perception()->known_objects(),
-    .strategy = *strat_config
+     block_sel_matrix(),
+     nullptr,
+     perception()->model<fspds::dpo_store>(),
+     perception()->known_objects(),
+     *strat_config
   };
 
   auto explore = fsexplore::block_factory().create(strat_config->blocks.explore.strategy,
@@ -180,10 +180,10 @@ void dpo_controller::private_init(
                                                     &strat_config->blocks.drop,
                                                     rng());
   cffsm::strategy_set strategies = {
-    .explore = std::move(explore),
-    .nest_acq = std::move(nest_acq),
-    .nest_exit = std::move(nest_exit),
-    .block_drop = std::move(block_drop)
+     std::move(explore),
+     std::move(nest_acq),
+     std::move(nest_exit),
+     std::move(block_drop)
   };
 
   m_fsm = std::make_unique<fsm::d0::dpo_fsm>(

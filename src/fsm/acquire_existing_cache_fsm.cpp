@@ -55,24 +55,20 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
           std::move(explore),
           rng,
           acquire_goal_fsm::hook_list{
-              RCPPSW_STRUCT_DOT_INITIALIZER(
-                  acquisition_goal,
-                  std::bind(&acquire_existing_cache_fsm::acq_goal_internal)),
-              RCPPSW_STRUCT_DOT_INITIALIZER(
-                  goal_select,
-                  std::bind(&acquire_existing_cache_fsm::existing_cache_select,
-                            this)),
-              RCPPSW_STRUCT_DOT_INITIALIZER(
-                  candidates_exist,
-                  std::bind(&acquire_existing_cache_fsm::candidates_exist, this)),
 
-              RCPPSW_STRUCT_DOT_INITIALIZER(begin_acq_cb, nullptr),
-              RCPPSW_STRUCT_DOT_INITIALIZER(
-                  goal_acquired_cb,
+                  std::bind(&acquire_existing_cache_fsm::acq_goal_internal),
+
+                  std::bind(&acquire_existing_cache_fsm::existing_cache_select,
+                            this),
+
+                  std::bind(&acquire_existing_cache_fsm::candidates_exist, this),
+
+               nullptr,
+
                   std::bind(&acquire_existing_cache_fsm::cache_acquired_cb,
 
                             this,
-                            std::placeholders::_1)),
+                            std::placeholders::_1),
               /*
                * We never ever want to be able to acquire a cache via
                * exploration, because if we are near/inside a cache exploring,
@@ -81,15 +77,14 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
                * policy). Allowing acquisition via exploration can result in
                * violations of the pickup policy.
                */
-              RCPPSW_STRUCT_DOT_INITIALIZER(
-                  explore_term_cb,
-                  std::bind([]() noexcept { return false; })),
-              RCPPSW_STRUCT_DOT_INITIALIZER(
-                  goal_valid_cb,
+
+                  std::bind([]() noexcept { return false; }),
+
                   std::bind(&acquire_existing_cache_fsm::cache_acq_valid,
                             this,
                             std::placeholders::_1,
-                            std::placeholders::_2)) }),
+                            std::placeholders::_2)
+          }),
       mc_for_pickup(for_pickup),
       mc_matrix(c_ro->csel_matrix),
       mc_store(c_ro->store) {}

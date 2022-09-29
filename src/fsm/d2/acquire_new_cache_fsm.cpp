@@ -54,32 +54,26 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
           std::move(explore),
           rng,
           acquire_goal_fsm::hook_list{
-              RCPPSW_STRUCT_DOT_INITIALIZER(
-                  acquisition_goal,
+
                   std::bind(&acquire_new_cache_fsm::acquisition_goal_internal,
-                            this)),
-              RCPPSW_STRUCT_DOT_INITIALIZER(
-                  goal_select,
-                  std::bind(&acquire_new_cache_fsm::cache_select, this)),
-              RCPPSW_STRUCT_DOT_INITIALIZER(
-                  candidates_exist,
-                  std::bind(&acquire_new_cache_fsm::candidates_exist, this)),
-              RCPPSW_STRUCT_DOT_INITIALIZER(begin_acq_cb, nullptr),
-              RCPPSW_STRUCT_DOT_INITIALIZER(
-                  goal_acquired_cb,
+                            this),
+
+                  std::bind(&acquire_new_cache_fsm::cache_select, this),
+
+                  std::bind(&acquire_new_cache_fsm::candidates_exist, this),
+               nullptr,
+
                   std::bind(&acquire_new_cache_fsm::cache_acquired_cb,
                             this,
-                            std::placeholders::_1)),
+                            std::placeholders::_1),
 
               /* new caches never acquired via exploration */
-              RCPPSW_STRUCT_DOT_INITIALIZER(
-                  explore_term_cb,
-                  std::bind([](void) noexcept { return false; })),
-              RCPPSW_STRUCT_DOT_INITIALIZER(
-                  goal_valid_cb,
+
+                  std::bind([](void) noexcept { return false; }),
+
                   [](const rmath::vector2d&, const rtypes::type_uuid&) noexcept {
                     return true;
-                  }) }),
+                  } }),
       mc_matrix(c_ro->csel_matrix),
       mc_store(c_ro->store) {}
 

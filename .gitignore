@@ -53,6 +53,7 @@ ext/cosm
 node_modules
 
 # Runtime
+backtrace-*
 
 .gdb_history
 *.csv

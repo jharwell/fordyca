@@ -104,10 +104,10 @@ void crw_controller::init(ticpp::Element& node) {
                                               rng());
 
   cffsm::strategy_set strategies = {
-    .explore = std::move(block_acq),
-    .nest_acq = std::move(nest_acq),
-    .nest_exit = std::move(nest_exit),
-    .block_drop = std::move(block_drop)
+     std::move(block_acq),
+     std::move(nest_acq),
+     std::move(nest_exit),
+    std::move(block_drop)
   };
   m_fsm = std::make_unique<fsm::d0::crw_fsm>(&fsm_params,
                                              std::move(strategies),

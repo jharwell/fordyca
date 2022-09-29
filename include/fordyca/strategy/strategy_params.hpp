@@ -45,22 +45,23 @@ NS_START(fordyca, strategy);
  * Class Definitions
  ******************************************************************************/
 struct strategy_params {
-  strategy_params(
-      const csfsm::fsm_params* fsm_in,
-      const cssexplore::config::explore_config* explore_in,
-      const controller::cognitive::block_sel_matrix* const bsel_matrix_in,
-      const controller::cognitive::cache_sel_matrix* const csel_matrix_in,
-      const fsperception::known_objects_accessor* accesor_in,
-      const rutils::color& ledtaxis_target_in)
-      : fsm(fsm_in),
-        explore(explore_in),
-        bsel_matrix(bsel_matrix_in),
-        csel_matrix(csel_matrix_in),
-        accessor(accesor_in),
-        ledtaxis_target(ledtaxis_target_in) {}
+ public:
+  /* strategy_params( */
+  /*     const csfsm::fsm_params* fsm_in, */
+  /*     const cssexplore::config::explore_config* explore_in, */
+  /*     const controller::cognitive::block_sel_matrix* const bsel_matrix_in, */
+  /*     const controller::cognitive::cache_sel_matrix* const csel_matrix_in, */
+  /*     const fsperception::known_objects_accessor* accesor_in, */
+  /*     const rutils::color& ledtaxis_target_in) */
+  /*     : fsm(fsm_in), */
+  /*       explore(explore_in), */
+  /*       bsel_matrix(bsel_matrix_in), */
+  /*       csel_matrix(csel_matrix_in), */
+  /*       accessor(accesor_in), */
+  /*       ledtaxis_target(ledtaxis_target_in) {} */
 
-  strategy_params(const strategy_params&) = delete;
-  strategy_params& operator=(const strategy_params&) = delete;
+  /* strategy_params(const strategy_params&) = delete; */
+  /* strategy_params& operator=(const strategy_params&) = delete; */
 
   /* clang-format off */
     const csfsm::fsm_params*                       fsm;

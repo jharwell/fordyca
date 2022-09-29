@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/init/init.hpp"
 
+#include "rcppsw/common/licensing.hpp"
+
 #include <iostream>
 
 #include "fordyca/version.hpp"
@@ -36,7 +38,8 @@ NS_START(fordyca, init);
  * Free Functions
  ******************************************************************************/
 void init(void) {
-  std::cout << "Loaded fordyca." << kVERSION << std::endl;
+  std::cout << "Loaded FORDYCA, " << kVERSION << ": ";
+  std::cout << RCPPSW_LICENSE(GPLV3, FORDYCA, 2022, John Harwell) << std::endl;
 } /* init() */
 
 NS_END(init, fordyca);

@@ -51,7 +51,8 @@
           (add-to-list 'flycheck-gcc-args (concat "-isystem" "/usr/include/eigen3"))
           (add-to-list 'flycheck-gcc-definitions "LIBRA_ER=LIBRA_ER_ALL")
           )
-        )))
+        )
+  ))
 
 
 ;;; end of .dir-locals.el
