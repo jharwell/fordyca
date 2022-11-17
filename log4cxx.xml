@@ -51,7 +51,7 @@
     <priority value ="info" />
   </category>
   <category name="cosm.foraging.fsm" >
-    <priority value ="debug" />
+    <priority value ="info" />
   </category>
   <category name="cosm.subsystem" >
     <priority value ="info" />
