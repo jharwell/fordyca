@@ -39,7 +39,7 @@ NS_START(fordyca, argos, support, caches);
  * Constructors/Destructor
  ******************************************************************************/
 creation_verifier::creation_verifier(carena::caching_arena_map* const map,
-                                     const rtypes::spatial_dist& cache_dim,
+                                     const rspatial::euclidean_dist& cache_dim,
                                      bool strict_constraints)
     : ER_CLIENT_INIT("fordyca.argos.support.creation_verifier"),
       mc_cache_dim(cache_dim),

@@ -97,7 +97,7 @@ acquire_new_cache_fsm::cache_select(void) {
             rcppsw::to_string(best->ranchor2D()).c_str(),
             rcppsw::to_string(best->danchor2D()).c_str());
 
-    auto tol = std::get<rtypes::spatial_dist>(
+    auto tol = std::get<rspatial::euclidean_dist>(
         mc_matrix->find(cselm::kNewCacheDropTolerance)->second);
     return boost::make_optional(
         acquire_goal_fsm::candidate_type(best->rcenter2D(), tol.v(), best->id()));

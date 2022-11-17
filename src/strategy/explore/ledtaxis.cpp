@@ -45,7 +45,7 @@ ledtaxis::ledtaxis(const fstrategy::strategy_params* params, rmath::rng* rng)
  * General Member Functions
  ******************************************************************************/
 void ledtaxis::task_execute(void) {
-  saa()->steer_force2D().accum(saa()->steer_force2D().wander(rng()));
+  saa()->apf2D().accum(saa()->apf2D().wander(rng()));
 
   if (auto obs = saa()->sensing()->proximity()->avg_prox_obj()) {
     inta_tracker()->state_enter();
@@ -56,7 +56,7 @@ void ledtaxis::task_execute(void) {
              obs->length());
     saa()->actuation()->diagnostics()->emit(
         chal::actuators::diagnostics::ekEXP_INTERFERENCE);
-    saa()->steer_force2D().accum(saa()->steer_force2D().avoidance(*obs));
+    saa()->apf2D().accum(saa()->apf2D().avoidance(*obs));
 
   } else {
     inta_tracker()->state_exit();
@@ -64,10 +64,10 @@ void ledtaxis::task_execute(void) {
     ER_DEBUG("No threatening obstacle found");
     saa()->actuation()->diagnostics()->emit(
         chal::actuators::diagnostics::ekTAXIS);
-    auto force = saa()->steer_force2D().phototaxis(
+    auto force = saa()->apf2D().phototaxis(
         saa()->sensing()->blobs()->readings(),
         carepr::light_type_index()[carepr::light_type_index::kCache]);
-    saa()->steer_force2D().accum(force);
+    saa()->apf2D().accum(force);
   }
 } /* task_execute() */
 

@@ -27,7 +27,7 @@
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/types/spatial_dist.hpp"
+#include "rcppsw/spatial/euclidean_dist.hpp"
 #include "rcppsw/types/timestep.hpp"
 
 #include "cosm/arena/ds/nest_vector.hpp"
@@ -69,7 +69,7 @@ class base_creator : public rer::client<base_creator> {
    *                  scalar).
    */
   base_creator(carena::caching_arena_map* map,
-                     const rtypes::spatial_dist& cache_dim);
+                     const rspatial::euclidean_dist& cache_dim);
 
   base_creator(const base_creator&) = delete;
   base_creator& operator=(const base_creator&) = delete;
@@ -101,11 +101,11 @@ class base_creator : public rer::client<base_creator> {
                       const rtypes::timestep& t,
                       bool pre_dist);
 
-  rtypes::spatial_dist cache_dim(void) const { return mc_cache_dim; }
+  rspatial::euclidean_dist cache_dim(void) const { return mc_cache_dim; }
 
  private:
   /* clang-format off */
-  const rtypes::spatial_dist mc_cache_dim;
+  const rspatial::euclidean_dist mc_cache_dim;
 
   carena::caching_arena_map* m_map;
   /* clang-format on */

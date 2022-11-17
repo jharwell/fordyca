@@ -69,7 +69,7 @@ void birtd_dpo_controller::control_step(void) {
    * correct. This can't be done when applying the steering forces because then
    * they are always 0 during loop function visualization.
    */
-  saa()->steer_force2D().tracking_reset();
+  saa()->apf2D().tracking_reset();
 
   /*
    * Execute the current task/allocate a new task/abort a task/etc and apply

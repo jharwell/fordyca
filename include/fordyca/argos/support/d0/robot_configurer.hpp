@@ -60,7 +60,7 @@ class robot_configurer : public boost::static_visitor<void> {
   void operator()(U* const c) const {
     if (nullptr != mc_config) {
       c->display_id(mc_config->robot_id);
-      c->display_steer2D(mc_config->robot_steer2D);
+      c->display_apf2D(mc_config->robot_apf2D);
     }
   }
   template<typename U = TController,
@@ -73,7 +73,7 @@ class robot_configurer : public boost::static_visitor<void> {
     if (nullptr != mc_config) {
       c->display_los(mc_config->robot_los);
       c->display_id(mc_config->robot_id);
-      c->display_steer2D(mc_config->robot_steer2D);
+      c->display_apf2D(mc_config->robot_apf2D);
     }
   }
   template<typename U = TController,
@@ -86,7 +86,7 @@ class robot_configurer : public boost::static_visitor<void> {
     if (nullptr != mc_config) {
       c->display_los(mc_config->robot_los);
       c->display_id(mc_config->robot_id);
-      c->display_steer2D(mc_config->robot_steer2D);
+      c->display_apf2D(mc_config->robot_apf2D);
     }
     if (nullptr != mc_oracle) {
       auto receptor = std::make_unique<fsperception::oracular_info_receptor>(mc_oracle);

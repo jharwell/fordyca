@@ -35,7 +35,7 @@
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/types/spatial_dist.hpp"
+#include "rcppsw/spatial/euclidean_dist.hpp"
 #include "rcppsw/math/rng.hpp"
 
 #include "fordyca/subsystem/perception/perception_fwd.hpp"
@@ -71,12 +71,12 @@ class cache_site_selector: public rer::client<cache_site_selector> {
   struct cache_constraint_data {
     const carepr::base_cache* mc_cache{nullptr};
     cache_site_selector*      selector{nullptr};
-    rtypes::spatial_dist      cache_prox{0.0};
+    rspatial::euclidean_dist      cache_prox{0.0};
   };
   struct nest_constraint_data {
     rmath::vector2d      nest_loc{};
     cache_site_selector* selector{nullptr};
-    rtypes::spatial_dist nest_prox{0.0};
+    rspatial::euclidean_dist nest_prox{0.0};
   };
   struct site_utility_data {
     rmath::vector2d position{};

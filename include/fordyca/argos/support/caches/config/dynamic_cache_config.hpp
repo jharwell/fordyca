@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include <string>
 #include "rcppsw/config/base_config.hpp"
-#include "rcppsw/types/spatial_dist.hpp"
+#include "rcppsw/spatial/euclidean_dist.hpp"
 
 #include "fordyca/fordyca.hpp"
 
@@ -52,7 +52,7 @@ struct dynamic_cache_config final : public rconfig::base_config {
    * dynamic cache creation (should be >= whatever the threshold value for the
    * \ref cache_sel_matrix is, or weird behavior will likely result).
    */
-  rtypes::spatial_dist min_dist{0.0};
+  rspatial::euclidean_dist min_dist{0.0};
 
   /**
    * \brief How many blocks within min_dist does it take to trigger dynamic

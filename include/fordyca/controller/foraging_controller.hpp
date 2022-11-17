@@ -116,7 +116,7 @@ class foraging_controller
   bool block_detect(const ccontroller::block_detect_context& context) override;
 
   /* movement metrics */
-  rtypes::spatial_dist
+  rspatial::euclidean_dist
   ts_distance(const csmetrics::movement_category& category) const override;
   rmath::vector3d
   ts_velocity(const csmetrics::movement_category& category) const override;

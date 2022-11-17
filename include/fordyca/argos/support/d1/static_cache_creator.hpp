@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include <vector>
 
-#include "rcppsw/types/spatial_dist.hpp"
+#include "rcppsw/spatial/euclidean_dist.hpp"
 
 #include "fordyca/argos/support/caches/base_creator.hpp"
 #include "fordyca/ds/block_alloc_map.hpp"
@@ -52,7 +52,7 @@ class static_cache_creator : public fascaches::base_creator,
  public:
   static_cache_creator(carena::caching_arena_map* map,
                        const std::vector<rmath::vector2d>& centers,
-                       const rtypes::spatial_dist& cache_dim);
+                       const rspatial::euclidean_dist& cache_dim);
   ~static_cache_creator(void) override = default;
 
   /**

@@ -85,7 +85,7 @@ class block_op_penalty_handler final : public ctv::temporal_penalty_handler,
   op_filter_status penalty_init(const controller::foraging_controller& controller,
                                 const rtypes::timestep& t,
                                 block_op_src src,
-                                const boost::optional<rtypes::spatial_dist>& cache_prox) {
+                                const boost::optional<rspatial::euclidean_dist>& cache_prox) {
     /*
      * Check if we have satisfied the conditions for a block operation, which
      * involves querying the area map.

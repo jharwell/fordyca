@@ -322,7 +322,7 @@ void foraging_controller::saa_init(
   auto sensors = sensing_init(this, sensing_p);
 
   auto saa = std::make_unique<csubsystem::saa_subsystemQ3D>(
-      std::move(sensors), std::move(actuators), &actuation_p->steering);
+      std::move(sensors), std::move(actuators), &actuation_p->apf_manager);
   base_controller2D::saa(std::move(saa));
 } /* saa_init() */
 
@@ -344,7 +344,7 @@ void foraging_controller::irv_init(const ctv::robot_dynamics_applicator* rda) {
 /*******************************************************************************
  * Movement Metrics
  ******************************************************************************/
-rtypes::spatial_dist foraging_controller::ts_distance(
+rspatial::euclidean_dist foraging_controller::ts_distance(
     const csmetrics::movement_category& category) const {
   if (csmetrics::movement_category::ekALL == category) {
     return ts_distance_impl();
@@ -358,7 +358,7 @@ rtypes::spatial_dist foraging_controller::ts_distance(
       return ts_distance_impl();
     }
   }
-  return rtypes::spatial_dist(0);
+  return rspatial::euclidean_dist(0);
 } /* ts_distance() */
 
 rmath::vector3d foraging_controller::ts_velocity(

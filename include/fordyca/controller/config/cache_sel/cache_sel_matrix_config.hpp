@@ -27,7 +27,7 @@
 
 #include "rcppsw/math/range.hpp"
 #include "rcppsw/config/base_config.hpp"
-#include "rcppsw/types/spatial_dist.hpp"
+#include "rcppsw/spatial/euclidean_dist.hpp"
 
 #include "fordyca/controller/config/cache_sel/cache_pickup_policy_config.hpp"
 
@@ -46,9 +46,9 @@ NS_START(fordyca, controller, config, cache_sel);
  * \brief XML parameters for the \ref cache_sel_matrix
  */
 struct cache_sel_matrix_config final : public rconfig::base_config {
-  rtypes::spatial_dist         cache_prox_dist{0.0};
-  rtypes::spatial_dist         block_prox_dist{0.0};
-  rtypes::spatial_dist         nest_prox_dist{0.0};
+  rspatial::euclidean_dist         cache_prox_dist{0.0};
+  rspatial::euclidean_dist         block_prox_dist{0.0};
+  rspatial::euclidean_dist         nest_prox_dist{0.0};
   rmath::rangez                site_xrange{};
   rmath::rangez                site_yrange{};
   cache_pickup_policy_config   pickup_policy{};
@@ -63,7 +63,7 @@ struct cache_sel_matrix_config final : public rconfig::base_config {
    */
   bool                         strict_constraints{true};
 
-  rtypes::spatial_dist         new_cache_tol{0.0};
+  rspatial::euclidean_dist         new_cache_tol{0.0};
 };
 
 NS_END(cache_sel, config, controller, fordyca);

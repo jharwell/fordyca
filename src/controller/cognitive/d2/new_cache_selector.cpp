@@ -98,9 +98,9 @@ bool new_cache_selector::new_cache_is_excluded(
     const fspds::dp_cache_map& existing_caches,
     const fspds::dp_block_map& blocks,
     const crepr::base_block3D* const new_cache) const {
-  auto cache_prox = std::get<rtypes::spatial_dist>(
+  auto cache_prox = std::get<rspatial::euclidean_dist>(
       mc_matrix->find(cselm::kCacheProxDist)->second);
-  auto cluster_prox = std::get<rtypes::spatial_dist>(
+  auto cluster_prox = std::get<rspatial::euclidean_dist>(
       mc_matrix->find(cselm::kClusterProxDist)->second);
 
   /*

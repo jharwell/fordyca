@@ -192,22 +192,24 @@
           </env_sensor>
         </sensing_subsystemQ3D>
         <actuation_subsystem2D>
-          <force_calculator>
-            <avoidance_force lookahead="0.5"
+          <apf_manager>
+            <nav>
+              <avoidance_force lookahead="0.5"
+                               max="0.08"/>
+              <arrival_force slowing_radius="0.2"
+                             slowing_speed_min="0.01"
                              max="0.08"/>
-            <arrival_force slowing_radius="0.2"
-                           slowing_speed_min="0.01"
-                           max="0.08"/>
-            <wander_force circle_distance="4.0"
-                          circle_radius="100.0"
-                          max="0.09"
-                          interval="1">
-              <!-- 5 degrees max delta. -->
-              <bias_angle src="uniform"
-                          max_delta="0.0872"/>
-            </wander_force>
-            <phototaxis_force max="0.08"/>
-          </force_calculator>
+              <wander_force circle_distance="4.0"
+                            circle_radius="100.0"
+                            max="0.09"
+                            interval="1">
+                <!-- 5 degrees max delta. -->
+                <bias_angle src="uniform"
+                            max_delta="0.0872"/>
+              </wander_force>
+              <phototaxis_force max="0.08"/>
+            </nav>
+          </apf_manager>
 
           <!-- 25 degrees soft_turn_max. -->
           <diff_drive soft_turn_max="0.436"

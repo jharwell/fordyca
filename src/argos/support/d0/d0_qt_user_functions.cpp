@@ -36,7 +36,7 @@ RCPPSW_WARNING_DISABLE_POP()
 
 #include "cosm/argos/vis/block_carry_visualizer.hpp"
 #include "cosm/argos/vis/polygon2D_visualizer.hpp"
-#include "cosm/argos/vis/steer2D_visualizer.hpp"
+#include "cosm/argos/vis/apf2D_visualizer.hpp"
 #include "cosm/repr/sim_block3D.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
 
@@ -90,11 +90,11 @@ void d0_qt_user_functions::Draw(chal::robot& c_entity) {
     cavis::polygon2D_visualizer(this).relative_draw(
         rmath::vector3d(base->rpos2D()), points, rutils::color::kBLUE);
   }
-  if (base->display_steer2D()) {
-    auto steering = cavis::steer2D_visualizer(this, kTEXT_VIS_OFFSET);
+  if (base->display_apf2D()) {
+    auto steering = cavis::apf2D_visualizer(this, kTEXT_VIS_OFFSET);
     steering(rmath::vector3d(base->rpos2D()),
              c_entity.GetEmbodiedEntity().GetOriginAnchor().Orientation,
-             base->saa()->steer_force2D().tracker(),
+             base->saa()->apf2D().tracker(),
              false);
   }
 }

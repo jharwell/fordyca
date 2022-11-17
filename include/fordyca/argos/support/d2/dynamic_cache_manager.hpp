@@ -79,7 +79,7 @@ class dynamic_cache_manager final : public fascaches::base_manager,
    * dimension, minimmum distance between blocks to consider when creating
    * caches);
    */
-  rtypes::spatial_dist cache_proximity_dist(void) const {
+  rspatial::euclidean_dist cache_proximity_dist(void) const {
     return std::max(config()->dimension * 2, config()->dynamic.min_dist);
   }
 

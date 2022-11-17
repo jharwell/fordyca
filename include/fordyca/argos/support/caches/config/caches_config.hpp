@@ -48,7 +48,7 @@ struct caches_config final : public rconfig::base_config {
    * \brief How large are cache (geometrical area), when created (same for
    * static and dynamic) ?
    */
-  rtypes::spatial_dist dimension{0.0};
+  rspatial::euclidean_dist dimension{0.0};
 
   /**
    * \brief If \c TRUE, then cache creation will be strict, meaning that any

@@ -54,7 +54,7 @@ class prox_checker : public rer::client<prox_checker> {
   };
 
   prox_checker(const carena::caching_arena_map* const map,
-                     const rtypes::spatial_dist& prox_dist)
+                     const rspatial::euclidean_dist& prox_dist)
       : ER_CLIENT_INIT("fordyca.argos.support.d2.prox_checker"),
         mc_prox_dist(prox_dist),
         mc_map(map) {}
@@ -163,7 +163,7 @@ class prox_checker : public rer::client<prox_checker> {
 
  private:
   /* clang-format off */
-  const rtypes::spatial_dist       mc_prox_dist;
+  const rspatial::euclidean_dist       mc_prox_dist;
   const carena::caching_arena_map* mc_map;
   /* clang-format on */
 };

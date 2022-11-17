@@ -68,7 +68,7 @@ void mdpo_controller::control_step(void) {
    * correct. This can't be done when applying the steering forces because then
    * they are always 0 during loop function visualization.
    */
-  saa()->steer_force2D().tracking_reset();
+  saa()->apf2D().tracking_reset();
 
   perception()->update(nullptr);
 

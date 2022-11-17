@@ -28,7 +28,7 @@
 #include <boost/optional.hpp>
 
 #include "rcppsw/er/client.hpp"
-#include "rcppsw/types/spatial_dist.hpp"
+#include "rcppsw/spatial/euclidean_dist.hpp"
 #include "rcppsw/types/timestep.hpp"
 #include "rcppsw/math/vector2.hpp"
 
@@ -124,7 +124,7 @@ class base_manager : public fmetrics::caches::lifecycle_metrics,
    * - An odd multiple of the  \ref base_arena_map grid resolution so that
    *   caches have an unambiguous center.
    */
-  rtypes::spatial_dist cache_dim_calc(void) const;
+  rspatial::euclidean_dist cache_dim_calc(void) const;
 
   /**
    * \brief Check the dimension that a derived class wants to use to create
@@ -136,7 +136,7 @@ class base_manager : public fmetrics::caches::lifecycle_metrics,
    * If the cache dimension is not an odd multiple of the arena resolution, then
    * a modified dimension is returned (smaller than the argument, never larger).
    */
-  rtypes::spatial_dist dimension_check(rtypes::spatial_dist dim) const;
+  rspatial::euclidean_dist dimension_check(rspatial::euclidean_dist dim) const;
 
   void caches_created(size_t c) { m_caches_created += c; }
   void caches_discarded(size_t c) { m_caches_discarded += c; }

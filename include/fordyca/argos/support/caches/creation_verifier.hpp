@@ -25,7 +25,7 @@
  ******************************************************************************/
 
 #include "rcppsw/er/client.hpp"
-#include "rcppsw/types/spatial_dist.hpp"
+#include "rcppsw/spatial/euclidean_dist.hpp"
 
 #include "cosm/arena/ds/nest_vector.hpp"
 #include "cosm/ds/block3D_vector.hpp"
@@ -57,7 +57,7 @@ NS_START(fordyca, argos, support, caches);
 class creation_verifier : public rer::client<creation_verifier> {
  public:
   creation_verifier(carena::caching_arena_map* map,
-                     const rtypes::spatial_dist& cache_dim,
+                     const rspatial::euclidean_dist& cache_dim,
                      bool strict_constraints);
 
   creation_verifier(const creation_verifier&) = delete;
@@ -112,7 +112,7 @@ class creation_verifier : public rer::client<creation_verifier> {
                                  const cads::nest_vectorro& nests) const;
 
   /* clang-format off */
-  const rtypes::spatial_dist mc_cache_dim;
+  const rspatial::euclidean_dist mc_cache_dim;
   const bool                 mc_strict_constraints;
 
   carena::caching_arena_map* m_map;

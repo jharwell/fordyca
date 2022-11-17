@@ -99,7 +99,7 @@ bool cache_site_selector::verify_site(
 
   /* check distances to known caches */
   for (const auto& c : known_caches) {
-    ER_CHECK(rtypes::spatial_dist((c->rcenter2D() - site).length()) >=
+    ER_CHECK(rspatial::euclidean_dist((c->rcenter2D() - site).length()) >=
                  std::get<0>(m_constraints)[0].cache_prox,
              "Cache site@%s too close to cache%d (%f <= %f)",
              rcppsw::to_string(site).c_str(),
@@ -109,7 +109,7 @@ bool cache_site_selector::verify_site(
   } /* for(&c..) */
 
   /* check distance to nest center */
-  ER_CHECK(rtypes::spatial_dist((ndata->nest_loc - site).length()) >=
+  ER_CHECK(rspatial::euclidean_dist((ndata->nest_loc - site).length()) >=
                ndata->nest_prox,
            "Cache site@%s too close to nest (%f <= %f)",
            rcppsw::to_string(site).c_str(),
@@ -176,14 +176,14 @@ void cache_site_selector::constraints_create(
     std::get<0>(m_constraints)
         .push_back({ c,
                      this,
-                     std::get<rtypes::spatial_dist>(
+                     std::get<rspatial::euclidean_dist>(
                          mc_matrix->find(cselm::kCacheProxDist)->second) });
   } /* for(&c..) */
 
   std::get<1>(m_constraints)
       .push_back({ nest_loc,
                    this,
-                   std::get<rtypes::spatial_dist>(
+                   std::get<rspatial::euclidean_dist>(
                        mc_matrix->find(cselm::kNestProxDist)->second) });
 
   for (auto& c : std::get<0>(m_constraints)) {

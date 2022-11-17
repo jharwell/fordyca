@@ -194,7 +194,7 @@ cds::block3D_vectorno dynamic_cache_creator::cache_i_blocks_alloc(
      * If we find a block that is close enough to our anchor/target block, then
      * add to the src list.
      */
-    rtypes::spatial_dist to_block(
+    rspatial::euclidean_dist to_block(
         (candidate->rcenter2D() - candidate->rcenter2D()).length());
     if (to_block <= mc_min_dist) {
       ER_ASSERT(std::find(cache_i_blocks.begin(),
@@ -216,7 +216,7 @@ cds::block3D_htno dynamic_cache_creator::cache_i_alloc_from_absorbable(
     const cds::block3D_htno& c_absorbable_blocks,
     const cds::block3D_vectorno& c_cache_i_blocks,
     const rmath::vector2d& c_center,
-    const rtypes::spatial_dist& c_cache_dim) const {
+    const rspatial::euclidean_dist& c_cache_dim) const {
   cds::block3D_htno absorb_blocks;
   rmath::vector2d cache_dim(c_cache_dim.v(), c_cache_dim.v());
   using checker = cspatial::conflict_checker;

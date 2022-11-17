@@ -143,7 +143,7 @@ void base_manager::bloctree_update(const cads::acache_vectoro& caches) {
   m_map->created_caches_clear();
 } /* bloctree_update() */
 
-rtypes::spatial_dist base_manager::cache_dim_calc(void) const {
+rspatial::euclidean_dist base_manager::cache_dim_calc(void) const {
   using checker = cspatial::dimension_checker;
 
   /*

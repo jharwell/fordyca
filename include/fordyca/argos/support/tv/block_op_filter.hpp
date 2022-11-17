@@ -74,7 +74,7 @@ class block_op_filter : public rer::client<block_op_filter> {
    */
   op_filter_result operator()(const controller::foraging_controller& controller,
                               block_op_src src,
-                              boost::optional<rtypes::spatial_dist> cache_prox) {
+                              boost::optional<rspatial::euclidean_dist> cache_prox) {
     /*
      * If the robot has not acquired a block, or thinks it has but actually has
      * not, nothing to do. If a robot is carrying a block but is still
@@ -155,7 +155,7 @@ class block_op_filter : public rer::client<block_op_filter> {
    * block/cache is too close.
    */
   op_filter_result cache_site_drop_filter(const controller::foraging_controller& controller,
-                                          const rtypes::spatial_dist& cache_prox) const {
+                                          const rspatial::euclidean_dist& cache_prox) const {
     op_filter_result result;
     if (!(controller.goal_acquired() &&
           fsm::foraging_acq_goal::ekCACHE_SITE == controller.acquisition_goal() &&
@@ -182,7 +182,7 @@ class block_op_filter : public rer::client<block_op_filter> {
    * is too close to another cache to do a free block drop at the chosen site.
    */
   op_filter_result new_cache_drop_filter(const controller::foraging_controller& controller,
-                                         const rtypes::spatial_dist& cache_prox) const {
+                                         const rspatial::euclidean_dist& cache_prox) const {
     op_filter_result result;
     if (!(controller.goal_acquired() &&
           fsm::foraging_acq_goal::ekNEW_CACHE == controller.acquisition_goal() &&

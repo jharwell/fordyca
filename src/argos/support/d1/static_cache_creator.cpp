@@ -38,7 +38,7 @@ using carepr::base_cache;
 static_cache_creator::static_cache_creator(
     carena::caching_arena_map* const map,
     const std::vector<rmath::vector2d>& centers,
-    const rtypes::spatial_dist& cache_dim)
+    const rspatial::euclidean_dist& cache_dim)
     : base_creator(map, cache_dim),
       ER_CLIENT_INIT("fordyca.argos.support.d1.static_cache_creator"),
       mc_centers(centers) {}

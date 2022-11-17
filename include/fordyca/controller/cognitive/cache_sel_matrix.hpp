@@ -31,7 +31,7 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/range.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/types/spatial_dist.hpp"
+#include "rcppsw/spatial/euclidean_dist.hpp"
 
 #include "fordyca/controller/config/cache_sel/cache_sel_matrix_config.hpp"
 #include "fordyca/controller/cognitive/cache_sel_exception.hpp"
@@ -48,7 +48,7 @@ NS_START(fordyca, controller, cognitive);
  * matrix can have the same type.
  */
 using cache_sel_variant =
-    std::variant<rtypes::spatial_dist,
+    std::variant<rspatial::euclidean_dist,
                    rmath::vector2d,
                    rmath::rangez,
                    std::vector<rtypes::type_uuid>,

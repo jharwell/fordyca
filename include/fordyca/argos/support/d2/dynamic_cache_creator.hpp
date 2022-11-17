@@ -65,8 +65,8 @@ class dynamic_cache_creator : public fascaches::base_creator,
   struct params {
     /* clang-format off */
     carena::caching_arena_map* map;
-    rtypes::spatial_dist       cache_dim;
-    rtypes::spatial_dist       min_dist;
+    rspatial::euclidean_dist       cache_dim;
+    rspatial::euclidean_dist       min_dist;
     uint                       min_blocks;
     bool                       strict_constraints;
     /* clang-format on */
@@ -136,7 +136,7 @@ class dynamic_cache_creator : public fascaches::base_creator,
       const cds::block3D_htno& c_absorbable_blocks,
       const cds::block3D_vectorno& c_cache_i_blocks,
       const rmath::vector2d& c_center,
-      const rtypes::spatial_dist& c_cache_dim) const;
+      const rspatial::euclidean_dist& c_cache_dim) const;
 
   /**
    * \brief Create the set of caches that our new cache needs to avoid during
@@ -170,7 +170,7 @@ class dynamic_cache_creator : public fascaches::base_creator,
 
   /* clang-format off */
   const uint                 mc_min_blocks;
-  const rtypes::spatial_dist mc_min_dist;
+  const rspatial::euclidean_dist mc_min_dist;
   const bool                 mc_strict_constraints;
 
   rmath::rng*                m_rng;

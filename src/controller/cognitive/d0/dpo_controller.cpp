@@ -72,11 +72,11 @@ void dpo_controller::control_step(void) {
   ndc_uuid_push();
 
   /*
-   * Reset steering forces tracking so per-timestep visualizations are
-   * correct. This can't be done when applying the steering forces because then
-   * they are always 0 during loop function visualization.
+   * Reset APF forces tracking so per-timestep visualizations are correct. This
+   * can't be done when applying the steering forces because then they are
+   * always 0 during loop function visualization.
    */
-  saa()->steer_force2D().tracking_reset();
+  saa()->apf2D().tracking_reset();
 
   ER_ASSERT(!(nullptr != block() && !block()->is_carried_by_robot()),
             "Carried block%d has robot id=%d",

@@ -36,7 +36,7 @@
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/types/spatial_dist.hpp"
+#include "rcppsw/spatial/euclidean_dist.hpp"
 #include "rcppsw/math/rng.hpp"
 
 /*******************************************************************************
@@ -76,7 +76,7 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    * \param c_clusters Vector of block clusters in the area.
    */
   cache_center_calculator(cads::arena_grid* grid,
-                          const rtypes::spatial_dist& cache_dim,
+                          const rspatial::euclidean_dist& cache_dim,
                           const cads::nest_vectorro& c_nests,
                           const cfds::block3D_cluster_vectorro& c_clusters);
 
@@ -144,7 +144,7 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
       rmath::rng* rng) const;
 
   /* clang-format off */
-  const rtypes::spatial_dist         mc_cache_dim;
+  const rspatial::euclidean_dist         mc_cache_dim;
   const cads::nest_vectorro          mc_nests;
   const cfds::block3D_cluster_vectorro mc_clusters;
 
