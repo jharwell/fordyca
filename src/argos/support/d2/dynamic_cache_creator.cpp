@@ -15,7 +15,7 @@
 #include "cosm/arena/operations/cache_extent_clear.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/repr/sim_block3D.hpp"
-#include "cosm/spatial/conflict_checker.hpp"
+#include "cosm/spatial/common/conflict_checker.hpp"
 
 #include "fordyca/argos/support/caches/creation_verifier.hpp"
 #include "fordyca/argos/support/d2/cache_center_calculator.hpp"

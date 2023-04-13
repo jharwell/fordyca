@@ -128,7 +128,7 @@ void crw_controller::control_step(void) {
    * correct. This can't be done when applying the steering forces because then
    * they are always 0 during loop function visualization.
    */
-  saa()->apf2D().tracking_reset();
+  saa()->apf().tracking_reset();
 
   /*
    * Run the FSM and apply steering forces if normal operation, otherwise handle

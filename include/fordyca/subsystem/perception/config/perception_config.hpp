@@ -15,8 +15,6 @@
 
 #include "rcppsw/config/base_config.hpp"
 
-#include "cosm/subsystem/perception/config/rlos_config.hpp"
-
 #include "fordyca/subsystem/perception/config/dpo_config.hpp"
 #include "fordyca/subsystem/perception/config/mdpo_config.hpp"
 

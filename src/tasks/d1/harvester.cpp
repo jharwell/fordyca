@@ -11,7 +11,7 @@
  ******************************************************************************/
 #include "fordyca/tasks/d1/harvester.hpp"
 
-#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystem.hpp"
 #include "cosm/ta/config/task_alloc_config.hpp"
 
 #include "fordyca/controller/cognitive/d1/events/block_vanished.hpp"

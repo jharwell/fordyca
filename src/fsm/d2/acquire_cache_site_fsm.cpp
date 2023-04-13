@@ -13,7 +13,7 @@
 
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
-#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystem.hpp"
 
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"

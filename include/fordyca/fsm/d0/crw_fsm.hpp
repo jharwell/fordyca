@@ -63,10 +63,10 @@ class crw_fsm final : public cffsm::foraging_util_hfsm,
   exp_status is_exploring_for_goal(void) const override RCPPSW_PURE;
   bool is_vectoring_to_goal(void) const override { return false; }
   bool goal_acquired(void) const override RCPPSW_PURE;
-  rmath::vector3z acquisition_loc3D(void) const override RCPPSW_PURE;
+  boost::optional<rmath::vector3z> acquisition_loc3D(void) const override RCPPSW_PURE;
   rtypes::type_uuid entity_acquired_id(void) const override RCPPSW_PURE;
-  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, explore_loc3D, const);
-  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, vector_loc3D, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(boost::optional<rmath::vector3z>, explore_loc3D, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(boost::optional<rmath::vector3z>, vector_loc3D, const);
 
   /* block transportation */
   foraging_transport_goal block_transport_goal(void) const override RCPPSW_PURE;

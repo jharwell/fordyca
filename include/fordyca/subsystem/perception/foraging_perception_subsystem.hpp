@@ -44,13 +44,11 @@ class foraging_perception_subsystem
       public virtual rmetrics::base_metrics {
  public:
   explicit foraging_perception_subsystem(
-      const cspconfig::rlos_config* const config,
+      const csprlos::config::rlos_config* const config,
       std::unique_ptr<csperception::base_memory_model> model)
       : mlos_perception_subsystem(config, std::move(model)) {}
 
   ~foraging_perception_subsystem(void) override = default;
-
-  using mlos_perception_subsystem<repr::forager_los>::los_dim;
 
   /**
    * \brief Update the internal data structure/repr of the

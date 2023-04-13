@@ -11,7 +11,7 @@
  ******************************************************************************/
 #include "fordyca/controller/config/d1/controller_repository.hpp"
 
-#include "cosm/hal/subsystem/config/xml/sensing_subsystemQ3D_parser.hpp"
+#include "cosm/hal/subsystem/config/xml/sensing_subsystem_parser.hpp"
 #include "cosm/ta/config/xml/task_alloc_parser.hpp"
 
 #include "fordyca/controller/config/cache_sel/cache_sel_matrix_parser.hpp"
@@ -40,8 +40,8 @@ controller_repository::controller_repository(void) {
   parser_find<rtcxml::task_alloc_parser>(rtcxml::task_alloc_parser::kXMLRoot)
       ->exec_est_task_add(ftd1::foraging_task::kHarvesterName);
 
-  parser_find<chsubsystem::config::xml::sensing_subsystemQ3D_parser>(
-      chsubsystem::config::xml::sensing_subsystemQ3D_parser::kXMLRoot)
+  parser_find<chsubsystem::config::xml::sensing_subsystem_parser>(
+      chsubsystem::config::xml::sensing_subsystem_parser::kXMLRoot)
       ->env_detection_add("cache");
 }
 

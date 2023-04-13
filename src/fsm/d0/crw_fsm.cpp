@@ -12,9 +12,9 @@
 #include "fordyca/fsm/d0/crw_fsm.hpp"
 
 #include "cosm/spatial/strategy/base_strategy.hpp"
-#include "cosm/subsystem/actuation_subsystem2D.hpp"
+#include "cosm/subsystem/actuation_subsystem.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
-#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystem.hpp"
 
 #include "fordyca/fsm/foraging_signal.hpp"
 
@@ -181,17 +181,23 @@ bool crw_fsm::goal_acquired(void) const {
   return false;
 } /* goal_acquired() */
 
-rmath::vector3z crw_fsm::acquisition_loc3D(void) const {
-  return saa()->sensing()->dpos3D();
+boost::optional<rmath::vector3z> crw_fsm::acquisition_loc3D(void) const {
+  if (goal_acquired()) {
+    return boost::make_optional(saa()->sensing()->dpos3D());
+  }
+  return boost::none;
 } /* acquisition_loc3D() */
 
-rmath::vector3z crw_fsm::explore_loc3D(void) const {
-  return saa()->sensing()->dpos3D();
+boost::optional<rmath::vector3z> crw_fsm::explore_loc3D(void) const {
+  if (is_exploring_for_goal().is_exploring) {
+    return boost::make_optional(saa()->sensing()->dpos3D());
+  }
+  return boost::none;
 } /* explore_loc3D() */
 
-rmath::vector3z crw_fsm::vector_loc3D(void) const {
+boost::optional<rmath::vector3z> crw_fsm::vector_loc3D(void) const {
   ER_FATAL_SENTINEL("CRW_FSM current vector location undefined");
-  return saa()->sensing()->dpos3D();
+  return boost::none;
 } /* vector_loc3D() */
 
 rtypes::type_uuid crw_fsm::entity_acquired_id(void) const {

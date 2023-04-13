@@ -148,7 +148,7 @@ bool cached_block_to_nest_fsm::exited_interference(void) const {
          cffsm::foraging_util_hfsm::exited_interference();
 } /* exited_interference() */
 
-rtypes::timestep cached_block_to_nest_fsm::interference_duration(void) const {
+boost::optional<rtypes::timestep> cached_block_to_nest_fsm::interference_duration(void) const {
   if (m_cache_fsm.task_running()) {
     return m_cache_fsm.interference_duration();
   } else {
@@ -156,7 +156,7 @@ rtypes::timestep cached_block_to_nest_fsm::interference_duration(void) const {
   }
 } /* interference_duration() */
 
-rmath::vector3z cached_block_to_nest_fsm::interference_loc3D(void) const {
+boost::optional<rmath::vector3z> cached_block_to_nest_fsm::interference_loc3D(void) const {
   if (m_cache_fsm.task_running()) {
     return m_cache_fsm.interference_loc3D();
   } else {

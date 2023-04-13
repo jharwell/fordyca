@@ -12,9 +12,9 @@
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 
 #include "cosm/spatial/fsm/acquire_goal_fsm.hpp"
-#include "cosm/subsystem/actuation_subsystem2D.hpp"
+#include "cosm/subsystem/actuation_subsystem.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
-#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystem.hpp"
 
 #include "fordyca/fsm/foraging_acq_goal.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
@@ -167,16 +167,16 @@ bool block_to_goal_fsm::exited_interference(void) const {
          (m_goal_fsm->task_running() && m_goal_fsm->exited_interference());
 } /* exited_interference() */
 
-rtypes::timestep block_to_goal_fsm::interference_duration(void) const {
+boost::optional<rtypes::timestep> block_to_goal_fsm::interference_duration(void) const {
   if (m_block_fsm->task_running()) {
     return m_block_fsm->interference_duration();
   } else if (m_goal_fsm->task_running()) {
     return m_goal_fsm->interference_duration();
   }
-  return rtypes::timestep(0);
+  return boost::none;
 } /* interference_duration() */
 
-rmath::vector3z block_to_goal_fsm::interference_loc3D(void) const {
+boost::optional<rmath::vector3z> block_to_goal_fsm::interference_loc3D(void) const {
   ER_ASSERT(m_block_fsm->task_running() || m_goal_fsm->task_running(),
             "In collision interference without running task?");
   if (m_block_fsm->task_running()) {
@@ -184,6 +184,7 @@ rmath::vector3z block_to_goal_fsm::interference_loc3D(void) const {
   } else { /* goal FSM must be running */
     return m_goal_fsm->interference_loc3D();
   }
+  return boost::none;
 } /* interference_loc3D() */
 
 /*******************************************************************************
@@ -219,16 +220,25 @@ block_to_goal_fsm::acquisition_goal(void) const {
   return fsm::to_goal_type(foraging_acq_goal::ekNONE);
 } /* acquisition_goal() */
 
-rmath::vector3z block_to_goal_fsm::acquisition_loc3D(void) const {
-  return m_goal_fsm->acquisition_loc3D();
+boost::optional<rmath::vector3z> block_to_goal_fsm::acquisition_loc3D(void) const {
+  if (goal_acquired()) {
+    return m_goal_fsm->acquisition_loc3D();
+  }
+  return boost::none;
 } /* acquisition_loc3D() */
 
-rmath::vector3z block_to_goal_fsm::explore_loc3D(void) const {
-  return saa()->sensing()->dpos3D();
+boost::optional<rmath::vector3z> block_to_goal_fsm::explore_loc3D(void) const {
+  if (is_exploring_for_goal().is_exploring) {
+    return saa()->sensing()->dpos3D();
+  }
+  return boost::none;
 } /* explore_loc3D() */
 
-rmath::vector3z block_to_goal_fsm::vector_loc3D(void) const {
-  return saa()->sensing()->dpos3D();
+boost::optional<rmath::vector3z> block_to_goal_fsm::vector_loc3D(void) const {
+  if (is_vectoring_to_goal()) {
+    return saa()->sensing()->dpos3D();
+  }
+  return boost::none;
 } /* vector_loc3D() */
 
 /*******************************************************************************

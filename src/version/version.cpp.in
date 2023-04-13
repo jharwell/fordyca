@@ -1,5 +1,5 @@
 /**
- * \file init.cpp
+ * \file version.cpp
  *
  * \copyright 2022 John Harwell, All rights reserved.
  *
@@ -9,25 +9,34 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/init/init.hpp"
-
-#include "rcppsw/version/version.hpp"
-
-#include <iostream>
-
 #include "fordyca/version/version.hpp"
+
+#include "rcppsw/version/licenses.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, init);
+NS_START(fordyca, version);
 
 /*******************************************************************************
- * Free Functions
+ * Global Variables
  ******************************************************************************/
-void init(void) {
-  std::cout << "Loaded FOraging Robots use DYnamic CAches (FORDYCA): ";
-  std::cout << rversion::meta_info_to_str(&version::kVersion);
-} /* init() */
+rversion::meta_info kVersion = {
+  .version = {
+    .version = "v@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@.@PROJECT_VERSION_PATCH@",
+    .license = {
+      .abbrev = RCPPSW_LICENSE_SHORT(MIT, FORDYCA),
+      .full = RCPPSW_LICENSE_FULL(MIT, FORDYCA),
+      .copyright = RCPPSW_COPYRIGHT(2022, John Harwell)
+    },
+  },
+  .build = {
+    .git_rev = "@LIBRA_GIT_REV@",
+    .git_diff = "@LIBRA_GIT_DIFF@",
+    .git_tag = "@LIBRA_GIT_TAG@",
+    .git_branch = "@LIBRA_GIT_BRANCH@",
+    .compiler_flags = "@LIBRA_CXX_FLAGS_BUILD@"
+  }
+};
 
-NS_END(init, fordyca);
+NS_END(version, fordyca);

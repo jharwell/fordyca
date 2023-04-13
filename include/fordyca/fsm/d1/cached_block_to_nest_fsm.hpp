@@ -88,16 +88,16 @@ class cached_block_to_nest_fsm final : public cffsm::foraging_util_hfsm,
   bool exp_interference(void) const override RCPPSW_PURE;
   bool entered_interference(void) const override RCPPSW_PURE;
   bool exited_interference(void) const override RCPPSW_PURE;
-  rtypes::timestep interference_duration(void) const override RCPPSW_PURE;
-  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, interference_loc3D, const);
+  boost::optional<rtypes::timestep> interference_duration(void) const override RCPPSW_PURE;
+  RCPPSW_WRAP_DECL_OVERRIDE(boost::optional<rmath::vector3z>, interference_loc3D, const);
 
   /* goal acquisition metrics */
   bool goal_acquired(void) const override RCPPSW_PURE;
   RCPPSW_WRAP_DECL_OVERRIDE(exp_status, is_exploring_for_goal, const);
   RCPPSW_WRAP_DECL_OVERRIDE(bool, is_vectoring_to_goal, const);
-  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, acquisition_loc3D, const);
-  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, explore_loc3D, const);
-  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, vector_loc3D, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(boost::optional<rmath::vector3z>, acquisition_loc3D, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(boost::optional<rmath::vector3z>, explore_loc3D, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(boost::optional<rmath::vector3z>, vector_loc3D, const);
   RCPPSW_WRAP_DECL_OVERRIDE(rtypes::type_uuid, entity_acquired_id, const);
   csmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCPPSW_PURE;
 

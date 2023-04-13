@@ -12,9 +12,9 @@
 #include "fordyca/strategy/explore/ledtaxis.hpp"
 
 #include "cosm/arena/repr/light_type_index.hpp"
-#include "cosm/subsystem/actuation_subsystem2D.hpp"
+#include "cosm/subsystem/actuation_subsystem.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
-#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,7 +33,7 @@ ledtaxis::ledtaxis(const fstrategy::strategy_params* params, rmath::rng* rng)
  * General Member Functions
  ******************************************************************************/
 void ledtaxis::task_execute(void) {
-  saa()->apf2D().accum(saa()->apf2D().wander(rng()));
+  saa()->apf().accum(saa()->apf().wander(rng()));
 
   if (auto obs = saa()->sensing()->proximity()->avg_prox_obj()) {
     inta_tracker()->state_enter();
@@ -44,7 +44,7 @@ void ledtaxis::task_execute(void) {
              obs->length());
     saa()->actuation()->diagnostics()->emit(
         chal::actuators::diagnostics::ekEXP_INTERFERENCE);
-    saa()->apf2D().accum(saa()->apf2D().avoidance(*obs));
+    saa()->apf().accum(saa()->apf().avoidance(*obs));
 
   } else {
     inta_tracker()->state_exit();
@@ -52,10 +52,10 @@ void ledtaxis::task_execute(void) {
     ER_DEBUG("No threatening obstacle found");
     saa()->actuation()->diagnostics()->emit(
         chal::actuators::diagnostics::ekTAXIS);
-    auto force = saa()->apf2D().phototaxis(
+    auto force = saa()->apf().phototaxis(
         saa()->sensing()->blobs()->readings(),
         carepr::light_type_index()[carepr::light_type_index::kCache]);
-    saa()->apf2D().accum(force);
+    saa()->apf().accum(force);
   }
 } /* task_execute() */
 

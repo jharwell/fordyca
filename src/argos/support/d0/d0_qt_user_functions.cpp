@@ -82,7 +82,7 @@ void d0_qt_user_functions::Draw(chal::robot& c_entity) {
     auto steering = cavis::apf2D_visualizer(this, kTEXT_VIS_OFFSET);
     steering(rmath::vector3d(base->rpos2D()),
              c_entity.GetEmbodiedEntity().GetOriginAnchor().Orientation,
-             base->saa()->apf2D().tracker(),
+             base->saa()->apf().tracker(),
              false);
   }
 }

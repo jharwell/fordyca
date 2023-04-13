@@ -77,9 +77,9 @@ class cache_starter final : public foraging_task,
   RCPPSW_WRAP_DECL_OVERRIDE(csmetrics::goal_acq_metrics::goal_type,
                             acquisition_goal,
                             const);
-  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, acquisition_loc3D, const);
-  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, explore_loc3D, const);
-  RCPPSW_WRAP_DECL_OVERRIDE(rmath::vector3z, vector_loc3D, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(boost::optional<rmath::vector3z>, acquisition_loc3D, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(boost::optional<rmath::vector3z>, explore_loc3D, const);
+  RCPPSW_WRAP_DECL_OVERRIDE(boost::optional<rmath::vector3z>, vector_loc3D, const);
   RCPPSW_WRAP_DECL_OVERRIDE(rtypes::type_uuid, entity_acquired_id, const);
 
   /* block transportation */

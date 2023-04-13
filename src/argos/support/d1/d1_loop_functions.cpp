@@ -24,7 +24,7 @@
 #include "cosm/interactors/applicator.hpp"
 #include "cosm/oracle/config/aggregate_oracle_config.hpp"
 #include "cosm/pal/argos/swarm_iterator.hpp"
-#include "cosm/spatial/nest_zone_tracker.hpp"
+#include "cosm/spatial/common/nest_zone_tracker.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
 

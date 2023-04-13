@@ -17,7 +17,7 @@
 
 #include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/repr/sim_block3D.hpp"
-#include "cosm/spatial/dimension_checker.hpp"
+#include "cosm/spatial/common/dimension_checker.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

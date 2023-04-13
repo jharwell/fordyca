@@ -39,10 +39,12 @@
           output_parent="output"
           output_leaf="__current_date__"
           />
-        <perception
-            los_dim="0.4">
+        <perception type="rlos">
+	<rlos type="grid"
+              dim="0.4">
           <grid2D resolution="0.2"
                 dims="12, 6, 2"/>
+          </rlos>
           <pheromone rho="0.00001"
                      repeat_deposit="false"/>
         </perception>
@@ -63,7 +65,7 @@
                   />
             </nest>
         </strategy>
-        <sensing_subsystemQ3D>
+        <sensing_subsystem>
           <!-- -5pi/6 : 5pi/6 -->
           <proximity_sensor fov="-2.61:2.61"
                             delta="0.1" />
@@ -80,9 +82,10 @@
             <cache range="0.3:0.5"
                    consensus="3"/>
           </env_sensor>
-        </sensing_subsystemQ3D>
-        <actuation_subsystem2D>
-          <force_calculator>
+        </sensing_subsystem>
+        <actuation_subsystem>
+          <apf_manager>
+            <nav>
             <avoidance_force lookahead="0.5"
                              max="0.08"/>
             <arrival_force slowing_radius="0.2"
@@ -97,13 +100,14 @@
                           max_delta="0.0872"/>
             </wander_force>
             <phototaxis_force max="0.08"/>
-          </force_calculator>
+          </nav>
+         </apf_manager>
 
           <!-- 25 degrees soft_turn_max. -->
           <diff_drive soft_turn_max="0.836"
                       max_linear_speed="0.09"
                       max_angular_speed="10"/>
-        </actuation_subsystem2D>
+        </actuation_subsystem>
       </params>
     </crw_controller>
 

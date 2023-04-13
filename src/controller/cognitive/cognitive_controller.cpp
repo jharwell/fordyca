@@ -37,8 +37,8 @@ void cognitive_controller::perception(
   m_perception = std::move(perception);
 }
 
-double cognitive_controller::los_dim(void) const {
-  return perception()->los_dim();
+rspatial::euclidean_dist cognitive_controller::los_dim(void) const {
+  return perception()->config()->grid.dim;
 } /* los_dim() */
 
 void cognitive_controller::reset(void) {

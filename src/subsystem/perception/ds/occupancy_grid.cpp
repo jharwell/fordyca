@@ -24,9 +24,9 @@ NS_START(fordyca, subsystem, perception, ds);
 occupancy_grid::occupancy_grid(const config::mdpo_config* c_config)
     : ER_CLIENT_INIT("fordyca.subsystem.perception.ds.occupancy_grid"),
       stacked_grid2D(rmath::vector2d(0.0, 0.0),
-                     c_config->rlos.grid2D.dims,
-                     c_config->rlos.grid2D.resolution,
-                     c_config->rlos.grid2D.resolution),
+                     c_config->rlos.grid.grid2D.dims,
+                     c_config->rlos.grid.grid2D.resolution,
+                     c_config->rlos.grid.grid2D.resolution),
       m_pheromone_repeat_deposit(c_config->pheromone.repeat_deposit) {
   ER_INFO("real=(%fx%f), discrete=(%zux%zu), resolution=%f",
           xrsize(),

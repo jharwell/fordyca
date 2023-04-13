@@ -16,7 +16,7 @@
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/spatial/fsm/point_argument.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
-#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystem.hpp"
 
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/d2/cache_site_selector.hpp"

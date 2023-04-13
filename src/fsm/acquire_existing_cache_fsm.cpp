@@ -13,7 +13,7 @@
 
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
-#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystem.hpp"
 
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/cache_acq_point_selector.hpp"

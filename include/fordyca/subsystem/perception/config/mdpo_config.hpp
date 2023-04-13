@@ -14,7 +14,7 @@
 #include "rcppsw/config/base_config.hpp"
 
 #include "cosm/subsystem/perception/config/pheromone_config.hpp"
-#include "cosm/subsystem/perception/config/rlos_config.hpp"
+#include "cosm/subsystem/perception/rlos/config/rlos_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,7 +33,7 @@ NS_START(fordyca, subsystem, perception, config);
  */
 struct mdpo_config final : public rconfig::base_config {
   cspconfig::pheromone_config pheromone {};
-  cspconfig::rlos_config rlos {};
+  csperception::rlos::config::rlos_config rlos {};
 };
 
 NS_END(config, perception, subsystem, fordyca);

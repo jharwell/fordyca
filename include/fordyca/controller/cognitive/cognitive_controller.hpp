@@ -40,7 +40,7 @@ class cognitive_controller : public foraging_controller,
   /* foraging_controller overrides */
   void reset(void) override RCPPSW_COLD;
 
-  double los_dim(void) const RCPPSW_PURE;
+  rspatial::euclidean_dist los_dim(void) const RCPPSW_PURE;
 
   /**
    * \brief Set whether or not a robot is supposed to display it's LOS as a

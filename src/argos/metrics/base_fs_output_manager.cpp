@@ -67,11 +67,13 @@ base_fs_output_manager::base_fs_output_manager(
     { typeid(fmetrics::blocks::manipulation_metrics_collector),
       fmspecs::blocks::kManipulation.xml(),
       fmspecs::blocks::kManipulation.scoped(),
-      rmetrics::output_mode::ekAPPEND },
+      rmetrics::output_mode::ekAPPEND,
+      typeid(fmetrics::blocks::manipulation_metrics_csv_sink)},
     { typeid(fmetrics::tv::env_dynamics_metrics_collector),
       cmspecs::tv::kEnvironment.xml(),
       cmspecs::tv::kEnvironment.scoped(),
-      rmetrics::output_mode::ekAPPEND },
+      rmetrics::output_mode::ekAPPEND,
+      typeid(fmetrics::tv::env_dynamics_metrics_csv_sink)},
   };
 
   rmetrics::register_with_sink<base_fs_output_manager,

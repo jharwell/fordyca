@@ -29,8 +29,15 @@
                                                                 "$localroot/system/include")))
           (add-to-list 'flycheck-clang-args (concat "-isystem" "/usr/include/eigen3"))
           (add-to-list 'flycheck-clang-args "-ftemplate-backtrace-limit=0")
-          (add-to-list 'flycheck-clang-definitions "COSM_HAL_TARGET=COSM_HAL_TARGET_ARGOS_FOOTBOT")
-          (add-to-list 'flycheck-clang-definitions "COSM_ENABLE_PAL_TARGET_ARGOS")
+          (add-to-list 'flycheck-clang-definitions
+                       "COSM_HAL_TARGET=COSM_HAL_TARGET_ARGOS_FOOTBOT")
+          (add-to-list 'flycheck-clang-definitions
+                       "COSM_ENABLE_PAL_TARGET_ARGOS")
+          (add-to-list 'flycheck-clang-definitions
+                       "COSM_HAL_TARGET_HAS_2D_BINDINGS")
+          (add-to-list 'flycheck-clang-definitions
+                       "COSM_HAL_TARGET_HAS_DIFF_DRIVE_SENSOR")
+
           ;; (add-to-list 'flycheck-clang-definitions "COSM_HAL_TARGET=COSM_HAL_TARGET_ROS_TURTLEBOT3")
           ;; (add-to-list 'flycheck-clang-definitions "COSM_ENABLE_PAL_TARGET_ROS")
           (add-to-list 'flycheck-clang-definitions "RCPPSW_ER_SYSTEM_LOG4CXX")
@@ -38,8 +45,15 @@
           (add-to-list 'flycheck-clang-definitions "LIBRA_ER=LIBRA_ER_ALL")
 
           (add-to-list 'flycheck-gcc-args "-fPIC")
-          (add-to-list 'flycheck-gcc-definitions "COSM_HAL_TARGET=COSM_HAL_TARGET_ARGOS_FOOTBOT")
-          (add-to-list 'flycheck-gcc-definitions "COSM_ENABLE_PAL_TARGET_ARGOS")
+          (add-to-list 'flycheck-gcc-definitions
+                       "COSM_HAL_TARGET=COSM_HAL_TARGET_ARGOS_FOOTBOT")
+          (add-to-list 'flycheck-gcc-definitions
+                       "COSM_ENABLE_PAL_TARGET_ARGOS")
+          (add-to-list 'flycheck-gcc-definitions
+                       "COSM_HAL_TARGET_HAS_2D_BINDINGS")
+          (add-to-list 'flycheck-gcc-definitions
+                       "COSM_HAL_TARGET_HAS_DIFF_DRIVE_SENSOR")
+
           ;; (add-to-list 'flycheck-gcc-definitions "COSM_HAL_TARGET=COSM_HAL_TARGET_ROS_TURTLEBOT3")
           ;; (add-to-list 'flycheck-gcc-definitions "COSM_ENABLE_PAL_TARGET_ROS")
           (add-to-list 'flycheck-gcc-definitions "RCPPSW_AL_MT_SAFE_TYPES")

@@ -11,7 +11,7 @@ v * \file generalist.cpp
  ******************************************************************************/
 #include "fordyca/tasks/d0/generalist.hpp"
 
-#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystem.hpp"
 
 #include "fordyca/controller/cognitive/d0/events/block_vanished.hpp"
 #include "fordyca/controller/cognitive/d0/events/free_block_pickup.hpp"

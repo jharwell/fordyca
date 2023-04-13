@@ -16,7 +16,7 @@
 
 #include "rcppsw/config/xml/xml_config_parser.hpp"
 
-#include "cosm/subsystem/perception/config/xml/rlos_parser.hpp"
+#include "cosm/subsystem/perception/rlos/config/xml/rlos_parser.hpp"
 #include "cosm/subsystem/perception/config/xml/pheromone_parser.hpp"
 
 #include "fordyca/subsystem/perception/config/dpo_config.hpp"
@@ -61,9 +61,9 @@ class dpo_parser : public rer::client<dpo_parser>,
 
  private:
   /* clang-format off */
-  std::shared_ptr<config_type>     m_config{nullptr};
-  cspconfig::xml::pheromone_parser m_pheromone{};
-  cspconfig::xml::rlos_parser      m_rlos{};
+  std::shared_ptr<config_type>      m_config{nullptr};
+  cspconfig::xml::pheromone_parser  m_pheromone{};
+  csprlos::config::xml::rlos_parser m_rlos{};
 
   /* clang-format on */
 };

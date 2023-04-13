@@ -11,7 +11,7 @@
  ******************************************************************************/
 #include "fordyca/tasks/d1/collector.hpp"
 
-#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystem.hpp"
 
 #include "fordyca/controller/cognitive/d1/events/cache_vanished.hpp"
 #include "fordyca/controller/cognitive/d1/events/cached_block_pickup.hpp"

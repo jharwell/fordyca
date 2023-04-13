@@ -16,7 +16,7 @@
 #include "cosm/foraging/repr/block_cluster.hpp"
 #include "cosm/repr/nest.hpp"
 #include "cosm/repr/sim_block3D.hpp"
-#include "cosm/spatial/conflict_checker.hpp"
+#include "cosm/spatial/common/conflict_checker.hpp"
 
 /*******************************************************************************
  * Namespaces

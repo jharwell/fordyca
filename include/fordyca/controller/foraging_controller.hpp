@@ -15,17 +15,20 @@
 #include <memory>
 #include <string>
 #include <typeindex>
+#include <filesystem>
 
 #include "cosm/controller/block_carrying_controller.hpp"
 #include "cosm/controller/irv_recipient_controller.hpp"
 #include "cosm/controller/manip_event_recorder.hpp"
 #include "cosm/fsm/block_transporter.hpp"
 #include "cosm/fsm/metrics/block_transporter_metrics.hpp"
-#include "cosm/hal/subsystem/config/sensing_subsystemQ3D_config.hpp"
+#include "cosm/hal/subsystem/config/sensing_subsystem_config.hpp"
 #include "cosm/pal/config/output_config.hpp"
 #include "cosm/pal/controller/controller2D.hpp"
 #include "cosm/spatial/metrics/nest_zone_metrics.hpp"
+#include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 #include "cosm/subsystem/subsystem_fwd.hpp"
+#include "cosm/hal/subsystem/config/actuation_subsystem_config.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/foraging_transport_goal.hpp"
@@ -34,12 +37,6 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::subsystem::config {
-struct actuation_subsystem2D_config;
-} // namespace cosm::subsystem::config
-namespace cosm::steer2D::config {
-struct force_calculator_config;
-}
 namespace cosm::tv {
 class robot_dynamics_applicator;
 }
@@ -61,6 +58,8 @@ class forager_los;
 
 NS_START(fordyca, controller);
 
+namespace fs = std::filesystem;
+
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
@@ -81,7 +80,8 @@ class foraging_controller
       public cfsm::metrics::block_transporter_metrics,
       public ccontroller::irv_recipient_controller,
       public rer::client<foraging_controller>,
-      public csmetrics::nest_zone_metrics {
+      public csmetrics::nest_zone_metrics,
+      public csmetrics::goal_acq_metrics {
  public:
   using block_manip_recorder_type = ccontroller::manip_event_recorder<
       metrics::blocks::block_manip_events::ekMAX_EVENTS>;
@@ -103,11 +103,9 @@ class foraging_controller
   /* block carrying controller overrides */
   bool block_detect(const ccontroller::block_detect_context& context) override;
 
-  /* movement metrics */
-  rspatial::euclidean_dist
-  ts_distance(const csmetrics::movement_category& category) const override;
-  rmath::vector3d
-  ts_velocity(const csmetrics::movement_category& category) const override;
+  /* replace base_controller saa() to get our variant */
+  const csubsystem::saa_subsystemQ3D* saa(void) const;
+  csubsystem::saa_subsystemQ3D* saa(void);
 
   /* nest zone metrics */
   RCPPSW_WRAP_DECL_OVERRIDE(bool, in_nest, const);
@@ -130,8 +128,8 @@ class foraging_controller
 
  private:
   void
-  saa_init(const csubsystem::config::actuation_subsystem2D_config* actuation,
-           const chal::subsystem::config::sensing_subsystemQ3D_config* sensing);
+  saa_init(const chsubsystem::config::actuation_subsystem_config* actuation,
+           const chsubsystem::config::sensing_subsystem_config* sensing);
   fs::path output_init(const cpconfig::output_config* outputp) override;
 
   /* clang-format off */

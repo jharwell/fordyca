@@ -12,7 +12,7 @@
 #include "fordyca/strategy/explore/ledtaxis_cache_search.hpp"
 
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
-#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

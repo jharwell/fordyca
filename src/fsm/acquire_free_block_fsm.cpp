@@ -12,9 +12,9 @@
 #include "fordyca/fsm/acquire_free_block_fsm.hpp"
 
 #include "cosm/repr/base_block3D.hpp"
-#include "cosm/subsystem/actuation_subsystem2D.hpp"
+#include "cosm/subsystem/actuation_subsystem.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
-#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystem.hpp"
 
 #include "fordyca/controller/cognitive/block_selector.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"

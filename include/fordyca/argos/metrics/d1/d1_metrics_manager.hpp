@@ -14,7 +14,7 @@
 #include <string>
 
 #include "cosm/controller/metrics/manipulation_metrics.hpp"
-#include "cosm/spatial/metrics/movement_metrics.hpp"
+#include "cosm/kin/metrics/kinematics_metrics.hpp"
 #include "cosm/spatial/metrics/interference_metrics.hpp"
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
 #include "cosm/ta/metrics/bi_tdgraph_metrics.hpp"

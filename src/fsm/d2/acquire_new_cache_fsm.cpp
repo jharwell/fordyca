@@ -13,7 +13,7 @@
 
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
-#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystem.hpp"
 
 #include "fordyca/controller/cognitive/cache_sel_matrix.hpp"
 #include "fordyca/controller/cognitive/d2/new_cache_selector.hpp"

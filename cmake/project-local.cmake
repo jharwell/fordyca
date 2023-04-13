@@ -1,5 +1,5 @@
 ################################################################################
-# Configuration Options                                                        #
+# Configuration Options
 ################################################################################
 # We are building a shared library
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -7,7 +7,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # Each conference tag=minor increment. Each minor feature added=patch increment.
 set(PROJECT_VERSION_MAJOR 1)
 set(PROJECT_VERSION_MINOR 3)
-set(PROJECT_VERSION_PATCH 0)
+set(PROJECT_VERSION_PATCH 1)
 
 set(FORDYCA_WITH_ROBOT_RAB "NO" CACHE STRING "Enable robots to read/write over the RAB medium via sensors/actuators.")
 set(FORDYCA_WITH_ROBOT_BATTERY "NO" CACHE STRING "Enable robots to use the battery.")
@@ -17,7 +17,7 @@ set(FORDYCA_WITH_ROBOT_CAMERA "YES" CACHE STRING "Enable robots to use their cam
 set(fordyca_CHECK_LANGUAGE "CXX")
 
 ################################################################################
-# External Projects                                                            #
+# External Projects
 ################################################################################
 # COSM
 if("${COSM_BUILD_FOR}" MATCHES "ARGOS_FOOTBOT")
@@ -39,7 +39,7 @@ string(CONCAT common_regex
   "src/repr/diagnostics|"
   "src/metrics/specs"
   )
-component_register_as_src(
+libra_component_register_as_src(
   fordyca_common_SRC
   fordyca
   "${fordyca_SRC}"
@@ -60,7 +60,7 @@ if ("${COSM_BUILD_FOR}" MATCHES "ARGOS")
       "src/metrics|"
       "src/argos"
       )
-  component_register_as_src(
+  libra_component_register_as_src(
     fordyca_argos_SRC
     fordyca
     "${fordyca_SRC}"
@@ -68,7 +68,7 @@ if ("${COSM_BUILD_FOR}" MATCHES "ARGOS")
     "(${argos_regex})")
 
   if(COSM_WITH_VIS)
-    component_register_as_src(
+    libra_component_register_as_src(
       fordyca_argos_vis_SRC
       fordyca
       "${fordyca_SRC}"
@@ -99,7 +99,7 @@ elseif("${COSM_BUILD_FOR}" MATCHES "ROS")
     "src/controller/foraging_controller|"
     "src/controller/config/foraging_controller_repository"
     )
-  component_register_as_src(
+  libra_component_register_as_src(
     fordyca_ros_SRC
     fordyca
     "${fordyca_SRC}"
@@ -114,10 +114,10 @@ elseif("${COSM_BUILD_FOR}" MATCHES "ROS")
   endif()
 endif()
 
-requested_components_check(fordyca)
+libra_requested_components_check(fordyca)
 
 ################################################################################
-# Libraries                                                                    #
+# Libraries
 ################################################################################
 # Create the source for the SINGLE library to build by combining the
 # source of the selected components
@@ -128,15 +128,11 @@ foreach(component ${fordyca_FIND_COMPONENTS})
 endforeach()
 
 # Configure version
-execute_process(COMMAND git rev-list --count HEAD
-  OUTPUT_VARIABLE FORDYCA_VERSION
-  OUTPUT_STRIP_TRAILING_WHITESPACE)
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/version.cpp.in
+libra_configure_version(
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/version/version.cpp.in
   ${CMAKE_CURRENT_BINARY_DIR}/src/version.cpp
-  @ONLY
+  fordyca_components_SRC
   )
-list(APPEND fordyca_components_SRC "${CMAKE_CURRENT_BINARY_DIR}/src/version.cpp")
 
 # Define the FORDYCA library
 set(fordyca_LIBRARY fordyca-${COSM_HAL_TARGET})
@@ -226,16 +222,34 @@ if ("${COSM_BUILD_FOR}" MATCHES "MSI")
 endif()
 
 ################################################################################
-# Installation                                                                 #
+# Installation and Deployment
 ################################################################################
-configure_exports_as(${fordyca_LIBRARY} ${CMAKE_INSTALL_PREFIX})
+libra_configure_exports_as(${fordyca_LIBRARY} ${CMAKE_INSTALL_PREFIX})
 
 # Install fordyca
-register_target_for_install(${fordyca_LIBRARY} ${CMAKE_INSTALL_PREFIX})
-register_headers_for_install(include/fordyca ${CMAKE_INSTALL_PREFIX})
+libra_register_target_for_install(${fordyca_LIBRARY} ${CMAKE_INSTALL_PREFIX})
+libra_register_headers_for_install(include/fordyca ${CMAKE_INSTALL_PREFIX})
+
+# Deploy COSM
+libra_register_copyright_for_install(${CMAKE_CURRENT_SOURCE_DIR}/LICENSE)
+if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/changelog)
+  libra_register_changelog_for_install(${CMAKE_CURRENT_SOURCE_DIR}/changelog)
+endif()
+set(CPACK_PACKAGE_NAME ${fordyca_LIBRARY})
+libra_configure_cpack(
+  "DEB;TGZ"
+
+  "FOraging Robots use DYnamic CAches (FORDYCA) is a foraging-based
+project for investigating various aspects of Multi-Agent System (MAS)
+behavior. This FORDYCA is built for: Platform=${COSM_PAL_TARGET},
+hardware=${COSM_HAL_TARGET}."
+
+  "John Harwell"
+  "https://jharwell.github.io/fordyca"
+  "John Harwell <john.r.harwell@gmail.com>")
 
 ################################################################################
-# Status                                                                       #
+# Status
 ################################################################################
 libra_config_summary()
 

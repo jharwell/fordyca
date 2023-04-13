@@ -72,7 +72,7 @@ void bitd_mdpo_controller::control_step(void) {
    * correct. This can't be done when applying the steering forces because then
    * they are always 0 during loop function visualization.
    */
-  saa()->apf2D().tracking_reset();
+  saa()->apf().tracking_reset();
 
   /*
    * Execute the current task/allocate a new task/abort a task/etc and apply
@@ -94,9 +94,9 @@ void bitd_mdpo_controller::shared_init(
 
   /* MDPO perception subsystem */
   auto p = *config_repo.config_get<fspconfig::perception_config>();
-  rmath::vector2d padding(p.mdpo.rlos.grid2D.resolution.v() * 5,
-                          p.mdpo.rlos.grid2D.resolution.v() * 5);
-  p.mdpo.rlos.grid2D.dims += padding;
+  rmath::vector2d padding(p.mdpo.rlos.grid.grid2D.resolution.v() * 5,
+                          p.mdpo.rlos.grid.grid2D.resolution.v() * 5);
+  p.mdpo.rlos.grid.grid2D.dims += padding;
 
   auto factory = fsperception::perception_subsystem_factory();
   perception(factory.create(p.type, &p));

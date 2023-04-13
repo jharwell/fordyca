@@ -16,12 +16,12 @@
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/ds/cell2D.hpp"
 #include "cosm/fsm/supervisor_fsm.hpp"
-#include "cosm/hal/subsystem/config/sensing_subsystemQ3D_config.hpp"
+#include "cosm/hal/subsystem/config/sensing_subsystem_config.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/repr/config/nest_config.hpp"
-#include "cosm/subsystem/actuation_subsystem2D.hpp"
+#include "cosm/subsystem/actuation_subsystem.hpp"
 #include "cosm/subsystem/saa_subsystemQ3D.hpp"
-#include "cosm/subsystem/sensing_subsystemQ3D.hpp"
+#include "cosm/subsystem/sensing_subsystem.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
 
@@ -68,7 +68,7 @@ void bitd_dpo_controller::control_step(void) {
    * correct. This can't be done when applying the steering forces because then
    * they are always 0 during loop function visualization.
    */
-  saa()->apf2D().tracking_reset();
+  saa()->apf().tracking_reset();
 
   /*
    * Execute the current task/allocate a new task/abort a task/etc and apply
@@ -123,7 +123,7 @@ void bitd_dpo_controller::shared_init(
    */
   auto sensing =
       config_repo
-          .config_get<chal::subsystem::config::sensing_subsystemQ3D_config>();
+          .config_get<chal::subsystem::config::sensing_subsystem_config>();
 
   saa()->sensing()->env()->config_update(&sensing->env);
 } /* shared_init() */

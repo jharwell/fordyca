@@ -146,31 +146,38 @@ void d1_metrics_manager::register_standard(
     { typeid(csmetrics::goal_acq_metrics_collector),
       fmspecs::caches::kAcqCounts.xml(),
       fmspecs::caches::kAcqCounts.scoped(),
-      rmetrics::output_mode::ekAPPEND },
+      rmetrics::output_mode::ekAPPEND,
+      typeid(csmetrics::goal_acq_metrics_csv_sink)},
     { typeid(ctametrics::execution_metrics_collector),
       fmspecs::tasks::exec::kCollector.xml(),
       fmspecs::tasks::exec::kCollector.scoped(),
-      rmetrics::output_mode::ekAPPEND },
+      rmetrics::output_mode::ekAPPEND,
+      typeid(ctametrics::execution_metrics_csv_sink),},
     { typeid(ctametrics::execution_metrics_collector),
       fmspecs::tasks::exec::kHarvester.xml(),
       fmspecs::tasks::exec::kHarvester.scoped(),
-      rmetrics::output_mode::ekAPPEND },
+      rmetrics::output_mode::ekAPPEND,
+      typeid(ctametrics::execution_metrics_csv_sink),},
     { typeid(ctametrics::execution_metrics_collector),
       fmspecs::tasks::exec::kGeneralist.xml(),
       fmspecs::tasks::exec::kGeneralist.scoped(),
-      rmetrics::output_mode::ekAPPEND },
+      rmetrics::output_mode::ekAPPEND,
+      typeid(ctametrics::execution_metrics_csv_sink),},
     { typeid(ctametrics::bi_tab_metrics_collector),
       fmspecs::tasks::tab::kGeneralist.xml(),
       fmspecs::tasks::tab::kGeneralist.scoped(),
-      rmetrics::output_mode::ekAPPEND },
+      rmetrics::output_mode::ekAPPEND,
+      typeid(ctametrics::bi_tab_metrics_csv_sink),},
     { typeid(cametrics::caches::utilization_metrics_collector),
       fmspecs::caches::kUtilization.xml(),
       fmspecs::caches::kUtilization.scoped(),
-      rmetrics::output_mode::ekAPPEND },
+      rmetrics::output_mode::ekAPPEND,
+      typeid(cametrics::caches::utilization_metrics_csv_sink)},
     { typeid(fmetrics::caches::lifecycle_metrics_collector),
       fmspecs::caches::kLifecycle.xml(),
       fmspecs::caches::kLifecycle.scoped(),
-      rmetrics::output_mode::ekAPPEND }
+      rmetrics::output_mode::ekAPPEND,
+      typeid(fmetrics::caches::lifecycle_metrics_csv_sink)}
   };
 
   rmetrics::register_with_sink<d1_metrics_manager, rmetrics::file_sink_registerer>
@@ -190,7 +197,8 @@ void d1_metrics_manager::register_with_decomp_depth(
     { typeid(ctametrics::bi_tdgraph_metrics_collector),
       cmspecs::tasks::kDistribution.xml(),
       cmspecs::tasks::kDistribution.scoped(),
-      rmetrics::output_mode::ekAPPEND }
+      rmetrics::output_mode::ekAPPEND,
+      typeid(ctametrics::bi_tdgraph_metrics_csv_sink),}
   };
   auto extra_args = std::make_tuple(depth);
 
@@ -217,19 +225,23 @@ void d1_metrics_manager::register_with_arena_dims2D(
     { typeid(csmetrics::goal_acq_locs2D_metrics_collector),
       fmspecs::caches::kAcqLocs2D.xml(),
       fmspecs::caches::kAcqLocs2D.scoped(),
-      rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE },
+      rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE,
+      typeid(csmetrics::goal_acq_locs2D_metrics_csv_sink),},
     { typeid(csmetrics::explore_locs2D_metrics_collector),
       fmspecs::caches::kAcqExploreLocs2D.xml(),
       fmspecs::caches::kAcqExploreLocs2D.scoped(),
-      rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE },
+      rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE,
+      typeid(csmetrics::explore_locs2D_metrics_csv_sink),},
     { typeid(csmetrics::vector_locs2D_metrics_collector),
       fmspecs::caches::kAcqVectorLocs2D.xml(),
       fmspecs::caches::kAcqVectorLocs2D.scoped(),
-      rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE },
+      rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE,
+      typeid(csmetrics::vector_locs2D_metrics_csv_sink),},
     { typeid(cametrics::caches::location_metrics_collector),
       fmspecs::caches::kLocations.xml(),
       fmspecs::caches::kLocations.scoped(),
-      rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE }
+      rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE,
+      typeid(cametrics::caches::location_metrics_csv_sink)}
   };
 
   auto extra_args = std::make_tuple(dims);

@@ -33,7 +33,7 @@ void dpo_parser::parse(const ticpp::Element& node) {
   m_rlos.parse(dnode);
   m_config->pheromone =
       *m_pheromone.config_get<cspconfig::xml::pheromone_parser::config_type>();
-  m_config->rlos = *m_rlos.config_get<cspconfig::xml::rlos_parser::config_type>();
+  m_config->rlos = *m_rlos.config_get<csprlos::config::xml::rlos_parser::config_type>();
 } /* parse() */
 
 bool dpo_parser::validate(void) const {

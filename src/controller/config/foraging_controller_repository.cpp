@@ -11,7 +11,7 @@
  ******************************************************************************/
 #include "fordyca/controller/config/foraging_controller_repository.hpp"
 
-#include "cosm/hal/subsystem/config/xml/sensing_subsystemQ3D_parser.hpp"
+#include "cosm/hal/subsystem/config/xml/sensing_subsystem_parser.hpp"
 #include "cosm/repr/config/xml/nest_parser.hpp"
 
 #include "fordyca/strategy/config/strategy_parser.hpp"
@@ -30,11 +30,11 @@ foraging_controller_repository::foraging_controller_repository(void) {
   parser_register<crepr::config::xml::nest_parser, crepr::config::nest_config>(
       crepr::config::xml::nest_parser::kXMLRoot);
 
-  parser_find<chsubsystem::config::xml::sensing_subsystemQ3D_parser>(
-      chsubsystem::config::xml::sensing_subsystemQ3D_parser::kXMLRoot)
+  parser_find<chsubsystem::config::xml::sensing_subsystem_parser>(
+      chsubsystem::config::xml::sensing_subsystem_parser::kXMLRoot)
       ->env_detection_add("nest");
-  parser_find<chsubsystem::config::xml::sensing_subsystemQ3D_parser>(
-      chsubsystem::config::xml::sensing_subsystemQ3D_parser::kXMLRoot)
+  parser_find<chsubsystem::config::xml::sensing_subsystem_parser>(
+      chsubsystem::config::xml::sensing_subsystem_parser::kXMLRoot)
       ->env_detection_add("block");
 }
 

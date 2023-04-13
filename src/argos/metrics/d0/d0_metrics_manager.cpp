@@ -24,7 +24,7 @@
 #include "cosm/metrics/specs.hpp"
 #include "cosm/repr/base_block3D.hpp"
 #include "cosm/spatial/metrics/goal_acq_metrics.hpp"
-#include "cosm/spatial/metrics/movement_metrics.hpp"
+#include "cosm/kin/metrics/kinematics_metrics.hpp"
 
 #include "fordyca//controller/foraging_controller.hpp"
 #include "fordyca/controller/cognitive/d0/dpo_controller.hpp"
@@ -69,11 +69,13 @@ d0_metrics_manager::d0_metrics_manager(
     { typeid(fmetrics::perception::mdpo_metrics_collector),
       fmspecs::perception::kMDPO.xml(),
       fmspecs::perception::kMDPO.scoped(),
-      rmetrics::output_mode::ekAPPEND },
+      rmetrics::output_mode::ekAPPEND,
+      typeid(fmetrics::perception::mdpo_metrics_csv_sink)},
     { typeid(fmetrics::perception::dpo_metrics_collector),
       fmspecs::perception::kDPO.xml(),
       fmspecs::perception::kDPO.scoped(),
-      rmetrics::output_mode::ekAPPEND }
+      rmetrics::output_mode::ekAPPEND,
+      typeid(fmetrics::perception::dpo_metrics_csv_sink)}
   };
 
   rmetrics::register_with_sink<fametrics::d0::d0_metrics_manager,
