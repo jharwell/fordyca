@@ -1,1 +1,16 @@
-./libra/package.json
+{
+  "husky": {
+    "hooks": {
+      "commit-msg": "./node_modules/@commitlint/cli/lib/cli.js -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.3.1",
+    "@commitlint/config-conventional": "^7.5.0",
+    "husky": "^1.3.1",
+    "prettier": "^1.16.4"
+  },
+  "dependencies": {
+    "core-js": "^3.8.3"
+  }
+}
